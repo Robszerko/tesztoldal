@@ -317,17 +317,19 @@
 
         /* RESPONSIVE STYLES (for mobile) */
         @media (max-width: 900px) {
-            /* === MOBILE SCROLL FIX === */
             html, body {
                 height: auto; 
                 overflow: auto;
             }
             .game-view {
-                height: 100%; /* Make the view take full height to position the overlay correctly */
+                height: 100%;
                 padding: 0;
             }
+            #start-screen .overlay-content-wrapper {
+                 height: 100%;
+            }
             .overlay-screen {
-                position: relative; /* Change from fixed to relative for scrolling */
+                position: relative;
             }
             .overlay-content-wrapper { 
                 width: 100%;
@@ -335,13 +337,13 @@
                 max-height: none;
                 padding: 15px;
                 box-sizing: border-box;
-                overflow: visible; /* Let the body scroll */
+                overflow-y: auto; /* Allow this specific wrapper to scroll its content */
                 justify-content: flex-start;
             }
             #game-container {
                 width: 100%;
                 height: auto;
-                min-height: 100vh; /* Make sure it's at least full screen */
+                min-height: 100vh;
                 justify-content: flex-start;
                 padding: 15px;
                 box-sizing: border-box;
@@ -356,10 +358,11 @@
             .overlay-content h1 { font-size: 2.2em; } 
             .overlay-content p { font-size: 1.1em; }
             #question-text { font-size: 1.2em; }
-            #bridge-scene { perspective: none; height: auto; flex-grow: 0; margin: 20px 0; }
+            #bridge-scene { perspective: none; height: auto; flex-grow: 0; margin: 30px 0; }
             .future-bridge { display: none; }
             .options-container { transform: none; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
             .bridge-option { width: 90%; max-width: 400px; height: auto; min-height: 70px; font-size: 1em; }
+            #feedback-container { min-height: 120px; }
             #explanation-container { font-size: 1em; }
             .shop-item-row { flex-wrap: wrap; }
             .lifeline-wrapper:hover::before, .lifeline-wrapper:hover::after { display: none; }
@@ -933,6 +936,12 @@
                     explanationContainer.textContent = currentQuestion.explanation;
                     explanationContainer.style.display = 'block';
                     explanationContainer.style.opacity = 1;
+
+                    // === MOBILE SCROLL-TO-VIEW LOGIC ===
+                    if (window.innerWidth <= 900) {
+                        const feedbackEl = document.getElementById('feedback-container');
+                        feedbackEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
 
                     if (isCorrect || currentRoundState.usedSafetyNetThisTurn) {
                         if (currentQuestionIndex < gameQuestions.length - 1) {
