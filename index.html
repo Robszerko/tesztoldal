@@ -356,12 +356,24 @@
             #game-logo { width: 140px; }
             .overlay-content h1 { font-size: 2.2em; } 
             .overlay-content p { font-size: 1.1em; }
-            #question-text { font-size: 1.2em; }
-            #bridge-scene { perspective: none; height: auto; flex-grow: 0; margin: 40px 0; }
+            
+            /* === MOBILE OVERLAP FIX === */
+            #question-text {
+                font-size: 1.3em;
+                min-height: 4em; /* Give it enough space for ~3 lines of text */
+                margin-bottom: 25px; /* Create a clear gap below the question */
+            }
+            #bridge-scene {
+                perspective: none;
+                height: auto;
+                flex-grow: 0;
+                margin: 20px 0; /* Adjusted margin for better flow */
+            }
+
             .future-bridge { display: none; }
             .options-container { transform: none; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
             .bridge-option { width: 90%; max-width: 400px; height: auto; min-height: 70px; font-size: 1em; }
-            #feedback-container { min-height: auto; padding: 20px 0; }
+            #feedback-container { min-height: auto; padding-top: 30px; } /* More space above feedback */
             #explanation-container { font-size: 1em; }
             .shop-item-row { flex-wrap: wrap; }
             .lifeline-wrapper:hover::before, .lifeline-wrapper:hover::after { display: none; }
@@ -838,7 +850,7 @@
 
         function showQuestion() {
              if (window.innerWidth <= 900) {
-                window.scrollTo(0, 0);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
             gameContainer.classList.remove('success-pulse', 'fail-shake');
             bridgeScene.classList.remove('advance');
