@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Az Ugrás - Kockázat és Nyeremény</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00e5ff;
+            --secondary-color: #ff00c1;
+            --correct-color: #00ff9b;
+            --incorrect-color: #ff3d71;
+            --selected-color: #ffc400;
+            --background-start: #0f0c29;
+            --background-mid: #302b63;
+            --background-end: #24243e;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevents scrollbars on the body for desktop VIEW */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--background-start), var(--background-mid), var(--background-end));
+            color: #fff;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        #background-scenery { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; object-fit: cover; }
+        
+        .game-view {
+            display: none;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        #game-screen.active, #start-screen.active, #end-screen.active {
+            display: flex;
+        }
+        
+        #game-container, .overlay-content-wrapper {
+            width: 90vw;
+            max-width: 1600px;
+            height: 100%;
+            max-height: 95vh;
+            margin: auto; 
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px; 
+            border-radius: 20px; 
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.2);
+            border: 1px solid rgba(0, 229, 255, 0.3); 
+            backdrop-filter: blur(10px);
+            position: relative; 
+            z-index: 1; 
+            display: flex; 
+            flex-direction: column;
+            justify-content: space-around;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .overlay-content-wrapper {
+            overflow-y: auto; 
+        }
+
+        /* Custom Scrollbar for overlays */
+        .overlay-content-wrapper::-webkit-scrollbar { width: 8px; }
+        .overlay-content-wrapper::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        .overlay-content-wrapper::-webkit-scrollbar-thumb { background-color: var(--primary-color); border-radius: 10px; }
+
+        /* Overlay screens (Start, End) */
+        .overlay-screen {
+            position: fixed; top: 0; left: 0; z-index: 100;
+            background: rgba(15, 12, 41, 0.8);
+        }
+        .overlay-content { max-width: 700px; text-align: center; display: flex; flex-direction: column; align-items: center; margin: 0 auto; }
+        .overlay-content h1 { font-size: 3em; color: var(--primary-color); text-shadow: 0 0 15px var(--primary-color); }
+        .overlay-content p { font-size: 1.2em; line-height: 1.5; max-width: 90%; margin-bottom: 20px; }
+        .credit-display { font-size: 1.8em; font-weight: bold; margin: 15px 0; color: var(--selected-color); }
+        .credit-display.flash-green { animation: flashGreen 1s ease-out; }
+        .overlay-content .btn, .btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); color: #fff; padding: 12px 30px; border: none; border-radius: 50px;
+            cursor: pointer; font-size: 1.2em; font-weight: 600; transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 0, 193, 0.5); margin: 10px 5px 5px 5px;
+        }
+        .overlay-content .btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 0, 193, 0.8); }
+        .overlay-content .btn:disabled { background: #555; cursor: not-allowed; box-shadow: none; opacity: 0.6; }
+        .shop-container, .wager-container, .daily-bonus-container, #rules-container { width: 100%; margin: 15px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; }
+        
+        .shop-item { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
+        .shop-item-row { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px; }
+        .shop-icon { pointer-events: none; flex-shrink: 0; }
+        .shop-item p, #bonus-status { font-size: 0.9em; color: rgba(255, 255, 255, 0.7); margin-top: 5px; margin-bottom: 5px; flex-basis: 100%; min-height: 1em; }
+        
+        /* === JÁTÉKSZABÁLYZAT STÍLUSOK (IMPROVED) === */
+        #rules-content {
+            display: none;
+            text-align: left;
+            padding: 10px;
+            margin-top: 15px;
+            border-top: 1px solid var(--primary-color);
+        }
+        #rules-content h3, #rules-content h4 {
+            color: var(--primary-color);
+            text-align: center;
+        }
+        #rules-content h4 {
+            margin-top: 20px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.3);
+            padding-bottom: 5px;
+        }
+        #rules-content p, #rules-content ul {
+            text-align: justify;
+            margin: 10px auto;
+        }
+        #rules-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        #rules-content li {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            display: flex;
+            align-items: flex-start;
+        }
+        #rules-content li .rules-icon {
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        #rules-content li .lifeline {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9em;
+        }
+        #rules-content strong {
+            color: var(--selected-color);
+        }
+        
+        #current-date-display { font-size: 1.1em; color: var(--primary-color); margin-bottom: 10px; text-align: center; }
+        #streak-meter { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; }
+        .streak-day { width: 30px; height: 30px; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; transition: all 0.3s ease; }
+        .streak-day.active { background-color: var(--correct-color); color: #000; border-color: #fff; box-shadow: 0 0 10px var(--correct-color); transform: scale(1.1); }
+
+        #start-logo {
+            width: 250px;
+            max-width: 70%;
+            margin-bottom: 10px;
+        }
+
+        .copyright-notice {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+
+        /* Game Header */
+        #game-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; gap: 20px; flex-wrap: wrap; flex-shrink: 0; }
+        #header-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+        #game-logo { width: 180px; height: auto; }
+        #question-counter { font-size: 1.2em; font-weight: 600; color: var(--primary-color); margin-top: 5px; text-align: center; }
+        #progress-container { flex-grow: 1; height: 20px; background-color: rgba(0, 0, 0, 0.3); border: 1px solid var(--primary-color); border-radius: 20px; overflow: hidden; box-shadow: inset 0 0 5px rgba(0, 229, 255, 0.5); position: relative; min-width: 200px; }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--secondary-color), var(--primary-color)); border-radius: 20px; transition: width 0.5s ease-out; box-shadow: 0 0 15px var(--primary-color); }
+        
+        #progress-milestone {
+            position: absolute;
+            left: 50%;
+            top: -5px;
+            bottom: -5px;
+            width: 4px;
+            background-color: rgba(255, 196, 0, 0.5);
+            border-radius: 2px;
+            transition: all 0.5s ease;
+        }
+        #progress-milestone.reached {
+            background-color: var(--selected-color);
+            box-shadow: 0 0 10px var(--selected-color);
+            transform: scaleY(1.5);
+        }
+
+        #header-controls { display: flex; align-items: center; gap: 15px; }
+        
+        #total-credits-display {
+            background: rgba(0,0,0,0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--selected-color);
+            border: 1px solid var(--selected-color);
+        }
+        
+        #header-next-button {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); color: #fff; padding: 10px 25px; border: none; border-radius: 50px;
+            cursor: pointer; font-size: 1em; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 0 20px rgba(255, 0, 193, 0.5);
+            visibility: hidden; opacity: 0; flex-shrink: 0;
+        }
+        #header-next-button:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 0, 193, 0.8); }
+        #header-next-button.visible { visibility: visible; opacity: 1; }
+        
+        /* Lifelines */
+        #lifelines-container { display: flex; gap: 10px; align-items: center; }
+        .lifeline-wrapper { position: relative; }
+        .lifeline { background: rgba(0,0,0,0.4); border: 1px solid var(--primary-color); border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; font-weight: bold; position: relative; }
+        .lifeline:hover:not(.used) { background: var(--primary-color); color: #000; }
+        .lifeline.used { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+        .lifeline .count { position: absolute; bottom: -5px; right: -5px; background: var(--secondary-color); border-radius: 50%; font-size: 0.8em; width: 20px; height: 20px; line-height: 20px; }
+        #lifeline-swap { font-size: 0.8em; }
+
+        .lifeline-wrapper::after { content: attr(data-tooltip); position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background-color: #000; color: #fff; padding: 8px 12px; border-radius: 5px; font-size: 0.9em; font-weight: normal; white-space: nowrap; z-index: 10; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; pointer-events: none; }
+        .lifeline-wrapper::before { content: ''; position: absolute; bottom: 125%; margin-bottom: -5px; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 10; pointer-events: none; }
+        .lifeline-wrapper:hover::before, .lifeline-wrapper:hover::after { opacity: 1; visibility: visible; }
+
+        /* Question & Answers */
+        #question-text { font-size: 1.4em; font-weight: 600; line-height: 1.4; display: flex; align-items: center; justify-content: center; padding: 0 20px; flex-shrink: 0;}
+        
+        #bridge-scene { 
+            perspective: 1200px; 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); 
+            z-index: 10;
+            flex-grow: 1; 
+            min-height: 200px; 
+        }
+        #bridge-scene.advance { transform: translateZ(250px) scale(1.2); }
+        .future-bridge { position: absolute; background: rgba(0, 229, 255, 0.2); border: 1px solid rgba(0, 229, 255, 0.5); border-radius: 10px; width: 180px; height: 100px; transition: all 0.5s ease-out; opacity: 0; transform-style: preserve-3d; }
+        .future-bridge:nth-of-type(1) { transform: translateZ(-250px) scale(0.8); opacity: 0.5; filter: blur(1px); }
+        .future-bridge:nth-of-type(2) { transform: translateZ(-500px) scale(0.6); opacity: 0.3; filter: blur(2px); }
+        .options-container { display: flex; justify-content: center; gap: 20px; transform: rotateX(45deg); transform-style: preserve-3d; position: relative; }
+        .bridge-option { background: linear-gradient(rgba(0, 229, 255, 0.1), rgba(0, 229, 255, 0.3)); color: #fff; border: 2px solid var(--primary-color); border-radius: 10px; cursor: pointer; font-size: 1.1em; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(0, 229, 255, 0.5); width: 200px; height: 120px; display: flex; align-items: center; justify-content: center; padding: 10px; position: relative; opacity: 0; animation: revealBridge 0.5s forwards ease-out; }
+        .bridge-option span { text-shadow: 0 0 5px #000; overflow-wrap: break-word; word-break: break-word; }
+        .bridge-option:not(.disabled):hover { transform: scale(1.05) translateZ(10px); box-shadow: 0 0 25px var(--primary-color); }
+        
+        .bridge-option.is-chosen {
+            border-color: var(--selected-color);
+            transform: scale(1.05) translateZ(10px);
+            animation: glow-gold 0.8s infinite alternate;
+        }
+
+        .bridge-option.disabled { cursor: not-allowed; pointer-events: none; }
+        .bridge-option.disabled-by-lifeline { opacity: 0.3 !important; background: #333; border-color: #555; pointer-events: none; cursor: not-allowed; }
+        .bridge-option.correct { animation: none; background: var(--correct-color); border-color: #fff; color: #000; box-shadow: 0 0 30px var(--correct-color); opacity: 1 !important; transform: scale(1.1) translateZ(20px); }
+        .bridge-option.correct.flashing { animation: flashCorrect 0.5s 3; }
+        .bridge-option.incorrect { animation: none; background: var(--incorrect-color); border-color: #fff; color: #fff; box-shadow: 0 0 30px var(--incorrect-color); opacity: 1 !important; }
+        
+        /* Feedback */
+        #feedback-container { min-height: 160px; position: relative; z-index: 20; flex-shrink: 0; }
+        #result { font-size: 1.8em; font-weight: bold; height: 40px; }
+        #potential-winnings-display {
+            font-size: 1.3em;
+            color: var(--selected-color);
+            font-weight: 600;
+            margin: 10px 0;
+            height: 25px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        #explanation-container { background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 15px; margin: 15px auto 0 auto; max-width: 800px; font-size: 1.1em; line-height: 1.6; display: none; opacity: 0; transition: opacity 0.5s ease; }
+        
+        .feedback-buttons { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px; }
+
+        #end-game-button, #bank-button { 
+            visibility: hidden; 
+            opacity: 0; 
+            transition: all 0.3s ease; 
+            font-size: 1em; 
+            padding: 10px 25px;
+        }
+        #end-game-button.visible, #bank-button.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+        #bank-button { background: linear-gradient(45deg, var(--correct-color), #00c77a); box-shadow: 0 0 20px rgba(0, 255, 155, 0.5); }
+        #bank-button:hover:not(:disabled) { box-shadow: 0 0 30px rgba(0, 255, 155, 0.8); }
+
+        /* ANIMATIONS */
+        @keyframes revealBridge { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes flashCorrect { 50% { background: #fff; color: #000; } }
+        @keyframes glow-gold {
+            from { box-shadow: 0 0 15px 2px var(--selected-color); }
+            to { box-shadow: 0 0 35px 10px var(--selected-color); }
+        }
+        @keyframes success-pulse { 0% { box-shadow: 0 0 30px rgba(0, 229, 255, 0.2); } 50% { box-shadow: 0 0 60px 15px rgba(0, 255, 155, 0.7); } 100% { box-shadow: 0 0 30px rgba(0, 229, 255, 0.2); } }
+        @keyframes fail-shake { 0%, 100% { transform: translateX(0); box-shadow: 0 0 30px rgba(0, 229, 255, 0.2); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); } 20%, 40%, 60%, 80% { transform: translateX(10px); } 50% { box-shadow: 0 0 80px 20px rgba(255, 61, 113, 0.8); } }
+        @keyframes flashGreen {
+            50% { color: var(--correct-color); text-shadow: 0 0 10px var(--correct-color); transform: scale(1.1); }
+        }
+        
+        /* WIDESCREEN DESKTOP STYLES */
+        @media (min-width: 1201px) {
+            .overlay-content h1 { font-size: 3.5em; }
+            .overlay-content p { font-size: 1.4em; }
+            .overlay-content { max-width: 800px; }
+            #question-text { font-size: 1.8em; }
+            .options-container { gap: 30px; }
+            .bridge-option { width: 240px; height: 140px; font-size: 1.2em; }
+            #feedback-container { min-height: 180px; }
+        }
+
+        /* RESPONSIVE STYLES (for mobile) */
+        @media (max-width: 900px) {
+            /* === MOBILE SCROLL FIX === */
+            html, body {
+                height: auto; 
+                overflow: auto;
+            }
+            .game-view {
+                height: 100%; /* Make the view take full height to position the overlay correctly */
+                padding: 0;
+            }
+            .overlay-screen {
+                position: relative; /* Change from fixed to relative for scrolling */
+            }
+            .overlay-content-wrapper { 
+                width: 100%;
+                height: auto;
+                max-height: none;
+                padding: 15px;
+                box-sizing: border-box;
+                overflow: visible; /* Let the body scroll */
+                justify-content: flex-start;
+            }
+            #game-container {
+                width: 100%;
+                height: auto;
+                min-height: 100vh; /* Make sure it's at least full screen */
+                justify-content: flex-start;
+                padding: 15px;
+                box-sizing: border-box;
+                overflow: visible;
+            }
+            #game-header { flex-wrap: wrap; justify-content: center; gap: 15px; }
+            #header-left { order: 1; flex-basis: 50%; }
+            #lifelines-container { order: 2; flex-basis: 40%; justify-content: flex-end; }
+            #progress-container { order: 3; width: 100%; height: 15px; }
+            #header-controls { order: 4; width: 100%; justify-content: center; margin-top: 10px; }
+            #game-logo { width: 140px; }
+            .overlay-content h1 { font-size: 2.2em; } 
+            .overlay-content p { font-size: 1.1em; }
+            #question-text { font-size: 1.2em; }
+            #bridge-scene { perspective: none; height: auto; flex-grow: 0; margin: 20px 0; }
+            .future-bridge { display: none; }
+            .options-container { transform: none; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+            .bridge-option { width: 90%; max-width: 400px; height: auto; min-height: 70px; font-size: 1em; }
+            #explanation-container { font-size: 1em; }
+            .shop-item-row { flex-wrap: wrap; }
+            .lifeline-wrapper:hover::before, .lifeline-wrapper:hover::after { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <svg id="background-scenery" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice"><defs><filter id="glow"><feGaussianBlur stdDeviation="7" result="coloredBlur"></feGaussianBlur><feMerge><feMergeNode in="coloredBlur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter><linearGradient id="bridgeGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:var(--secondary-color);stop-opacity:1" /><stop offset="100%" style="stop-color:var(--primary-color);stop-opacity:1" /></linearGradient></defs><path d="M0 650 L1920 650" stroke="url(#bridgeGradient)" stroke-width="2" filter="url(#glow)"></path></svg>
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="overlay-screen game-view">
+        <div class="overlay-content-wrapper">
+            <div class="overlay-content">
+                 <svg id="start-logo" viewBox="0 0 200 115" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="logoGradient" x1="0%" y1="50%" x2="100%" y2="50%">
+                            <stop offset="0%" style="stop-color:var(--secondary-color)" />
+                            <stop offset="100%" style="stop-color:var(--primary-color)" />
+                        </linearGradient>
+                        <filter id="logoGlow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <g filter="url(#logoGlow)">
+                        <path d="M 30 65 L 70 15 L 110 65 M 100 45 L 170 45" stroke="url(#logoGradient)" stroke-width="10" stroke-linecap="round" fill="none"/>
+                        <text x="100" y="90" font-family="Poppins, sans-serif" font-size="24" font-weight="600" fill="url(#logoGradient)" text-anchor="middle">AZ UGRÁS</text>
+                        <text x="100" y="105" font-family="Poppins, sans-serif" font-size="10" font-weight="400" fill="url(#logoGradient)" text-anchor="middle" letter-spacing="1.5">KOCKÁZAT ÉS NYEREMÉNY</text>
+                    </g>
+                </svg>
+                 <p class="copyright-notice">&copy; Copyright by: Robi</p>
+
+                <div id="rules-container">
+                    <button id="toggle-rules-btn" class="btn">Játékszabályzat megnyitása</button>
+                    <div id="rules-content">
+                        <h3>A Játék Célja</h3>
+                        <p>Juss át mind a 10 hídon 10 kvízkérdés helyes megválaszolásával. Gyűjts minél több Kreditet okos döntésekkel, használd a segítségeket, és nyerd meg a főnyereményt!</p>
+
+                        <h3>A Játék Menete</h3>
+                        
+                        <h4>1. Indulás: Játékmód Választása</h4>
+                        <p>A játék elején két út áll előtted:
+                            <br>- <strong>Normál Játék:</strong> Kockázat nélkül indulsz, a főnyeremény 1000 Kredit.
+                            <br>- <strong>Kockázatos Ugrás:</strong> 500 Kredit a tét, de a főnyeremény a duplája, 2000 Kredit!
+                        </p>
+
+                        <h4>2. A Cél: Építsd a Sorozatot!</h4>
+                        <p>Minden helyes válasszal növeled a helyes válasz-sorozatodat és <strong>"kockán forgó"</strong> krediteket gyűjtesz. Minél hosszabb a sorozatod, annál értékesebb a következő helyes válasz! A cél, hogy a lehető legnagyobb összeget gyűjtsd össze, mielőtt bankolsz vagy hibázol.</p>
+
+                        <h4>3. A Döntés: Bankolsz vagy Kockáztatsz?</h4>
+                        <p>
+                            Minden sikeres ugrás után döntened kell:
+                            <br>- <strong>Bank:</strong> A <strong>`Bank`</strong> gombbal bebiztosíthatod a kockán forgó kreditjeidet. Ezek véglegesen a tieid lesznek, de a kreditgyűjtő sorozatod újraindul.
+                            <br>- <strong>Kockázat:</strong> Ha a <strong>`Következő híd`</strong> gombot választod, a kreditek játékban maradnak, és esélyed van tovább növelni a nyereményt, de egy rossz válasz esetén az összes, addig nem bankolt kreditet elveszíted!
+                        </p>
+                        
+                        <h4>4. A Végeredmény: Győzelem vagy Vereség</h4>
+                        <p>
+                            - <strong>Győzelem:</strong> Ha mind a 10 kérdésre helyesen válaszolsz, a főnyereményt ÉS az utolsó körben gyűjtött, nem bankolt krediteket is megkapod.
+                            <br>- <strong>Vereség:</strong> Ha rosszul válaszolsz és nincs Biztonsági Hálód, a játék véget ér. Csak a már sikeresen bankolt és a mérföldkőnél (5. híd) szerzett krediteket tarthatod meg.
+                        </p>
+
+                        <h3>Segítségek</h3>
+                        <ul>
+                            <li>
+                                <div class="rules-icon"><div class="lifeline shop-icon">50/50</div></div>
+                                <div><strong>50/50:</strong> Eltávolít két helytelen választ a négyből, így megduplázva az esélyeidet.</div>
+                            </li>
+                             <li>
+                                <div class="rules-icon"><div class="lifeline shop-icon" style="font-size: 0.8em;">CSERE</div></div>
+                                <div><strong>Kérdéscsere:</strong> Ha egy kérdés túl nehéz, ezzel a segítséggel lecserélheted egy teljesen újra.</div>
+                            </li>
+                              <li>
+                                <div class="rules-icon"><div class="lifeline shop-icon">BH</div></div>
+                                <div><strong>Biztonsági Háló:</strong> Ha rosszul válaszolsz, megment a leeséstől, és folytathatod a játékot. A kreditgyűjtő sorozatod azonban ilyenkor is megszakad!</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p>Jelenlegi egyenleged:</p>
+                <div id="start-credits" class="credit-display">0 Kredit</div>
+                <div class="shop-container">
+                    <h2>Segítségek vásárlása</h2>
+                    <div class="shop-item">
+                        <div class="shop-item-row">
+                            <div class="lifeline shop-icon">50/50</div>
+                            <button id="buy-fiftyfifty" class="btn">50/50 (250 K)</button>
+                        </div>
+                         <p>A számítógép elvesz két helytelen választ.</p>
+                    </div>
+                     <div class="shop-item">
+                         <div class="shop-item-row">
+                            <div class="lifeline shop-icon" style="font-size: 0.8em;">CSERE</div>
+                            <button id="buy-swap" class="btn">Kérdéscsere (350 K)</button>
+                        </div>
+                         <p>Lecseréli a jelenlegi kérdést egy véletlen újra.</p>
+                    </div>
+                    <div class="shop-item">
+                        <div class="shop-item-row">
+                            <div class="lifeline shop-icon">BH</div>
+                            <button id="buy-safetynet" class="btn">Biztonsági Háló (500 K)</button>
+                        </div>
+                        <p>Rossz válasz esetén megment a kieséstől.</p>
+                    </div>
+                </div>
+                <div class="wager-container">
+                    <h2>Válassz Tétet!</h2>
+                    <button id="start-normal-game" class="btn">Normál Játék (1x Nyeremény)</button>
+                    <button id="start-risky-game" class="btn">Kockázatos Ugrás (2x Nyeremény, -500 K Tét)</button>
+                </div>
+                <div class="daily-bonus-container">
+                    <h2>Napi Bónusz</h2>
+                    <p id="current-date-display"></p>
+                    <div id="streak-meter"></div>
+                    <button id="claim-bonus-btn" class="btn">Bónusz begyűjtése</button>
+                    <p id="bonus-status"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- END GAME SCREEN -->
+    <div id="end-screen" class="overlay-screen game-view">
+        <div class="overlay-content-wrapper">
+             <div class="overlay-content">
+                <h1 id="end-title">Játék Vége</h1>
+                <p id="end-message">Sajnos leestél.</p>
+                <p>Változás:</p>
+                <div id="end-credits-change" class="credit-display">0 Kredit</div>
+                <p>Új egyenleged:</p>
+                <div id="end-total-credits" class="credit-display">0 Kredit</div>
+                <button id="play-again-btn" class="btn">Új Játék</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="game-view">
+        <div id="game-container">
+            <div id="game-header">
+                <div id="header-left">
+                     <svg id="game-logo" viewBox="0 0 200 115" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="logoGradientHeader" x1="0%" y1="50%" x2="100%" y2="50%">
+                                <stop offset="0%" style="stop-color:var(--secondary-color)" />
+                                <stop offset="100%" style="stop-color:var(--primary-color)" />
+                            </linearGradient>
+                            <filter id="logoGlowHeader">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        <g filter="url(#logoGlowHeader)">
+                            <path d="M 30 65 L 70 15 L 110 65 M 100 45 L 170 45" stroke="url(#logoGradientHeader)" stroke-width="10" stroke-linecap="round" fill="none"/>
+                            <text x="100" y="90" font-family="Poppins, sans-serif" font-size="24" font-weight="600" fill="url(#logoGradientHeader)" text-anchor="middle">AZ UGRÁS</text>
+                             <text x="100" y="105" font-family="Poppins, sans-serif" font-size="10" font-weight="400" fill="url(#logoGradientHeader)" text-anchor="middle" letter-spacing="1.5">KOCKÁZAT ÉS NYEREMÉNY</text>
+                        </g>
+                    </svg>
+                    <div id="question-counter"></div>
+                </div>
+                <div id="lifelines-container">
+                    <div class="lifeline-wrapper" data-tooltip="Két helytelen választ eltávolít.">
+                        <div id="lifeline-fiftyfifty" class="lifeline">50/50<span class="count">0</span></div>
+                    </div>
+                    <div class="lifeline-wrapper" data-tooltip="Lecseréli a kérdést egy újra.">
+                        <div id="lifeline-swap" class="lifeline">CSERE<span class="count">0</span></div>
+                    </div>
+                    <div class="lifeline-wrapper" data-tooltip="Megment a kieséstől egy rossz válasz esetén.">
+                        <div id="lifeline-safetynet" class="lifeline">BH<span class="count">0</span></div>
+                    </div>
+                </div>
+                <div id="progress-container">
+                    <div id="progress-bar"></div>
+                    <div id="progress-milestone"></div>
+                </div>
+                <div id="header-controls">
+                    <div id="total-credits-display">0 Kredit</div>
+                    <button id="header-next-button">Következő híd</button>
+                </div>
+            </div>
+            <p id="question-text"></p>
+            <div id="bridge-scene">
+                <div class="future-bridge"></div><div class="future-bridge"></div>
+                <div class="options-container"></div>
+            </div>
+            <div id="feedback-container">
+                <div id="result"></div>
+                <div id="potential-winnings-display"></div>
+                <div id="explanation-container" class="info-box"></div>
+                <div class="feedback-buttons">
+                    <button id="bank-button" class="btn">Bank</button>
+                    <button id="end-game-button" class="btn">Játék befejezése</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // GAME DATA
+        const allQuestions = [
+            { question: "Mi Kanada fővárosa?", options: ["Toronto", "Vancouver", "Ottawa", "Montréal"], answer: "Ottawa", explanation: "Bár nem a legnagyobb, Ottawa Kanada politikai és adminisztratív központja." },
+            { question: "Melyik erő tartja a bolygókat a Nap körüli pályájukon?", options: ["Mágnesesség", "Súrlódás", "Nukleáris erő", "Gravitáció"], answer: "Gravitáció", explanation: "A Nap hatalmas tömegvonzása, a gravitáció tartja a bolygókat keringési pályájukon." },
+            { question: "Melyik híres magyar étel fő összetevője a paprika és a paradicsom?", options: ["Töltött káposzta", "Gulyásleves", "Lecsó", "Túrós csusza"], answer: "Lecsó", explanation: "A lecsó egy tradicionális magyar egytálétel, amelynek alapja a hagyma, paprika és paradicsom." },
+            { question: "Mit jelent a 'CPU' rövidítés a számítástechnikában?", options: ["Központi Tápellátó Egység", "Központi Feldolgozó Egység", "Számítógép Személyi Egység", "Alapvető Programozási Egység"], answer: "Központi Feldolgozó Egység", explanation: "A CPU (Central Processing Unit) a számítógép 'agya', amely a legtöbb számítási feladatot elvégzi." },
+            { question: "Ki írta a 'Rómeó és Júlia' című drámát?", options: ["Charles Dickens", "William Shakespeare", "Molière", "Goethe"], answer: "William Shakespeare", explanation: "A 'Rómeó és Júlia' az angol drámaíró, William Shakespeare egyik legismertebb tragédiája." },
+            { question: "Melyik a legkisebb kontinens?", options: ["Európa", "Antarktisz", "Dél-Amerika", "Ausztrália"], answer: "Ausztrália", explanation: "Terület és népesség alapján is Ausztrália a legkisebb lakott kontinens." },
+            
+        ];
+       // Game state and constants
+        const TOTAL_GAME_QUESTIONS = 10;
+        const BASE_WIN_CREDITS = 1000;
+        const RISKY_WAGER = 500;
+        const MILESTONE_QUESTION = 5;
+        const MILESTONE_CREDITS = 150;
+        const PRICES = { fiftyFifty: 250, swap: 350, safetyNet: 500 };
+        const STREAK_BONUSES = [100, 125, 150, 175, 200, 250, 300];
+        const QUESTION_REWARDS = [50, 75, 100, 150, 200, 250, 350, 500, 750, 1000]; // Rewards based on streak
+        let currentQuestionIndex = 0;
+        let gameQuestions = [];
+        let unusedQuestionPool = [];
+        let gameState = {};
+        let currentRoundState = {};
+
+        // DOM Elements
+        const views = { start: document.getElementById('start-screen'), game: document.getElementById('game-screen'), end: document.getElementById('end-screen') };
+        const gameContainer = document.getElementById('game-container');
+        const questionCounter = document.getElementById('question-counter');
+        const questionText = document.getElementById('question-text');
+        const bridgeScene = document.getElementById('bridge-scene');
+        const resultContainer = document.getElementById('result');
+        const explanationContainer = document.getElementById('explanation-container');
+        const nextButton = document.getElementById('header-next-button');
+        const endGameButton = document.getElementById('end-game-button');
+        const bankButton = document.getElementById('bank-button');
+        const progressBar = document.getElementById('progress-bar');
+        const progressMilestone = document.getElementById('progress-milestone');
+        const startCreditsEl = document.getElementById('start-credits');
+        const buyFiftyFiftyBtn = document.getElementById('buy-fiftyfifty');
+        const buySwapBtn = document.getElementById('buy-swap');
+        const buySafetyNetBtn = document.getElementById('buy-safetynet');
+        const startNormalBtn = document.getElementById('start-normal-game');
+        const startRiskyBtn = document.getElementById('start-risky-game');
+        const endTitleEl = document.getElementById('end-title');
+        const endMessageEl = document.getElementById('end-message');
+        const endCreditsChangeEl = document.getElementById('end-credits-change');
+        const endTotalCreditsEl = document.getElementById('end-total-credits');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const lifelinesContainer = document.getElementById('lifelines-container');
+        const fiftyFiftyEl = document.getElementById('lifeline-fiftyfifty');
+        const swapEl = document.getElementById('lifeline-swap');
+        const safetyNetEl = document.getElementById('lifeline-safetynet');
+        const claimBonusBtn = document.getElementById('claim-bonus-btn');
+        const bonusStatusEl = document.getElementById('bonus-status');
+        const dateDisplayEl = document.getElementById('current-date-display');
+        const streakMeterEl = document.getElementById('streak-meter');
+        const totalCreditsDisplay = document.getElementById('total-credits-display');
+        const potentialWinningsDisplay = document.getElementById('potential-winnings-display');
+        const toggleRulesBtn = document.getElementById('toggle-rules-btn');
+        const rulesContent = document.getElementById('rules-content');
+
+
+        // --- STATE MANAGEMENT ---
+        function loadGameState() {
+            try {
+                const savedState = JSON.parse(localStorage.getItem('azUgrasGameState'));
+                gameState = {
+                    totalCredits: 0,
+                    lastClaimDate: null,
+                    streakCount: 0,
+                    ...savedState
+                };
+            } catch (e) { 
+                gameState = { totalCredits: 0, lastClaimDate: null, streakCount: 0 }; 
+            }
+        }
+
+        function saveGameState() {
+            localStorage.setItem('azUgrasGameState', JSON.stringify(gameState));
+        }
+
+        // --- VIEW SWITCHING ---
+        function showView(viewName) {
+            Object.values(views).forEach(view => view.classList.remove('active'));
+            views[viewName].classList.add('active');
+        }
+
+        // --- START SCREEN LOGIC ---
+        function showStartScreen() {
+            updateStartScreenUI();
+            checkDailyBonus();
+            showView('start');
+        }
+
+        toggleRulesBtn.addEventListener('click', () => {
+            const isHidden = rulesContent.style.display === 'none' || rulesContent.style.display === '';
+            rulesContent.style.display = isHidden ? 'block' : 'none';
+            toggleRulesBtn.textContent = isHidden ? 'Játékszabályzat elrejtése' : 'Játékszabályzat megnyitása';
+        });
+
+        buyFiftyFiftyBtn.addEventListener('click', () => {
+             if (gameState.totalCredits >= PRICES.fiftyFifty) {
+                gameState.totalCredits -= PRICES.fiftyFifty;
+                currentRoundState.lifelines.fiftyFifty++;
+                updateStartScreenUI();
+            }
+        });
+        
+        buySwapBtn.addEventListener('click', () => {
+             if (gameState.totalCredits >= PRICES.swap) {
+                gameState.totalCredits -= PRICES.swap;
+                currentRoundState.lifelines.swap++;
+                updateStartScreenUI();
+            }
+        });
+
+        buySafetyNetBtn.addEventListener('click', () => {
+            if (gameState.totalCredits >= PRICES.safetyNet) {
+                gameState.totalCredits -= PRICES.safetyNet;
+                currentRoundState.lifelines.safetyNet++;
+                updateStartScreenUI();
+            }
+        });
+
+        function updateStartScreenUI() {
+            startCreditsEl.textContent = `${gameState.totalCredits} Kredit`;
+            buyFiftyFiftyBtn.disabled = gameState.totalCredits < PRICES.fiftyFifty;
+            buySwapBtn.disabled = gameState.totalCredits < PRICES.swap;
+            buySafetyNetBtn.disabled = gameState.totalCredits < PRICES.safetyNet;
+            startRiskyBtn.disabled = gameState.totalCredits < RISKY_WAGER;
+        }
+
+        startNormalBtn.addEventListener('click', () => startGame(false));
+        startRiskyBtn.addEventListener('click', () => startGame(true));
+
+        // --- NAPI BÓNUSZ LOGIKA ---
+        function getFormattedDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function updateStreakMeter(count) {
+            streakMeterEl.innerHTML = '';
+            for (let i = 1; i <= STREAK_BONUSES.length; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.classList.add('streak-day');
+                dayDiv.textContent = i;
+                if (i <= count) {
+                    dayDiv.classList.add('active');
+                }
+                streakMeterEl.appendChild(dayDiv);
+            }
+        }
+
+        function checkDailyBonus() {
+            const today = new Date();
+            const todayStr = getFormattedDate(today);
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            const yesterdayStr = getFormattedDate(yesterday);
+
+            dateDisplayEl.textContent = today.toLocaleDateString('hu-HU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            if (gameState.lastClaimDate && gameState.lastClaimDate !== yesterdayStr && gameState.lastClaimDate !== todayStr) {
+                gameState.streakCount = 0;
+            }
+
+            updateStreakMeter(gameState.streakCount);
+
+            if (gameState.lastClaimDate === todayStr) {
+                claimBonusBtn.disabled = true;
+                claimBonusBtn.textContent = 'Bónusz begyűjtve';
+                bonusStatusEl.textContent = `Jelenlegi sorozatod: ${gameState.streakCount} nap.`;
+            } else {
+                const currentStreak = (gameState.lastClaimDate === yesterdayStr) ? gameState.streakCount : 0;
+                const bonusIndex = Math.min(currentStreak, STREAK_BONUSES.length - 1);
+                const bonusAmount = STREAK_BONUSES[bonusIndex];
+                
+                claimBonusBtn.disabled = false;
+                claimBonusBtn.textContent = `Begyűjtöm a ${bonusAmount} Kreditet!`;
+                bonusStatusEl.textContent = `Jelenlegi sorozatod: ${currentStreak} nap.`;
+            }
+        }
+
+        claimBonusBtn.addEventListener('click', () => {
+            const today = new Date();
+            const todayStr = getFormattedDate(today);
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+            const yesterdayStr = getFormattedDate(yesterday);
+
+            if (gameState.lastClaimDate !== todayStr) {
+                if (gameState.lastClaimDate === yesterdayStr) {
+                    gameState.streakCount++;
+                } else {
+                    gameState.streakCount = 1;
+                }
+                
+                const bonusIndex = Math.min(gameState.streakCount - 1, STREAK_BONUSES.length - 1);
+                const bonusAmount = STREAK_BONUSES[bonusIndex];
+
+                gameState.totalCredits += bonusAmount;
+                gameState.lastClaimDate = todayStr;
+                
+                saveGameState();
+                updateStartScreenUI();
+                checkDailyBonus();
+
+                startCreditsEl.classList.add('flash-green');
+                setTimeout(() => startCreditsEl.classList.remove('flash-green'), 1000);
+            }
+        });
+
+        // --- END SCREEN LOGIC ---
+        function showEndScreen(isWin, creditsChange) {
+            let finalCreditsChange;
+            if (isWin) {
+                finalCreditsChange = creditsChange;
+            } else {
+                finalCreditsChange = currentRoundState.milestoneCreditsEarned;
+            }
+
+            gameState.totalCredits += finalCreditsChange;
+            saveGameState();
+            endTitleEl.textContent = isWin ? "Sikeres Átkelés!" : "Játék Vége";
+            endMessageEl.textContent = isWin ? "Gratulálok, sikeresen átjutottál mind a 10 hídon és bezsebelted a főnyereményt!" : `Sajnos leestél a(z) ${currentQuestionIndex + 1}. hídnál. A nem bankolt krediteket elvesztetted.`;
+            
+            const displayChange = isWin ? finalCreditsChange : (currentRoundState.isRisky ? finalCreditsChange - RISKY_WAGER : finalCreditsChange);
+
+            endCreditsChangeEl.textContent = `${displayChange >= 0 ? '+' : ''}${displayChange} Kredit`;
+            endCreditsChangeEl.style.color = displayChange >= 0 ? 'var(--correct-color)' : 'var(--incorrect-color)';
+            endTotalCreditsEl.textContent = `${gameState.totalCredits} Kredit`;
+            showView('end');
+        }
+
+        playAgainBtn.addEventListener('click', init);
+
+        // --- GAME LOGIC ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function startGame(isRisky) {
+            currentQuestionIndex = 0;
+            currentRoundState.isRisky = isRisky;
+            currentRoundState.milestoneCreditsEarned = 0;
+            currentRoundState.usedSafetyNetThisTurn = false;
+            currentRoundState.potentialWinnings = 0;
+            currentRoundState.streak = 0; 
+            
+            if (isRisky) { 
+                 if (gameState.totalCredits >= RISKY_WAGER) {
+                    gameState.totalCredits -= RISKY_WAGER;
+                }
+            }
+            
+            const shuffledAll = [...allQuestions];
+            shuffleArray(shuffledAll);
+            gameQuestions = shuffledAll.slice(0, TOTAL_GAME_QUESTIONS);
+            unusedQuestionPool = shuffledAll.slice(TOTAL_GAME_QUESTIONS);
+
+            showView('game');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            gameContainer.classList.remove('success-pulse', 'fail-shake');
+            bridgeScene.classList.remove('advance');
+            
+            progressMilestone.classList.toggle('reached', currentRoundState.milestoneCreditsEarned > 0);
+            
+            progressBar.style.width = `${(currentQuestionIndex / TOTAL_GAME_QUESTIONS) * 100}%`;
+            const currentQuestion = gameQuestions[currentQuestionIndex];
+            questionCounter.textContent = `Híd: ${currentQuestionIndex + 1} / ${TOTAL_GAME_QUESTIONS}`;
+            questionText.textContent = currentQuestion.question;
+            document.querySelector('.options-container').innerHTML = '';
+            resultContainer.textContent = '';
+            explanationContainer.style.opacity = 0;
+            explanationContainer.style.display = 'none';
+            potentialWinningsDisplay.style.opacity = currentRoundState.potentialWinnings > 0 ? 1 : 0;
+            nextButton.classList.remove('visible');
+            endGameButton.classList.remove('visible');
+            bankButton.classList.remove('visible');
+            bankButton.disabled = false;
+
+            fiftyFiftyEl.dataset.usedInRound = 'false';
+            swapEl.dataset.usedInRound = 'false';
+
+            const futureBridges = bridgeScene.querySelectorAll('.future-bridge');
+            futureBridges.forEach((bridge, index) => {
+                bridge.style.display = (index < (TOTAL_GAME_QUESTIONS - currentQuestionIndex - 1)) ? 'block' : 'none';
+            });
+            currentQuestion.options.forEach((optionText) => {
+                const bridge = document.createElement('div');
+                bridge.classList.add('bridge-option');
+                const span = document.createElement('span');
+                span.textContent = optionText;
+                bridge.appendChild(span);
+                bridge.addEventListener('click', (event) => handleAnswer(event.currentTarget));
+                document.querySelector('.options-container').appendChild(bridge);
+            });
+            lifelinesContainer.style.pointerEvents = 'auto';
+            updateGameUI();
+        }
+        
+        function handleAnswer(selectedBridge) {
+            lifelinesContainer.style.pointerEvents = 'none';
+            document.querySelectorAll('.bridge-option').forEach(option => {
+                option.classList.add('disabled');
+            });
+            
+            selectedBridge.classList.add('is-chosen');
+
+            const selectedOptionText = selectedBridge.textContent;
+            const currentQuestion = gameQuestions[currentQuestionIndex];
+            const isCorrect = selectedOptionText === currentQuestion.answer;
+            
+            setTimeout(() => {
+                selectedBridge.classList.remove('is-chosen');
+                const correctBridge = Array.from(document.querySelectorAll('.bridge-option')).find(opt => opt.textContent === currentQuestion.answer);
+                
+                if (isCorrect) {
+                    const reward = QUESTION_REWARDS[currentRoundState.streak] || QUESTION_REWARDS[QUESTION_REWARDS.length - 1];
+                    currentRoundState.potentialWinnings += reward;
+                    currentRoundState.streak++;
+                    
+                    potentialWinningsDisplay.style.opacity = 1;
+
+                    if (correctBridge) correctBridge.classList.add('correct', 'flashing');
+                    gameContainer.classList.add('success-pulse');
+                    bridgeScene.classList.add('advance');
+                    
+                    if ((currentQuestionIndex + 1) === MILESTONE_QUESTION && currentRoundState.milestoneCreditsEarned === 0) {
+                        currentRoundState.milestoneCreditsEarned = MILESTONE_CREDITS;
+                        resultContainer.textContent = `Biztonsági Pont! ${MILESTONE_CREDITS} Kredit biztosítva!`;
+                        progressMilestone.classList.add('reached');
+                    } else {
+                         resultContainer.textContent = "SIKERES UGRÁS!";
+                    }
+                    resultContainer.style.color = 'var(--correct-color)';
+
+                } else { // Incorrect answer
+                    currentRoundState.potentialWinnings = 0; 
+                    currentRoundState.streak = 0; 
+                    
+                    selectedBridge.classList.add('incorrect');
+                    if (correctBridge) correctBridge.classList.add('correct');
+                    if (currentRoundState.lifelines.safetyNet > 0 && !currentRoundState.usedSafetyNetThisTurn) {
+                        currentRoundState.lifelines.safetyNet--;
+                        currentRoundState.usedSafetyNetThisTurn = true;
+                        resultContainer.textContent = "A BIZTONSÁGI HÁLÓ MEGMENTETT!";
+                        resultContainer.style.color = 'var(--selected-color)';
+                    } else {
+                        gameContainer.classList.add('fail-shake');
+                        resultContainer.textContent = "LEESTÉL!";
+                        resultContainer.style.color = 'var(--incorrect-color)';
+                    }
+                }
+                updateGameUI();
+
+                setTimeout(() => {
+                    explanationContainer.textContent = currentQuestion.explanation;
+                    explanationContainer.style.display = 'block';
+                    explanationContainer.style.opacity = 1;
+
+                    if (isCorrect || currentRoundState.usedSafetyNetThisTurn) {
+                        if (currentQuestionIndex < gameQuestions.length - 1) {
+                            nextButton.classList.add('visible');
+                            if (currentRoundState.potentialWinnings > 0) {
+                                bankButton.classList.add('visible');
+                            }
+                        } else { // Victory
+                            progressBar.style.width = '100%';
+                            const mainPrize = BASE_WIN_CREDITS * (currentRoundState.isRisky ? 2 : 1);
+                            let finalWinAmount = mainPrize + currentRoundState.potentialWinnings;
+                            showEndScreen(true, finalWinAmount);
+                        }
+                    } else { // Loss
+                        endGameButton.classList.add('visible');
+                        endGameButton.onclick = () => showEndScreen(false, 0);
+                    }
+                }, 1500);
+
+            }, 1500);
+        }
+
+        nextButton.onclick = () => {
+            currentQuestionIndex++;
+            currentRoundState.usedSafetyNetThisTurn = false;
+            showQuestion();
+        };
+
+        bankButton.addEventListener('click', () => {
+            if (currentRoundState.potentialWinnings > 0) {
+                gameState.totalCredits += currentRoundState.potentialWinnings;
+                resultContainer.textContent = `${currentRoundState.potentialWinnings} Kredit sikeresen bankolva!`;
+                currentRoundState.potentialWinnings = 0;
+                currentRoundState.streak = 0; 
+                saveGameState();
+                updateGameUI();
+                bankButton.disabled = true;
+                bankButton.classList.remove('visible');
+                
+                totalCreditsDisplay.classList.add('flash-green');
+                setTimeout(() => totalCreditsDisplay.classList.remove('flash-green'), 1000);
+            }
+        });
+
+        // --- LIFELINES & UI LOGIC ---
+        function updateGameUI() {
+            // Lifelines
+            fiftyFiftyEl.querySelector('.count').textContent = currentRoundState.lifelines.fiftyFifty;
+            swapEl.querySelector('.count').textContent = currentRoundState.lifelines.swap;
+            safetyNetEl.querySelector('.count').textContent = currentRoundState.lifelines.safetyNet;
+            
+            fiftyFiftyEl.classList.toggle('used', currentRoundState.lifelines.fiftyFifty === 0 || fiftyFiftyEl.dataset.usedInRound === 'true');
+            swapEl.classList.toggle('used', currentRoundState.lifelines.swap === 0 || unusedQuestionPool.length === 0 || swapEl.dataset.usedInRound === 'true');
+            safetyNetEl.classList.toggle('used', currentRoundState.lifelines.safetyNet === 0);
+
+            // Credits
+            totalCreditsDisplay.textContent = `${gameState.totalCredits} Kredit`;
+            if (currentRoundState.potentialWinnings > 0) {
+                 potentialWinningsDisplay.textContent = `Kockán forog: ${currentRoundState.potentialWinnings} K (Sorozat: ${currentRoundState.streak})`;
+            } else {
+                potentialWinningsDisplay.textContent = '';
+            }
+        }
+        
+        fiftyFiftyEl.addEventListener('click', () => {
+            if (currentRoundState.lifelines.fiftyFifty > 0 && fiftyFiftyEl.dataset.usedInRound !== 'true') {
+                currentRoundState.lifelines.fiftyFifty--;
+                fiftyFiftyEl.dataset.usedInRound = 'true';
+                updateGameUI();
+                const currentQuestion = gameQuestions[currentQuestionIndex];
+                const options = Array.from(document.querySelectorAll('.bridge-option'));
+                const wrongOptions = options.filter(opt => opt.textContent !== currentQuestion.answer);
+                shuffleArray(wrongOptions);
+                wrongOptions[0].classList.add('disabled-by-lifeline');
+                wrongOptions[1].classList.add('disabled-by-lifeline');
+            }
+        });
+        
+        swapEl.addEventListener('click', () => {
+            if (currentRoundState.lifelines.swap > 0 && swapEl.dataset.usedInRound !== 'true' && unusedQuestionPool.length > 0) {
+                currentRoundState.lifelines.swap--;
+                swapEl.dataset.usedInRound = 'true';
+                
+                const newQuestion = unusedQuestionPool.pop();
+                gameQuestions[currentQuestionIndex] = newQuestion;
+                
+                showQuestion();
+            }
+        });
+
+        // --- INITIALIZATION ---
+        function init() {
+            loadGameState();
+            currentRoundState = {
+                isRisky: false,
+                lifelines: { fiftyFifty: 1, swap: 1, safetyNet: 1 },
+                usedSafetyNetThisTurn: false,
+                milestoneCreditsEarned: 0,
+                potentialWinnings: 0,
+                streak: 0
+            };
+            showStartScreen();
+        }
+
+        init();
+    </script>
+
+</body>
+</html>
