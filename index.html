@@ -106,7 +106,6 @@
         .shop-icon { pointer-events: none; flex-shrink: 0; }
         .shop-item p, #bonus-status { font-size: 0.9em; color: rgba(255, 255, 255, 0.7); margin-top: 5px; margin-bottom: 5px; flex-basis: 100%; min-height: 1em; }
         
-        /* === JÁTÉKSZABÁLYZAT STÍLUSOK (IMPROVED) === */
         #rules-content {
             display: none;
             text-align: left;
@@ -337,7 +336,7 @@
                 max-height: none;
                 padding: 15px;
                 box-sizing: border-box;
-                overflow-y: auto; /* Allow this specific wrapper to scroll its content */
+                overflow-y: auto;
                 justify-content: flex-start;
             }
             #game-container {
@@ -358,11 +357,11 @@
             .overlay-content h1 { font-size: 2.2em; } 
             .overlay-content p { font-size: 1.1em; }
             #question-text { font-size: 1.2em; }
-            #bridge-scene { perspective: none; height: auto; flex-grow: 0; margin: 30px 0; }
+            #bridge-scene { perspective: none; height: auto; flex-grow: 0; margin: 40px 0; }
             .future-bridge { display: none; }
             .options-container { transform: none; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
             .bridge-option { width: 90%; max-width: 400px; height: auto; min-height: 70px; font-size: 1em; }
-            #feedback-container { min-height: 120px; }
+            #feedback-container { min-height: auto; padding: 20px 0; }
             #explanation-container { font-size: 1em; }
             .shop-item-row { flex-wrap: wrap; }
             .lifeline-wrapper:hover::before, .lifeline-wrapper:hover::after { display: none; }
@@ -838,6 +837,9 @@
         }
 
         function showQuestion() {
+             if (window.innerWidth <= 900) {
+                window.scrollTo(0, 0);
+            }
             gameContainer.classList.remove('success-pulse', 'fail-shake');
             bridgeScene.classList.remove('advance');
             
@@ -937,10 +939,9 @@
                     explanationContainer.style.display = 'block';
                     explanationContainer.style.opacity = 1;
 
-                    // === MOBILE SCROLL-TO-VIEW LOGIC ===
                     if (window.innerWidth <= 900) {
-                        const feedbackEl = document.getElementById('feedback-container');
-                        feedbackEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        const resultEl = document.getElementById('result');
+                        resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
 
                     if (isCorrect || currentRoundState.usedSafetyNetThisTurn) {
