@@ -3,1062 +3,645 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Az Ugrás - Kockázat és Nyeremény</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>BUMM! - A Vetélkedő</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Orbitron:wght@800&display=swap');
         :root {
-            --primary-color: #00e5ff;
-            --secondary-color: #ff00c1;
-            --correct-color: #00ff9b;
-            --incorrect-color: #ff3d71;
-            --selected-color: #ffc400;
-            --background-start: #0f0c29;
-            --background-mid: #302b63;
-            --background-end: #24243e;
+            --bg-gradient-start: #1D2B64; --bg-gradient-end: #0F0C29;
+            --cell-bg: rgba(255, 255, 255, 0.05); --cell-border: rgba(0, 191, 255, 0.5);
+            --text-color: #E0E5EC; --glow-accent: #00BFFF; --bomb-color: #FF4757;
+            --success-color: #2ED573; --exit-color: #5758BB; --life-color: #FF6B81;
+            --money-color: #FFD700; --crater-bg: rgba(0,0,0,0.4); --path-color: rgba(255, 215, 0, 0.5);
+            --player-glow-intensity: 0.2;
         }
-
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow: hidden; /* Prevents scrollbars on the body for DESKTOP VIEW */
-        }
-
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--background-start), var(--background-mid), var(--background-end));
-            color: #fff;
-            text-align: center;
+            font-family: 'Poppins', sans-serif; display: flex; align-items: flex-start; justify-content: center;
+            min-height: 100vh; background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-color); margin: 0; padding: 20px; box-sizing: border-box; overflow-x: hidden;
+        }
+        #app-container {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            box-sizing: border-box;
-        }
-
-        #background-scenery { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; object-fit: cover; }
-        
-        .game-view {
-            display: none;
-            width: 100%;
-            height: 100%;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            box-sizing: border-box;
-        }
-        #game-screen.active, #start-screen.active, #end-screen.active {
-            display: flex;
-        }
-        
-        #game-container, .overlay-content-wrapper {
-            width: 90vw;
-            max-width: 1600px;
-            height: 100%;
-            max-height: 95vh;
-            margin: auto; 
-            background: rgba(0, 0, 0, 0.4);
-            padding: 20px; 
-            border-radius: 20px; 
-            box-shadow: 0 0 30px rgba(0, 229, 255, 0.2);
-            border: 1px solid rgba(0, 229, 255, 0.3); 
-            backdrop-filter: blur(10px);
-            position: relative; 
-            z-index: 1; 
-            display: flex; 
             flex-direction: column;
-            justify-content: space-around;
-            box-sizing: border-box;
-            overflow: hidden;
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+            align-items: center;
         }
-
-        .overlay-content-wrapper {
-            overflow-y: auto; 
-        }
-
-        .overlay-content-wrapper::-webkit-scrollbar { width: 8px; }
-        .overlay-content-wrapper::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
-        .overlay-content-wrapper::-webkit-scrollbar-thumb { background-color: var(--primary-color); border-radius: 10px; }
-
-        .overlay-screen {
-            position: fixed; top: 0; left: 0; z-index: 100;
-            background: rgba(15, 12, 41, 0.8);
-        }
-        .overlay-content { max-width: 700px; text-align: center; display: flex; flex-direction: column; align-items: center; margin: 0 auto; }
-        .overlay-content h1 { font-size: 3em; color: var(--primary-color); text-shadow: 0 0 15px var(--primary-color); }
-        .overlay-content p { font-size: 1.2em; line-height: 1.5; max-width: 90%; margin-bottom: 20px; }
-        .credit-display { font-size: 1.8em; font-weight: bold; margin: 15px 0; color: var(--selected-color); }
-        .credit-display.flash-green { animation: flashGreen 1s ease-out; }
-        .overlay-content .btn, .btn {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); color: #fff; padding: 12px 30px; border: none; border-radius: 50px;
-            cursor: pointer; font-size: 1.2em; font-weight: 600; transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(255, 0, 193, 0.5); margin: 10px 5px 5px 5px;
-        }
-        .overlay-content .btn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 0, 193, 0.8); }
-        .overlay-content .btn:disabled { background: #555; cursor: not-allowed; box-shadow: none; opacity: 0.6; }
-        .shop-container, .wager-container, .daily-bonus-container, #rules-container { width: 100%; margin: 15px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; }
-        
-        .shop-item { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
-        .shop-item-row { display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px; }
-        .shop-icon { pointer-events: none; flex-shrink: 0; }
-        .shop-item p, #bonus-status { font-size: 0.9em; color: rgba(255, 255, 255, 0.7); margin-top: 5px; margin-bottom: 5px; flex-basis: 100%; min-height: 1em; }
-        
-        #rules-content {
-            display: none;
-            text-align: left;
-            padding: 10px;
-            margin-top: 15px;
-            border-top: 1px solid var(--primary-color);
-        }
-        #rules-content h3, #rules-content h4 {
-            color: var(--primary-color);
+        #game-wrapper {
+            background: rgba(0, 0, 0, 0.2); padding: clamp(15px, 2vw, 30px); border-radius: 30px;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
             text-align: center;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            position: relative; /* Pozíció a várakozó képernyőhöz */
         }
-        #rules-content h4 {
-            margin-top: 20px;
-            border-bottom: 1px solid rgba(0, 229, 255, 0.3);
-            padding-bottom: 5px;
+        #info-panel {
+            width: 100%;
+            max-width: 650px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        #rules-content p, #rules-content ul {
-            text-align: justify;
-            margin: 10px auto;
-        }
-        #rules-content ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        #rules-content li {
-            margin-bottom: 15px;
-            line-height: 1.6;
-            display: flex;
-            align-items: flex-start;
-        }
-        #rules-content li .rules-icon {
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-        #rules-content li .lifeline {
-            width: 35px;
-            height: 35px;
-            font-size: 0.9em;
-        }
-        #rules-content strong {
-            color: var(--selected-color);
-        }
+        #info-panel h3 { font-family: 'Orbitron', sans-serif; margin-top: 0; color: var(--glow-accent); }
+        .info-section { margin-bottom: 20px; min-height: 50px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; }
+        #info-proximity-warning { color: var(--bomb-color); font-weight: 700; font-size: 1.2em; text-shadow: 0 0 10px var(--bomb-color); animation: flash-warning 1s infinite; visibility: hidden; }
+        #info-answer-buttons button { display: block; width: 100%; padding: 10px; margin: 8px 0; border: 1px solid var(--cell-border); border-radius: 10px; background: rgba(255,255,255,0.1); color: var(--text-color); font-size: 0.9em; cursor: pointer; transition: all 0.2s ease; }
+        #info-answer-buttons button.correct-answer { background-color: var(--success-color) !important; color: #0F0C29; }
+        #info-answer-buttons button.incorrect-answer { background-color: var(--bomb-color) !important; color: #FFF; }
+        #info-answer-buttons button:disabled:not(.correct-answer):not(.incorrect-answer) { opacity: 0.5; background: #555; }
+        #new-map-button { display: none; margin-top: 10px; }
+        #info-time { text-align: center; }
+        #info-time p { margin: 5px 0; }
         
-        #current-date-display { font-size: 1.1em; color: var(--primary-color); margin-bottom: 10px; text-align: center; }
-        #streak-meter { display: flex; justify-content: center; gap: 8px; margin-bottom: 15px; }
-        .streak-day { width: 30px; height: 30px; border: 2px solid var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; transition: all 0.3s ease; }
-        .streak-day.active { background-color: var(--correct-color); color: #000; border-color: #fff; box-shadow: 0 0 10px var(--correct-color); transform: scale(1.1); }
-
-        #start-logo {
-            width: 250px;
-            max-width: 70%;
-            margin-bottom: 10px;
-        }
-
-        .copyright-notice {
-            font-size: 0.8em;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 0;
-            margin-bottom: 25px;
-            font-weight: 400;
-        }
-
-        /* Game Header */
-        #game-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px; gap: 20px; flex-wrap: wrap; flex-shrink: 0; }
-        #header-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-        #game-logo { width: 180px; height: auto; }
-        #question-counter { font-size: 1.2em; font-weight: 600; color: var(--primary-color); margin-top: 5px; text-align: center; }
-        #progress-container { flex-grow: 1; height: 20px; background-color: rgba(0, 0, 0, 0.3); border: 1px solid var(--primary-color); border-radius: 20px; overflow: hidden; box-shadow: inset 0 0 5px rgba(0, 229, 255, 0.5); position: relative; min-width: 200px; }
-        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--secondary-color), var(--primary-color)); border-radius: 20px; transition: width 0.5s ease-out; box-shadow: 0 0 15px var(--primary-color); }
+        #game-header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; margin-bottom: 15px; gap: 10px; }
+        #logo-title { grid-column: 2 / 3; font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 6vw, 3rem); color: white; font-weight: 800; text-shadow: 0 0 10px var(--glow-accent), 0 0 20px var(--glow-accent); transition: transform 0.1s ease; }
+        #logo-title.triggered { animation: shake-and-flash 0.5s ease-in-out; }
+        .stats-container { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .stats-container.left { justify-content: flex-start; } .stats-container.right { justify-content: flex-end; }
+        .game-stat { display: flex; align-items: center; gap: 8px; font-size: clamp(0.9rem, 2vw, 1.1rem); font-weight: 600; padding: 8px 12px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
+        .game-stat svg { width: clamp(20px, 3vw, 24px); height: clamp(20px, 3vw, 24px); }
+        #vest-indicator, #doubler-indicator { color: white; display: none; } #bomb-counter svg { color: var(--bomb-color); }
         
-        #progress-milestone {
+        #game-board-wrapper { overflow-x: auto; }
+        #game-board { border-collapse: separate; border-spacing: 4px; margin: 15px auto; }
+        #game-board th, #game-board td { width: clamp(35px, 8vw, 45px); height: clamp(35px, 8vw, 45px); }
+        #game-board th { font-family: 'Orbitron'; color: var(--glow-accent); cursor: default; user-select: none; /* Letiltja a szöveg kijelölését */ }
+        #game-board td { background: var(--cell-bg); border: 2px solid var(--cell-border); border-radius: 10px; box-shadow: inset 0 0 10px rgba(0, 191, 255, 0.2); position: relative; transition: all 0.2s ease; cursor: pointer; }
+        #game-board.scanner-active td { cursor: crosshair; }
+        #game-board td .icon { width: 60%; height: 60%; opacity: 0; transition: all 0.4s ease; transform: scale(0.5); position: absolute; top: 20%; left: 20%; filter: drop-shadow(0 0 5px currentColor); pointer-events: none; }
+        .player .icon, .question-cell .icon, .question-answered .icon, .exit-cell .icon, .bomb.revealed .icon, .life-cell .icon, .safe-cell .icon, .bomb-disarmed .icon, .code-piece-cell .icon, .lost-money-cell .icon, .flagged-cell .icon { opacity: 1; transform: scale(1); }
+        .player { background-color: var(--glow-accent) !important; box-shadow: 0 0 15px var(--glow-accent), 0 0 25px rgba(0, 191, 255, var(--player-glow-intensity)) !important; animation: player-glow 2s infinite; }
+        .bomb.revealed, .bomb.scanned { background-color: var(--bomb-color); box-shadow: 0 0 20px var(--bomb-color); }
+        .bomb-disarmed { background: var(--crater-bg); box-shadow: inset 0 0 15px #000; border-color: #555; cursor: default; }
+        .safe-cell, .code-piece-cell, .lost-money-cell { color: var(--money-color); }
+        .flagged-cell { color: var(--bomb-color); }
+        .question-cell,.question-answered,.exit-cell,.life-cell {color:#FFF} .question-answered{background-color:var(--success-color);box-shadow:0 0 20px var(--success-color)} .exit-cell{background-color:var(--exit-color);box-shadow:0 0 20px var(--exit-color)} .life-cell{color:var(--life-color)}
+        .path-highlight { background-color: var(--path-color) !important; box-shadow: 0 0 15px var(--path-color) !important; }
+        
+        #shop-container { margin-top:15px; } #shop-title { font-size:1.1em; font-weight:600; margin-bottom:10px; text-transform:uppercase; letter-spacing:2px; }
+        .shop-buttons { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .shop-button { padding:8px 12px; border:2px solid var(--glow-accent); border-radius:12px; background:transparent; color:var(--glow-accent); font-size:.8em; font-weight:600; cursor:pointer; box-shadow:0 0 10px var(--glow-accent),inset 0 0 10px var(--glow-accent); transition:all .2s ease; }
+        .shop-button:hover:not(:disabled) { background-color:var(--glow-accent); color:#0F0C29; text-shadow:none; } .shop-button:disabled { opacity:.4; cursor:not-allowed; box-shadow:none; }
+        
+        #message-container { font-size:1.1em; font-weight:600; margin-top:15px; height:25px; }
+        #restart-button { margin-top:15px; padding:12px 25px; border:2px solid var(--glow-accent); border-radius:50px; background-color:transparent; color:var(--glow-accent); font-size:1em; font-weight:700; cursor:pointer; text-transform:uppercase; box-shadow:0 0 10px var(--glow-accent),inset 0 0 10px var(--glow-accent); transition:all .2s ease; }
+        #restart-button:hover { background-color:var(--glow-accent); color:#0F0C29; text-shadow:none; }
+        
+        #integrated-wait-screen {
             position: absolute;
-            left: 50%;
-            top: -5px;
-            bottom: -5px;
-            width: 4px;
-            background-color: rgba(255, 196, 0, 0.5);
-            border-radius: 2px;
-            transition: all 0.5s ease;
-        }
-        #progress-milestone.reached {
-            background-color: var(--selected-color);
-            box-shadow: 0 0 10px var(--selected-color);
-            transform: scaleY(1.5);
-        }
-
-        #header-controls { display: flex; align-items: center; gap: 15px; }
-        
-        #total-credits-display {
-            background: rgba(0,0,0,0.3);
-            padding: 8px 15px;
+            top: 110px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: rgba(15, 12, 41, 0.97);
             border-radius: 20px;
-            font-size: 1.1em;
-            font-weight: 600;
-            color: var(--selected-color);
-            border: 1px solid var(--selected-color);
+            z-index: 50;
+            display: none; /* Alapból rejtett */
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: clamp(15px, 3vw, 30px);
+            box-sizing: border-box;
+            overflow-y: auto;
         }
-        
-        #header-next-button {
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); color: #fff; padding: 10px 25px; border: none; border-radius: 50px;
-            cursor: pointer; font-size: 1em; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 0 20px rgba(255, 0, 193, 0.5);
-            visibility: hidden; opacity: 0; flex-shrink: 0;
+        #wait-info-content {
+            text-align: left;
+            max-width: 95%;
+            width: 100%;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
         }
-        #header-next-button:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 0, 193, 0.8); }
-        #header-next-button.visible { visibility: visible; opacity: 1; }
-        
-        /* Lifelines */
-        #lifelines-container { display: flex; gap: 10px; align-items: center; }
-        .lifeline-wrapper { position: relative; }
-        .lifeline { background: rgba(0,0,0,0.4); border: 1px solid var(--primary-color); border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; font-weight: bold; position: relative; }
-        .lifeline:hover:not(.used) { background: var(--primary-color); color: #000; }
-        .lifeline.used { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
-        .lifeline .count { position: absolute; bottom: -5px; right: -5px; background: var(--secondary-color); border-radius: 50%; font-size: 0.8em; width: 20px; height: 20px; line-height: 20px; }
-        #lifeline-swap { font-size: 0.8em; }
+        #wait-info-content h3 { font-family: 'Orbitron', sans-serif; font-size: clamp(1.2em, 3vw, 1.7em); margin-bottom: 15px; color: var(--glow-accent); text-align: center; }
+        #wait-info-content h4 { font-family: 'Orbitron', sans-serif; color: var(--glow-accent); margin-top: 15px; font-size: clamp(0.9em, 2.5vw, 1em); }
+        #wait-info-content p { font-size: clamp(0.85em, 2vw, 1em); line-height: 1.5; text-align: center; margin-bottom: 15px; }
+        #wait-info-content ul { padding-left: 18px; line-height: 1.6; }
+        #wait-info-content ul li { margin-bottom: 6px; }
+        #wait-info-content ul ul { margin-left: 18px; margin-top: 5px; }
 
-        .lifeline-wrapper::after { content: attr(data-tooltip); position: absolute; bottom: 125%; left: 50%; transform: translateX(-50%); background-color: #000; color: #fff; padding: 8px 12px; border-radius: 5px; font-size: 0.9em; font-weight: normal; white-space: nowrap; z-index: 10; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; pointer-events: none; }
-        .lifeline-wrapper::before { content: ''; position: absolute; bottom: 125%; margin-bottom: -5px; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: #000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 10; pointer-events: none; }
-        .lifeline-wrapper:hover::before, .lifeline-wrapper:hover::after { opacity: 1; visibility: visible; }
-
-        /* Question & Answers */
-        #question-text { font-size: 1.4em; font-weight: 600; line-height: 1.4; display: flex; align-items: center; justify-content: center; padding: 0 20px; flex-shrink: 0;}
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; z-index: 1000; }
+        .modal.visible { opacity: 1; pointer-events: auto; }
+        .modal-content { transform: scale(0.9); transition: transform 0.3s ease; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cell-border); padding: 30px; border-radius: 20px; width: 90%; text-align: center; }
+        .modal.visible .modal-content { transform: scale(1); }
+        #safe-container { max-width: 350px; }
+        #final-chance-container { max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        #final-chance-container button { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 1px solid var(--cell-border); border-radius: 15px; background: rgba(255,255,255,0.1); color: var(--text-color); font-size: 1.1em; cursor: pointer; }
+        #safe-display { width: 100%; height: 50px; background: rgba(0,0,0,0.3); border-radius: 10px; margin-bottom: 20px; font-size: 2em; letter-spacing: 10px; text-align: center; color: white; }
+        #safe-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        #safe-keypad button { padding: 15px; font-size: 1.5em; border: 1px solid var(--cell-border); border-radius: 15px; background: rgba(255,255,255,0.1); color: var(--text-color); cursor: pointer; }
+        #safe-display.error { animation: shake-error 0.5s; }
         
-        #bridge-scene { 
-            perspective: 1200px; 
-            position: relative; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); 
-            z-index: 10;
-            flex-grow: 1; 
-            min-height: 200px; 
-        }
-        #bridge-scene.advance { transform: translateZ(250px) scale(1.2); }
-        .future-bridge { position: absolute; background: rgba(0, 229, 255, 0.2); border: 1px solid rgba(0, 229, 255, 0.5); border-radius: 10px; width: 180px; height: 100px; transition: all 0.5s ease-out; opacity: 0; transform-style: preserve-3d; }
-        .future-bridge:nth-of-type(1) { transform: translateZ(-250px) scale(0.8); opacity: 0.5; filter: blur(1px); }
-        .future-bridge:nth-of-type(2) { transform: translateZ(-500px) scale(0.6); opacity: 0.3; filter: blur(2px); }
-        .options-container { display: flex; justify-content: center; gap: 20px; transform: rotateX(45deg); transform-style: preserve-3d; position: relative; }
-        .bridge-option { background: linear-gradient(rgba(0, 229, 255, 0.1), rgba(0, 229, 255, 0.3)); color: #fff; border: 2px solid var(--primary-color); border-radius: 10px; cursor: pointer; font-size: 1.1em; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 0 15px rgba(0, 229, 255, 0.5); width: 200px; height: 120px; display: flex; align-items: center; justify-content: center; padding: 10px; position: relative; opacity: 0; animation: revealBridge 0.5s forwards ease-out; }
-        .bridge-option span { text-shadow: 0 0 5px #000; overflow-wrap: break-word; word-break: break-word; }
-        .bridge-option:not(.disabled):hover { transform: scale(1.05) translateZ(10px); box-shadow: 0 0 25px var(--primary-color); }
+        @keyframes shake-and-flash { 0%,100%{transform:translateX(0);color:white;text-shadow:0 0 10px var(--glow-accent),0 0 20px var(--glow-accent)} 10%,30%,50%,70%,90%{transform:translateX(-5px);color:var(--bomb-color);text-shadow:0 0 10px var(--bomb-color)} 20%,40%,60%,80%{transform:translateX(5px)} }
+        @keyframes player-glow { 50% { box-shadow: 0 0 25px var(--glow-accent), 0 0 40px rgba(0, 191, 255, var(--player-glow-intensity)); } }
+        @keyframes flash-warning { 50% { opacity: 0.5; } }
+        @keyframes shake-error { 10%,90%{transform:translateX(-5px)} 20%,80%{transform:translateX(5px)} 30%,50%,70%{transform:translateX(-8px)} 40%,60%{transform:translateX(8px)} }
         
-        .bridge-option.is-chosen {
-            border-color: var(--selected-color);
-            transform: scale(1.05) translateZ(10px);
-            animation: glow-gold 0.8s infinite alternate;
-        }
-
-        .bridge-option.disabled { cursor: not-allowed; pointer-events: none; }
-        .bridge-option.disabled-by-lifeline { opacity: 0.3 !important; background: #333; border-color: #555; pointer-events: none; cursor: not-allowed; }
-        .bridge-option.correct { animation: none; background: var(--correct-color); border-color: #fff; color: #000; box-shadow: 0 0 30px var(--correct-color); opacity: 1 !important; transform: scale(1.1) translateZ(20px); }
-        .bridge-option.correct.flashing { animation: flashCorrect 0.5s 3; }
-        .bridge-option.incorrect { animation: none; background: var(--incorrect-color); border-color: #fff; color: #fff; box-shadow: 0 0 30px var(--incorrect-color); opacity: 1 !important; }
-        
-        /* Feedback */
-        #feedback-container { min-height: 160px; position: relative; z-index: 20; flex-shrink: 0; }
-        #result { font-size: 1.8em; font-weight: bold; height: 40px; }
-        #potential-winnings-display {
-            font-size: 1.3em;
-            color: var(--selected-color);
-            font-weight: 600;
-            margin: 10px 0;
-            height: 25px;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-        #explanation-container { background-color: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 15px; margin: 15px auto 0 auto; max-width: 800px; font-size: 1.1em; line-height: 1.6; display: none; opacity: 0; transition: opacity 0.5s ease; }
-        
-        .feedback-buttons { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px; }
-
-        #end-game-button, #bank-button { 
-            visibility: hidden; 
-            opacity: 0; 
-            transition: all 0.3s ease; 
-            font-size: 1em; 
-            padding: 10px 25px;
-        }
-        #end-game-button.visible, #bank-button.visible {
-            visibility: visible;
-            opacity: 1;
-        }
-        #bank-button { background: linear-gradient(45deg, var(--correct-color), #00c77a); box-shadow: 0 0 20px rgba(0, 255, 155, 0.5); }
-        #bank-button:hover:not(:disabled) { box-shadow: 0 0 30px rgba(0, 255, 155, 0.8); }
-
-        /* ANIMATIONS */
-        @keyframes revealBridge { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes flashCorrect { 50% { background: #fff; color: #000; } }
-        @keyframes glow-gold {
-            from { box-shadow: 0 0 15px 2px var(--selected-color); }
-            to { box-shadow: 0 0 35px 10px var(--selected-color); }
-        }
-        @keyframes success-pulse { 0% { box-shadow: 0 0 30px rgba(0, 229, 255, 0.2); } 50% { box-shadow: 0 0 60px 15px rgba(0, 255, 155, 0.7); } 100% { box-shadow: 0 0 30px rgba(0, 229, 255, 0.2); } }
-        @keyframes fail-shake { 0%, 100% { transform: translateX(0); box-shadow: 0 0 30px rgba(0, 229, 255, 0.2); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); } 20%, 40%, 60%, 80% { transform: translateX(10px); } 50% { box-shadow: 0 0 80px 20px rgba(255, 61, 113, 0.8); } }
-        @keyframes flashGreen {
-            50% { color: var(--correct-color); text-shadow: 0 0 10px var(--correct-color); transform: scale(1.1); }
-        }
-        
-        /* WIDESCREEN DESKTOP STYLES */
-        @media (min-width: 1201px) {
-            .overlay-content h1 { font-size: 3.5em; }
-            .overlay-content p { font-size: 1.4em; }
-            .overlay-content { max-width: 800px; }
-            #question-text { font-size: 1.8em; }
-            .options-container { gap: 30px; }
-            .bridge-option { width: 240px; height: 140px; font-size: 1.2em; }
-            #feedback-container { min-height: 180px; }
-        }
-
-        /* ==== TOTAL MOBILE REFACTOR ==== */
-        @media (max-width: 900px) {
-            html, body {
-                height: auto; 
-                overflow: auto;
+        /* Asztali nézet */
+        @media (min-width: 1051px) {
+            #app-container {
+                flex-direction: row;
+                align-items: flex-start;
             }
-            .game-view {
-                padding: 0;
+            #game-wrapper {
+                flex-grow: 1;
+                max-width: none;
             }
-            .overlay-screen, #game-screen {
-                 height: auto;
-                 min-height: 100vh;
-                 position: relative;
+            #info-panel {
+                width: 300px;
+                flex-shrink: 0;
+                max-width: 300px;
             }
-            #start-screen .overlay-content-wrapper {
-                 height: 100%;
-            }
-            .overlay-content-wrapper { 
-                width: 100%;
-                height: auto;
-                max-height: none;
-                padding: 15px;
-                box-sizing: border-box;
-                overflow-y: auto;
-                justify-content: flex-start;
-            }
-            #game-container {
-                width: 100%;
-                height: auto;
-                min-height: 100vh;
-                display: block; /* Change from flex to simple block */
-                padding: 15px;
-                box-sizing: border-box;
-                overflow: visible;
-            }
-            #game-header { flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 20px; }
-            #header-left { order: 1; flex-basis: 50%; }
-            #lifelines-container { order: 2; flex-basis: 40%; justify-content: flex-end; }
-            #progress-container { order: 3; width: 100%; height: 15px; }
-            #header-controls { order: 4; width: 100%; justify-content: center; margin-top: 10px; }
-            #game-logo { width: 140px; }
-            .overlay-content h1 { font-size: 2.2em; } 
-            .overlay-content p { font-size: 1.1em; }
-            
-            #question-text {
-                font-size: 1.4em;
-                min-height: 3em; /* Ensure space for text */
-                margin-bottom: 30px; /* CRITICAL: Adds space between question and answers */
-                padding: 10px 0;
-            }
-            #bridge-scene {
-                perspective: none;
-                height: auto;
-                margin: 0; /* Let its children create space */
-            }
-
-            .future-bridge { display: none; }
-            .options-container { transform: none; flex-direction: column; align-items: center; gap: 15px; width: 100%; }
-            .bridge-option { width: 95%; max-width: 450px; height: auto; min-height: 70px; font-size: 1.1em; }
-            #feedback-container { min-height: auto; padding-top: 50px; } /* CRITICAL: Adds space before feedback appears */
-            #explanation-container { font-size: 1em; }
-            .shop-item-row { flex-wrap: wrap; }
-            .lifeline-wrapper:hover::before, .lifeline-wrapper:hover::after { display: none; }
         }
     </style>
 </head>
 <body>
-
-    <svg id="background-scenery" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice"><defs><filter id="glow"><feGaussianBlur stdDeviation="7" result="coloredBlur"></feGaussianBlur><feMerge><feMergeNode in="coloredBlur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter><linearGradient id="bridgeGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:var(--secondary-color);stop-opacity:1" /><stop offset="100%" style="stop-color:var(--primary-color);stop-opacity:1" /></linearGradient></defs><path d="M0 650 L1920 650" stroke="url(#bridgeGradient)" stroke-width="2" filter="url(#glow)"></path></svg>
-
-    <!-- START SCREEN -->
-    <div id="start-screen" class="overlay-screen game-view">
-        <div class="overlay-content-wrapper">
-            <div class="overlay-content">
-                 <svg id="start-logo" viewBox="0 0 200 115" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="logoGradient" x1="0%" y1="50%" x2="100%" y2="50%">
-                            <stop offset="0%" style="stop-color:var(--secondary-color)" />
-                            <stop offset="100%" style="stop-color:var(--primary-color)" />
-                        </linearGradient>
-                        <filter id="logoGlow">
-                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                            <feMerge>
-                                <feMergeNode in="coloredBlur"/>
-                                <feMergeNode in="SourceGraphic"/>
-                            </feMerge>
-                        </filter>
-                    </defs>
-                    <g filter="url(#logoGlow)">
-                        <path d="M 30 65 L 70 15 L 110 65 M 100 45 L 170 45" stroke="url(#logoGradient)" stroke-width="10" stroke-linecap="round" fill="none"/>
-                        <text x="100" y="90" font-family="Poppins, sans-serif" font-size="24" font-weight="600" fill="url(#logoGradient)" text-anchor="middle">AZ UGRÁS</text>
-                        <text x="100" y="105" font-family="Poppins, sans-serif" font-size="10" font-weight="400" fill="url(#logoGradient)" text-anchor="middle" letter-spacing="1.5">KOCKÁZAT ÉS NYEREMÉNY</text>
-                    </g>
-                </svg>
-                 <p class="copyright-notice">&copy; Copyright by: Robi</p>
-
-                <div id="rules-container">
-                    <button id="toggle-rules-btn" class="btn">Játékszabályzat megnyitása</button>
-                    <div id="rules-content">
-                        <h3>A Játék Célja</h3>
-                        <p>Juss át mind a 10 hídon 10 kvízkérdés helyes megválaszolásával. Gyűjts minél több Kreditet okos döntésekkel, használd a segítségeket, és nyerd meg a főnyereményt!</p>
-
-                        <h3>A Játék Menete</h3>
-                        
-                        <h4>1. Indulás: Játékmód Választása</h4>
-                        <p>A játék elején két út áll előtted:
-                            <br>- <strong>Normál Játék:</strong> Kockázat nélkül indulsz, a főnyeremény 1000 Kredit.
-                            <br>- <strong>Kockázatos Ugrás:</strong> 500 Kredit a tét, de a főnyeremény a duplája, 2000 Kredit!
-                        </p>
-
-                        <h4>2. A Cél: Építsd a Sorozatot!</h4>
-                        <p>Minden helyes válasszal növeled a helyes válasz-sorozatodat és <strong>"kockán forgó"</strong> krediteket gyűjtesz. Minél hosszabb a sorozatod, annál értékesebb a következő helyes válasz! A cél, hogy a lehető legnagyobb összeget gyűjtsd össze, mielőtt bankolsz vagy hibázol.</p>
-
-                        <h4>3. A Döntés: Bankolsz vagy Kockáztatsz?</h4>
-                        <p>
-                            Minden sikeres ugrás után döntened kell:
-                            <br>- <strong>Bank:</strong> A <strong>`Bank`</strong> gombbal bebiztosíthatod a kockán forgó kreditjeidet. Ezek véglegesen a tieid lesznek, de a kreditgyűjtő sorozatod újraindul.
-                            <br>- <strong>Kockázat:</strong> Ha a <strong>`Következő híd`</strong> gombot választod, a kreditek játékban maradnak, és esélyed van tovább növelni a nyereményt, de egy rossz válasz esetén az összes, addig nem bankolt kreditet elveszíted!
-                        </p>
-                        
-                        <h4>4. A Végeredmény: Győzelem vagy Vereség</h4>
-                        <p>
-                            - <strong>Győzelem:</strong> Ha mind a 10 kérdésre helyesen válaszolsz, a főnyereményt ÉS az utolsó körben gyűjtött, nem bankolt krediteket is megkapod.
-                            <br>- <strong>Vereség:</strong> Ha rosszul válaszolsz és nincs Biztonsági Hálód, a játék véget ér. Csak a már sikeresen bankolt és a mérföldkőnél (5. híd) szerzett krediteket tarthatod meg.
-                        </p>
-
-                        <h3>Segítségek</h3>
-                        <ul>
-                            <li>
-                                <div class="rules-icon"><div class="lifeline shop-icon">50/50</div></div>
-                                <div><strong>50/50:</strong> Eltávolít két helytelen választ a négyből, így megduplázva az esélyeidet.</div>
-                            </li>
-                             <li>
-                                <div class="rules-icon"><div class="lifeline shop-icon" style="font-size: 0.8em;">CSERE</div></div>
-                                <div><strong>Kérdéscsere:</strong> Ha egy kérdés túl nehéz, ezzel a segítséggel lecserélheted egy teljesen újra.</div>
-                            </li>
-                              <li>
-                                <div class="rules-icon"><div class="lifeline shop-icon">BH</div></div>
-                                <div><strong>Biztonsági Háló:</strong> Ha rosszul válaszolsz, megment a leeséstől, és folytathatod a játékot. A kreditgyűjtő sorozatod azonban ilyenkor is megszakad!</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <p>Jelenlegi egyenleged:</p>
-                <div id="start-credits" class="credit-display">0 Kredit</div>
-                <div class="shop-container">
-                    <h2>Segítségek vásárlása</h2>
-                    <div class="shop-item">
-                        <div class="shop-item-row">
-                            <div class="lifeline shop-icon">50/50</div>
-                            <button id="buy-fiftyfifty" class="btn">50/50 (250 K)</button>
-                        </div>
-                         <p>A számítógép elvesz két helytelen választ.</p>
-                    </div>
-                     <div class="shop-item">
-                         <div class="shop-item-row">
-                            <div class="lifeline shop-icon" style="font-size: 0.8em;">CSERE</div>
-                            <button id="buy-swap" class="btn">Kérdéscsere (350 K)</button>
-                        </div>
-                         <p>Lecseréli a jelenlegi kérdést egy véletlen újra.</p>
-                    </div>
-                    <div class="shop-item">
-                        <div class="shop-item-row">
-                            <div class="lifeline shop-icon">BH</div>
-                            <button id="buy-safetynet" class="btn">Biztonsági Háló (500 K)</button>
-                        </div>
-                        <p>Rossz válasz esetén megment a kieséstől.</p>
-                    </div>
-                </div>
-                <div class="wager-container">
-                    <h2>Válassz Tétet!</h2>
-                    <button id="start-normal-game" class="btn">Normál Játék (1x Nyeremény)</button>
-                    <button id="start-risky-game" class="btn">Kockázatos Ugrás (2x Nyeremény, -500 K Tét)</button>
-                </div>
-                <div class="daily-bonus-container">
-                    <h2>Napi Bónusz</h2>
-                    <p id="current-date-display"></p>
-                    <div id="streak-meter"></div>
-                    <button id="claim-bonus-btn" class="btn">Bónusz begyűjtése</button>
-                    <p id="bonus-status"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- END GAME SCREEN -->
-    <div id="end-screen" class="overlay-screen game-view">
-        <div class="overlay-content-wrapper">
-             <div class="overlay-content">
-                <h1 id="end-title">Játék Vége</h1>
-                <p id="end-message">Sajnos leestél.</p>
-                <p>Változás:</p>
-                <div id="end-credits-change" class="credit-display">0 Kredit</div>
-                <p>Új egyenleged:</p>
-                <div id="end-total-credits" class="credit-display">0 Kredit</div>
-                <button id="play-again-btn" class="btn">Új Játék</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- GAME SCREEN -->
-    <div id="game-screen" class="game-view">
-        <div id="game-container">
+    <div id="app-container">
+        <div id="game-wrapper">
             <div id="game-header">
-                <div id="header-left">
-                     <svg id="game-logo" viewBox="0 0 200 115" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="logoGradientHeader" x1="0%" y1="50%" x2="100%" y2="50%">
-                                <stop offset="0%" style="stop-color:var(--secondary-color)" />
-                                <stop offset="100%" style="stop-color:var(--primary-color)" />
-                            </linearGradient>
-                            <filter id="logoGlowHeader">
-                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                                <feMerge>
-                                    <feMergeNode in="coloredBlur"/>
-                                    <feMergeNode in="SourceGraphic"/>
-                                </feMerge>
-                            </filter>
-                        </defs>
-                        <g filter="url(#logoGlowHeader)">
-                            <path d="M 30 65 L 70 15 L 110 65 M 100 45 L 170 45" stroke="url(#logoGradientHeader)" stroke-width="10" stroke-linecap="round" fill="none"/>
-                            <text x="100" y="90" font-family="Poppins, sans-serif" font-size="24" font-weight="600" fill="url(#logoGradientHeader)" text-anchor="middle">AZ UGRÁS</text>
-                             <text x="100" y="105" font-family="Poppins, sans-serif" font-size="10" font-weight="400" fill="url(#logoGradientHeader)" text-anchor="middle" letter-spacing="1.5">KOCKÁZAT ÉS NYEREMÉNY</text>
-                        </g>
-                    </svg>
-                    <div id="question-counter"></div>
-                </div>
-                <div id="lifelines-container">
-                    <div class="lifeline-wrapper" data-tooltip="Két helytelen választ eltávolít.">
-                        <div id="lifeline-fiftyfifty" class="lifeline">50/50<span class="count">0</span></div>
-                    </div>
-                    <div class="lifeline-wrapper" data-tooltip="Lecseréli a kérdést egy újra.">
-                        <div id="lifeline-swap" class="lifeline">CSERE<span class="count">0</span></div>
-                    </div>
-                    <div class="lifeline-wrapper" data-tooltip="Megment a kieséstől egy rossz válasz esetén.">
-                        <div id="lifeline-safetynet" class="lifeline">BH<span class="count">0</span></div>
+                <div class="stats-container left">
+                    <div id="lives-container" class="game-stat"></div>
+                    <div id="money-container" class="game-stat">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13.5,15.5H16.5V17H13.5V15.5M13.5,13H16.5V14.5H13.5V13M7.5,15.5H10.5V17H7.5V15.5M7.5,13H10.5V14.5H7.5V13M12,6A3,3 0 0,1 15,9H9A3,3 0 0,1 12,6M12,7.75C11.31,7.75 10.75,8.31 10.75,9H13.25C13.25,8.31 12.69,7.75 12,7.75M12,18.5A1.5,1.5 0 0,1 10.5,17H13.5A1.5,1.5 0 0,1 12,18.5Z" /></svg>
+                        <span id="money-value">0 Ft</span>
                     </div>
                 </div>
-                <div id="progress-container">
-                    <div id="progress-bar"></div>
-                    <div id="progress-milestone"></div>
-                </div>
-                <div id="header-controls">
-                    <div id="total-credits-display">0 Kredit</div>
-                    <button id="header-next-button">Következő híd</button>
+                <div id="logo-title">BUMM!</div>
+                <div class="stats-container right">
+                    <div id="doubler-indicator" class="game-stat">2x <span id="doubler-count"></span></div>
+                    <div id="vest-indicator" class="game-stat">🛡️ <span id="vest-count"></span></div>
+                    <div id="bomb-counter" class="game-stat">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v2h-2zm0-8h2v6h-2z"/></svg>
+                        <span id="bomb-value">5</span>
+                    </div>
+                    <div id="question-counter" class="game-stat">
+                        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,10H12V4H14M14,12H12V14H14M10,10H8V12H10M10,4H8V8H10M16,16H8V18H16M16,12H14V14H16M16,10H14V8H16M18,20H6V3C6,2.45 6.45,2 7,2H17C17.55,2 18,2.45 18,3V20M20,20V3C20,1.34 18.66,0 17,0H7C5.34,0 4,1.34 4,3V20C4,21.66 5.34,23 7,23H17C18.66,23 20,21.66 20,20Z" /></svg>
+                        <span id="question-value">0 / 5</span>
+                    </div>
                 </div>
             </div>
-            <p id="question-text"></p>
-            <div id="bridge-scene">
-                <div class="future-bridge"></div><div class="future-bridge"></div>
-                <div class="options-container"></div>
+            <div id="game-elements">
+                 <div id="info-status" class="info-section">
+                    <h3>Státusz</h3>
+                    <p id="info-proximity-warning">BOMBA A KÖZELBEN!</p>
+                    <p id="info-exit-coords"></p>
+                </div>
+                <div id="game-board-wrapper"><table id="game-board"></table></div>
+                <div id="info-question" class="info-section">
+                    <h3 id="info-question-title">Kérdés</h3>
+                    <p id="info-question-text"></p>
+                    <div id="info-answer-buttons"></div>
+                    <div id="info-question-shop" class="shop-buttons" style="margin-top:15px; display:none;">
+                         <button id="shop-halve" class="shop-button">🧠 Felező (100 Ft)</button>
+                         <button id="shop-skip" class="shop-button">⏩ Átugrás (200 Ft)</button>
+                    </div>
+                </div>
+                <div id="shop-container">
+                    <div id="shop-title">Segítségek</div>
+                    <div class="shop-buttons">
+                        <button id="shop-scan-cell" class="shop-button">🎯 Mező Szkenner (75 Ft)</button>
+                        <button id="shop-doubler" class="shop-button">2x Pénz Duplázó (150 Ft)</button>
+                        <button id="shop-gps" class="shop-button">🛰️ GPS Útvonal (250 Ft)</button>
+                        <button id="shop-vest" class="shop-button">🛡️ Bomba Mellény (300 Ft)</button>
+                        <button id="shop-life" class="shop-button">❤️ Extra Élet (400 Ft)</button>
+                    </div>
+                </div>
+                <div id="message-container"></div>
+                <button id="restart-button">Új Játék Indítása</button>
             </div>
-            <div id="feedback-container">
-                <div id="result"></div>
-                <div id="potential-winnings-display"></div>
-                <div id="explanation-container" class="info-box"></div>
-                <div class="feedback-buttons">
-                    <button id="bank-button" class="btn">Bank</button>
-                    <button id="end-game-button" class="btn">Játék befejezése</button>
+            <div id="integrated-wait-screen">
+                <div id="wait-info-content">
+                    <h3>A játék egyelőre véget ért.</h3>
+                    <p>A következő, mindenki számára egységes pálya <strong id="wait-time"></strong>-kor indul.</p>
+                    <h4>Részletes Játékszabályzat</h4>
+                    <ul>
+                        <li><strong>Cél:</strong> Juss el a véletlenszerűen elhelyezett kijárathoz, miután mind az 5 kérdésre válaszoltál!</li>
+                        <li><strong>Bombák:</strong> Kerüld el a rejtett bombákat! A helyüket a játék elején 2 másodpercre megmutatjuk. Ha bombára lépsz, életet veszítesz, de a helye biztonságossá válik (kráter jelzi). Jobb klikkel megjelölhetsz egy mezőt, ha bombát sejtesz ott.</li>
+                        <li><strong>Kérdések:</strong> A kérdőjeles mezőkön te választhatod ki a kérdés nehézségét (és a jutalmát). Helytelen válasz 1 életbe kerül, de a kérdés megválaszoltnek minősül.</li>
+                        <li><strong>Széf & Kód:</strong> A pályán el van rejtve egy széf és a 4 jegyű kódjának darabjai. Gyűjtsd össze a darabokat, lépj a széf-mezőre, és hatástalanítsd az összes bombát!</li>
+                        <li><strong>Életek & Power-upok:</strong> 3 élettel kezdesz. A pályán fix helyeken találsz plusz életeket.</li>
+                        <li><strong>Pénz & Segítségek:</strong> A helyes válaszokért pénzt kapsz, amit a boltban különböző segítségekre válthatsz. Elegendő pénzért bármennyi segítséget vásárolhatsz.
+                            <ul>
+                                <li><strong>Mező Szkenner:</strong> Felfed egy általad választott mezőt anélkül, hogy rálépnél.</li>
+                                <li><strong>Pénz Duplázó:</strong> A következő helyes válaszodért dupla pénz jár. Több is felhalmozható.</li>
+                                <li><strong>GPS Útvonal:</strong> Megmutatja a legrövidebb biztonságos utat a következő kérdéshez.</li>
+                                <li><strong>Bomba Mellény:</strong> Megvéd a következő bomba robbanásától (nem veszítesz életet). Több is felhalmozható.</li>
+                                <li><strong>Extra Élet:</strong> Azonnal kapsz egy plusz életet.</li>
+                                <li><strong>Felező / Átugrás:</strong> A kérdés alatt elérhető opciók.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Pénzmentés:</strong> Ha minden életed elfogy, egy utolsó kérdéssel átmentheted a pénzed a következő, szinkronizált pályára. Ha elbukod, a következő pályán visszaszerezheted!</li>
+                    </ul>
                 </div>
             </div>
         </div>
+        <div id="info-panel">
+             <div id="info-time" class="info-section">
+                <p>Idő: <span id="current-time"></span></p>
+                <p>Új pálya: <span id="next-map-time"></span></p>
+                <button id="new-map-button" class="shop-button">Új Pálya Elérhető!</button>
+            </div>
+            <div id="info-safe" class="info-section">
+                <h3>Széf</h3>
+                <p id="info-safe-hint"></p>
+                <p id="info-safe-coords"></p>
+            </div>
+        </div>
     </div>
-
+    <div id="safe-modal" class="modal">
+        <div id="safe-container" class="modal-content">
+            <h3>Add meg a Széf Kódját</h3>
+            <div id="safe-display"></div>
+            <div id="safe-keypad"></div>
+        </div>
+    </div>
+    <div id="final-chance-modal" class="modal">
+        <div id="final-chance-container" class="modal-content">
+            <h3>Pénzmentő Kérdés!</h3>
+            <p id="final-chance-message"></p>
+            <h2 id="final-chance-question"></h2>
+            <div id="final-chance-answers"></div>
+        </div>
+    </div>
+    <div id="svg-definitions" style="display: none;">
+        <svg id="player-svg" viewBox="0 0 24 24"><path fill="white" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <svg id="bomb-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v2h-2zm0-8h2v6h-2z"/></svg>
+        <svg id="safe-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M18,4H6C4.9,4 4,4.9 4,6V18C4,19.1 4.9,20 6,20H18C19.1,20 20,19.1 20,18V6C20,4.9 19.1,4 18,4M12,16C10.9,16 10,15.1 10,14C10,12.9 10.9,12 12,12C13.1,12 14,12.9 14,14C14,15.1 13.1,16 12,16M15,8H9V10H15V8Z" /></svg>
+        <svg id="code-piece-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M15,4V6H18V18H15V20H18C19.1,20 20,19.1 20,18V6C20,4.9 19.1,4 18,4M9,20V18H6V6H9V4H6C4.9,4 4,4.9 4,6V18C4,19.1 4.9,20 6,20M14,14H10V16H14V14M14,10H10V12H14V10M14,6H10V8H14V6Z" /></svg>
+        <svg id="flag-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M14.4,6L14,4H5V21H7V14H12.6L13,16H20V6H14.4Z" /></svg>
+        <svg id="lost-money-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M15,13V11H18.2C18.1,9.8 17.6,8.8 16.8,8.1L15.4,9.5C15.8,9.9 16,10.4 16.1,11H15M11,15H13V16.1C12.6,16 12.3,16 12,16C10.1,16 8.5,14.6 8.2,12.8H10V11H8.1C8,10.7 8,10.4 8,10C8,8.1 9.4,6.5 11.2,6.2V8H13V6.1C13.4,6.2 13.7,6.2 14,6.3L15.4,4.9C14.1,4.3 12.6,4 11.1,4C6.1,4 2,8 2,13C2,18 6.1,22 11.1,22C12.4,22 13.6,21.8 14.7,21.3L13.3,19.9C12.6,20 11.9,20.1 11.1,20.1C7.3,20.1 4.1,17 4.1,13C4.1,9 7.3,5.9 11.1,5.9C11.4,5.9 11.7,6 12,6C12,6 12,6 12,6V6C12,6 12,6 12,6V8H11V6C11,6 11,6 11,6M20,13H22V11H20V13M20,17H22V15H20V17M18,21H20V19H18V21Z" /></svg>
+        <svg id="crater-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4C14.25,4 16.3,5.05 17.75,6.56L6.56,17.75C5.05,16.3 4,14.25 4,12C4,7.58 7.58,4 12,4M12,20C9.75,20 7.7,18.95 6.25,17.44L17.44,6.25C18.95,7.7 20,9.75 20,12C20,16.42 16.42,20 12,20Z" /></svg>
+        <svg id="question-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v2h-2V7zm0 4h2v6h-2v-6z"/></svg>
+        <svg id="disarmed-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        <svg id="exit-svg" viewBox="0 0 24 24"><path fill="white" d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/></svg>
+        <svg id="life-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </div>
     <script>
-        // GAME DATA
-        const allQuestions = [
-            { question: "Mi Kanada fővárosa?", options: ["Toronto", "Vancouver", "Ottawa", "Montréal"], answer: "Ottawa", explanation: "Bár nem a legnagyobb, Ottawa Kanada politikai és adminisztratív központja." },
-            { question: "Melyik erő tartja a bolygókat a Nap körüli pályájukon?", options: ["Mágnesesség", "Súrlódás", "Nukleáris erő", "Gravitáció"], answer: "Gravitáció", explanation: "A Nap hatalmas tömegvonzása, a gravitáció tartja a bolygókat keringési pályájukon." },
-            { question: "Melyik híres magyar étel fő összetevője a paprika és a paradicsom?", options: ["Töltött káposzta", "Gulyásleves", "Lecsó", "Túrós csusza"], answer: "Lecsó", explanation: "A lecsó egy tradicionális magyar egytálétel, amelynek alapja a hagyma, paprika és paradicsom." },
-            { question: "Mit jelent a 'CPU' rövidítés a számítástechnikában?", options: ["Központi Tápellátó Egység", "Központi Feldolgozó Egység", "Számítógép Személyi Egység", "Alapvető Programozási Egység"], answer: "Központi Feldolgozó Egység", explanation: "A CPU (Central Processing Unit) a számítógép 'agya', amely a legtöbb számítási feladatot elvégzi." },
-            { question: "Ki írta a 'Rómeó és Júlia' című drámát?", options: ["Charles Dickens", "William Shakespeare", "Molière", "Goethe"], answer: "William Shakespeare", explanation: "A 'Rómeó és Júlia' az angol drámaíró, William Shakespeare egyik legismertebb tragédiája." },
-            { question: "Melyik a legkisebb kontinens?", options: ["Európa", "Antarktisz", "Dél-Amerika", "Ausztrália"], answer: "Ausztrália", explanation: "Terület és népesség alapján is Ausztrália a legkisebb lakott kontinens." },
+        document.addEventListener('DOMContentLoaded', () => {
+            const boardSize = 8, bombCount = 5, questionCount = 5, initialLives = 3;
+            const costs = { scanCell: 75, halve: 100, doubler: 150, skip: 200, gps: 250, vest: 300, life: 400 };
+            const fixedLifeCoords = [{x:1, y:1}, {x:1, y:6}, {x:6, y:1}, {x:6, y:6}];
+            let safeCode = "1234"; // Kezdeti érték, felülíródik az initGame-ben
+            const MAP_REFRESH_INTERVAL = 5 * 60 * 1000;
+
+            // DOM Elements...
+            const gameBoardElement = document.getElementById('game-board'), safeModal = document.getElementById('safe-modal'), finalChanceModal = document.getElementById('final-chance-modal'),
+                  messageContainer = document.getElementById('message-container'), restartButton = document.getElementById('restart-button'),
+                  livesContainer = document.getElementById('lives-container'), moneyValueEl = document.getElementById('money-value'),
+                  questionCounterEl = document.getElementById('question-value'), bombCounterEl = document.getElementById('bomb-value'),
+                  logoTitle = document.getElementById('logo-title'), infoSafeHintEl = document.getElementById('info-safe-hint'),
+                  infoSafeCoordsEl = document.getElementById('info-safe-coords'), infoProximityEl = document.getElementById('info-proximity-warning'),
+                  infoQuestionTextEl = document.getElementById('info-question-text'), infoAnswerButtonsEl = document.getElementById('info-answer-buttons'),
+                  infoExitCoordsEl = document.getElementById('info-exit-coords'), infoQuestionShopEl = document.getElementById('info-question-shop'),
+                  safeDisplay = document.getElementById('safe-display'), safeKeypad = document.getElementById('safe-keypad'),
+                  vestIndicator = document.getElementById('vest-indicator'), vestCountEl = document.getElementById('vest-count'),
+                  doublerIndicator = document.getElementById('doubler-indicator'), doublerCountEl = document.getElementById('doubler-count'),
+                  shopScanCellBtn = document.getElementById('shop-scan-cell'), shopGpsBtn = document.getElementById('shop-gps'),
+                  shopVestBtn = document.getElementById('shop-vest'), shopHalveBtn = document.getElementById('shop-halve'),
+                  shopSkipBtn = document.getElementById('shop-skip'), shopDoublerBtn = document.getElementById('shop-doubler'),
+                  shopLifeBtn = document.getElementById('shop-life'),
+                  currentTimeEl = document.getElementById('current-time'), nextMapTimeEl = document.getElementById('next-map-time'),
+                  newMapButton = document.getElementById('new-map-button'),
+                  waitTimeEl = document.getElementById('wait-time'),
+                  gameElements = document.getElementById('game-elements'),
+                  integratedWaitScreen = document.getElementById('integrated-wait-screen');
+                  
+            const icons = {
+                player: document.getElementById('player-svg').cloneNode(true), bomb: document.getElementById('bomb-svg').cloneNode(true),
+                safe: document.getElementById('safe-svg').cloneNode(true), crater: document.getElementById('crater-svg').cloneNode(true), 
+                question: document.getElementById('question-svg').cloneNode(true), disarmed: document.getElementById('disarmed-svg').cloneNode(true), 
+                exit: document.getElementById('exit-svg').cloneNode(true), life: document.getElementById('life-svg').cloneNode(true),
+                codePiece: document.getElementById('code-piece-svg').cloneNode(true), lostMoney: document.getElementById('lost-money-svg').cloneNode(true),
+                flag: document.getElementById('flag-svg').cloneNode(true) };
+            Object.values(icons).forEach(icon => icon.classList.add('icon'));
+
+            let playerPosition, boardData, currentQuestion, exitPosition;
+            let answeredQuestions, gameOver, gameLocked, lives, money, prevPosition, isScannerActive, activeBombs;
+            let vestCount, doublerCount;
+            let foundCodePieces = ['_', '_', '_', '_'];
+            let usedQuestionIndices, currentMapSeed, lostMoneyAmount = 0;
+            let seededRandom;
             
-        ];
-       // Game state and constants
-        const TOTAL_GAME_QUESTIONS = 10;
-        const BASE_WIN_CREDITS = 1000;
-        const RISKY_WAGER = 500;
-        const MILESTONE_QUESTION = 5;
-        const MILESTONE_CREDITS = 150;
-        const PRICES = { fiftyFifty: 250, swap: 350, safetyNet: 500 };
-        const STREAK_BONUSES = [100, 125, 150, 175, 200, 250, 300];
-        const QUESTION_REWARDS = [50, 75, 100, 150, 200, 250, 350, 500, 750, 1000]; // Rewards based on streak
-        let currentQuestionIndex = 0;
-        let gameQuestions = [];
-        let unusedQuestionPool = [];
-        let gameState = {};
-        let currentRoundState = {};
-
-        // DOM Elements
-        const views = { start: document.getElementById('start-screen'), game: document.getElementById('game-screen'), end: document.getElementById('end-screen') };
-        const gameContainer = document.getElementById('game-container');
-        const questionCounter = document.getElementById('question-counter');
-        const questionText = document.getElementById('question-text');
-        const bridgeScene = document.getElementById('bridge-scene');
-        const resultContainer = document.getElementById('result');
-        const explanationContainer = document.getElementById('explanation-container');
-        const nextButton = document.getElementById('header-next-button');
-        const endGameButton = document.getElementById('end-game-button');
-        const bankButton = document.getElementById('bank-button');
-        const progressBar = document.getElementById('progress-bar');
-        const progressMilestone = document.getElementById('progress-milestone');
-        const startCreditsEl = document.getElementById('start-credits');
-        const buyFiftyFiftyBtn = document.getElementById('buy-fiftyfifty');
-        const buySwapBtn = document.getElementById('buy-swap');
-        const buySafetyNetBtn = document.getElementById('buy-safetynet');
-        const startNormalBtn = document.getElementById('start-normal-game');
-        const startRiskyBtn = document.getElementById('start-risky-game');
-        const endTitleEl = document.getElementById('end-title');
-        const endMessageEl = document.getElementById('end-message');
-        const endCreditsChangeEl = document.getElementById('end-credits-change');
-        const endTotalCreditsEl = document.getElementById('end-total-credits');
-        const playAgainBtn = document.getElementById('play-again-btn');
-        const lifelinesContainer = document.getElementById('lifelines-container');
-        const fiftyFiftyEl = document.getElementById('lifeline-fiftyfifty');
-        const swapEl = document.getElementById('lifeline-swap');
-        const safetyNetEl = document.getElementById('lifeline-safetynet');
-        const claimBonusBtn = document.getElementById('claim-bonus-btn');
-        const bonusStatusEl = document.getElementById('bonus-status');
-        const dateDisplayEl = document.getElementById('current-date-display');
-        const streakMeterEl = document.getElementById('streak-meter');
-        const totalCreditsDisplay = document.getElementById('total-credits-display');
-        const potentialWinningsDisplay = document.getElementById('potential-winnings-display');
-        const toggleRulesBtn = document.getElementById('toggle-rules-btn');
-        const rulesContent = document.getElementById('rules-content');
-
-
-        // --- STATE MANAGEMENT ---
-        function loadGameState() {
-            try {
-                const savedState = JSON.parse(localStorage.getItem('azUgrasGameState'));
-                gameState = {
-                    totalCredits: 0,
-                    lastClaimDate: null,
-                    streakCount: 0,
-                    ...savedState
-                };
-            } catch (e) { 
-                gameState = { totalCredits: 0, lastClaimDate: null, streakCount: 0 }; 
-            }
-        }
-
-        function saveGameState() {
-            localStorage.setItem('azUgrasGameState', JSON.stringify(gameState));
-        }
-
-        // --- VIEW SWITCHING ---
-        function showView(viewName) {
-            Object.values(views).forEach(view => view.classList.remove('active'));
-            views[viewName].classList.add('active');
-        }
-
-        // --- START SCREEN LOGIC ---
-        function showStartScreen() {
-            updateStartScreenUI();
-            checkDailyBonus();
-            showView('start');
-        }
-
-        toggleRulesBtn.addEventListener('click', () => {
-            const isHidden = rulesContent.style.display === 'none' || rulesContent.style.display === '';
-            rulesContent.style.display = isHidden ? 'block' : 'none';
-            toggleRulesBtn.textContent = isHidden ? 'Játékszabályzat elrejtése' : 'Játékszabályzat megnyitása';
-        });
-
-        buyFiftyFiftyBtn.addEventListener('click', () => {
-             if (gameState.totalCredits >= PRICES.fiftyFifty) {
-                gameState.totalCredits -= PRICES.fiftyFifty;
-                currentRoundState.lifelines.fiftyFifty++;
-                updateStartScreenUI();
-            }
-        });
-        
-        buySwapBtn.addEventListener('click', () => {
-             if (gameState.totalCredits >= PRICES.swap) {
-                gameState.totalCredits -= PRICES.swap;
-                currentRoundState.lifelines.swap++;
-                updateStartScreenUI();
-            }
-        });
-
-        buySafetyNetBtn.addEventListener('click', () => {
-            if (gameState.totalCredits >= PRICES.safetyNet) {
-                gameState.totalCredits -= PRICES.safetyNet;
-                currentRoundState.lifelines.safetyNet++;
-                updateStartScreenUI();
-            }
-        });
-
-        function updateStartScreenUI() {
-            startCreditsEl.textContent = `${gameState.totalCredits} Kredit`;
-            buyFiftyFiftyBtn.disabled = gameState.totalCredits < PRICES.fiftyFifty;
-            buySwapBtn.disabled = gameState.totalCredits < PRICES.swap;
-            buySafetyNetBtn.disabled = gameState.totalCredits < PRICES.safetyNet;
-            startRiskyBtn.disabled = gameState.totalCredits < RISKY_WAGER;
-        }
-
-        startNormalBtn.addEventListener('click', () => startGame(false));
-        startRiskyBtn.addEventListener('click', () => startGame(true));
-
-        // --- NAPI BÓNUSZ LOGIKA ---
-        function getFormattedDate(date) {
-            return date.toISOString().split('T')[0];
-        }
-
-        function updateStreakMeter(count) {
-            streakMeterEl.innerHTML = '';
-            for (let i = 1; i <= STREAK_BONUSES.length; i++) {
-                const dayDiv = document.createElement('div');
-                dayDiv.classList.add('streak-day');
-                dayDiv.textContent = i;
-                if (i <= count) {
-                    dayDiv.classList.add('active');
-                }
-                streakMeterEl.appendChild(dayDiv);
-            }
-        }
-
-        function checkDailyBonus() {
-            const today = new Date();
-            const todayStr = getFormattedDate(today);
-            const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() - 1);
-            const yesterdayStr = getFormattedDate(yesterday);
-
-            dateDisplayEl.textContent = today.toLocaleDateString('hu-HU', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-            if (gameState.lastClaimDate && gameState.lastClaimDate !== yesterdayStr && gameState.lastClaimDate !== todayStr) {
-                gameState.streakCount = 0;
-            }
-
-            updateStreakMeter(gameState.streakCount);
-
-            if (gameState.lastClaimDate === todayStr) {
-                claimBonusBtn.disabled = true;
-                claimBonusBtn.textContent = 'Bónusz begyűjtve';
-                bonusStatusEl.textContent = `Jelenlegi sorozatod: ${gameState.streakCount} nap.`;
-            } else {
-                const currentStreak = (gameState.lastClaimDate === yesterdayStr) ? gameState.streakCount : 0;
-                const bonusIndex = Math.min(currentStreak, STREAK_BONUSES.length - 1);
-                const bonusAmount = STREAK_BONUSES[bonusIndex];
-                
-                claimBonusBtn.disabled = false;
-                claimBonusBtn.textContent = `Begyűjtöm a ${bonusAmount} Kreditet!`;
-                bonusStatusEl.textContent = `Jelenlegi sorozatod: ${currentStreak} nap.`;
-            }
-        }
-
-        claimBonusBtn.addEventListener('click', () => {
-            const today = new Date();
-            const todayStr = getFormattedDate(today);
-            const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() - 1);
-            const yesterdayStr = getFormattedDate(yesterday);
-
-            if (gameState.lastClaimDate !== todayStr) {
-                if (gameState.lastClaimDate === yesterdayStr) {
-                    gameState.streakCount++;
-                } else {
-                    gameState.streakCount = 1;
-                }
-                
-                const bonusIndex = Math.min(gameState.streakCount - 1, STREAK_BONUSES.length - 1);
-                const bonusAmount = STREAK_BONUSES[bonusIndex];
-
-                gameState.totalCredits += bonusAmount;
-                gameState.lastClaimDate = todayStr;
-                
-                saveGameState();
-                updateStartScreenUI();
-                checkDailyBonus();
-
-                startCreditsEl.classList.add('flash-green');
-                setTimeout(() => startCreditsEl.classList.remove('flash-green'), 1000);
-            }
-        });
-
-        // --- END SCREEN LOGIC ---
-        function showEndScreen(isWin, creditsChange) {
-            let finalCreditsChange;
-            if (isWin) {
-                finalCreditsChange = creditsChange;
-            } else {
-                finalCreditsChange = currentRoundState.milestoneCreditsEarned;
-            }
-
-            gameState.totalCredits += finalCreditsChange;
-            saveGameState();
-            endTitleEl.textContent = isWin ? "Sikeres Átkelés!" : "Játék Vége";
-            endMessageEl.textContent = isWin ? "Gratulálok, sikeresen átjutottál mind a 10 hídon és bezsebelted a főnyereményt!" : `Sajnos leestél a(z) ${currentQuestionIndex + 1}. hídnál. A nem bankolt krediteket elvesztetted.`;
-            
-            const displayChange = isWin ? finalCreditsChange : (currentRoundState.isRisky ? finalCreditsChange - RISKY_WAGER : finalCreditsChange);
-
-            endCreditsChangeEl.textContent = `${displayChange >= 0 ? '+' : ''}${displayChange} Kredit`;
-            endCreditsChangeEl.style.color = displayChange >= 0 ? 'var(--correct-color)' : 'var(--incorrect-color)';
-            endTotalCreditsEl.textContent = `${gameState.totalCredits} Kredit`;
-            showView('end');
-        }
-
-        playAgainBtn.addEventListener('click', init);
-
-        // --- GAME LOGIC ---
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-
-        function startGame(isRisky) {
-            currentQuestionIndex = 0;
-            currentRoundState.isRisky = isRisky;
-            currentRoundState.milestoneCreditsEarned = 0;
-            currentRoundState.usedSafetyNetThisTurn = false;
-            currentRoundState.potentialWinnings = 0;
-            currentRoundState.streak = 0; 
-            
-            if (isRisky) { 
-                 if (gameState.totalCredits >= RISKY_WAGER) {
-                    gameState.totalCredits -= RISKY_WAGER;
-                }
-            }
-            
-            const shuffledAll = [...allQuestions];
-            shuffleArray(shuffledAll);
-            gameQuestions = shuffledAll.slice(0, TOTAL_GAME_QUESTIONS);
-            unusedQuestionPool = shuffledAll.slice(TOTAL_GAME_QUESTIONS);
-
-            showView('game');
-            showQuestion();
-        }
-
-        function showQuestion() {
-             if (window.innerWidth <= 900) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-            gameContainer.classList.remove('success-pulse', 'fail-shake');
-            bridgeScene.classList.remove('advance');
-            
-            progressMilestone.classList.toggle('reached', currentRoundState.milestoneCreditsEarned > 0);
-            
-            progressBar.style.width = `${(currentQuestionIndex / TOTAL_GAME_QUESTIONS) * 100}%`;
-            const currentQuestion = gameQuestions[currentQuestionIndex];
-            questionCounter.textContent = `Híd: ${currentQuestionIndex + 1} / ${TOTAL_GAME_QUESTIONS}`;
-            questionText.textContent = currentQuestion.question;
-            document.querySelector('.options-container').innerHTML = '';
-            resultContainer.textContent = '';
-            explanationContainer.style.opacity = 0;
-            explanationContainer.style.display = 'none';
-            potentialWinningsDisplay.style.opacity = currentRoundState.potentialWinnings > 0 ? 1 : 0;
-            nextButton.classList.remove('visible');
-            endGameButton.classList.remove('visible');
-            bankButton.classList.remove('visible');
-            bankButton.disabled = false;
-
-            fiftyFiftyEl.dataset.usedInRound = 'false';
-            swapEl.dataset.usedInRound = 'false';
-
-            const futureBridges = bridgeScene.querySelectorAll('.future-bridge');
-            futureBridges.forEach((bridge, index) => {
-                bridge.style.display = (index < (TOTAL_GAME_QUESTIONS - currentQuestionIndex - 1)) ? 'block' : 'none';
-            });
-            currentQuestion.options.forEach((optionText) => {
-                const bridge = document.createElement('div');
-                bridge.classList.add('bridge-option');
-                const span = document.createElement('span');
-                span.textContent = optionText;
-                bridge.appendChild(span);
-                bridge.addEventListener('click', (event) => handleAnswer(event.currentTarget));
-                document.querySelector('.options-container').appendChild(bridge);
-            });
-            lifelinesContainer.style.pointerEvents = 'auto';
-            updateGameUI();
-        }
-        
-        function handleAnswer(selectedBridge) {
-            lifelinesContainer.style.pointerEvents = 'none';
-            document.querySelectorAll('.bridge-option').forEach(option => {
-                option.classList.add('disabled');
-            });
-            
-            selectedBridge.classList.add('is-chosen');
-
-            const selectedOptionText = selectedBridge.textContent;
-            const currentQuestion = gameQuestions[currentQuestionIndex];
-            const isCorrect = selectedOptionText === currentQuestion.answer;
-            
-            setTimeout(() => {
-                selectedBridge.classList.remove('is-chosen');
-                const correctBridge = Array.from(document.querySelectorAll('.bridge-option')).find(opt => opt.textContent === currentQuestion.answer);
-                
-                if (isCorrect) {
-                    const reward = QUESTION_REWARDS[currentRoundState.streak] || QUESTION_REWARDS[QUESTION_REWARDS.length - 1];
-                    currentRoundState.potentialWinnings += reward;
-                    currentRoundState.streak++;
-                    
-                    potentialWinningsDisplay.style.opacity = 1;
-
-                    if (correctBridge) correctBridge.classList.add('correct', 'flashing');
-                    gameContainer.classList.add('success-pulse');
-                    bridgeScene.classList.add('advance');
-                    
-                    if ((currentQuestionIndex + 1) === MILESTONE_QUESTION && currentRoundState.milestoneCreditsEarned === 0) {
-                        currentRoundState.milestoneCreditsEarned = MILESTONE_CREDITS;
-                        resultContainer.textContent = `Biztonsági Pont! ${MILESTONE_CREDITS} Kredit biztosítva!`;
-                        progressMilestone.classList.add('reached');
-                    } else {
-                         resultContainer.textContent = "SIKERES UGRÁS!";
-                    }
-                    resultContainer.style.color = 'var(--correct-color)';
-
-                } else { // Incorrect answer
-                    currentRoundState.potentialWinnings = 0; 
-                    currentRoundState.streak = 0; 
-                    
-                    selectedBridge.classList.add('incorrect');
-                    if (correctBridge) correctBridge.classList.add('correct');
-                    if (currentRoundState.lifelines.safetyNet > 0 && !currentRoundState.usedSafetyNetThisTurn) {
-                        currentRoundState.lifelines.safetyNet--;
-                        currentRoundState.usedSafetyNetThisTurn = true;
-                        resultContainer.textContent = "A BIZTONSÁGI HÁLÓ MEGMENTETT!";
-                        resultContainer.style.color = 'var(--selected-color)';
-                    } else {
-                        gameContainer.classList.add('fail-shake');
-                        resultContainer.textContent = "LEESTÉL!";
-                        resultContainer.style.color = 'var(--incorrect-color)';
-                    }
-                }
-                updateGameUI();
-
-                setTimeout(() => {
-                    explanationContainer.textContent = currentQuestion.explanation;
-                    explanationContainer.style.display = 'block';
-                    explanationContainer.style.opacity = 1;
-
-                    if (window.innerWidth <= 900) {
-                        const resultEl = document.getElementById('result');
-                        resultEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-
-                    if (isCorrect || currentRoundState.usedSafetyNetThisTurn) {
-                        if (currentQuestionIndex < gameQuestions.length - 1) {
-                            nextButton.classList.add('visible');
-                            if (currentRoundState.potentialWinnings > 0) {
-                                bankButton.classList.add('visible');
-                            }
-                        } else { // Victory
-                            progressBar.style.width = '100%';
-                            const mainPrize = BASE_WIN_CREDITS * (currentRoundState.isRisky ? 2 : 1);
-                            let finalWinAmount = mainPrize + currentRoundState.potentialWinnings;
-                            showEndScreen(true, finalWinAmount);
-                        }
-                    } else { // Loss
-                        endGameButton.classList.add('visible');
-                        endGameButton.onclick = () => showEndScreen(false, 0);
-                    }
-                }, 1500);
-
-            }, 1500);
-        }
-
-        nextButton.onclick = () => {
-            currentQuestionIndex++;
-            currentRoundState.usedSafetyNetThisTurn = false;
-            showQuestion();
-        };
-
-        bankButton.addEventListener('click', () => {
-            if (currentRoundState.potentialWinnings > 0) {
-                gameState.totalCredits += currentRoundState.potentialWinnings;
-                resultContainer.textContent = `${currentRoundState.potentialWinnings} Kredit sikeresen bankolva!`;
-                currentRoundState.potentialWinnings = 0;
-                currentRoundState.streak = 0; 
-                saveGameState();
-                updateGameUI();
-                bankButton.disabled = true;
-                bankButton.classList.remove('visible');
-                
-                totalCreditsDisplay.classList.add('flash-green');
-                setTimeout(() => totalCreditsDisplay.classList.remove('flash-green'), 1000);
-            }
-        });
-
-        // --- LIFELINES & UI LOGIC ---
-        function updateGameUI() {
-            // Lifelines
-            fiftyFiftyEl.querySelector('.count').textContent = currentRoundState.lifelines.fiftyFifty;
-            swapEl.querySelector('.count').textContent = currentRoundState.lifelines.swap;
-            safetyNetEl.querySelector('.count').textContent = currentRoundState.lifelines.safetyNet;
-            
-            fiftyFiftyEl.classList.toggle('used', currentRoundState.lifelines.fiftyFifty === 0 || fiftyFiftyEl.dataset.usedInRound === 'true');
-            swapEl.classList.toggle('used', currentRoundState.lifelines.swap === 0 || unusedQuestionPool.length === 0 || swapEl.dataset.usedInRound === 'true');
-            safetyNetEl.classList.toggle('used', currentRoundState.lifelines.safetyNet === 0);
-
-            // Credits
-            totalCreditsDisplay.textContent = `${gameState.totalCredits} Kredit`;
-            if (currentRoundState.potentialWinnings > 0) {
-                 potentialWinningsDisplay.textContent = `Kockán forog: ${currentRoundState.potentialWinnings} K (Sorozat: ${currentRoundState.streak})`;
-            } else {
-                potentialWinningsDisplay.textContent = '';
-            }
-        }
-        
-        fiftyFiftyEl.addEventListener('click', () => {
-            if (currentRoundState.lifelines.fiftyFifty > 0 && fiftyFiftyEl.dataset.usedInRound !== 'true') {
-                currentRoundState.lifelines.fiftyFifty--;
-                fiftyFiftyEl.dataset.usedInRound = 'true';
-                updateGameUI();
-                const currentQuestion = gameQuestions[currentQuestionIndex];
-                const options = Array.from(document.querySelectorAll('.bridge-option'));
-                const wrongOptions = options.filter(opt => opt.textContent !== currentQuestion.answer);
-                shuffleArray(wrongOptions);
-                wrongOptions[0].classList.add('disabled-by-lifeline');
-                wrongOptions[1].classList.add('disabled-by-lifeline');
-            }
-        });
-        
-        swapEl.addEventListener('click', () => {
-            if (currentRoundState.lifelines.swap > 0 && swapEl.dataset.usedInRound !== 'true' && unusedQuestionPool.length > 0) {
-                currentRoundState.lifelines.swap--;
-                swapEl.dataset.usedInRound = 'true';
-                
-                const newQuestion = unusedQuestionPool.pop();
-                gameQuestions[currentQuestionIndex] = newQuestion;
-                
-                showQuestion();
-            }
-        });
-
-        // --- INITIALIZATION ---
-        function init() {
-            loadGameState();
-            currentRoundState = {
-                isRisky: false,
-                lifelines: { fiftyFifty: 1, swap: 1, safetyNet: 1 },
-                usedSafetyNetThisTurn: false,
-                milestoneCreditsEarned: 0,
-                potentialWinnings: 0,
-                streak: 0
+            const questions = {
+                easy: [
+                    { question: "Melyik állat ugat?", answers: ["Macska", "Kutya", "Ló"], correct: 1 }, { question: "Hány sarka van egy háromszögnek?", answers: ["3", "4", "5"], correct: 0 }, { question: "Mi a neve a varázslófiúnak, aki Roxfortba járt?", answers: ["Peter Pan", "Luke Skywalker", "Harry Potter"], correct: 2 }, { question: "Melyik színű a fű?", answers: ["Kék", "Piros", "Zöld"], correct: 2 }, { question: "Hány nap van egy júniusi hónapban?", answers: ["30", "31", "28"], correct: 0 }, { question: "Melyik a legkisebb kétjegyű szám?", answers: ["9", "10", "11"], correct: 1 }, { question: "Milyen állat volt Micimackó?", answers: ["Tigris", "Malac", "Medve"], correct: 2 }, { question: "Melyik bolygón élünk?", answers: ["Mars", "Föld", "Vénusz"], correct: 1 }, { question: "Hány óra van egy napban?", answers: ["12", "24", "60"], correct: 1 }, { question: "Melyik gyümölcs sárga és görbe?", answers: ["Alma", "Banán", "Szőlő"], correct: 1 }, { question: "Melyik a legnagyobb szárazföldi állat?", answers: ["Elefánt", "Zsiráf", "Víziló"], correct: 0 }, { question: "Melyik ország fővárosa Párizs?", answers: ["Németország", "Olaszország", "Franciaország"], correct: 2 }, { question: "Milyen színű a vér?", answers: ["Zöld", "Kék", "Piros"], correct: 2 }, { question: "Hogyan hívják a Mikulás rénszarvasait vezető állatot?", answers: ["Rudolf", "Táltos", "Villám"], correct: 0 }, { question: "Melyik nem egy évszak?", answers: ["Tél", "Hétfő", "Nyár"], correct: 1 }, { question: "Mi a méz alapanyaga?", answers: ["Tej", "Víz", "Virágnéktár"], correct: 2 }, { question: "Hány lába van egy embernek?", answers: ["Kettő", "Négy", "Hat"], correct: 0 }, { question: "Melyik hangszernek vannak billentyűi?", answers: ["Hegedű", "Dob", "Zongora"], correct: 2 }, { question: "Melyik sportot játsszák ütővel és labdával egy háló felett?", answers: ["Foci", "Tenisz", "Úszás"], correct: 1 }, { question: "Melyik a hét első napja?", answers: ["Vasárnap", "Hétfő", "Szombat"], correct: 1 }, { question: "Melyik mesében van üvegcipellő?", answers: ["Hófehérke", "Csipkerózsika", "Hamupipőke"], correct: 2 }, { question: "Melyik közlekedési eszköz repül?", answers: ["Autó", "Hajó", "Repülőgép"], correct: 2 }, { question: "Mi a Nap?", answers: ["Bolygó", "Hold", "Csillag"], correct: 2 }, { question: "Melyik állat mondja, hogy 'mú'?", answers: ["Tehén", "Bárány", "Kakas"], correct: 0 }, { question: "Hogyan írjuk le a 10-es számot római számmal?", answers: ["V", "X", "L"], correct: 1 }
+                ],
+                medium: [
+                    { question: "Melyik a legkisebb ország Dél-Amerikában?", answers: ["Uruguay", "Suriname", "Ecuador"], correct: 1 }, { question: "Ki írta a 'Kincses sziget' című regényt?", answers: ["Jules Verne", "Robert Louis Stevenson", "Mark Twain"], correct: 1 }, { question: "Mi a mitokondrium fő feladata a sejtben?", answers: ["Fehérjeszintézis", "Energiatermelés (ATP)", "Anyagszállítás"], correct: 1 }, { question: "Melyik város volt az Oszmán Birodalom fővárosa?", answers: ["Ankara", "Isztambul (Konstantinápoly)", "Bagdad"], correct: 1 }, { question: "Milyen típusú csillag a Nap?", answers: ["Vörös óriás", "Fehér törpe", "Sárga törpe"], correct: 2 }, { question: "Ki volt az a festő, aki 'Az emlékezet állandósága' (olvadó órák) című képet festette?", answers: ["Pablo Picasso", "Vincent van Gogh", "Salvador Dalí"], correct: 2 }, { question: "Melyik a Föld legszárazabb (nem sarki) sivataga?", answers: ["Szahara", "Góbi", "Atacama"], correct: 2 }, { question: "Melyik évben alapították a Facebookot?", answers: ["2001", "2004", "2007"], correct: 1 }, { question: "Mi a neve a kémiai elemnek, amelynek vegyjele 'Au'?", answers: ["Ezüst", "Argon", "Arany"], correct: 2 }, { question: "Melyik országban található Angkorvat templomromja?", answers: ["Thaiföld", "Kambodzsa", "Vietnám"], correct: 1 }, { question: "Hány szimfóniát írt Beethoven?", answers: ["9", "12", "41"], correct: 0 }, { question: "Ki volt a második ember, aki a Holdra lépett?", answers: ["Michael Collins", "Neil Armstrong", "Buzz Aldrin"], correct: 2 }, { question: "Melyik a legnépesebb sziget a világon?", answers: ["Nagy-Britannia", "Honshu", "Jáva"], correct: 2 }, { question: "Mi a 'szonár' rövidítés feloldása?", answers: ["Hang Navigáció és Távolságmérés", "Szuper-Navigációs Radar", "Hangos Navigációs Rendszer"], correct: 0 }, { question: "Melyik állat szerepel Ausztrália címerében a kenguru mellett?", answers: ["Koala", "Emu", "Vombat"], correct: 1 }, { question: "Mi a neve a híres fizikusnak, aki az almafa alatt ülve jött rá a gravitáció törvényére?", answers: ["Albert Einstein", "Isaac Newton", "Galileo Galilei"], correct: 1 }, { question: "Melyik a legmagasabb aktív vulkán Európában?", answers: ["Vezúv", "Etna", "Stromboli"], correct: 1 }, { question: "Melyik irodalmi mű főszereplője Jean Valjean?", answers: ["A három testőr", "Monte Cristo grófja", "A nyomorultak"], correct: 2 }, { question: "Melyik a legnagyobb cápafaj?", answers: ["Nagy fehércápa", "Tigriscápa", "Cetecápa"], correct: 2 }, { question: "Mi a neve a japán szamurájok harci kódexének?", answers: ["Harakiri", "Szamuráj Kód", "Busidó"], correct: 2 }, { question: "Melyik országban található a Serengeti Nemzeti Park?", answers: ["Kenya", "Dél-Afrika", "Tanzánia"], correct: 2 }, { question: "Hány szálból áll egy DNS-molekula?", answers: ["Egy", "Kettő", "Négy"], correct: 1 }, { question: "Melyik a világ leghosszabb hídja?", answers: ["Akashi Kaikyō híd", "Tanyang-Kunshan Nagy Híd", "Jiaozhou-öböl híd"], correct: 1 }, { question: "Ki rendezte a 'Ponyvaregény' (Pulp Fiction) című filmet?", answers: ["Martin Scorsese", "Steven Spielberg", "Quentin Tarantino"], correct: 2 }, { question: "Mi a neve a Mars két holdjának?", answers: ["Io és Europa", "Phobos és Deimos", "Titan és Rhea"], correct: 1 }
+                ],
+                hard: [
+                    { question: "Melyik fizikus nevéhez fűződik a 'Pauli-elv'?", answers: ["Werner Heisenberg", "Wolfgang Pauli", "Erwin Schrödinger"], correct: 1 }, { question: "Mi a 'tokaji aszú' minimális puttonyszáma?", answers: ["3", "4", "5"], correct: 0 }, { question: "Ki volt az Egyesült Államok 13. elnöke?", answers: ["James K. Polk", "Zachary Taylor", "Millard Fillmore"], correct: 2 }, { question: "Mi a 'Kerberos' a görög mitológiában?", answers: ["A bölcsesség istene", "Az alvilág háromfejű kutyája", "Héraklész egyik feladata"], correct: 1 }, { question: "Melyik a legkisebb prímszám?", answers: ["0", "1", "2"], correct: 2 }, { question: "Hogy hívják a Föld legkülső, szilárd rétegét, amely a lemezekből áll?", answers: ["Asztenoszféra", "Litoszféra", "Mezoszféra"], correct: 1 }, { question: "Ki írta a 'A tőke' (Das Kapital) című közgazdasági művet?", answers: ["Adam Smith", "Karl Marx", "John Maynard Keynes"], correct: 1 }, { question: "Melyik évben zajlott a nándorfehérvári diadal?", answers: ["1456", "1521", "1526"], correct: 0 }, { question: "Melyik a legnehezebb természetben előforduló elem?", answers: ["Urán", "Plutónium", "Oganeszon"], correct: 0 }, { question: "Mi a neve a legfényesebb csillagnak az éjszakai égbolton?", answers: ["Sarkcsillag", "Szíriusz", "Vega"], correct: 1 }, { question: "Melyik művész alkotta meg a 'Dávid' szobrot, amely Firenzében található?", answers: ["Leonardo da Vinci", "Donatello", "Michelangelo"], correct: 2 }, { question: "Mi a 'Fibonacci-sorozat' első két tagja (a 0 után)?", answers: ["1 és 1", "1 és 2", "2 és 3"], correct: 0 }, { question: "Melyik birodalom uralkodója volt Nagy Kürosz?", answers: ["Egyiptomi Birodalom", "Óperzsa Birodalom", "Makedón Birodalom"], correct: 1 }, { question: "Melyik a leggyakoribb fehérvérsejt típus az emberi vérben?", answers: ["Limfocita", "Monocita", "Neutrofil granulocita"], correct: 2 }, { question: "Mi a neve annak a filozófiai elvnek, amely szerint 'a cél szentesíti az eszközt'?", answers: ["Utilitarizmus", "Hedonizmus", "Machiavellizmus"], correct: 2 }, { question: "Melyik a Föld legmélyebb pontja?", answers: ["Puerto Ricó-i árok", "Mariana-árok", "Tonga-árok"], correct: 1 }, { question: "Hány állatövi jegy van a nyugati asztrológiában?", answers: ["10", "12", "13"], correct: 1 }, { question: "Melyik a legkisebb madárfaj a világon?", answers: ["Törpepapagáj", "Méhkolibri", "Ökörszem"], correct: 1 }, { question: "Ki volt az utolsó orosz cár?", answers: ["Nagy Péter", "I. Sándor", "II. Miklós"], correct: 2 }, { question: "Melyik Nobel-díjat NEM osztották ki a díj alapításakor?", answers: ["Fizikai", "Béke", "Közgazdasági"], correct: 2 }, { question: "Mi a 'Doppler-effektus'?", answers: ["A fény megtörése", "A hanghullámok frekvenciaváltozása a forrás mozgása miatt", "A mágneses mező változása"], correct: 1 }, { question: "Melyik országban található a legtöbb piramis?", answers: ["Egyiptom", "Mexikó", "Szudán"], correct: 2 }, { question: "Melyik a legkeményebb ismert anyag az univerzumban?", answers: ["Gyémánt", "Grafén", "Nukleáris paszta"], correct: 2 }, { question: "Ki volt az a magyar tudós, aki feltalálta a golyóstollat?", answers: ["Irinyi János", "Bíró László József", "Jedlik Ányos"], correct: 1 }, { question: "Mi a neve a híres paradoxonnak, amelyben egy macska egyszerre élő és holt is lehet?", answers: ["Schrödinger macskája", "Fermi-paradoxon", "Russell-paradoxon"], correct: 0 }
+                ]
             };
-            showStartScreen();
-        }
+            
+            function mulberry32(a) { return function() { let t = a += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; } }
 
-        init();
+            function initGame(carryOverMoney = 0) {
+                const newSeed = Math.floor(Date.now() / MAP_REFRESH_INTERVAL);
+                if(gameOver && newSeed === currentMapSeed) {
+                    showWaitScreen();
+                    return;
+                }
+                currentMapSeed = newSeed;
+                seededRandom = mulberry32(currentMapSeed);
+
+                // Széfkód generálása a seed alapján
+                let codeNum = Math.floor(seededRandom() * 9000) + 1000;
+                safeCode = codeNum.toString();
+
+                integratedWaitScreen.style.display = 'none';
+                gameElements.style.display = 'block';
+                document.getElementById('info-panel').style.display = 'block';
+
+                playerPosition = { x: 0, y: 0 }; prevPosition = { x: 0, y: 0 };
+                answeredQuestions = 0; lives = initialLives; money = carryOverMoney; activeBombs = bombCount;
+                gameOver = false; gameLocked = true; isScannerActive = false;
+                vestCount = 0; doublerCount = 0;
+                foundCodePieces = ['_', '_', '_', '_'];
+                usedQuestionIndices = { easy: new Set(), medium: new Set(), hard: new Set() };
+                messageContainer.className = ''; infoQuestionTextEl.textContent = '';
+                infoExitCoordsEl.textContent = ''; infoSafeCoordsEl.textContent = '';
+                
+                boardData = Array(boardSize).fill(null).map(() => Array.from({ length: boardSize }, () => ({ type: 'empty', isFlagged: false })));
+                
+                placeFixedItems(); placeRandomItems('exit', 1); placeRandomItems('safe', 1);
+                placeRandomItems('bomb', bombCount); placeRandomItems('question', questionCount);
+                placeRandomItems('codePiece', 4);
+                if(lostMoneyAmount > 0) placeRandomItems('lostMoney', 1);
+                
+                updateSafeHint();
+                
+                renderLives(); updateMoneyDisplay(); updateQuestionCounter(); updateBombCounter(); renderBoard();
+                flashBombs(); setupSafeKeypad(); updateVestIndicator(); updateDoublerIndicator();
+            }
+
+            function placeFixedItems() { fixedLifeCoords.forEach(c => { boardData[c.y][c.x] = { type: 'life', collected: false, isFlagged: false }; }); }
+            function placeRandomItems(type, count) {
+                 for (let i = 0; i < count; i++) {
+                    let x, y;
+                    do { x = Math.floor(seededRandom() * boardSize); y = Math.floor(seededRandom() * boardSize);
+                    } while ((x === 0 && y === 0) || boardData[y][x].type !== 'empty');
+                    
+                    if (type === 'question') boardData[y][x] = { type: 'question', used: false, isFlagged: false };
+                    else if (type === 'bomb') boardData[y][x] = { type: 'bomb', triggered: false, isFlagged: false };
+                    else if (type === 'safe') boardData[y][x] = { type: 'safe', isFlagged: false };
+                    else if (type === 'exit') { boardData[y][x] = { type: 'exit', isFlagged: false }; exitPosition = {x, y}; }
+                    else if (type === 'codePiece') boardData[y][x] = { type: 'codePiece', index: i, collected: false, isFlagged: false };
+                    else if (type === 'lostMoney') boardData[y][x] = { type: 'lostMoney', collected: false, isFlagged: false };
+                }
+            }
+
+            function flashBombs() {
+                messageContainer.textContent = 'Jegyezd meg a bombákat!';
+                setTimeout(() => {
+                    document.querySelectorAll('.bomb').forEach(cell => cell && cell.classList.add('revealed'));
+                    setTimeout(() => {
+                        document.querySelectorAll('.bomb').forEach(cell => cell && cell.classList.remove('revealed'));
+                        gameLocked = false;
+                        messageContainer.textContent = '';
+                    }, 2000);
+                }, 1000);
+            }
+
+            function renderBoard() {
+                if(!gameBoardElement) return;
+                gameBoardElement.innerHTML = `<thead><tr><th></th>${'ABCDEFGH'.split('').map(l => `<th>${l}</th>`).join('')}</tr></thead><tbody></tbody>`;
+                const tbody = gameBoardElement.querySelector('tbody');
+                for (let y = 0; y < boardSize; y++) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<th>${y + 1}</th>`;
+                    for (let x = 0; x < boardSize; x++) {
+                        const cell = document.createElement('td');
+                        cell.dataset.x = x; cell.dataset.y = y;
+                        cell.onclick = () => handleCellClick(x, y);
+                        cell.oncontextmenu = (e) => { e.preventDefault(); handleRightClick(x,y); };
+                        const cellData = boardData[y][x];
+                        
+                        if(cellData.isFlagged && !(x === playerPosition.x && y === playerPosition.y)) {
+                             cell.classList.add('flagged-cell'); cell.appendChild(icons.flag.cloneNode(true));
+                        } else {
+                            if (cellData.type === 'exit') { cell.classList.add('exit-cell'); cell.appendChild(icons.exit.cloneNode(true)); } 
+                            else if (cellData.type === 'bomb') {
+                                cell.classList.add('bomb');
+                                if(cellData.triggered) { cell.classList.add('bomb-disarmed'); cell.appendChild(icons.crater.cloneNode(true)); }
+                            }
+                            else if (cellData.type === 'life') { if(!cellData.collected) { cell.classList.add('life-cell'); cell.appendChild(icons.life.cloneNode(true)); } }
+                            else if (cellData.type === 'safe') { cell.classList.add('safe-cell'); cell.appendChild(icons.safe.cloneNode(true)); }
+                            else if (cellData.type === 'codePiece') { if(!cellData.collected) { cell.classList.add('code-piece-cell'); cell.appendChild(icons.codePiece.cloneNode(true)); } }
+                            else if (cellData.type === 'lostMoney') { if(!cellData.collected) { cell.classList.add('lost-money-cell'); cell.appendChild(icons.lostMoney.cloneNode(true)); } }
+                            else if (cellData.type === 'question') {
+                                cell.classList.add('question-cell');
+                                if(cellData.answered) { cell.classList.add('question-answered'); cell.appendChild(icons.disarmed.cloneNode(true)); } 
+                                else { cell.appendChild(icons.question.cloneNode(true)); }
+                            }
+                        }
+
+                        if (x === playerPosition.x && y === playerPosition.y) {
+                            cell.classList.add('player'); cell.innerHTML = ''; cell.appendChild(icons.player.cloneNode(true));
+                        }
+                        row.appendChild(cell);
+                    }
+                    tbody.appendChild(row);
+                }
+                updatePlayerProximityGlow(); checkBombProximity();
+            }
+            
+            function handleCellClick(x, y) {
+                if (gameOver || gameLocked || (boardData[y][x].isFlagged && !(x === playerPosition.x && y === playerPosition.y))) return;
+                if(isScannerActive){
+                    const cell = gameBoardElement.querySelector(`[data-x='${x}'][data-y='${y}']`); const cellData = boardData[y][x];
+                    let tempClass = cellData.type === 'bomb' && !cellData.triggered ? 'revealed' : cellData.type + '-cell';
+                    if(tempClass) cell.classList.add(tempClass);
+                    setTimeout(() => { if(tempClass) cell.classList.remove(tempClass) }, 2000);
+                    isScannerActive = false; gameBoardElement.classList.remove('scanner-active'); messageContainer.textContent = '';
+                    return;
+                }
+                if ((x === playerPosition.x && y === playerPosition.y) || Math.abs(x - playerPosition.x) + Math.abs(y - playerPosition.y) !== 1) return;
+                
+                prevPosition = { ...playerPosition }; playerPosition = { x, y };
+                const cellData = boardData[y][x];
+                if (cellData.type === 'exit') {
+                    infoExitCoordsEl.textContent = `Kijárat: ${String.fromCharCode(65 + x)}-${y + 1}`;
+                    if (answeredQuestions >= questionCount) endGame(true);
+                    else { messageContainer.textContent = `Válaszolj meg minden kérdést a kijutáshoz!`; playerPosition = prevPosition; }
+                } 
+                else if (cellData.type === 'bomb' && !cellData.triggered) { activeBombs--; updateBombCounter(); cellData.triggered = true; handleMistake(); } 
+                else if (cellData.type === 'life' && !cellData.collected) { cellData.collected = true; lives++; renderLives(); }
+                else if (cellData.type === 'safe') { infoSafeCoordsEl.textContent = `Széf: ${String.fromCharCode(65 + x)}-${y + 1}`; safeModal.classList.add('visible'); gameLocked = true; }
+                else if (cellData.type === 'question' && !cellData.answered) { showDifficultyChoice(); }
+                else if (cellData.type === 'codePiece' && !cellData.collected) {
+                    cellData.collected = true; foundCodePieces[cellData.index] = safeCode[cellData.index]; updateSafeHint();
+                }
+                else if (cellData.type === 'lostMoney' && !cellData.collected) {
+                    cellData.collected = true; fetchAndShowQuestion('hard', lostMoneyAmount, true);
+                }
+                renderBoard();
+            }
+
+            function handleRightClick(x, y) {
+                if(gameOver || gameLocked || (x === playerPosition.x && y === playerPosition.y) || boardData[y][x].type === 'empty') return;
+                boardData[y][x].isFlagged = !boardData[y][x].isFlagged;
+                renderBoard();
+            }
+
+            function showDifficultyChoice() {
+                gameLocked = true; infoQuestionTextEl.textContent = "Válassz kérdés nehézséget:";
+                infoAnswerButtonsEl.innerHTML = `<button data-difficulty="easy" data-reward="75">Könnyű (75 Ft)</button> <button data-difficulty="medium" data-reward="150">Közepes (150 Ft)</button> <button data-difficulty="hard" data-reward="300">Nehéz (300 Ft)</button>`;
+                infoAnswerButtonsEl.querySelectorAll('button').forEach(btn => {
+                    const diff = btn.dataset.difficulty;
+                    if(usedQuestionIndices[diff].size >= questions[diff].length) btn.disabled = true;
+                    btn.onclick = () => fetchAndShowQuestion(diff, parseInt(btn.dataset.reward));
+                });
+            }
+            
+            function fetchAndShowQuestion(difficulty, reward, isLostMoneyQuestion = false) {
+                let questionIndex;
+                const questionPool = questions[difficulty];
+                if (usedQuestionIndices[difficulty].size >= questionPool.length) {
+                    infoQuestionTextEl.textContent = "Sajnos elfogytak a kérdések ebből a kategóriából.";
+                    infoAnswerButtonsEl.innerHTML = '';
+                    setTimeout(() => { gameLocked = false; infoQuestionTextEl.textContent = ''; }, 2000);
+                    return;
+                }
+                do { questionIndex = Math.floor(Math.random() * questionPool.length); } while (usedQuestionIndices[difficulty].has(questionIndex));
+                
+                usedQuestionIndices[difficulty].add(questionIndex);
+                currentQuestion = { difficulty, index: questionIndex, reward, isLostMoneyQuestion };
+                const q = questionPool[questionIndex];
+                infoQuestionTextEl.textContent = q.question; infoAnswerButtonsEl.innerHTML = '';
+                q.answers.forEach((answerText, i) => { const button = document.createElement('button'); button.textContent = answerText; button.dataset.index = i; button.onclick = () => checkAnswer(i, button); infoAnswerButtonsEl.appendChild(button); });
+                infoQuestionShopEl.style.display = isLostMoneyQuestion ? 'none' : 'flex'; updateShopButtonsState();
+            }
+            
+            function checkAnswer(selectedIndex, clickedButton) {
+                const qData = questions[currentQuestion.difficulty][currentQuestion.index];
+                const isCorrect = selectedIndex === qData.correct;
+                clickedButton.classList.add(isCorrect ? 'correct-answer' : 'incorrect-answer');
+                Array.from(infoAnswerButtonsEl.children).forEach(btn => btn.disabled = true);
+                let reward = currentQuestion.reward;
+                if (isCorrect) {
+                    if(doublerCount > 0) { reward *= 2; doublerCount--; updateDoublerIndicator(); }
+                    if(currentQuestion.isLostMoneyQuestion) { money += lostMoneyAmount; lostMoneyAmount = 0; } else { money += reward; }
+                    updateMoneyDisplay();
+                } else { if(currentQuestion.isLostMoneyQuestion) { lostMoneyAmount = 0; } else { handleMistake(false); } }
+                if(!currentQuestion.isLostMoneyQuestion) { boardData[playerPosition.y][playerPosition.x].answered = true; answeredQuestions++; updateQuestionCounter(); }
+                setTimeout(() => { 
+                    infoQuestionTextEl.textContent = ''; infoAnswerButtonsEl.innerHTML = ''; infoQuestionShopEl.style.display = 'none';
+                    gameLocked = false;
+                    renderBoard();
+                }, 2000);
+                if (answeredQuestions >= questionCount) messageContainer.textContent = 'Minden kérdés megválaszolva! Irány a kijárat!';
+            }
+
+            function handleMistake(isBomb = true) {
+                if (vestCount > 0 && isBomb) { vestCount--; updateVestIndicator(); messageContainer.textContent = "A mellény megvédett a robbanástól!"; return; }
+                lives--; renderLives();
+                logoTitle.classList.add('triggered'); setTimeout(() => logoTitle.classList.remove('triggered'), 500);
+                if (lives <= 0) { endGame(false); }
+            }
+
+            function triggerFinalChance() {
+                gameLocked = true;
+                const finalQuestion = questions.medium[Math.floor(Math.random() * questions.medium.length)];
+                document.getElementById('final-chance-question').textContent = finalQuestion.question;
+                const finalAnswersContainer = document.getElementById('final-chance-answers');
+                const finalChanceMessage = document.getElementById('final-chance-message');
+                finalChanceMessage.textContent = `Válaszolj helyesen, hogy átmentsd a(z) ${money} Ft-ot a következő körre!`;
+                finalAnswersContainer.innerHTML = '';
+                finalQuestion.answers.forEach((answer, index) => {
+                    const button = document.createElement('button');
+                    button.textContent = answer;
+                    button.onclick = () => handleFinalAnswer(index === finalQuestion.correct, button);
+                    finalAnswersContainer.appendChild(button);
+                });
+                finalChanceModal.classList.add('visible');
+            }
+
+            function handleFinalAnswer(isCorrect, btn) {
+                Array.from(btn.parentElement.children).forEach(b => b.disabled = true);
+                btn.classList.add(isCorrect ? 'correct-answer' : 'incorrect-answer');
+                const finalChanceMessage = document.getElementById('final-chance-message');
+                if(isCorrect) {
+                    finalChanceMessage.textContent = `HELYES! A(z) ${money} Ft-ot sikeresen átmentetted!`;
+                    lostMoneyAmount = 0;
+                    setTimeout(() => {
+                        finalChanceModal.classList.remove('visible');
+                        showWaitScreen();
+                    }, 2000);
+                } else {
+                    finalChanceMessage.textContent = `SAJNOS NEM TALÁLT! De ne csüggedj, a(z) ${money} Ft-ot elrejtettük a következő pályán.`;
+                    lostMoneyAmount = money;
+                    money = 0;
+                    setTimeout(() => {
+                        finalChanceModal.classList.remove('visible');
+                        showWaitScreen();
+                    }, 2000);
+                }
+            }
+            
+            function endGame(isWin) {
+                gameOver = true;
+                gameLocked = true;
+                if (isWin) {
+                    messageContainer.textContent = `Gratulálok, kijutottál! ${money} Ft-ot továbbviszel a következő pályára!`;
+                    lostMoneyAmount = 0;
+                    setTimeout(showWaitScreen, 4000);
+                } else {
+                    triggerFinalChance();
+                }
+            }
+
+            function showWaitScreen() {
+                gameElements.style.display = 'none';
+                document.getElementById('info-panel').style.display = 'none';
+                const nextTime = new Date( (currentMapSeed + 1) * MAP_REFRESH_INTERVAL );
+                waitTimeEl.textContent = nextTime.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit'});
+                integratedWaitScreen.style.display = 'flex';
+            }
+            
+            function tick() {
+                const now = new Date();
+                const newSeed = Math.floor(now.getTime() / MAP_REFRESH_INTERVAL);
+                currentTimeEl.textContent = now.toLocaleTimeString('hu-HU');
+                const nextTime = new Date((currentMapSeed + 1) * MAP_REFRESH_INTERVAL);
+                nextMapTimeEl.textContent = nextTime.toLocaleTimeString('hu-HU', { hour: '2-digit', minute: '2-digit' });
+                if (newSeed > currentMapSeed && !gameOver) { newMapButton.style.display = 'block'; }
+                if (integratedWaitScreen.style.display !== 'none' && newSeed > currentMapSeed) { 
+                    initGame(lostMoneyAmount > 0 ? 0 : money); 
+                }
+            }
+            
+            function updateShopButtonsState() { shopScanCellBtn.disabled=money<costs.scanCell||gameOver||isScannerActive; shopDoublerBtn.disabled=money<costs.doubler||gameOver; shopGpsBtn.disabled=money<costs.gps||gameOver; shopVestBtn.disabled=money<costs.vest||gameOver; shopLifeBtn.disabled=money<costs.life||gameOver; shopHalveBtn.disabled=money<costs.halve||gameOver||!gameLocked; shopSkipBtn.disabled=money<costs.skip||gameOver||!gameLocked; }
+            function renderLives(){livesContainer.innerHTML='';for(let i=0;i<lives;i++){livesContainer.appendChild(icons.life.cloneNode(true))}}
+            function updateMoneyDisplay(){moneyValueEl.textContent=`${money} Ft`;updateShopButtonsState()}
+            function updateQuestionCounter(){questionCounterEl.textContent=`${answeredQuestions} / ${questionCount}`}
+            function updateBombCounter(){bombCounterEl.textContent = activeBombs; }
+            function updateVestIndicator(){ vestCountEl.textContent = `x${vestCount}`; vestIndicator.style.display=vestCount > 0?'flex':'none' }
+            function updateDoublerIndicator(){ doublerCountEl.textContent = `x${doublerCount}`; doublerIndicator.style.display=doublerCount > 0?'flex':'none' }
+            function checkBombProximity(){const {x,y}=playerPosition;const n=[[0,1],[0,-1],[1,0],[-1,0]];let b=false;for(const[dx,dy]of n){const nx=x+dx,ny=y+dy;if(nx>=0&&nx<boardSize&&ny>=0&&ny<boardSize&&boardData[ny][nx].type==='bomb'&&!boardData[ny][nx].triggered){b=true;break}}infoProximityEl.style.visibility=b?'visible':'hidden'}
+            function findClosestQuestion(fromPos){let d=Infinity;for(let y=0;y<boardSize;y++)for(let x=0;x<boardSize;x++)if(boardData[y][x].type==='question'&&!boardData[y][x].answered){const dist=Math.abs(fromPos.x-x)+Math.abs(fromPos.y-y);if(dist<d)d=dist}return d}
+            function updatePlayerProximityGlow(){const d=findClosestQuestion(playerPosition);const i=(d<=1)?1:(d<=3)?0.6:0.2;const p=document.querySelector('.player');if(p)p.style.setProperty('--player-glow-intensity',i)}
+            
+            function setupSafeKeypad(){safeKeypad.innerHTML='';['1','2','3','4','5','6','7','8','9','C','0','✓'].forEach(key=>{const b=document.createElement('button');b.textContent=key;b.onclick=()=>handleSafeKeypad(key);safeKeypad.appendChild(b)})}
+            function handleSafeKeypad(key){if(/\d/.test(key)&&safeDisplay.textContent.length<4)safeDisplay.textContent+=key;else if(key==='C')safeDisplay.textContent='';else if(key==='✓')checkSafeCode()}
+            function checkSafeCode(){if(safeDisplay.textContent===safeCode){disarmAllBombs();messageContainer.textContent="Sikeres kód! Minden bomba hatástalanítva!";safeModal.classList.remove('visible');gameLocked=false;renderBoard()}else{safeDisplay.classList.add('error');setTimeout(()=>{safeDisplay.classList.remove('error');safeDisplay.textContent=''},500)}}
+            function disarmAllBombs(){for(let y=0;y<boardSize;y++)for(let x=0;x<boardSize;x++)if(boardData[y][x].type==='bomb')boardData[y][x].triggered=true;activeBombs=0;updateBombCounter();}
+            function updateSafeHint(){ infoSafeHintEl.textContent = `Kód: ${foundCodePieces.join(' ')}`; }
+            safeModal.onclick=(e)=>{if(e.target===safeModal){safeModal.classList.remove('visible');gameLocked=false}};
+            
+            shopScanCellBtn.onclick=()=>{if(money>=costs.scanCell&&!isScannerActive){money-=costs.scanCell;updateMoneyDisplay();isScannerActive=true;gameBoardElement.classList.add('scanner-active');messageContainer.textContent="Kattints egy mezőre a szkenneléshez!"}};
+            shopGpsBtn.onclick=()=>{if(money<costs.gps)return;money-=costs.gps;updateMoneyDisplay();const path=findPathToClosestQuestion(playerPosition);if(path){path.forEach((pos,i)=>{if(i>0){const cell=gameBoardElement.querySelector(`[data-x='${pos.x}'][data-y='${pos.y}']`);if(cell)cell.classList.add('path-highlight');setTimeout(()=>cell&&cell.classList.remove('path-highlight'),3000)}})}};
+            shopVestBtn.onclick=()=>{if(money>=costs.vest){money-=costs.vest;vestCount++;updateMoneyDisplay();updateVestIndicator()}};
+            shopLifeBtn.onclick=()=>{if(money>=costs.life){money-=costs.life;updateMoneyDisplay();lives++;renderLives();}};
+            shopDoublerBtn.onclick=()=>{if(money>=costs.doubler){money-=costs.doubler;doublerCount++;updateMoneyDisplay();updateDoublerIndicator()}};
+            shopHalveBtn.onclick=()=>{if(money>=costs.halve){money-=costs.halve;updateMoneyDisplay();const qData=questions[currentQuestion.difficulty][currentQuestion.index];const c=qData.correct;const i=Array.from(infoAnswerButtonsEl.children).filter(b=>parseInt(b.dataset.index)!==c);if(i.length>1)i[Math.floor(Math.random()*i.length)].disabled=!0;shopHalveBtn.disabled=!0}};
+            shopSkipBtn.onclick=()=>{if(money>=costs.skip){money-=costs.skip;updateMoneyDisplay();boardData[playerPosition.y][playerPosition.x].answered=true;answeredQuestions++;updateQuestionCounter();if(answeredQuestions>=questionCount)messageContainer.textContent='Minden kérdés megválaszolva! Irány a kijárat!';gameLocked=false;infoQuestionTextEl.textContent='';infoAnswerButtonsEl.innerHTML='';infoQuestionShopEl.style.display='none';renderBoard()}};
+            
+            function findPathToClosestQuestion(start){const openSet=[{...start,g:0,h:0,f:0,parent:null}];const closedSet=new Set();let closestQuestion=null;let minH=Infinity;for(let y=0;y<boardSize;y++)for(let x=0;x<boardSize;x++)if(boardData[y][x].type==='question'&&!boardData[y][x].answered){const h=Math.abs(start.x-x)+Math.abs(start.y-y);if(h<minH){minH=h;closestQuestion={x,y}}}if(!closestQuestion)return null;while(openSet.length>0){openSet.sort((a,b)=>a.f-b.f);const current=openSet.shift();const currentKey=`${current.x},${current.y}`;if(current.x===closestQuestion.x&&current.y===closestQuestion.y){const path=[];let temp=current;while(temp){path.unshift(temp);temp=temp.parent}return path}closedSet.add(currentKey);[[0,1],[0,-1],[1,0],[-1,0]].forEach(([dx,dy])=>{const nx=current.x+dx;const ny=current.y+dy;if(nx<0||nx>=boardSize||ny<0||ny>=boardSize)return;const nKey=`${nx},${ny}`;if(closedSet.has(nKey)||(boardData[ny][nx].type==='bomb'&&!boardData[ny][nx].triggered))return;const g=current.g+1;let neighbor=openSet.find(n=>n.x===nx&&n.y===ny);if(!neighbor){const h=Math.abs(nx-closestQuestion.x)+Math.abs(ny-closestQuestion.y);neighbor={x:nx,y:ny,g,h,f:g+h,parent:current};openSet.push(neighbor)}else if(g<neighbor.g){neighbor.g=g;neighbor.f=g+neighbor.h;neighbor.parent=current}})}return null}
+
+            newMapButton.addEventListener('click', () => { newMapButton.style.display = 'none'; initGame(money); });
+            restartButton.addEventListener('click', () => initGame());
+            
+            setInterval(tick, 1000);
+            initGame();
+        });
     </script>
-
 </body>
 </html>
