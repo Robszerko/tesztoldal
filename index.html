@@ -45,10 +45,6 @@
         #info-panel h3 { font-family: 'Orbitron', sans-serif; margin-top: 0; color: var(--glow-accent); }
         .info-section { margin-bottom: 20px; min-height: 50px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; }
         #info-proximity-warning { color: var(--bomb-color); font-weight: 700; font-size: 1.2em; text-shadow: 0 0 10px var(--bomb-color); animation: flash-warning 1s infinite; visibility: hidden; }
-        #info-answer-buttons button { display: block; width: 100%; padding: 10px; margin: 8px 0; border: 1px solid var(--cell-border); border-radius: 10px; background: rgba(255,255,255,0.1); color: var(--text-color); font-size: 0.9em; cursor: pointer; transition: all 0.2s ease; }
-        #info-answer-buttons button.correct-answer { background-color: var(--success-color) !important; color: #0F0C29; }
-        #info-answer-buttons button.incorrect-answer { background-color: var(--bomb-color) !important; color: #FFF; }
-        #info-answer-buttons button:disabled:not(.correct-answer):not(.incorrect-answer) { opacity: 0.5; background: #555; }
         #new-map-button { display: none; margin-top: 10px; }
         #info-time { text-align: center; }
         #info-time p { margin: 5px 0; }
@@ -121,9 +117,11 @@
         .modal.visible { opacity: 1; pointer-events: auto; }
         .modal-content { transform: scale(0.9); transition: transform 0.3s ease; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--cell-border); padding: 30px; border-radius: 20px; width: 90%; text-align: center; }
         .modal.visible .modal-content { transform: scale(1); }
-        #safe-container { max-width: 350px; }
-        #final-chance-container { max-width: 600px; max-height: 90vh; overflow-y: auto; }
-        #final-chance-container button { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 1px solid var(--cell-border); border-radius: 15px; background: rgba(255,255,255,0.1); color: var(--text-color); font-size: 1.1em; cursor: pointer; }
+        #safe-container, #question-container, #final-chance-container { max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        #final-chance-container button, #question-modal-answers button { display: block; width: 100%; padding: 15px; margin: 10px 0; border: 1px solid var(--cell-border); border-radius: 15px; background: rgba(255,255,255,0.1); color: var(--text-color); font-size: 1.1em; cursor: pointer; }
+        #question-modal-answers button.correct-answer { background-color: var(--success-color) !important; color: #0F0C29; }
+        #question-modal-answers button.incorrect-answer { background-color: var(--bomb-color) !important; color: #FFF; }
+        #question-modal-answers button:disabled:not(.correct-answer):not(.incorrect-answer) { opacity: 0.5; background: #555; }
         #safe-display { width: 100%; height: 50px; background: rgba(0,0,0,0.3); border-radius: 10px; margin-bottom: 20px; font-size: 2em; letter-spacing: 10px; text-align: center; color: white; }
         #safe-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         #safe-keypad button { padding: 15px; font-size: 1.5em; border: 1px solid var(--cell-border); border-radius: 15px; background: rgba(255,255,255,0.1); color: var(--text-color); cursor: pointer; }
@@ -184,15 +182,6 @@
                     <p id="info-exit-coords"></p>
                 </div>
                 <div id="game-board-wrapper"><table id="game-board"></table></div>
-                <div id="info-question" class="info-section">
-                    <h3 id="info-question-title">Kérdés</h3>
-                    <p id="info-question-text"></p>
-                    <div id="info-answer-buttons"></div>
-                    <div id="info-question-shop" class="shop-buttons" style="margin-top:15px; display:none;">
-                         <button id="shop-halve" class="shop-button">🧠 Felező (100 Ft)</button>
-                         <button id="shop-skip" class="shop-button">⏩ Átugrás (200 Ft)</button>
-                    </div>
-                </div>
                 <div id="shop-container">
                     <div id="shop-title">Segítségek</div>
                     <div class="shop-buttons">
@@ -260,6 +249,17 @@
             <div id="final-chance-answers"></div>
         </div>
     </div>
+    <div id="question-modal" class="modal">
+        <div id="question-container" class="modal-content">
+            <h3 id="question-modal-title">Kérdés</h3>
+            <p id="question-modal-text"></p>
+            <div id="question-modal-answers"></div>
+            <div id="question-modal-shop" class="shop-buttons" style="margin-top:15px; display:none;">
+                 <button id="shop-halve" class="shop-button">🧠 Felező (100 Ft)</button>
+                 <button id="shop-skip" class="shop-button">⏩ Átugrás (200 Ft)</button>
+            </div>
+        </div>
+    </div>
     <div id="svg-definitions" style="display: none;">
         <svg id="player-svg" viewBox="0 0 24 24"><path fill="white" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         <svg id="bomb-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v2h-2zm0-8h2v6h-2z"/></svg>
@@ -278,30 +278,36 @@
             const boardSize = 8, bombCount = 5, questionCount = 5, initialLives = 3;
             const costs = { scanCell: 75, halve: 100, doubler: 150, skip: 200, gps: 250, vest: 300, life: 400 };
             const fixedLifeCoords = [{x:1, y:1}, {x:1, y:6}, {x:6, y:1}, {x:6, y:6}];
-            let safeCode = "1234"; // Kezdeti érték, felülíródik az initGame-ben
+            let safeCode = "1234"; 
             const MAP_REFRESH_INTERVAL = 5 * 60 * 1000;
 
             // DOM Elements...
             const gameBoardElement = document.getElementById('game-board'), safeModal = document.getElementById('safe-modal'), finalChanceModal = document.getElementById('final-chance-modal'),
+                  questionModal = document.getElementById('question-modal'),
                   messageContainer = document.getElementById('message-container'), restartButton = document.getElementById('restart-button'),
                   livesContainer = document.getElementById('lives-container'), moneyValueEl = document.getElementById('money-value'),
                   questionCounterEl = document.getElementById('question-value'), bombCounterEl = document.getElementById('bomb-value'),
                   logoTitle = document.getElementById('logo-title'), infoSafeHintEl = document.getElementById('info-safe-hint'),
                   infoSafeCoordsEl = document.getElementById('info-safe-coords'), infoProximityEl = document.getElementById('info-proximity-warning'),
-                  infoQuestionTextEl = document.getElementById('info-question-text'), infoAnswerButtonsEl = document.getElementById('info-answer-buttons'),
-                  infoExitCoordsEl = document.getElementById('info-exit-coords'), infoQuestionShopEl = document.getElementById('info-question-shop'),
+                  infoExitCoordsEl = document.getElementById('info-exit-coords'),
                   safeDisplay = document.getElementById('safe-display'), safeKeypad = document.getElementById('safe-keypad'),
                   vestIndicator = document.getElementById('vest-indicator'), vestCountEl = document.getElementById('vest-count'),
                   doublerIndicator = document.getElementById('doubler-indicator'), doublerCountEl = document.getElementById('doubler-count'),
                   shopScanCellBtn = document.getElementById('shop-scan-cell'), shopGpsBtn = document.getElementById('shop-gps'),
-                  shopVestBtn = document.getElementById('shop-vest'), shopHalveBtn = document.getElementById('shop-halve'),
-                  shopSkipBtn = document.getElementById('shop-skip'), shopDoublerBtn = document.getElementById('shop-doubler'),
-                  shopLifeBtn = document.getElementById('shop-life'),
+                  shopVestBtn = document.getElementById('shop-vest'),
+                  shopLifeBtn = document.getElementById('shop-life'), shopDoublerBtn = document.getElementById('shop-doubler'),
                   currentTimeEl = document.getElementById('current-time'), nextMapTimeEl = document.getElementById('next-map-time'),
                   newMapButton = document.getElementById('new-map-button'),
                   waitTimeEl = document.getElementById('wait-time'),
                   gameElements = document.getElementById('game-elements'),
-                  integratedWaitScreen = document.getElementById('integrated-wait-screen');
+                  integratedWaitScreen = document.getElementById('integrated-wait-screen'),
+                  // Question Modal Elements
+                  questionModalTitle = document.getElementById('question-modal-title'),
+                  questionModalText = document.getElementById('question-modal-text'),
+                  questionModalAnswers = document.getElementById('question-modal-answers'),
+                  questionModalShop = document.getElementById('question-modal-shop'),
+                  shopHalveBtn = document.getElementById('shop-halve'),
+                  shopSkipBtn = document.getElementById('shop-skip');
                   
             const icons = {
                 player: document.getElementById('player-svg').cloneNode(true), bomb: document.getElementById('bomb-svg').cloneNode(true),
@@ -342,7 +348,6 @@
                 currentMapSeed = newSeed;
                 seededRandom = mulberry32(currentMapSeed);
 
-                // Széfkód generálása a seed alapján
                 let codeNum = Math.floor(seededRandom() * 9000) + 1000;
                 safeCode = codeNum.toString();
 
@@ -356,7 +361,7 @@
                 vestCount = 0; doublerCount = 0;
                 foundCodePieces = ['_', '_', '_', '_'];
                 usedQuestionIndices = { easy: new Set(), medium: new Set(), hard: new Set() };
-                messageContainer.className = ''; infoQuestionTextEl.textContent = '';
+                messageContainer.className = '';
                 infoExitCoordsEl.textContent = ''; infoSafeCoordsEl.textContent = '';
                 
                 boardData = Array(boardSize).fill(null).map(() => Array.from({ length: boardSize }, () => ({ type: 'empty', isFlagged: false })));
@@ -482,9 +487,14 @@
             }
 
             function showDifficultyChoice() {
-                gameLocked = true; infoQuestionTextEl.textContent = "Válassz kérdés nehézséget:";
-                infoAnswerButtonsEl.innerHTML = `<button data-difficulty="easy" data-reward="75">Könnyű (75 Ft)</button> <button data-difficulty="medium" data-reward="150">Közepes (150 Ft)</button> <button data-difficulty="hard" data-reward="300">Nehéz (300 Ft)</button>`;
-                infoAnswerButtonsEl.querySelectorAll('button').forEach(btn => {
+                gameLocked = true;
+                questionModalTitle.textContent = "Válassz kérdés nehézséget:";
+                questionModalText.textContent = "";
+                questionModalAnswers.innerHTML = `<button data-difficulty="easy" data-reward="75">Könnyű (75 Ft)</button> <button data-difficulty="medium" data-reward="150">Közepes (150 Ft)</button> <button data-difficulty="hard" data-reward="300">Nehéz (300 Ft)</button>`;
+                questionModalShop.style.display = 'none';
+                questionModal.classList.add('visible');
+
+                questionModalAnswers.querySelectorAll('button').forEach(btn => {
                     const diff = btn.dataset.difficulty;
                     if(usedQuestionIndices[diff].size >= questions[diff].length) btn.disabled = true;
                     btn.onclick = () => fetchAndShowQuestion(diff, parseInt(btn.dataset.reward));
@@ -495,9 +505,7 @@
                 let questionIndex;
                 const questionPool = questions[difficulty];
                 if (usedQuestionIndices[difficulty].size >= questionPool.length) {
-                    infoQuestionTextEl.textContent = "Sajnos elfogytak a kérdések ebből a kategóriából.";
-                    infoAnswerButtonsEl.innerHTML = '';
-                    setTimeout(() => { gameLocked = false; infoQuestionTextEl.textContent = ''; }, 2000);
+                    closeQuestionModalWithMessage("Sajnos elfogytak a kérdések ebből a kategóriából.");
                     return;
                 }
                 do { questionIndex = Math.floor(Math.random() * questionPool.length); } while (usedQuestionIndices[difficulty].has(questionIndex));
@@ -505,29 +513,59 @@
                 usedQuestionIndices[difficulty].add(questionIndex);
                 currentQuestion = { difficulty, index: questionIndex, reward, isLostMoneyQuestion };
                 const q = questionPool[questionIndex];
-                infoQuestionTextEl.textContent = q.question; infoAnswerButtonsEl.innerHTML = '';
-                q.answers.forEach((answerText, i) => { const button = document.createElement('button'); button.textContent = answerText; button.dataset.index = i; button.onclick = () => checkAnswer(i, button); infoAnswerButtonsEl.appendChild(button); });
-                infoQuestionShopEl.style.display = isLostMoneyQuestion ? 'none' : 'flex'; updateShopButtonsState();
+                
+                questionModalTitle.textContent = q.question;
+                questionModalText.textContent = "";
+                questionModalAnswers.innerHTML = '';
+                q.answers.forEach((answerText, i) => { 
+                    const button = document.createElement('button'); 
+                    button.textContent = answerText; 
+                    button.dataset.index = i; 
+                    button.onclick = () => checkAnswer(i, button); 
+                    questionModalAnswers.appendChild(button); 
+                });
+                
+                questionModalShop.style.display = isLostMoneyQuestion ? 'none' : 'flex'; 
+                updateShopButtonsState();
+            }
+
+            function closeQuestionModalWithMessage(message) {
+                messageContainer.textContent = message;
+                closeQuestionModal();
+            }
+
+            function closeQuestionModal() {
+                questionModal.classList.remove('visible');
+                gameLocked = false;
+                renderBoard();
             }
             
             function checkAnswer(selectedIndex, clickedButton) {
                 const qData = questions[currentQuestion.difficulty][currentQuestion.index];
                 const isCorrect = selectedIndex === qData.correct;
                 clickedButton.classList.add(isCorrect ? 'correct-answer' : 'incorrect-answer');
-                Array.from(infoAnswerButtonsEl.children).forEach(btn => btn.disabled = true);
+                Array.from(questionModalAnswers.children).forEach(btn => btn.disabled = true);
                 let reward = currentQuestion.reward;
+
                 if (isCorrect) {
                     if(doublerCount > 0) { reward *= 2; doublerCount--; updateDoublerIndicator(); }
                     if(currentQuestion.isLostMoneyQuestion) { money += lostMoneyAmount; lostMoneyAmount = 0; } else { money += reward; }
                     updateMoneyDisplay();
-                } else { if(currentQuestion.isLostMoneyQuestion) { lostMoneyAmount = 0; } else { handleMistake(false); } }
-                if(!currentQuestion.isLostMoneyQuestion) { boardData[playerPosition.y][playerPosition.x].answered = true; answeredQuestions++; updateQuestionCounter(); }
-                setTimeout(() => { 
-                    infoQuestionTextEl.textContent = ''; infoAnswerButtonsEl.innerHTML = ''; infoQuestionShopEl.style.display = 'none';
-                    gameLocked = false;
-                    renderBoard();
-                }, 2000);
-                if (answeredQuestions >= questionCount) messageContainer.textContent = 'Minden kérdés megválaszolva! Irány a kijárat!';
+                } else { 
+                    if(currentQuestion.isLostMoneyQuestion) { lostMoneyAmount = 0; } else { handleMistake(false); } 
+                }
+                
+                if(!currentQuestion.isLostMoneyQuestion) { 
+                    boardData[playerPosition.y][playerPosition.x].answered = true; 
+                    answeredQuestions++; 
+                    updateQuestionCounter(); 
+                }
+                
+                setTimeout(closeQuestionModal, 2000);
+
+                if (answeredQuestions >= questionCount) {
+                    messageContainer.textContent = 'Minden kérdés megválaszolva! Irány a kijárat!';
+                }
             }
 
             function handleMistake(isBomb = true) {
@@ -608,7 +646,16 @@
                 }
             }
             
-            function updateShopButtonsState() { shopScanCellBtn.disabled=money<costs.scanCell||gameOver||isScannerActive; shopDoublerBtn.disabled=money<costs.doubler||gameOver; shopGpsBtn.disabled=money<costs.gps||gameOver; shopVestBtn.disabled=money<costs.vest||gameOver; shopLifeBtn.disabled=money<costs.life||gameOver; shopHalveBtn.disabled=money<costs.halve||gameOver||!gameLocked; shopSkipBtn.disabled=money<costs.skip||gameOver||!gameLocked; }
+            function updateShopButtonsState() { 
+                const isQuestionLocked = gameLocked && questionModal.classList.contains('visible');
+                shopScanCellBtn.disabled = money < costs.scanCell || gameOver || isScannerActive; 
+                shopDoublerBtn.disabled = money < costs.doubler || gameOver; 
+                shopGpsBtn.disabled = money < costs.gps || gameOver; 
+                shopVestBtn.disabled = money < costs.vest || gameOver; 
+                shopLifeBtn.disabled = money < costs.life || gameOver; 
+                shopHalveBtn.disabled = money < costs.halve || !isQuestionLocked; 
+                shopSkipBtn.disabled = money < costs.skip || !isQuestionLocked; 
+            }
             function renderLives(){livesContainer.innerHTML='';for(let i=0;i<lives;i++){livesContainer.appendChild(icons.life.cloneNode(true))}}
             function updateMoneyDisplay(){moneyValueEl.textContent=`${money} Ft`;updateShopButtonsState()}
             function updateQuestionCounter(){questionCounterEl.textContent=`${answeredQuestions} / ${questionCount}`}
@@ -631,8 +678,8 @@
             shopVestBtn.onclick=()=>{if(money>=costs.vest){money-=costs.vest;vestCount++;updateMoneyDisplay();updateVestIndicator()}};
             shopLifeBtn.onclick=()=>{if(money>=costs.life){money-=costs.life;updateMoneyDisplay();lives++;renderLives();}};
             shopDoublerBtn.onclick=()=>{if(money>=costs.doubler){money-=costs.doubler;doublerCount++;updateMoneyDisplay();updateDoublerIndicator()}};
-            shopHalveBtn.onclick=()=>{if(money>=costs.halve){money-=costs.halve;updateMoneyDisplay();const qData=questions[currentQuestion.difficulty][currentQuestion.index];const c=qData.correct;const i=Array.from(infoAnswerButtonsEl.children).filter(b=>parseInt(b.dataset.index)!==c);if(i.length>1)i[Math.floor(Math.random()*i.length)].disabled=!0;shopHalveBtn.disabled=!0}};
-            shopSkipBtn.onclick=()=>{if(money>=costs.skip){money-=costs.skip;updateMoneyDisplay();boardData[playerPosition.y][playerPosition.x].answered=true;answeredQuestions++;updateQuestionCounter();if(answeredQuestions>=questionCount)messageContainer.textContent='Minden kérdés megválaszolva! Irány a kijárat!';gameLocked=false;infoQuestionTextEl.textContent='';infoAnswerButtonsEl.innerHTML='';infoQuestionShopEl.style.display='none';renderBoard()}};
+            shopHalveBtn.onclick=()=>{if(money>=costs.halve){money-=costs.halve;updateMoneyDisplay();const qData=questions[currentQuestion.difficulty][currentQuestion.index];const c=qData.correct;const i=Array.from(questionModalAnswers.children).filter(b=>parseInt(b.dataset.index)!==c);if(i.length>1)i[Math.floor(Math.random()*i.length)].disabled=!0;shopHalveBtn.disabled=!0}};
+            shopSkipBtn.onclick=()=>{if(money>=costs.skip){money-=costs.skip;updateMoneyDisplay();boardData[playerPosition.y][playerPosition.x].answered=true;answeredQuestions++;updateQuestionCounter();if(answeredQuestions>=questionCount)messageContainer.textContent='Minden kérdés megválaszolva! Irány a kijárat!';closeQuestionModal();}};
             
             function findPathToClosestQuestion(start){const openSet=[{...start,g:0,h:0,f:0,parent:null}];const closedSet=new Set();let closestQuestion=null;let minH=Infinity;for(let y=0;y<boardSize;y++)for(let x=0;x<boardSize;x++)if(boardData[y][x].type==='question'&&!boardData[y][x].answered){const h=Math.abs(start.x-x)+Math.abs(start.y-y);if(h<minH){minH=h;closestQuestion={x,y}}}if(!closestQuestion)return null;while(openSet.length>0){openSet.sort((a,b)=>a.f-b.f);const current=openSet.shift();const currentKey=`${current.x},${current.y}`;if(current.x===closestQuestion.x&&current.y===closestQuestion.y){const path=[];let temp=current;while(temp){path.unshift(temp);temp=temp.parent}return path}closedSet.add(currentKey);[[0,1],[0,-1],[1,0],[-1,0]].forEach(([dx,dy])=>{const nx=current.x+dx;const ny=current.y+dy;if(nx<0||nx>=boardSize||ny<0||ny>=boardSize)return;const nKey=`${nx},${ny}`;if(closedSet.has(nKey)||(boardData[ny][nx].type==='bomb'&&!boardData[ny][nx].triggered))return;const g=current.g+1;let neighbor=openSet.find(n=>n.x===nx&&n.y===ny);if(!neighbor){const h=Math.abs(nx-closestQuestion.x)+Math.abs(ny-closestQuestion.y);neighbor={x:nx,y:ny,g,h,f:g+h,parent:current};openSet.push(neighbor)}else if(g<neighbor.g){neighbor.g=g;neighbor.f=g+neighbor.h;neighbor.parent=current}})}return null}
 
