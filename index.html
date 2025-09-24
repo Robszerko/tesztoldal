@@ -279,11 +279,41 @@
         { label: "25k Ft", value: 25000, color: "#4dd0e1" }, { label: "BANK FELE", value: "half", color: "#ffa726" },
         { label: "100k Ft", value: 100000, color: "#26c6da" }, { label: "+50k Ft", value: 50000, color: "#66bb6a" }
     ];
+    
+    // BŐVÍTETT KÉRDÉSBANK
     const ALL_QUESTIONS = [
         { "question": "Melyik bolygó a legnagyobb a Naprendszerben?", "options": ["Föld", "Jupiter", "Mars", "Szaturnusz"], "answer": "Jupiter", "explanation": "A Jupiter tömege több mint kétszerese a Naprendszer összes többi bolygója együttes tömegének." },
         { "question": "Hány lába van egy póknak?", "options": ["6", "8", "10", "12"], "answer": "8", "explanation": "A pókok a pókszabásúak osztályába tartoznak, melyek egyik fő jellemzője a nyolc láb." },
         { "question": "Mi a víz kémiai képlete?", "options": ["H2O", "CO2", "O2", "NaCl"], "answer": "H2O", "explanation": "A vízmolekula két hidrogén (H) és egy oxigén (O) atomból áll." },
         { "question": "Ki írta a Hamletet?", "options": ["Charles Dickens", "J.K. Rowling", "William Shakespeare", "Tolkien"], "answer": "William Shakespeare", "explanation": "A 'Hamlet, dán királyfi' Shakespeare egyik legismertebb tragédiája." },
+        { "question": "Mi a világ legmagasabb hegycsúcsa?", "options": ["K2", "Mount Everest", "Kancsendzönga", "Lhoce"], "answer": "Mount Everest", "explanation": "A Mount Everest 8848,86 méter magas, a Himalájában található." },
+        { "question": "Melyik évben volt a mohácsi csata?", "options": ["1241", "1456", "1526", "1686"], "answer": "1526", "explanation": "A mohácsi csata a középkori Magyar Királyság hadtörténetének egyik legtragikusabb eseménye." },
+        { "question": "Ki festette a Mona Lisát?", "options": ["Michelangelo", "Raffaello", "Leonardo da Vinci", "Donatello"], "answer": "Leonardo da Vinci", "explanation": "A Mona Lisa a párizsi Louvre-ban van kiállítva és a világ egyik leghíresebb festménye." },
+        { "question": "Melyik a legkönnyebb kémiai elem?", "options": ["Hélium", "Oxigén", "Hidrogén", "Lítium"], "answer": "Hidrogén", "explanation": "A hidrogén rendszáma 1, a legelső és legegyszerűbb elem a periódusos rendszerben." },
+        { "question": "Hány megyéje van Magyarországnak?", "options": ["18", "19", "20", "21"], "answer": "19", "explanation": "Magyarország 19 megyére és a fővárosra, Budapestre tagozódik." },
+        { "question": "Melyik a leggyorsabb szárazföldi állat?", "options": ["Oroszlán", "Gepárd", "Gazella", "Prériantilop"], "answer": "Gepárd", "explanation": "A gepárd rövid távon akár a 120 km/h sebességet is elérheti." },
+        { "question": "Ki írta az Egri csillagokat?", "options": ["Jókai Mór", "Mikszáth Kálmán", "Gárdonyi Géza", "Móricz Zsigmond"], "answer": "Gárdonyi Géza", "explanation": "Gárdonyi Géza történelmi regénye az 1552-es egri ostrom eseményeit dolgozza fel." },
+        { "question": "Melyik országban található a Gízai piramisok?", "options": ["Görögország", "Törökország", "Egyiptom", "Irán"], "answer": "Egyiptom", "explanation": "A gízai piramisegyüttes Kairó közelében, Egyiptomban található." },
+        { "question": "Mi a Föld légkörének legnagyobb arányban előforduló gáza?", "options": ["Oxigén", "Szén-dioxid", "Argon", "Nitrogén"], "answer": "Nitrogén", "explanation": "A Föld légkörének körülbelül 78%-a nitrogén." },
+        { "question": "Hány aranyérmet nyert Michael Phelps összesen az olimpiákon?", "options": ["18", "23", "28", "31"], "answer": "23", "explanation": "Michael Phelps amerikai úszó 23 aranyérmével minden idők legeredményesebb olimpikonja." },
+        { "question": "Melyik város Olaszország fővárosa?", "options": ["Milánó", "Velence", "Nápoly", "Róma"], "answer": "Róma", "explanation": "Róma, az 'Örök Város' Olaszország politikai és kulturális központja." },
+        { "question": "Melyik zeneszerző volt süket élete jelentős részében?", "options": ["Mozart", "Bach", "Beethoven", "Chopin"], "answer": "Beethoven", "explanation": "Ludwig van Beethoven a halláskárosodása ellenére is folytatta a zeneszerzést." },
+        { "question": "Melyik évben lépett az első ember a Holdra?", "options": ["1965", "1969", "1971", "1973"], "answer": "1969", "explanation": "Neil Armstrong 1969. július 20-án lépett a Hold felszínére az Apollo–11 küldetés során." },
+        { "question": "Mi a hivatalos pénznem Japánban?", "options": ["Won", "Jüan", "Jen", "Ringgit"], "answer": "Jen", "explanation": "A japán jen (JPY) a világ egyik legfontosabb kereskedelmi valutája." },
+        { "question": "Melyik a világ legnagyobb óceánja?", "options": ["Atlanti-óceán", "Indiai-óceán", "Jeges-tenger", "Csendes-óceán"], "answer": "Csendes-óceán", "explanation": "A Csendes-óceán a Föld teljes felszínének mintegy egyharmadát borítja." },
+        { "question": "Ki rendezte a 'Ponyvaregény' (Pulp Fiction) című filmet?", "options": ["Steven Spielberg", "Martin Scorsese", "Quentin Tarantino", "James Cameron"], "answer": "Quentin Tarantino", "explanation": "A Ponyvaregényt 1994-ben mutatták be, és a modern filmtörténet egyik ikonikus alkotása." },
+        { "question": "Melyik vitamin hiánya okozza a skorbutot?", "options": ["A-vitamin", "B12-vitamin", "C-vitamin", "D-vitamin"], "answer": "C-vitamin", "explanation": "A skorbutot a krónikus C-vitamin-hiány okozza, régen a tengerészek betegsége volt." },
+        { "question": "Melyik kontinensen élnek a kenguruk vadon?", "options": ["Afrika", "Dél-Amerika", "Ausztrália", "Ázsia"], "answer": "Ausztrália", "explanation": "A kenguruk Ausztrália legismertebb őshonos állatai." },
+        { "question": "Melyik festő vágta le a saját fülét?", "options": ["Claude Monet", "Pablo Picasso", "Salvador Dalí", "Vincent van Gogh"], "answer": "Vincent van Gogh", "explanation": "Bár a pontos körülmények vitatottak, van Gogh egy mentális összeomlás során csonkította meg magát." },
+        { "question": "Hogy hívják a Harry Potter sorozat főgonoszát?", "options": ["Grindelwald", "Voldemort", "Malfoy", "Piton"], "answer": "Voldemort", "explanation": "Voldemort nagyúr, eredeti nevén Tom Denem, a varázsvilág legrettegettebb sötét mágusa." },
+        { "question": "Melyik sportágban híres Michael Jordan?", "options": ["Futball", "Kosárlabda", "Baseball", "Jégkorong"], "answer": "Kosárlabda", "explanation": "Michael Jordant széles körben minden idők legjobb kosárlabdázójának tartják." },
+        { "question": "Melyik a leghosszabb folyó a világon?", "options": ["Nílus", "Amazonas", "Jangce", "Mississippi"], "answer": "Nílus", "explanation": "Bár néha vitatják, a Nílust tartják a leghosszabb folyónak, kb. 6650 km hosszúsággal." },
+        { "question": "Mi a 'Félhomály' zóna eredeti, angol címe?", "options": ["The Outer Limits", "Black Mirror", "The Twilight Zone", "Tales from the Crypt"], "answer": "The Twilight Zone", "explanation": "A The Twilight Zone egy klasszikus amerikai antológia-sorozat, amelyet Rod Serling alkotott." },
+        { "question": "Melyik ország nem tagja az Európai Uniónak?", "options": ["Horvátország", "Románia", "Svájc", "Lengyelország"], "answer": "Svájc", "explanation": "Svájc bár Európában van, de nem tagja az EU-nak, szoros gazdasági kapcsolatokat ápol vele." },
+        { "question": "Ki volt az első magyar űrhajós?", "options": ["Kármán Tódor", "Farkas Bertalan", "Charles Simonyi", "Bay Zoltán"], "answer": "Farkas Bertalan", "explanation": "Farkas Bertalan 1980-ban járt az űrben a Szojuz–36 űrhajó fedélzetén." },
+        { "question": "Melyik hangszeren játszott Louis Armstrong?", "options": ["Szaxofon", "Zongora", "Trombita", "Klarinét"], "answer": "Trombita", "explanation": "Louis Armstrong a jazz történetének egyik legmeghatározóbb trombita- és énekes előadója volt." },
+        { "question": "Melyik színész játszotta Indiana Jones-t?", "options": ["Tom Hanks", "Harrison Ford", "Sean Connery", "Mel Gibson"], "answer": "Harrison Ford", "explanation": "Harrison Ford neve szorosan összeforrt a kalandvágyó régészprofesszor, Indiana Jones karakterével." },
+        { "question": "Mi a relativitáselmélet kidolgozójának neve?", "options": ["Isaac Newton", "Galileo Galilei", "Albert Einstein", "Stephen Hawking"], "answer": "Albert Einstein", "explanation": "Albert Einstein speciális és általános relativitáselmélete forradalmasította a modern fizikát." }
     ];
     
     const screens = { loading: document.getElementById('loading-screen'), nameSetup: document.getElementById('name-setup-screen'), menu: document.getElementById('menu-screen'), hostWait: document.getElementById('host-wait-screen'), join: document.getElementById('join-screen'), game: document.getElementById('game-screen'), wheel: document.getElementById('wheel-modal'), answerModal: document.getElementById('answer-modal') };
@@ -445,7 +475,7 @@
         if (!gameData) return;
         
         if (gameData.status === 'waiting' || !gameData.player2) {
-             switchScreen('hostWait');
+             if (!screens.hostWait.classList.contains('active')) switchScreen('hostWait');
              return;
         }
 
@@ -460,7 +490,7 @@
             showWheelUI(gameData);
         } else if (gameData.status === 'active' && screens.wheel.style.display === 'flex') {
             screens.wheel.style.display = 'none';
-            switchScreen('game');
+            if (!screens.game.classList.contains('active')) switchScreen('game');
         }
 
         document.getElementById('player1-info').classList.toggle('active', gameData.turn === gameData.player1.uid);
@@ -519,7 +549,6 @@
                      chainLevel: 0,
                      turn: data.turn === data.player1.uid ? data.player2.uid : data.player1.uid,
                      questionActive: false, selectedAnswer: null, answerRevealed: false,
-                     // JAVÍTVA: Az index itt is lép, hogy a következő játékos új kérdést kapjon
                      questionIndex: Math.min(data.questionIndex + 1, QUESTIONS_PER_ROUND)
                  });
             });
@@ -562,37 +591,33 @@
         }
     }
     
-    // VÉGLEGESEN JAVÍTOTT LOGIKA
     async function calculateNextState(data) {
       try {
         const isCorrect = data.selectedAnswer === data.questions[data.questionIndex].answer;
         const turnPlayer = data.turn === data.player1.uid ? data.player1 : data.player2;
         
         const updates = {};
-        // A kérdés indexe MINDIG növekszik, miután egy kérdésre válaszoltak.
         const nextQuestionIndex = data.questionIndex + 1;
 
         if (isCorrect) {
             updates.chainLevel = Math.min(data.chainLevel + 1, MONEY_PYRAMID.length - 1);
             updates.lastAction = `${turnPlayer.name} helyesen válaszolt! A sorozat folytatódik.`;
-            updates.turn = data.turn; // A kör nem változik
+            // A kör nem változik, a játékos folytatja
+            updates.turn = data.turn; 
         } else {
             updates.chainLevel = 0;
-            updates.turn = data.turn === data.player1.uid ? data.player2.uid : data.player1.uid; // A kör a másik játékosé
+            // A kör a másik játékosé
+            updates.turn = data.turn === data.player1.uid ? data.player2.uid : data.player1.uid; 
             updates.lastAction = `${turnPlayer.name} hibázott! A lánc megszakadt.`;
         }
         
-        // A kérdés indexének kezelése a kör vége ellenőrzéssel együtt
         if (nextQuestionIndex >= QUESTIONS_PER_ROUND) {
             updates.status = 'roundOver';
-            // Ha az utolsó kérdés helyes volt, a pénzt még hozzáadjuk
-            if (isCorrect) {
-                const finalBank = updates.chainLevel > 0 ? MONEY_PYRAMID[updates.chainLevel].value : 0;
-                if(finalBank > 0) {
-                    const dailyScoreRef = ref(db, `dailyScores/${getTodayString()}/${data.turn}/score`);
-                    await runTransaction(dailyScoreRef, (score) => (score || 0) + finalBank);
-                    updates.lastAction += ` Az utolsó körben bankolt ${finalBank.toLocaleString()} Ft-ot!`;
-                }
+            const bankableAmount = MONEY_PYRAMID[updates.chainLevel || data.chainLevel].value;
+            if (isCorrect && bankableAmount > 0) {
+                 const dailyScoreRef = ref(db, `dailyScores/${getTodayString()}/${data.turn}/score`);
+                 await runTransaction(dailyScoreRef, (score) => (score || 0) + bankableAmount);
+                 updates.lastAction += ` Az utolsó kérdéssel bankolt ${bankableAmount.toLocaleString()} Ft-ot!`;
             }
         } else {
             updates.questionIndex = nextQuestionIndex;
@@ -621,13 +646,19 @@
         
         await runTransaction(dailyScoreRef, (currentScore) => (currentScore || 0) + pointsToBank);
 
-        await update(ref(db, `games/${currentGameId}`), {
+        const nextQuestionIndex = data.questionIndex + 1;
+        const updates = {
             chainLevel: 0,
             turn: data.turn === data.player1.uid ? data.player2.uid : data.player1.uid,
             lastAction: `${turnPlayer.name} bankolt ${pointsToBank.toLocaleString()} Ft-ot!`,
-            // JAVÍTVA: Bankolás után is a következő kérdés jön
-            questionIndex: Math.min(data.questionIndex + 1, QUESTIONS_PER_ROUND)
-        });
+            questionIndex: nextQuestionIndex
+        };
+        
+        if (nextQuestionIndex >= QUESTIONS_PER_ROUND) {
+            updates.status = 'roundOver';
+        }
+
+        await update(ref(db, `games/${currentGameId}`), updates);
     });
 
     function startTimer(duration, onEnd) {
@@ -781,6 +812,19 @@
             if(currentGameId) remove(ref(db, `games/${currentGameId}`)); 
             switchScreen('menu'); 
         });
+        
+        // Copy game code to clipboard
+        document.getElementById('game-code-display').addEventListener('click', (e) => {
+            const code = e.target.textContent;
+            if(code && code !== '----') {
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('Kód a vágólapra másolva!');
+                }).catch(err => {
+                    console.error('Hiba a másolás során: ', err);
+                });
+            }
+        });
+
     })();
 
 </script>
