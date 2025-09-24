@@ -55,6 +55,8 @@
         
         .lobby-btn { flex: 1; padding: 15px; font-size: 1rem; font-weight: 600; border: none; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; }
         .lobby-btn:disabled { background-color: var(--cell-border); color: var(--text-secondary); cursor: not-allowed; }
+        .lobby-btn.bonus-ready { animation: bonus-glow 1.5s infinite; }
+        @keyframes bonus-glow { 0%, 100% { box-shadow: 0 0 10px var(--money-color); } 50% { box-shadow: 0 0 25px var(--money-color); } }
         
         #startAIGameBtn { background: linear-gradient(45deg, var(--success-color), #27ae60); color: white; }
         #startAIGameBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4); }
@@ -96,6 +98,7 @@
         .player-score .name { font-weight: 600; font-size: 0.9rem; min-height: 50px; margin-bottom: 5px; word-break: break-all; }
         .player-score .score { font-size: 2rem; font-weight: 700; }
         .player-money-ingame { font-size: 0.8rem; color: var(--money-color); font-weight: 600; margin-top: 5px; }
+        .player-projection { font-size: 0.7rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.2; }
 
         #game-wager-display { text-align: center; margin-top: 20px; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: var(--money-color); }
         
@@ -145,6 +148,15 @@
         .equipped-btn { background-color: var(--cell-border); color: var(--text-secondary); cursor: not-allowed; }
         .sell-btn { background-color: var(--danger-color); color: white; }
 
+        #dailyBonus-week { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .day-box { width: 80px; height: 100px; background: var(--board-bg); border: 2px solid var(--cell-border); border-radius: 10px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .day-box.today { border-color: var(--accent-color); }
+        .day-box.claimed { background-color: var(--success-color); border-color: #27ae60; }
+        .day-box .day-name { font-size: 0.8rem; font-weight: 600; }
+        .day-box .day-date { font-size: 0.7rem; color: var(--text-secondary); }
+        .day-box .day-reward { font-size: 1.2rem; font-weight: 700; color: var(--money-color); margin-top: 5px; }
+
+
         #devPanel { max-height: 70vh; overflow-y: auto; }
         .dev-player-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 5px; }
         .dev-player-item input { width: 100px; margin: 0 10px; }
@@ -171,6 +183,9 @@
         
         @keyframes strobe-flash { 0%, 100% { filter: brightness(1); } 10%, 30%, 50%, 70%, 90% { filter: brightness(3.5) drop-shadow(0 0 15px rgba(255, 255, 255, 1)); } 20%, 40%, 60%, 80% { filter: brightness(1); } }
         .cell-flashed.x-icon, .cell-flashed.o-icon { animation: strobe-flash 0.6s ease-in-out; }
+        .money-strobe { animation: strobe-flash-money 1.5s ease-in-out; }
+        @keyframes strobe-flash-money { 0%, 100% { color: var(--money-color); transform: scale(1); } 10%, 30%, 50%, 70%, 90% { color: white; transform: scale(1.1); text-shadow: 0 0 15px white; } 20%, 40%, 60%, 80% { color: var(--money-color); transform: scale(1); } }
+
 
         @keyframes winning-icon-pulse { 0%, 100% { transform: scale(1); filter: brightness(1.5) drop-shadow(0 0 5px var(--success-color)); } 50% { transform: scale(1.1); filter: brightness(2.5) drop-shadow(0 0 15px var(--success-color)); } }
         .winning-cell { background-color: rgba(46, 204, 113, 0.15); }
@@ -243,6 +258,7 @@
         <div class="button-group">
             <div id="player-buttons">
                  <div class="secondary-buttons">
+                    <button id="dailyBonusBtn" class="lobby-btn secondary-btn hidden">Napi Bónusz 🎁</button>
                     <button id="shopBtn" class="lobby-btn secondary-btn hidden">Bolt 🛍️</button>
                     <button id="achievementsBtn" class="lobby-btn secondary-btn">Teljesítmények</button>
                     <button id="statsBtn" class="lobby-btn secondary-btn">Statisztikák</button>
@@ -278,6 +294,7 @@
                     <div class="name" id="playerXNameText">Játékos X</div>
                     <span class="score" id="scoreX">0</span>
                     <div class="player-money-ingame" id="playerXMoney"></div>
+                    <div class="player-projection" id="playerXProjection"></div>
                 </div>
                 <div class="player-score" id="playerOPanel">
                     <div class="player-avatar" id="playerOAvatar"></div>
@@ -286,6 +303,7 @@
                     <div class="name" id="playerONameText">Játékos O</div>
                     <span class="score" id="scoreO">0</span>
                     <div class="player-money-ingame" id="playerOMoney"></div>
+                    <div class="player-projection" id="playerOProjection"></div>
                 </div>
             </div>
             <div id="game-wager-display"></div>
@@ -354,6 +372,16 @@
             </div>
         </div>
     </div>
+    
+    <div id="dailyBonusModal" class="modal hidden">
+        <div class="modal-container">
+            <span id="closeDailyBonusBtn" class="close-btn">&times;</span>
+            <h2>Napi Belépési Bónusz</h2>
+            <p style="text-align: center; margin-bottom: 20px;">Minden nap belépve jutalmat kapsz! A mai jutalmad:</p>
+            <div id="dailyBonus-week"></div>
+            <button id="claimBonusBtn" class="lobby-btn">Bónusz Kérése</button>
+        </div>
+    </div>
 
     <div id="devModal" class="modal hidden">
         <div class="modal-container">
@@ -386,8 +414,8 @@
         const db = getFirestore(app);
         const rtdb = getDatabase(app); 
         
-        let currentGameId = null, localPlayerSymbol = null, localPlayerName = null, unsubscribeFromGame = null, unsubscribeFromChat = null, selectedAvatar = null;
-        let isSinglePlayer = false, isSpectatorMode = false;
+        let currentGameId = null, localPlayerSymbol = null, loggedInPlayerName = null, unsubscribeFromGame = null;
+        let isSinglePlayer = false, isSpectatorMode = false, selectedAvatar = null;
         let localGameState = null, spectatorPresenceRef = null, activeSpectators = {};
         let localPlayerData = null;
         
@@ -400,7 +428,7 @@
         
         const MASTER_PIKSZEL_WIN_QUOTES=["LOL, ezt benézted. De nagyon.","GG EZ. Mondanám, de nem volt az. Túl könnyű volt.","#skillissue. Ennyi. Bocsi.","Ne sírj, csak egy játék. Bár mostantól az én játékom.","Annyira próbálkoztál, cuki. Majdnem megsajnáltalak. Majdnem.","Ez a lépés annyira 2010-es volt. Haladjunk már, pls.","Nemár, komolyan ezt a stratégiát választottad? Cringe.","Oké, boomer. Ez a győzelem a Z generációnak szól.","Lehet, hogy neked van életed, de nekem több FPS-em. És győzelmem.","Na, erről ennyit. Majd írj, ha felnőttél a feladathoz.","Ez a győzelem annyira sima volt, mint egy filterezett Insta-sztori.","Látod? Én már a metában játszom, amíg te a tutorialt olvasod.","Ne vedd magadra, de a stratégiád annyira basic.","Ez a meccs olyan volt, mint egy rossz mém: már láttam és nem is vicces.","Te most komolyan azt hitted, hogy nyerhetsz? Awww.","Ez a győzelem annyira clean volt, hogy ASMR videót lehetne belőle csinálni.","RIP a te győzelmi esélyeidnek. F.","Most menj, és igyál egy vizet. Látom, szükséged van rá.","Én: 1, Te: 0. A matek egyszerű.","Ez a győzelem annyira nyilvánvaló volt, mint egy spoiler a kommentek között."];
         const MASTER_PIKSZEL_LOSS_QUOTES=["Oké, csaltál. Vagy a netem laggolt. Más magyarázat nincs.","Most hagytalak nyerni, hogy ne add fel teljesen. Nincs kivel játszanom.","WTF?! Ezt hogy? Várj, lementem a replayt, ezt látnia kell a többieknek.","Jó, jó, nyertél. Most már elmondhatod mindenkinek, hogy legyőztél egy lányt. Büszke lehetsz.","Ez most fájt az egómnak. De majd túlteszem magam rajta. Valószínűleg.","Hacker! Reportoltalak a rendszergazdánál. Ja, várj, az a Karesz. Mindegy.","Ne hidd, hogy ez megismétlődik. Csak rossz napom van. Meg amúgy is.","Most biztos azt hiszed, te vagy a menő. Hát... oké, ma te vagy.","Ez a győzelem olyan, mint egy bug a játékban. Nem kellett volna megtörténnie.","Oké, elismerem, ez most OP volt tőled. Nerfelni fognak, meglátod.","Jól van, na. Most elmehetsz flexelni a barátaidnak.","Ez biztos valami stream sniper volt. Vagy csak te voltál az.","A szerencse a noobok fegyvere. Ma szerencséd volt.","Ez annyira unfair volt. A fejlesztők biztos neked szurkoltak.","Oké, ezt a kört elengedtem. De a háborút én fogom megnyerni.","Most az egyszer. De jegyezd meg a nevem.","Fáj a szívem. De a bosszú édes lesz. Nagyon édes.","Most mit mondjak? Gratulálok. Vagy valami ilyesmi.","Ez a vereség annyira cringe. Törlöm a memóriámból. Most."];
-        const MASTER_PIKSZEL_DRAW_QUOTES=["Döntetlen? Ez annyira semmilyen. Mint egy langyos tea.","Oké, béke. De legközelebb nem leszek ilyen kegyes.","Most megúsztad. De a szemem rajtad tartom.","Meh. Ennél többet vártam. Magamtól is. Tőled is.","Ez olyan, mint amikor mindkét csapat veszít. Senki sem boldog.","Hívjuk ezt... kreatív válságnak. Mindkettőnk részéről.","Oké, ez most uncsi volt. Legközelebb hozz több izgalmat, pls."];
+        const MASTER_PIKSZEL_DRAW_QUOTES=["Döntetlen? Ez olyan... befejezetlen. Mint egy rossz Netflix sorozat.","Oké, megosztozunk a dicsőségen. De az én részem nagyobb.","Majdnem olyan jó voltál, mint én. Majdnem. Cuki.","Ezt a döntetlent vedd egy baráti figyelmeztetésnek.","Hívjuk ezt stratégiai kompromisszumnak. De legközelebb nem leszek ilyen kompromisszumkész.","Döntetlen? Ez olyan, mintha egy filter csak félig töltene be. Kellemetlen.","Úgy látom, ma egyikünk sem tudott a másik fölé kerekedni. De a ruhám szebb.","Ez a döntetlen csak azt bizonyítja, hogy néha még én is leereszkedem a te szintedre."];
         
         const aiMoodAvatars = { 
             karesz: { default: 'https://api.dicebear.com/8.x/adventurer/svg?seed=Karesz&glasses=variant02&glassesProbability=100&mustache=variant01&mustacheProbability=100' }, 
@@ -416,6 +444,7 @@
             playerXName: document.getElementById('playerXNameText'), playerOName: document.getElementById('playerONameText'), 
             playerXIcon: document.getElementById('playerXIcon'), playerOIcon: document.getElementById('playerOIcon'),
             playerXMoney: document.getElementById('playerXMoney'), playerOMoney: document.getElementById('playerOMoney'),
+            playerXProjection: document.getElementById('playerXProjection'), playerOProjection: document.getElementById('playerOProjection'),
             gameWagerDisplay: document.getElementById('game-wager-display'),
             scoreX: document.getElementById('scoreX'), scoreO: document.getElementById('scoreO'), playerXPanel: document.getElementById('playerXPanel'), playerOPanel: document.getElementById('playerOPanel'), loadingOverlay: document.getElementById('loadingOverlay'), avatarGrid: document.getElementById('avatar-grid'), playerXAvatar: document.getElementById('playerXAvatar'), playerOAvatar: document.getElementById('playerOAvatar'), spectateModeBtn: document.getElementById('spectateModeBtn'), joinAsSpectatorBtn: document.getElementById('joinAsSpectatorBtn'), cancelSpectateBtn: document.getElementById('cancelSpectateBtn'), playerOptions: document.getElementById('player-options'), spectatorOptions: document.getElementById('spectator-options'), playerButtons: document.getElementById('player-buttons'), spectatorButtons: document.getElementById('spectator-buttons'), spectatorNameInput: document.getElementById('spectatorNameInput'), spectatorCodeInput: document.getElementById('spectatorCodeInput'), spectatorCodeDisplay: document.getElementById('spectatorCodeDisplay'), spectatorList: document.getElementById('spectatorList'), statsBtn: document.getElementById('statsBtn'), statsModal: document.getElementById('statsModal'), closeStatsBtn: document.getElementById('closeStatsBtn'), achievementsBtn: document.getElementById('achievementsBtn'), achievementsModal: document.getElementById('achievementsModal'), closeAchievementsBtn: document.getElementById('closeAchievementsBtn'), achievementsList: document.getElementById('achievements-list'), 
             achievementOnBoard: document.getElementById('achievementOnBoard'), rulesLink: document.getElementById('rulesLink'),
@@ -424,6 +453,7 @@
             shopBtn: document.getElementById('shopBtn'), shopModal: document.getElementById('shopModal'), closeShopBtn: document.getElementById('closeShopBtn'), 
             shopItemsContainerBgs: document.getElementById('shop-items-container-backgrounds'), shopItemsContainerIcons: document.getElementById('shop-items-container-icons'),
             shopMoney: document.getElementById('shopMoney'),
+            dailyBonusBtn: document.getElementById('dailyBonusBtn'), dailyBonusModal: document.getElementById('dailyBonusModal'), closeDailyBonusBtn: document.getElementById('closeDailyBonusBtn'), dailyBonusWeek: document.getElementById('dailyBonus-week'), claimBonusBtn: document.getElementById('claimBonusBtn'),
             devModal: document.getElementById('devModal'), closeDevBtn: document.getElementById('closeDevBtn'), devPanel: document.getElementById('devPanel'), devGiveSelfMoneyBtn: document.getElementById('devGiveSelfMoney'), devUnlockAllBtn: document.getElementById('devUnlockAll'),
             sounds: { place: document.getElementById('place-sound'), win: document.getElementById('win-sound'), turn: document.getElementById('turn-sound') }
         };
@@ -532,14 +562,17 @@
         
         uiElements.playerNameInput.addEventListener('change', async (e) => { 
             const playerName = e.target.value.trim(); 
+            loggedInPlayerName = playerName;
             if (playerName === '0000') {
                 await getOrCreatePlayer(playerName);
                 openDevPanel();
             } else if(playerName) { 
                 await getOrCreatePlayer(playerName); 
             } else { 
+                loggedInPlayerName = null;
                 uiElements.playerWallet.classList.add('hidden'); 
                 uiElements.shopBtn.classList.add('hidden'); 
+                uiElements.dailyBonusBtn.classList.add('hidden');
             } 
         });
 
@@ -558,7 +591,8 @@
                     inventory: { backgrounds: ["bg_default"], icons: ["icon_default"] },
                     equipped: { background: "bg_default", icon: "icon_default" },
                     createdAt: serverTimestamp(),
-                    lastLogin: serverTimestamp()
+                    lastLogin: serverTimestamp(),
+                    lastBonusClaimed: null
                 };
                 await setDoc(playerRef, localPlayerData);
             }
@@ -568,6 +602,7 @@
             if (!localPlayerData.equipped) localPlayerData.equipped = { background: 'bg_default', icon: 'icon_default' };
 
             updatePlayerUI();
+            checkDailyBonusStatus();
             hideLoading();
         }
 
@@ -577,6 +612,7 @@
             uiElements.shopMoney.textContent = localPlayerData.money;
             uiElements.playerWallet.classList.remove('hidden');
             uiElements.shopBtn.classList.remove('hidden');
+            uiElements.dailyBonusBtn.classList.remove('hidden');
 
             const playerPanel = localPlayerSymbol === 'X' ? uiElements.playerXPanel : (localPlayerSymbol === 'O' ? uiElements.playerOPanel : null);
             if(playerPanel) {
@@ -603,7 +639,17 @@
             }
         }
         
-        function validateInputs(isSpectator = false) { if(isSpectator) { const spectatorName = uiElements.spectatorNameInput.value.trim(); if (!spectatorName) { alert('Kérlek, add meg a neved!'); return false; } return spectatorName; } const playerName = uiElements.playerNameInput.value.trim(); if (!playerName) { alert('Kérlek, adj meg egy játékosnevet!'); return false; } if (!selectedAvatar) { alert('Kérlek, válassz egy avatárt!'); return false; } return playerName; }
+        function validateInputs(isSpectator = false) { 
+            if(isSpectator) { 
+                const spectatorName = uiElements.spectatorNameInput.value.trim(); 
+                if (!spectatorName) { alert('Kérlek, add meg a neved!'); return false; } 
+                return spectatorName; 
+            } 
+            const playerName = uiElements.playerNameInput.value.trim(); 
+            if (!playerName) { alert('Kérlek, adj meg egy játékosnevet!'); return false; } 
+            if (!selectedAvatar) { alert('Kérlek, válassz egy avatárt!'); return false; } 
+            return playerName; 
+        }
         
         function toggleSpectatorMode(show) { isSpectatorMode = show; uiElements.playerOptions.classList.toggle('hidden', show); uiElements.playerButtons.classList.toggle('hidden', show); uiElements.spectatorOptions.classList.toggle('hidden', !show); uiElements.spectatorButtons.classList.toggle('hidden', !show); }
         uiElements.spectateModeBtn.addEventListener('click', () => toggleSpectatorMode(true));
@@ -649,7 +695,7 @@
                 }
 
                 await setDoc(gameRef, initialGameState);
-                attachGameListener(gameRef.id, 'X', name);
+                attachGameListener(gameRef.id, 'X');
             } catch (error) { console.error("Hiba a játék létrehozása során:", error); alert("Hiba történt a játék létrehozása közben."); } 
             finally { hideLoading(); }
         }
@@ -683,7 +729,7 @@
                         }
                         const updates = { 'players.O.name': playerName, 'players.O.avatar': selectedAvatar, 'players.O.icon': localPlayerData.equipped.icon, 'status': 'active' };
                         await updateDoc(doc(db, 'games', gameDoc.id), updates);
-                        attachGameListener(gameDoc.id, 'O', playerName);
+                        attachGameListener(gameDoc.id, 'O');
                     } else { alert("Nem csatlakozhatsz a saját játékodhoz!"); }
                 } else { alert('Nem található nyitott játék ezzel a kóddal.'); }
             } catch (error) { console.error("Hiba a csatlakozás során:", error); alert("Hiba történt a játékhoz való csatlakozás közben."); } 
@@ -709,7 +755,7 @@
                     return; 
                 } 
                 const gameDoc = querySnapshot.docs[0]; 
-                attachGameListener(gameDoc.id, 'spectator', spectatorName); 
+                attachGameListener(gameDoc.id, 'spectator'); 
             } catch (error) {
                 console.error("Leskelődés hiba:", error);
                 alert("Hiba történt a játék keresése közben. Valószínűleg a Firebase index még nem készült el. Lásd a konzolt.");
@@ -722,10 +768,10 @@
         function listenForSpectators(gameId) { const spectatorsRef = ref(rtdb, `presence/${gameId}`); onValue(spectatorsRef, (snapshot) => { activeSpectators = snapshot.val() || {}; updateSpectatorListUI(); }); }
         function updateSpectatorListUI() { const spectatorNames = Object.keys(activeSpectators); if (spectatorNames.length > 0) { uiElements.spectatorList.innerHTML = `Kukkolók: 👁️ <span>${spectatorNames.join(', ')}</span>`; } else { uiElements.spectatorList.innerHTML = ''; } }
 
-        function attachGameListener(gameId, role, name) {
-            currentGameId = gameId; localPlayerSymbol = role; localPlayerName = name; 
+        function attachGameListener(gameId, role) {
+            currentGameId = gameId; localPlayerSymbol = role; 
             if (role !== 'spectator') updatePlayerUI();
-            if (role === 'spectator') setupPresence(gameId, name);
+            if (role === 'spectator') setupPresence(gameId, loggedInPlayerName);
             listenForSpectators(gameId); 
             if (unsubscribeFromGame) unsubscribeFromGame(); 
             unsubscribeFromGame = onSnapshot(doc(db, 'games', currentGameId), (doc) => { 
@@ -826,7 +872,7 @@
                 }
                 await updateDoc(doc(db, 'users', playerXName), { money: increment(-newWager) });
 
-                await getOrCreatePlayer(localPlayerName);
+                await getOrCreatePlayer(loggedInPlayerName);
 
                 const gameRef = doc(db, 'games', currentGameId);
                 const updates = { 
@@ -848,19 +894,33 @@
                 const playerXRef = doc(db, 'users', players.X.name);
                 await updateDoc(playerXRef, { money: increment(wager) });
                 if (!isSinglePlayer && players.O.name) {
-                    const playerORef = doc(db, 'users', players.O.name);
+                    const playerORef = doc(db, 'users', players.O.name.replace(/<br>/g, ' '));
                     await updateDoc(playerORef, { money: increment(wager) });
                 }
             } else if (winner) {
                 const pot = wager * 2;
-                const winnerName = players[winner].name;
+                const winnerName = players[winner].name.replace(/<br>/g, ' ');
                 if (!winnerName.includes("(AI)")) {
-                    const winnerRef = doc(db, 'users', winnerName.replace(/<br>/g, ' '));
+                    const winnerRef = doc(db, 'users', winnerName);
                     await updateDoc(winnerRef, { money: increment(pot) });
+                } else if (winner === 'X') {
+                    const playerXRef = doc(db, 'users', players.X.name);
+                    await updateDoc(playerXRef, { money: increment(pot) });
                 }
             }
             await updateDoc(gameRef, { payoutComplete: true });
-            if (localPlayerName) await getOrCreatePlayer(localPlayerName);
+            
+            if (loggedInPlayerName) {
+                const oldMoney = localPlayerData.money;
+                await getOrCreatePlayer(loggedInPlayerName);
+                const newMoney = localPlayerData.money;
+                const moneyElement = players.X.name === loggedInPlayerName ? uiElements.playerXMoney : uiElements.playerOMoney;
+                
+                if (newMoney !== oldMoney) {
+                    moneyElement.classList.add('money-strobe');
+                    setTimeout(() => moneyElement.classList.remove('money-strobe'), 1500);
+                }
+            }
         }
         
         async function renderGame(gameState) {
@@ -884,27 +944,33 @@
         
             uiElements.playerXName.innerHTML = players.X.name;
             uiElements.playerOName.innerHTML = players.O.name ? players.O.name.replace(/<br>/g, '<br>') : 'Várakozás...';
-            if (players.O.name && players.O.name.includes("<br>")) {
-                uiElements.playerOName.innerHTML = players.O.name;
-            }
             uiElements.playerXAvatar.style.backgroundImage = `url(${players.X.avatar})`;
             if(players.O.avatar) { uiElements.playerOAvatar.style.backgroundImage = `url(${players.O.avatar})`; }
             
-            if (localPlayerData && players.X.name === localPlayerName) {
+            if (localPlayerData && players.X.name === loggedInPlayerName) {
                 applyEquippedItems(uiElements.playerXPanel, 'X');
-                uiElements.playerXMoney.textContent = `${localPlayerData.money} FT`;
+                uiElements.playerXMoney.textContent = `Egyenleg: ${localPlayerData.money} FT`;
+                uiElements.playerXProjection.innerHTML = `Nyer: ${localPlayerData.money + wager*2} FT | Veszít: ${localPlayerData.money} FT`;
             }
-            if (localPlayerData && players.O.name === localPlayerName) {
-                applyEquippedItems(uiElements.playerOPanel, 'O');
-                uiElements.playerOMoney.textContent = `${localPlayerData.money} FT`;
-            } else if (!isSinglePlayer && players.O.name) {
-                 getDoc(doc(db, "users", players.O.name)).then(opponentDoc => {
-                     if (opponentDoc.exists()) uiElements.playerOMoney.textContent = `${opponentDoc.data().money} FT`;
+
+            if (!isSinglePlayer && players.O.name) {
+                 getDoc(doc(db, "users", players.O.name.replace(/<br>/g, ' '))).then(opponentDoc => {
+                     if (opponentDoc.exists()) {
+                         const opponentData = opponentDoc.data();
+                         if (players.O.name === loggedInPlayerName) {
+                             applyEquippedItems(uiElements.playerOPanel, 'O');
+                             uiElements.playerOMoney.textContent = `Egyenleg: ${opponentData.money} FT`;
+                             uiElements.playerOProjection.innerHTML = `Nyer: ${opponentData.money + wager*2} FT | Veszít: ${opponentData.money} FT`;
+                         } else {
+                            uiElements.playerOMoney.textContent = `Egyenleg: ${opponentData.money} FT`;
+                            uiElements.playerOProjection.innerHTML = `Nyer: ${opponentData.money + wager*2} FT | Veszít: ${opponentData.money} FT`;
+                         }
+                     }
                  });
             } else {
                  uiElements.playerOMoney.textContent = '';
+                 uiElements.playerOProjection.innerHTML = '';
             }
-
 
             uiElements.playerXIcon.textContent = SHOP_ITEMS.icons.find(i => i.id === players.X.icon)?.icon || '';
             uiElements.playerOIcon.textContent = SHOP_ITEMS.icons.find(i => i.id === players.O.icon)?.icon || '';
@@ -928,7 +994,7 @@
             } 
             else if (status === 'finished') {
                 handlePayout(gameState);
-                if(localPlayerSymbol !== 'spectator' && (players.X.name === localPlayerName || players.O.name === localPlayerName)) {
+                if(localPlayerSymbol !== 'spectator' && (players.X.name === loggedInPlayerName || players.O.name.replace(/<br>/g, ' ') === loggedInPlayerName)) {
                     uiElements.rematchControls.classList.remove('hidden');
                     document.getElementById('rematchWagerInput').value = wager;
                     uiElements.startRematchBtn.disabled = localPlayerSymbol !== 'X';
@@ -952,7 +1018,7 @@
                         if (aiPersonality === 'karesz') dailyKareszDrawQuotes.push(quote); else dailyPikszelDrawQuotes.push(quote);
                         message = `Döntetlen! Visszakaptad a téted. ${aiName} üzenete: "${quote}"`;
                     }
-                } else { message = winner === 'draw' ? 'Döntetlen! Mindenki visszakapja a tétjét.' : `${players[winner].name} nyert ${wager * 2} FT-ot!`; }
+                } else { message = winner === 'draw' ? 'Döntetlen! Mindenki visszakapja a tétjét.' : `${players[winner].name.replace(/<br>/g, ' ')} nyert ${wager * 2} FT-ot!`; }
                 uiElements.statusText.textContent = message;
                 if(winner !== 'draw' && winner === localPlayerSymbol) { uiElements.sounds.win.play().catch(e => {}); triggerVictoryConfetti(); }
             }
@@ -1035,28 +1101,27 @@
         }
 
         async function buyItem(category, item) {
+            if (!loggedInPlayerName) { alert("Hiba: Nincs bejelentkezett játékos."); return; }
             if (localPlayerData.money < item.price) { alert('Nincs elég pénzed!'); return; }
             showLoading('Vásárlás...');
             try {
-                const playerRef = doc(db, 'users', localPlayerName);
+                const playerRef = doc(db, 'users', loggedInPlayerName);
                 await updateDoc(playerRef, {
                     money: increment(-item.price),
                     [`inventory.${category}`]: arrayUnion(item.id)
                 });
-                localPlayerData.money -= item.price;
-                if (!localPlayerData.inventory[category]) localPlayerData.inventory[category] = [];
-                localPlayerData.inventory[category].push(item.id);
-                updatePlayerUI();
+                await getOrCreatePlayer(loggedInPlayerName);
                 displayShop();
             } catch (error) { console.error("Vásárlási hiba:", error); alert("Hiba történt a vásárlás során."); } 
             finally { hideLoading(); }
         }
 
         async function equipItem(category, itemId) {
+            if (!loggedInPlayerName) { alert("Hiba: Nincs bejelentkezett játékos."); return; }
             showLoading('Felszerelés...');
             try {
                 const categorySingular = category.slice(0, -1);
-                const playerRef = doc(db, 'users', localPlayerName);
+                const playerRef = doc(db, 'users', loggedInPlayerName);
                 await updateDoc(playerRef, { [`equipped.${categorySingular}`]: itemId });
                 localPlayerData.equipped[categorySingular] = itemId;
                 updatePlayerUI();
@@ -1066,13 +1131,14 @@
         }
         
         async function sellItem(category, item) {
+            if (!loggedInPlayerName) { alert("Hiba: Nincs bejelentkezett játékos."); return; }
             const refund = Math.floor(item.price * SELL_RATIO);
             if (!confirm(`Biztosan eladod a(z) "${item.name}" tárgyat ${refund} FT-ért?`)) return;
 
             showLoading('Eladás...');
             try {
                 const categorySingular = category.slice(0, -1);
-                const playerRef = doc(db, 'users', localPlayerName);
+                const playerRef = doc(db, 'users', loggedInPlayerName);
                 
                 let updates = {
                     money: increment(refund),
@@ -1081,23 +1147,13 @@
 
                 if(localPlayerData.equipped[categorySingular] === item.id) {
                     updates[`equipped.${categorySingular}`] = `${categorySingular}_default`;
-                    localPlayerData.equipped[categorySingular] = `${categorySingular}_default`;
                 }
-
                 await updateDoc(playerRef, updates);
-
-                localPlayerData.money += refund;
-                localPlayerData.inventory[category] = localPlayerData.inventory[category].filter(id => id !== item.id);
-                
-                updatePlayerUI();
+                await getOrCreatePlayer(loggedInPlayerName);
                 displayShop();
 
-            } catch(error) {
-                console.error("Eladási hiba:", error);
-                alert("Hiba történt az eladás során.");
-            } finally {
-                hideLoading();
-            }
+            } catch(error) { console.error("Eladási hiba:", error); alert("Hiba történt az eladás során."); } 
+            finally { hideLoading(); }
         }
         
         async function openDevPanel() {
@@ -1135,19 +1191,19 @@
         }
 
         uiElements.devGiveSelfMoneyBtn.onclick = async () => {
-            await giveMoney('0000', 1000000);
-            await getOrCreatePlayer('0000');
+            await giveMoney(loggedInPlayerName, 1000000);
+            await getOrCreatePlayer(loggedInPlayerName);
         };
 
         uiElements.devUnlockAllBtn.onclick = async () => {
             const allBgIds = SHOP_ITEMS.backgrounds.map(item => item.id);
             const allIconIds = SHOP_ITEMS.icons.map(item => item.id);
-            await updateDoc(doc(db, 'users', '0000'), {
+            await updateDoc(doc(db, 'users', loggedInPlayerName), {
                 'inventory.backgrounds': allBgIds,
                 'inventory.icons': allIconIds
             });
-            alert('Minden feloldva a 0000 nevű felhasználónak.');
-            await getOrCreatePlayer('0000');
+            alert(`Minden feloldva a(z) ${loggedInPlayerName} nevű felhasználónak.`);
+            await getOrCreatePlayer(loggedInPlayerName);
         };
 
         uiElements.shopBtn.addEventListener('click', displayShop);
@@ -1159,6 +1215,69 @@
         });
         uiElements.closeDevBtn.addEventListener('click', () => uiElements.devModal.classList.add('hidden'));
 
+        function canClaimDailyBonus() {
+            if (!localPlayerData || !localPlayerData.lastBonusClaimed) return true;
+            const lastClaimDate = localPlayerData.lastBonusClaimed.toDate();
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            lastClaimDate.setHours(0, 0, 0, 0);
+            return lastClaimDate.getTime() < today.getTime();
+        }
+
+        function checkDailyBonusStatus() {
+            if (canClaimDailyBonus()) {
+                uiElements.dailyBonusBtn.classList.add('bonus-ready');
+                uiElements.dailyBonusBtn.disabled = false;
+            } else {
+                uiElements.dailyBonusBtn.classList.remove('bonus-ready');
+                uiElements.dailyBonusBtn.disabled = true;
+            }
+        }
+        
+        function showDailyBonusModal() {
+            const today = new Date();
+            const dayOfWeek = (today.getDay() + 6) % 7; // Hétfő = 0
+            const dayNames = ['H', 'K', 'Sze', 'Cs', 'P', 'Szo', 'V'];
+            uiElements.dailyBonusWeek.innerHTML = '';
+            for(let i = 0; i < 7; i++) {
+                const day = new Date();
+                day.setDate(today.getDate() - dayOfWeek + i);
+                const dayBox = document.createElement('div');
+                dayBox.classList.add('day-box');
+                dayBox.innerHTML = `
+                    <span class="day-name">${dayNames[i]}</span>
+                    <span class="day-date">${day.getMonth()+1}.${day.getDate()}</span>
+                    <span class="day-reward">🎁</span>
+                `;
+                if (i === dayOfWeek) dayBox.classList.add('today');
+                if (i < dayOfWeek || !canClaimDailyBonus() && i === dayOfWeek) dayBox.classList.add('claimed');
+
+                uiElements.dailyBonusWeek.appendChild(dayBox);
+            }
+            uiElements.claimBonusBtn.disabled = !canClaimDailyBonus();
+            uiElements.dailyBonusModal.classList.remove('hidden');
+        }
+
+        async function claimDailyBonus() {
+            if (!loggedInPlayerName) { alert("Hiba: Nincs bejelentkezett játékos."); return; }
+            if (!canClaimDailyBonus()) { alert("A mai bónuszt már felvetted!"); return; }
+            showLoading("Jutalom jóváírása...");
+            const bonusAmount = Math.floor(Math.random() * 901) + 100;
+            const playerRef = doc(db, 'users', loggedInPlayerName);
+            await updateDoc(playerRef, {
+                money: increment(bonusAmount),
+                lastBonusClaimed: serverTimestamp()
+            });
+            await getOrCreatePlayer(loggedInPlayerName);
+            alert(`Sikeresen begyűjtöttél ${bonusAmount} FT bónuszt!`);
+            uiElements.dailyBonusModal.classList.add('hidden');
+            checkDailyBonusStatus();
+            hideLoading();
+        }
+
+        uiElements.dailyBonusBtn.addEventListener('click', showDailyBonusModal);
+        uiElements.closeDailyBonusBtn.addEventListener('click', () => uiElements.dailyBonusModal.classList.add('hidden'));
+        uiElements.claimBonusBtn.addEventListener('click', claimDailyBonus);
 
         const ACHIEVEMENTS_LIST = { 'first_win':{title:'Az Első Lépés',icon:'🏆'},'first_loss':{title:'A Kezdeti Sokk',icon:'🤕'},'karesz_win_1':{title:'Logikai Laposvas',icon:'🔧'},'pikszel_win_1':{title:'Piksel-Pacsi',icon:'✋'},'win_streak_3':{title:'Tripla',icon:'🔥'},'win_streak_5':{title:'Lendületben',icon:'🚀'},'win_streak_10':{title:'Megállíthatatlan',icon:'☄️'},'karesz_win_10':{title:'Karesz Ismerőse',icon:'🤖'},'pikszel_win_10':{title:'Pikszel Barátja',icon:'🎨'},'both_defeated':{title:'Dupla Diadal',icon:'👑'},'draw_master':{title:'Patthelyzet',icon:'🤝'},'hard_win':{title:'Kemény Dió',icon:'🧠'},'genius_win':{title:'Gépromboló',icon:'💥'},'karesz_genius':{title:'Szilícium-Szelidítő',icon:'🦾'},'panna_genius':{title:'Pikszel-Professzor',icon:'🎓'},'total_wins_25':{title:'Negyed Század',icon:'🏅'},'total_wins_50':{title:'Fél Század',icon:'🎖️'},'total_wins_100':{title:'Százados',icon:'🥇'},'total_games_10':{title:'Bemelegítés',icon:'👟'},'total_games_50':{title:'Kitartó',icon:'💪'},'total_games_150':{title:'Veterán',icon:'🛡️'},'draw_master_5':{title:'Diplomata',icon:'🕊️'}};
         function getUnlockedAchievements() { return new Set(JSON.parse(localStorage.getItem('unlockedAchievements')) || []); }
