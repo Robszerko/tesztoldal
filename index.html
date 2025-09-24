@@ -696,21 +696,26 @@
             const spectatorCode = uiElements.spectatorCodeInput.value.trim(); 
             if (!spectatorCode || spectatorCode.length !== 2) { alert('Kérlek, adj meg egy érvényes, 2 jegyű kódot!'); return; } 
             showLoading("Játék keresése..."); 
-            const q = query(collection(db, "games"), 
-                where("spectatorCode", "==", spectatorCode), 
-                where("status", "in", ["waiting", "active"]),
-                orderBy("createdAt", "desc"),
-                limit(1)
-            );
-            const querySnapshot = await getDocs(q); 
-            if (querySnapshot.empty) { 
-                alert('Nem található aktív játék ezzel a leskelődő kóddal.'); 
-                hideLoading(); 
-                return; 
-            } 
-            const gameDoc = querySnapshot.docs[0]; 
-            attachGameListener(gameDoc.id, 'spectator', spectatorName); 
-            hideLoading(); 
+            try {
+                const q = query(collection(db, "games"), 
+                    where("spectatorCode", "==", spectatorCode), 
+                    where("status", "in", ["waiting", "active"]),
+                    orderBy("createdAt", "desc"),
+                    limit(1)
+                );
+                const querySnapshot = await getDocs(q); 
+                if (querySnapshot.empty) { 
+                    alert('Nem található aktív játék ezzel a leskelődő kóddal.'); 
+                    return; 
+                } 
+                const gameDoc = querySnapshot.docs[0]; 
+                attachGameListener(gameDoc.id, 'spectator', spectatorName); 
+            } catch (error) {
+                console.error("Leskelődés hiba:", error);
+                alert("Hiba történt a játék keresése közben. Valószínűleg a Firebase index még nem készült el. Lásd a konzolt.");
+            } finally {
+                hideLoading();
+            }
         });
 
         function setupPresence(gameId, name) { spectatorPresenceRef = ref(rtdb, `presence/${gameId}/${name}`); const connectedRef = ref(rtdb, '.info/connected'); onValue(connectedRef, (snap) => { if (snap.val() === true) { set(spectatorPresenceRef, true); onDisconnect(spectatorPresenceRef).remove(); } }); }
@@ -803,7 +808,7 @@
             if (newWager < 0) { alert("A tét nem lehet negatív!"); return; }
 
             const playerXName = localGameState.players.X.name;
-            const playerOName = localGameState.players.O.name;
+            const playerOName = localGameState.players.O.name.replace(/<br>/g, ' ');
 
             try {
                 showLoading("Revans indítása...");
@@ -923,7 +928,7 @@
             } 
             else if (status === 'finished') {
                 handlePayout(gameState);
-                if(localPlayerSymbol !== 'spectator') {
+                if(localPlayerSymbol !== 'spectator' && (players.X.name === localPlayerName || players.O.name === localPlayerName)) {
                     uiElements.rematchControls.classList.remove('hidden');
                     document.getElementById('rematchWagerInput').value = wager;
                     uiElements.startRematchBtn.disabled = localPlayerSymbol !== 'X';
