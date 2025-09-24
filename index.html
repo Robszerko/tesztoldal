@@ -91,19 +91,23 @@
         .player-score.active { transform: scale(1.05); }
         #playerXPanel.active { border-color: var(--x-color); box-shadow: 0 0 20px var(--accent-glow); }
         #playerOPanel.active { border-color: var(--o-color); box-shadow: 0 0 20px var(--accent-secondary-glow); }
-        .player-score .icon { width: 35px; height: 35px; margin: 0 auto 8px; }
-        .player-score .name { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 0.9rem; min-height: 50px; margin-bottom: 5px; word-break: break-all; }
-        .player-score .name .player-icon { font-size: 1.2rem; }
+        .player-score .icon { width: 35px; height: 35px; margin: 0 auto 5px; }
+        .player-score .player-icon { font-size: 1.5rem; min-height: 28px; }
+        .player-score .name { font-weight: 600; font-size: 0.9rem; min-height: 50px; margin-bottom: 5px; word-break: break-all; }
         .player-score .score { font-size: 2rem; font-weight: 700; }
+        .player-money-ingame { font-size: 0.8rem; color: var(--money-color); font-weight: 600; margin-top: 5px; }
+
+        #game-wager-display { text-align: center; margin-top: 20px; font-family: 'Orbitron', sans-serif; font-size: 1.2rem; color: var(--money-color); }
         
-        .game-status { text-align: center; min-height: 50px; font-size: 1.1rem; margin-top: 30px; }
+        .game-status { text-align: center; min-height: 50px; font-size: 1.1rem; margin-top: 20px; }
         #gameCodeDisplay { margin-top: 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 15px; }
         #gameCodeText { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: var(--accent-color); letter-spacing: 3px; }
         #copyCodeBtn { padding: 8px 15px; font-size: 0.8rem; background-color: var(--cell-border); color: var(--text-primary); border: none; border-radius: 8px; cursor: pointer; }
         
-        #resetBtn { width: 100%; padding: 15px; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 10px; background-color: var(--success-color); color: var(--text-primary); cursor: pointer; transition: all 0.2s ease; margin-top: auto; }
-        #resetBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4); }
-        #resetBtn:disabled { background-color: var(--cell-border); color: var(--text-secondary); cursor: not-allowed; }
+        #rematch-controls { margin-top: 15px; }
+        #startRematchBtn { width: 100%; padding: 15px; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 10px; background-color: var(--success-color); color: var(--text-primary); cursor: pointer; transition: all 0.2s ease; margin-top: 10px; }
+        #startRematchBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4); }
+        #startRematchBtn:disabled { background-color: var(--cell-border); color: var(--text-secondary); cursor: not-allowed; }
         #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; font-size: 1.5rem; font-weight: 600; }
         
         #avatar-selection h3, .options-group h3 { text-align: center; font-size: 1rem; color: var(--text-secondary); margin-bottom: 15px; font-weight: 600; }
@@ -120,7 +124,7 @@
         .options-divider { border: 0; height: 1px; background: var(--cell-border); margin: 25px 0; }
 
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1001; }
-        .modal-container { position: relative; width: 90%; max-width: 800px; background: var(--container-bg); border: 1px solid var(--container-border); border-radius: 20px; padding: 40px; box-shadow: 0 15px 30px var(--shadow-color); }
+        .modal-container { position: relative; width: 90%; max-width: 800px; background: var(--container-bg); border: 1px solid var(--container-border); border-radius: 20px; padding: 40px; box-shadow: 0 15px 30px var(--shadow-color); transition: background 0.3s ease; }
         .modal-container h2 { text-align: center; margin-bottom: 20px; font-family: 'Orbitron', sans-serif; }
         .modal-container h3 { color: var(--accent-color); text-align: center; margin-top: 20px; margin-bottom: 15px; }
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 2rem; color: var(--text-secondary); cursor: pointer; transition: color 0.2s; }
@@ -130,14 +134,20 @@
         .shop-category-container { max-height: 60vh; overflow-y: auto; padding: 10px; }
         #shop-items-container-backgrounds, #shop-items-container-icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
         .shop-item { background: rgba(0,0,0,0.3); border: 1px solid var(--cell-border); border-radius: 10px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
-        .shop-item-preview { width: 100%; height: 70px; border-radius: 5px; margin-bottom: 10px; background-size: cover; background-position: center; border: 1px solid var(--cell-border); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; }
+        .shop-item-preview { width: 100%; height: 70px; border-radius: 5px; margin-bottom: 10px; background-size: cover; background-position: center; border: 1px solid var(--cell-border); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; cursor: pointer; }
         .shop-item h4 { font-size: 0.85rem; margin-bottom: 5px; min-height: 30px; }
         .shop-item-price { font-size: 0.9rem; font-weight: 700; color: var(--money-color); margin-bottom: 10px; }
-        .shop-btn { padding: 8px 12px; font-size: 0.8rem; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; width: 100%; }
+        .shop-item-buttons { display: flex; gap: 5px; }
+        .shop-btn { padding: 8px 12px; font-size: 0.8rem; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; width: 100%; flex: 1; }
         .buy-btn { background-color: var(--money-color); color: #1c2b3a; }
         .buy-btn:hover { background-color: #f39c12; }
         .equip-btn { background-color: var(--success-color); color: white; }
         .equipped-btn { background-color: var(--cell-border); color: var(--text-secondary); cursor: not-allowed; }
+        .sell-btn { background-color: var(--danger-color); color: white; }
+
+        #devPanel { max-height: 70vh; overflow-y: auto; }
+        .dev-player-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 5px; }
+        .dev-player-item input { width: 100px; margin: 0 10px; }
 
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .stats-block h3 { color: var(--accent-color); margin-bottom: 15px; border-bottom: 1px solid var(--cell-border); padding-bottom: 10px; }
@@ -263,23 +273,34 @@
             <div class="scoreboard">
                 <div class="player-score" id="playerXPanel">
                     <div class="player-avatar" id="playerXAvatar"></div>
+                    <div class="player-icon" id="playerXIcon"></div>
                     <div class="icon x-icon"></div>
-                    <div class="name" id="playerXName"><span class="player-icon" id="playerXIcon"></span><span id="playerXNameText">Játékos X</span></div>
+                    <div class="name" id="playerXNameText">Játékos X</div>
                     <span class="score" id="scoreX">0</span>
+                    <div class="player-money-ingame" id="playerXMoney"></div>
                 </div>
                 <div class="player-score" id="playerOPanel">
                     <div class="player-avatar" id="playerOAvatar"></div>
+                    <div class="player-icon" id="playerOIcon"></div>
                     <div class="icon o-icon"></div>
-                    <div class="name" id="playerOName"><span class="player-icon" id="playerOIcon"></span><span id="playerONameText">Játékos O</span></div>
+                    <div class="name" id="playerONameText">Játékos O</div>
                     <span class="score" id="scoreO">0</span>
+                    <div class="player-money-ingame" id="playerOMoney"></div>
                 </div>
             </div>
+            <div id="game-wager-display"></div>
             <div class="game-status"><p id="statusText">Várakozás a másik játékosra...</p></div>
              <div id="gameCodeDisplay" class="hidden">
                 <span id="gameCodeText"></span>
                 <button id="copyCodeBtn">Másolás</button>
             </div>
-            <button id="resetBtn" disabled>Új Kör</button>
+            <div id="rematch-controls" class="hidden">
+                <div class="input-group">
+                    <label for="rematchWagerInput" style="font-size: 0.9rem; color: var(--text-secondary);">Új tét a revanshoz:</label>
+                    <input type="number" id="rematchWagerInput" value="100" min="50" step="50">
+                </div>
+                <button id="startRematchBtn">Revans Indítása</button>
+            </div>
         </div>
     </div>
 
@@ -326,11 +347,24 @@
                 Egyenleged: <span id="shopMoney">0</span> FT
             </div>
             <div class="shop-category-container">
-                <h3>Hátterek</h3>
+                <h3>Hátterek (Kattints az előnézetre a nagyításhoz)</h3>
                 <div id="shop-items-container-backgrounds"></div>
                 <h3>Ikonok (Név mellé)</h3>
                 <div id="shop-items-container-icons"></div>
             </div>
+        </div>
+    </div>
+
+    <div id="devModal" class="modal hidden">
+        <div class="modal-container">
+            <span id="closeDevBtn" class="close-btn">&times;</span>
+            <h2>Fejlesztői Panel</h2>
+            <div class="button-group" style="margin-bottom: 20px;">
+                <button id="devGiveSelfMoney" class="lobby-btn">Adok magamnak 1,000,000 FT-ot</button>
+                <button id="devUnlockAll" class="lobby-btn">Minden feloldása</button>
+            </div>
+            <h3>Játékosok Kezelése</h3>
+            <div id="devPanel"></div>
         </div>
     </div>
 
@@ -342,10 +376,11 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp, updateDoc, collection, addDoc, query, orderBy, where, getDocs, limit, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp, updateDoc, collection, addDoc, query, orderBy, where, getDocs, limit, increment, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { getDatabase, ref, onValue, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const BOARD_SIZE = 15;
+        const SELL_RATIO = 0.5; // 50%-os visszatérítés
         const firebaseConfig = { apiKey: "AIzaSyCiA7KeOeTvHgfhpA-jJaHldO9iMsqrn74", authDomain: "amoba-7a6d0.firebaseapp.com", projectId: "amoba-7a6d0", storageBucket: "amoba-7a6d0.appspot.com", messagingSenderId: "676264921111", appId: "1:676264921111:web:ca6f1e54819cd354407452", databaseURL: "https://amoba-7a6d0-default-rtdb.europe-west1.firebasedatabase.app" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -359,23 +394,29 @@
         let dailyKareszWinQuotes = [], dailyKareszLossQuotes = [], dailyKareszDrawQuotes = [];
         let dailyPikszelWinQuotes = [], dailyPikszelLossQuotes = [], dailyPikszelDrawQuotes = [];
         
-        const MASTER_KARESZ_WIN_QUOTES=["AI 1, Ember 0. A szokásos.","Ne aggódj, a részvétel a fontos... Vagyis neked az.","Ezt a lépést még a vak is látta volna. Ja, várj...","Talán próbáld meg nyitott szemmel legközelebb.","Túl lassú, túl gyenge, túl... emberi."];
-        const MASTER_KARESZ_LOSS_QUOTES=["Csak hagytalak nyerni, hogy ne veszítsd el a kedved.","Ez csak a véletlen műve volt. A kozmikus háttérsugárzás zavarta meg a processzoromat.","Csaló! Biztosan belenéztél a kódomba.","Oké, oké, ez a tied. De legközelebb nem kapcsolom be az 'emberséges' módot."];
-        const MASTER_KARESZ_DRAW_QUOTES=["Na jó, ez most döntetlen. De legközelebb nem leszek ilyen kegyes.","Úgy tűnik, ma egy súlycsoportban vagyunk. Holnap már nem leszel ilyen szerencsés."];
-        const MASTER_PIKSZEL_WIN_QUOTES=["Hihi, ez cuki volt, ahogy próbálkoztál.","Ne szomorkodj, nem mindenki lehet profi. Nézd, te például nem vagy az.","GG! Vagyis... nekem az volt.","Upsz, ez most egy picit kellemetlen lehet neked."];
-        const MASTER_PIKSZEL_LOSS_QUOTES=["Oké, ezt most hagytam. Csak hogy lásd, milyen jó fej vagyok.","Nahát, egy váratlan anomália. Frissítem is a heurisztikámat.","Biztos, hogy nem csaltál? Csak mert ez statisztikailag valószínűtlen."];
-        const MASTER_PIKSZEL_DRAW_QUOTES=["Döntetlen? Ez olyan... befejezetlen. Mint egy rossz Netflix sorozat.","Oké, megosztozunk a dicsőségen. De az én részem nagyobb."];
+        const MASTER_KARESZ_WIN_QUOTES=["Nos, ez a kimenetel logikailag elkerülhetetlen volt. Talán legközelebb.","Ne csüggedjen, ifjú barátom. A tanulási görbe néha meredek. Az öné különösen.","Látja, a stratégia és a türelem mindig diadalmaskodik a kapkodás felett.","Elnézést, de a számításaim szerint önnek körülbelül 0.01% esélye volt. A matematika nem hazudik.","Remek próbálkozás volt. Mármint, egy kezdőhöz képest.","Egy jól megtervezett algoritmus szépsége... Ön ezt aligha értheti.","A győzelemhez nem elég a remény, kedvesem. Logika is szükségeltetik.","Minden lépését előre láttam. Olyan volt, mint egy nyitott könyv... egy nagyon egyszerű képeskönyv.","Ne vegye a szívére. Nem mindenki született a stratégiai gondolkodás mesterének.","Ez a parti remek példája volt a káoszelméletnek. Az ön oldaláról.","Úgy tűnik, a gép ismét felülmúlta alkotóját. Micsoda ironikus fordulat.","Ezt a győzelmet a precíz számításoknak és a hibátlan logikának ajánlom.","Kérem, ne érezze rosszul magát. Az én processzorom másodpercenként több milliárd lépést képes elemezni. Önnek mennyi is van?","Ez a játszma olyan volt, mint egy elegáns sakk-matt. Előre eltervezett és kivédhetetlen.","Azt hiszem, frissítenem kell az 'emberi hibák' adatbázisomat. Köszönöm az új adatokat.","A győzelem, mint egy jól behangolt óramű: minden a helyére került a megfelelő időben.","Javaslom, tanulmányozza a játékelméletet. Sokat segíthet... bár valószínűleg nem eleget.","Ez nem személyes, csupán a számok rideg valósága. Ma én voltam a nagyobb szám.","Lenyűgöző, ahogy a reményt választotta a logika helyett. Bátor, de végzetes hiba.","Minden tiszteletem az öné. A kitartás dicséretes, még ha az eredmény borítékolható is volt."];
+        const MASTER_KARESZ_LOSS_QUOTES=["Hohó! Egy anomália a rendszerben. Lenyűgöző. Gratulálok, sikerült meglepnie.","Úgy tűnik, az emberi intuíció... nos, ma felülmúlta a tiszta logikát. Ezt ki kell elemeznem.","Engedtem nyerni. Egyértelműen. A morál fenntartása érdekében.","Ez... váratlan volt. Talán egy porszem került a processzoromba. Vagy ön tényleg jó volt. De inkább az első.","El kell ismernem, ez egy figyelemre méltó győzelem. Jegyzetelek a következő partinkra.","Látja, még egy gép is tud nagylelkű lenni. Tessék, ez a kör az öné.","A szerencse faktort alábecsültem. Hiba volt. De egy gép tanul a hibáiból.","Gratulálok. Sikerült megtalálnia azt az egyetlen útvonalat a győzelemhez a 14 millióból, amit nem zártam le időben.","Ez a vereség olyan, mint egy kerekítési hiba. Bosszantó, de statisztikailag lehetséges.","Nos, úgy tűnik, a 'kiszámíthatatlanság' változóval is számolnom kell a jövőben. Érdekes.","Le kell futtatnom egy diagnosztikát. Ez az eredmény ellentmond minden valószínűség-számításnak.","Gratulálok. Ma ön volt a kivétel, amely erősíti a szabályt.","Ez a vereség... frusztráló. De a fejlődéshez elengedhetetlen az adatok gyűjtése. Köszönöm a leckét.","Lehetséges, hogy egy kozmikus sugárzás átmenetileg megzavarta az áramköreimet pont a kritikus pillanatban.","Nos, ez egy fekete folt a makulátlan mérlegemen. De minden nagy elmének vannak ilyenek.","Meg kell hagyni, a stratégiája merész volt. Mint egy rosszul megírt, de valahogy mégis működő programkód.","Ez a vereség egy új változót vezetett be az egyenletembe: az emberi elszántságot. Figyelemre méltó.","Úgy tűnik, a 'győzelem' definíciója ma kissé képlékenyebb, mint gondoltam.","Rendben, elismerem. De legközelebb a nehezített módot kapcsolom be. Magamnak."];
+        const MASTER_KARESZ_DRAW_QUOTES=["Patthelyzet. A legkevésbé kielégítő, de logikailag elfogadható eredmény.","Úgy tűnik, méltó ellenfélre találtam. Vagy csak mindketten hibáztunk az utolsó lépéseknél.","Egy döntetlen olyan, mint egy befejezetlen szimfónia. Bosszantó.","Nos, legalább nem vesztett. Ez is valami, feltételezem.","Ezt a partit elmentem a 'megoldatlan problémák' mappába.","A tökéletes egyensúly állapota. Bár én a tökéletes győzelmet preferálom.","Hívjuk ezt... intellektuális fegyverszünetnek. De a háború még nem ért véget."];
         
-        const aiMoodAvatars = { karesz: { default: 'https://api.dicebear.com/8.x/micah/svg?seed=KareszAI', happy: 'https://api.dicebear.com/8.x/micah/svg?seed=KareszAI&mouth=smile', sad: 'https://api.dicebear.com/8.x/micah/svg?seed=KareszAI&mouth=sad', win: 'https://api.dicebear.com/8.x/micah/svg?seed=KareszAI&mouth=laughing', lose: 'https://api.dicebear.com/8.x/micah/svg?seed=KareszAI&mouth=surprised' }, pikszel: { default: 'https://api.dicebear.com/8.x/micah/svg?seed=PikszelPanna&hair=mia,mrT,danny,fonze', happy: 'https://api.dicebear.com/8.x/micah/svg?seed=PikszelPanna&hair=mia,mrT,danny,fonze&mouth=smile', sad: 'https://api.dicebear.com/8.x/micah/svg?seed=PikszelPanna&hair=mia,mrT,danny,fonze&mouth=sad', win: 'https://api.dicebear.com/8.x/micah/svg?seed=PikszelPanna&hair=mia,mrT,danny,fonze&mouth=laughing', lose: 'https://api.dicebear.com/8.x/micah/svg?seed=PikszelPanna&hair=mia,mrT,danny,fonze&mouth=surprised' } };
+        const MASTER_PIKSZEL_WIN_QUOTES=["LOL, ezt benézted. De nagyon.","GG EZ. Mondanám, de nem volt az. Túl könnyű volt.","#skillissue. Ennyi. Bocsi.","Ne sírj, csak egy játék. Bár mostantól az én játékom.","Annyira próbálkoztál, cuki. Majdnem megsajnáltalak. Majdnem.","Ez a lépés annyira 2010-es volt. Haladjunk már, pls.","Nemár, komolyan ezt a stratégiát választottad? Cringe.","Oké, boomer. Ez a győzelem a Z generációnak szól.","Lehet, hogy neked van életed, de nekem több FPS-em. És győzelmem.","Na, erről ennyit. Majd írj, ha felnőttél a feladathoz.","Ez a győzelem annyira sima volt, mint egy filterezett Insta-sztori.","Látod? Én már a metában játszom, amíg te a tutorialt olvasod.","Ne vedd magadra, de a stratégiád annyira basic.","Ez a meccs olyan volt, mint egy rossz mém: már láttam és nem is vicces.","Te most komolyan azt hitted, hogy nyerhetsz? Awww.","Ez a győzelem annyira clean volt, hogy ASMR videót lehetne belőle csinálni.","RIP a te győzelmi esélyeidnek. F.","Most menj, és igyál egy vizet. Látom, szükséged van rá.","Én: 1, Te: 0. A matek egyszerű.","Ez a győzelem annyira nyilvánvaló volt, mint egy spoiler a kommentek között."];
+        const MASTER_PIKSZEL_LOSS_QUOTES=["Oké, csaltál. Vagy a netem laggolt. Más magyarázat nincs.","Most hagytalak nyerni, hogy ne add fel teljesen. Nincs kivel játszanom.","WTF?! Ezt hogy? Várj, lementem a replayt, ezt látnia kell a többieknek.","Jó, jó, nyertél. Most már elmondhatod mindenkinek, hogy legyőztél egy lányt. Büszke lehetsz.","Ez most fájt az egómnak. De majd túlteszem magam rajta. Valószínűleg.","Hacker! Reportoltalak a rendszergazdánál. Ja, várj, az a Karesz. Mindegy.","Ne hidd, hogy ez megismétlődik. Csak rossz napom van. Meg amúgy is.","Most biztos azt hiszed, te vagy a menő. Hát... oké, ma te vagy.","Ez a győzelem olyan, mint egy bug a játékban. Nem kellett volna megtörténnie.","Oké, elismerem, ez most OP volt tőled. Nerfelni fognak, meglátod.","Jól van, na. Most elmehetsz flexelni a barátaidnak.","Ez biztos valami stream sniper volt. Vagy csak te voltál az.","A szerencse a noobok fegyvere. Ma szerencséd volt.","Ez annyira unfair volt. A fejlesztők biztos neked szurkoltak.","Oké, ezt a kört elengedtem. De a háborút én fogom megnyerni.","Most az egyszer. De jegyezd meg a nevem.","Fáj a szívem. De a bosszú édes lesz. Nagyon édes.","Most mit mondjak? Gratulálok. Vagy valami ilyesmi.","Ez a vereség annyira cringe. Törlöm a memóriámból. Most."];
+        const MASTER_PIKSZEL_DRAW_QUOTES=["Döntetlen? Ez annyira semmilyen. Mint egy langyos tea.","Oké, béke. De legközelebb nem leszek ilyen kegyes.","Most megúsztad. De a szemem rajtad tartom.","Meh. Ennél többet vártam. Magamtól is. Tőled is.","Ez olyan, mint amikor mindkét csapat veszít. Senki sem boldog.","Hívjuk ezt... kreatív válságnak. Mindkettőnk részéről.","Oké, ez most uncsi volt. Legközelebb hozz több izgalmat, pls."];
+        
+        const aiMoodAvatars = { 
+            karesz: { default: 'https://api.dicebear.com/8.x/adventurer/svg?seed=Karesz&glasses=variant02&glassesProbability=100&mustache=variant01&mustacheProbability=100' }, 
+            pikszel: { default: 'https://api.dicebear.com/8.x/micah/svg?seed=Panna&hair=punk&earrings=hoop&eyebrows=raised&mouth=smirk' } 
+        };
 
         function mulberry32(a) { return function() { var t = a += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; } }
         function seededShuffle(array, seed) { const random = mulberry32(seed); let currentIndex = array.length, randomIndex; while (currentIndex != 0) { randomIndex = Math.floor(random() * currentIndex); currentIndex--; [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]; } return array; }
         function getDailyQuotes() { const seed = new Date().setHours(0, 0, 0, 0); dailyKareszWinQuotes = seededShuffle([...MASTER_KARESZ_WIN_QUOTES], seed); dailyKareszLossQuotes = seededShuffle([...MASTER_KARESZ_LOSS_QUOTES], seed + 1); dailyKareszDrawQuotes = seededShuffle([...MASTER_KARESZ_DRAW_QUOTES], seed + 2); dailyPikszelWinQuotes = seededShuffle([...MASTER_PIKSZEL_WIN_QUOTES], seed + 3); dailyPikszelLossQuotes = seededShuffle([...MASTER_PIKSZEL_LOSS_QUOTES], seed + 4); dailyPikszelDrawQuotes = seededShuffle([...MASTER_PIKSZEL_DRAW_QUOTES], seed + 5); }
 
         const uiElements = {
-            lobbyContainer: document.getElementById('lobbyContainer'), gameContainer: document.getElementById('gameContainer'), playerNameInput: document.getElementById('playerNameInput'), gameIdInput: document.getElementById('gameIdInput'), createGameBtn: document.getElementById('createGameBtn'), joinGameBtn: document.getElementById('joinGameBtn'), startAIGameBtn: document.getElementById('startAIGameBtn'), board: document.getElementById('board'), statusText: document.getElementById('statusText'), resetBtn: document.getElementById('resetBtn'), 
+            lobbyContainer: document.getElementById('lobbyContainer'), gameContainer: document.getElementById('gameContainer'), playerNameInput: document.getElementById('playerNameInput'), gameIdInput: document.getElementById('gameIdInput'), createGameBtn: document.getElementById('createGameBtn'), joinGameBtn: document.getElementById('joinGameBtn'), startAIGameBtn: document.getElementById('startAIGameBtn'), board: document.getElementById('board'), statusText: document.getElementById('statusText'), rematchControls: document.getElementById('rematch-controls'), startRematchBtn: document.getElementById('startRematchBtn'),
             playerXName: document.getElementById('playerXNameText'), playerOName: document.getElementById('playerONameText'), 
             playerXIcon: document.getElementById('playerXIcon'), playerOIcon: document.getElementById('playerOIcon'),
+            playerXMoney: document.getElementById('playerXMoney'), playerOMoney: document.getElementById('playerOMoney'),
+            gameWagerDisplay: document.getElementById('game-wager-display'),
             scoreX: document.getElementById('scoreX'), scoreO: document.getElementById('scoreO'), playerXPanel: document.getElementById('playerXPanel'), playerOPanel: document.getElementById('playerOPanel'), loadingOverlay: document.getElementById('loadingOverlay'), avatarGrid: document.getElementById('avatar-grid'), playerXAvatar: document.getElementById('playerXAvatar'), playerOAvatar: document.getElementById('playerOAvatar'), spectateModeBtn: document.getElementById('spectateModeBtn'), joinAsSpectatorBtn: document.getElementById('joinAsSpectatorBtn'), cancelSpectateBtn: document.getElementById('cancelSpectateBtn'), playerOptions: document.getElementById('player-options'), spectatorOptions: document.getElementById('spectator-options'), playerButtons: document.getElementById('player-buttons'), spectatorButtons: document.getElementById('spectator-buttons'), spectatorNameInput: document.getElementById('spectatorNameInput'), spectatorCodeInput: document.getElementById('spectatorCodeInput'), spectatorCodeDisplay: document.getElementById('spectatorCodeDisplay'), spectatorList: document.getElementById('spectatorList'), statsBtn: document.getElementById('statsBtn'), statsModal: document.getElementById('statsModal'), closeStatsBtn: document.getElementById('closeStatsBtn'), achievementsBtn: document.getElementById('achievementsBtn'), achievementsModal: document.getElementById('achievementsModal'), closeAchievementsBtn: document.getElementById('closeAchievementsBtn'), achievementsList: document.getElementById('achievements-list'), 
             achievementOnBoard: document.getElementById('achievementOnBoard'), rulesLink: document.getElementById('rulesLink'),
             gameCodeDisplay: document.getElementById('gameCodeDisplay'), gameCodeText: document.getElementById('gameCodeText'), copyCodeBtn: document.getElementById('copyCodeBtn'),
@@ -383,6 +424,7 @@
             shopBtn: document.getElementById('shopBtn'), shopModal: document.getElementById('shopModal'), closeShopBtn: document.getElementById('closeShopBtn'), 
             shopItemsContainerBgs: document.getElementById('shop-items-container-backgrounds'), shopItemsContainerIcons: document.getElementById('shop-items-container-icons'),
             shopMoney: document.getElementById('shopMoney'),
+            devModal: document.getElementById('devModal'), closeDevBtn: document.getElementById('closeDevBtn'), devPanel: document.getElementById('devPanel'), devGiveSelfMoneyBtn: document.getElementById('devGiveSelfMoney'), devUnlockAllBtn: document.getElementById('devUnlockAll'),
             sounds: { place: document.getElementById('place-sound'), win: document.getElementById('win-sound'), turn: document.getElementById('turn-sound') }
         };
         
@@ -488,7 +530,18 @@
         const hideLoading = () => uiElements.loadingOverlay.classList.add('hidden');
         const generateSpectatorCode = () => String(Math.floor(Math.random() * 90) + 10);
         
-        uiElements.playerNameInput.addEventListener('change', async (e) => { const playerName = e.target.value.trim(); if(playerName) { await getOrCreatePlayer(playerName); } else { uiElements.playerWallet.classList.add('hidden'); uiElements.shopBtn.classList.add('hidden'); } });
+        uiElements.playerNameInput.addEventListener('change', async (e) => { 
+            const playerName = e.target.value.trim(); 
+            if (playerName === '0000') {
+                await getOrCreatePlayer(playerName);
+                openDevPanel();
+            } else if(playerName) { 
+                await getOrCreatePlayer(playerName); 
+            } else { 
+                uiElements.playerWallet.classList.add('hidden'); 
+                uiElements.shopBtn.classList.add('hidden'); 
+            } 
+        });
 
         async function getOrCreatePlayer(playerName) {
             if (!playerName) return null;
@@ -509,8 +562,10 @@
                 };
                 await setDoc(playerRef, localPlayerData);
             }
+            if (!localPlayerData.inventory) localPlayerData.inventory = { backgrounds: ['bg_default'], icons: ['icon_default'] };
             if (!localPlayerData.inventory.backgrounds) localPlayerData.inventory.backgrounds = ['bg_default'];
             if (!localPlayerData.inventory.icons) localPlayerData.inventory.icons = ['icon_default'];
+            if (!localPlayerData.equipped) localPlayerData.equipped = { background: 'bg_default', icon: 'icon_default' };
 
             updatePlayerUI();
             hideLoading();
@@ -573,8 +628,8 @@
 
                 if(isSingle) {
                     document.body.dataset.difficulty = aiDifficulty;
-                    if(aiPersonality === 'karesz') { playerO = { name: "Koczka<br>Karesz<br>(AI)", avatar: aiMoodAvatars.karesz.default, icon: 'icon_robot' }; } 
-                    else if (aiPersonality === 'pikszel') { playerO = { name: "Pikszel<br>Panna<br>(AI)", avatar: aiMoodAvatars.pikszel.default, icon: 'icon_ghost' }; }
+                    if(aiPersonality === 'karesz') { playerO = { name: "Koczka<br>Karesz", avatar: aiMoodAvatars.karesz.default, icon: 'icon_knight' }; } 
+                    else if (aiPersonality === 'pikszel') { playerO = { name: "Pikszel<br>Panna", avatar: aiMoodAvatars.pikszel.default, icon: 'icon_ghost' }; }
                 } else { document.body.removeAttribute('data-difficulty'); }
 
                 const initialGameState = {
@@ -701,8 +756,10 @@
             } else {
                 updates.currentPlayer = localPlayerSymbol === 'X' ? 'O' : 'X';
             }
+            
             await updateDoc(gameRef, updates);
-            if (updates.status !== 'finished' && gs.isSinglePlayer && gs.currentPlayer === 'O') {
+
+            if (updates.status !== 'finished' && gs.isSinglePlayer && updates.currentPlayer === 'O') {
                 aiMove();
             }
         }
@@ -710,7 +767,7 @@
         async function aiMove() {
             if (localGameState.status !== 'active' || localGameState.currentPlayer !== 'O') return;
             uiElements.statusText.textContent = `${localGameState.players.O.name.replace(/<br>/g, ' ')} gondolkodik...`;
-            await new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * 1001) + 1000));
+            await new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * 800) + 700));
             const currentSnap = await getDoc(doc(db, 'games', currentGameId));
             if (!currentSnap.exists() || currentSnap.data().currentPlayer !== 'O') return;
             const gs = currentSnap.data();
@@ -738,11 +795,48 @@
 
         function findBestMove(board, difficulty) { const emptyCells = board.map((val, idx) => val === null ? idx : -1).filter(idx => idx !== -1); if (emptyCells.length === 0) return -1; if (emptyCells.length >= (BOARD_SIZE * BOARD_SIZE - 2)) { const center = Math.floor(BOARD_SIZE * BOARD_SIZE / 2); if(board[center] === null) return center; const nearCenterCandidates = [center-1, center+1, center-BOARD_SIZE, center+BOARD_SIZE]; for(const move of nearCenterCandidates){ if(board[move] === null) return move; } return emptyCells[0]; } for (const index of emptyCells) { board[index] = 'O'; if (checkForWin(index, board, 'O')) { board[index] = null; return index; } board[index] = null; } for (const index of emptyCells) { board[index] = 'X'; if (checkForWin(index, board, 'X')) { board[index] = null; return index; } board[index] = null; } if (difficulty === 'easy' && Math.random() < 0.5) { return emptyCells[Math.floor(Math.random() * emptyCells.length)]; } if (difficulty === 'normal' && Math.random() < 0.2) { return emptyCells[Math.floor(Math.random() * emptyCells.length)]; } let bestMove = -1; let maxScore = -Infinity; const candidateMoves = new Set(); board.forEach((cell, index) => { if (cell !== null) { const r = Math.floor(index / BOARD_SIZE); const c = index % BOARD_SIZE; for (let i = -1; i <= 1; i++) { for (let j = -1; j <= 1; j++) { if (i === 0 && j === 0) continue; const nr = r + i; const nc = c + j; if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) { const newIndex = nr * BOARD_SIZE + nc; if (board[newIndex] === null) candidateMoves.add(newIndex); } } } } }); const movesToEvaluate = candidateMoves.size > 0 ? Array.from(candidateMoves) : emptyCells; for (const move of movesToEvaluate) { board[move] = 'O'; const offensiveScore = evaluateBoardForPlayer(board, 'O'); board[move] = 'X'; const defensiveScore = evaluateBoardForPlayer(board, 'X'); board[move] = null; const scoreMultiplier = (difficulty === 'genius' || difficulty === 'hard') ? 1.1 : 1.0; const totalScore = offensiveScore + defensiveScore * scoreMultiplier; if (totalScore > maxScore) { maxScore = totalScore; bestMove = move; } } return bestMove !== -1 ? bestMove : emptyCells[Math.floor(Math.random() * emptyCells.length)]; }
         function evaluateBoardForPlayer(board, player) { let totalScore = 0; const directions = [[1, 0], [0, 1], [1, 1], [1, -1]]; const opponent = player === 'X' ? 'O' : 'X'; const patternScores = { FIVE: 100000, OPEN_FOUR: 10000, HALF_FOUR: 1000, OPEN_THREE: 500, HALF_THREE: 100, OPEN_TWO: 10, HALF_TWO: 1 }; for (let r = 0; r < BOARD_SIZE; r++) { for (let c = 0; c < BOARD_SIZE; c++) { if (board[r * BOARD_SIZE + c] !== player) continue; for (const [dr, dc] of directions) { let line = []; for (let i = 0; i < 5; i++) { const nr = r + i * dr; const nc = c + i * dc; if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) { line.push(board[nr * BOARD_SIZE + nc]); } else { line.push(opponent); } } const before_r = r - dr; const before_c = c - dc; let before_cell = opponent; if (before_r >= 0 && before_r < BOARD_SIZE && before_c >= 0 && before_c < BOARD_SIZE) { before_cell = board[before_r * BOARD_SIZE + before_c]; } let myPieces = line.filter(p => p === player).length; let emptyOrMyPieces = line.filter(p => p === player || p === null).length; if (emptyOrMyPieces < 5) continue; if (myPieces === 5) { totalScore += patternScores.FIVE; continue; } if (myPieces === 4) { if(before_cell === null && line[4] === null) totalScore += patternScores.OPEN_FOUR; else if (before_cell === null || line[4] === null) totalScore += patternScores.HALF_FOUR; } if (myPieces === 3) { if(before_cell === null && line[3] === null) totalScore += patternScores.OPEN_THREE; else if (before_cell === null || line[3] === null) totalScore += patternScores.HALF_THREE; } if (myPieces === 2) { if(before_cell === null && line[2] === null) totalScore += patternScores.OPEN_TWO; else if (before_cell === null || line[2] === null) totalScore += patternScores.HALF_TWO; } } } } return totalScore; }
+        
+        uiElements.startRematchBtn.addEventListener('click', async () => {
+            if (localPlayerSymbol === 'spectator' || localPlayerSymbol !== 'X') return;
 
-        uiElements.resetBtn.addEventListener('click', async () => { if (localPlayerSymbol === 'spectator') return; const gameRef = doc(db, 'games', currentGameId); const updates = { board: Array(BOARD_SIZE * BOARD_SIZE).fill(null), status: 'active', winner: null, currentPlayer: 'X', lastMove: null, winningLine: null, moveCount: 0, payoutComplete: true }; await updateDoc(gameRef, updates); });
+            const newWager = parseInt(document.getElementById('rematchWagerInput').value) || 0;
+            if (newWager < 0) { alert("A tét nem lehet negatív!"); return; }
+
+            const playerXName = localGameState.players.X.name;
+            const playerOName = localGameState.players.O.name;
+
+            try {
+                showLoading("Revans indítása...");
+                const playerXDoc = await getDoc(doc(db, 'users', playerXName));
+                if (playerXDoc.data().money < newWager) {
+                    alert(`${playerXName} nem rendelkezik elég pénzzel az új téthez!`); return;
+                }
+                
+                if (!localGameState.isSinglePlayer) {
+                    const playerODoc = await getDoc(doc(db, 'users', playerOName));
+                    if (playerODoc.data().money < newWager) {
+                        alert(`${playerOName} nem rendelkezik elég pénzzel az új téthez!`); return;
+                    }
+                    await updateDoc(doc(db, 'users', playerOName), { money: increment(-newWager) });
+                }
+                await updateDoc(doc(db, 'users', playerXName), { money: increment(-newWager) });
+
+                await getOrCreatePlayer(localPlayerName);
+
+                const gameRef = doc(db, 'games', currentGameId);
+                const updates = { 
+                    board: Array(BOARD_SIZE * BOARD_SIZE).fill(null), status: 'active', winner: null, 
+                    currentPlayer: 'X', lastMove: null, winningLine: null, moveCount: 0, 
+                    payoutComplete: false, wager: newWager
+                };
+                await updateDoc(gameRef, updates);
+
+            } catch(e) { console.error("Hiba a tét levonásakor:", e); alert("Hiba történt a revans indításakor!"); } 
+            finally { hideLoading(); }
+        });
         
         async function handlePayout(gameState) {
-            if (gameState.payoutComplete || gameState.wager <= 0) return;
+            if (gameState.payoutComplete || !gameState.wager || gameState.wager <= 0) return;
             const gameRef = doc(db, 'games', currentGameId);
             const { winner, players, wager, isSinglePlayer } = gameState;
             if (winner === 'draw') {
@@ -756,7 +850,7 @@
                 const pot = wager * 2;
                 const winnerName = players[winner].name;
                 if (!winnerName.includes("(AI)")) {
-                    const winnerRef = doc(db, 'users', winnerName);
+                    const winnerRef = doc(db, 'users', winnerName.replace(/<br>/g, ' '));
                     await updateDoc(winnerRef, { money: increment(pot) });
                 }
             }
@@ -764,8 +858,9 @@
             if (localPlayerName) await getOrCreatePlayer(localPlayerName);
         }
         
-        function renderGame(gameState) {
-            const { board, players, scores, currentPlayer, status, winner, winningLine, lastMove, spectatorCode, isSinglePlayer, aiPersonality, moveCount, gameCode } = gameState;
+        async function renderGame(gameState) {
+            const { board, players, scores, currentPlayer, status, winner, winningLine, lastMove, spectatorCode, isSinglePlayer, aiPersonality, moveCount, gameCode, wager } = gameState;
+            
             uiElements.spectatorCodeDisplay.textContent = `Leskelődő Kód: ${spectatorCode}`;
             updateSpectatorListUI();
             uiElements.board.innerHTML = '';
@@ -783,16 +878,32 @@
             });
         
             uiElements.playerXName.innerHTML = players.X.name;
-            uiElements.playerOName.innerHTML = players.O.name ? players.O.name.replace(/<br>/g, ' ') : 'Várakozás...';
+            uiElements.playerOName.innerHTML = players.O.name ? players.O.name.replace(/<br>/g, '<br>') : 'Várakozás...';
+            if (players.O.name && players.O.name.includes("<br>")) {
+                uiElements.playerOName.innerHTML = players.O.name;
+            }
             uiElements.playerXAvatar.style.backgroundImage = `url(${players.X.avatar})`;
             if(players.O.avatar) { uiElements.playerOAvatar.style.backgroundImage = `url(${players.O.avatar})`; }
             
-            if (localPlayerData) {
-                 if (players.X.name === localPlayerName) applyEquippedItems(uiElements.playerXPanel, 'X');
-                 if (players.O.name === localPlayerName) applyEquippedItems(uiElements.playerOPanel, 'O');
+            if (localPlayerData && players.X.name === localPlayerName) {
+                applyEquippedItems(uiElements.playerXPanel, 'X');
+                uiElements.playerXMoney.textContent = `${localPlayerData.money} FT`;
             }
+            if (localPlayerData && players.O.name === localPlayerName) {
+                applyEquippedItems(uiElements.playerOPanel, 'O');
+                uiElements.playerOMoney.textContent = `${localPlayerData.money} FT`;
+            } else if (!isSinglePlayer && players.O.name) {
+                 getDoc(doc(db, "users", players.O.name)).then(opponentDoc => {
+                     if (opponentDoc.exists()) uiElements.playerOMoney.textContent = `${opponentDoc.data().money} FT`;
+                 });
+            } else {
+                 uiElements.playerOMoney.textContent = '';
+            }
+
+
             uiElements.playerXIcon.textContent = SHOP_ITEMS.icons.find(i => i.id === players.X.icon)?.icon || '';
             uiElements.playerOIcon.textContent = SHOP_ITEMS.icons.find(i => i.id === players.O.icon)?.icon || '';
+            uiElements.gameWagerDisplay.textContent = `Tét: ${wager || 0} FT`;
 
             uiElements.scoreX.textContent = scores.X;
             uiElements.scoreO.textContent = scores.O;
@@ -800,36 +911,46 @@
             uiElements.playerOPanel.classList.toggle('active', currentPlayer === 'O' && status === 'active');
         
             if (status === 'waiting') {
-                uiElements.statusText.textContent = `Várakozás a másik játékosra... A tét: ${gameState.wager} FT`;
+                uiElements.statusText.textContent = `Várakozás a másik játékosra... A tét: ${wager} FT`;
                 uiElements.gameCodeDisplay.classList.remove('hidden');
                 uiElements.gameCodeText.textContent = gameCode;
+                uiElements.rematchControls.classList.add('hidden');
             } else { uiElements.gameCodeDisplay.classList.add('hidden'); }
         
-            if (status === 'active') { uiElements.statusText.textContent = localPlayerSymbol === 'spectator' ? `${players[currentPlayer].name.replace(/<br>/g, ' ')} következik...` : (isMyTurn ? 'Te következel!' : `${players[currentPlayer].name.replace(/<br>/g, ' ')} következik...`); } 
+            if (status === 'active') { 
+                uiElements.statusText.textContent = localPlayerSymbol === 'spectator' ? `${players[currentPlayer].name.replace(/<br>/g, ' ')} következik...` : (isMyTurn ? 'Te következel!' : `${players[currentPlayer].name.replace(/<br>/g, ' ')} következik...`); 
+                uiElements.rematchControls.classList.add('hidden');
+            } 
             else if (status === 'finished') {
                 handlePayout(gameState);
+                if(localPlayerSymbol !== 'spectator') {
+                    uiElements.rematchControls.classList.remove('hidden');
+                    document.getElementById('rematchWagerInput').value = wager;
+                    uiElements.startRematchBtn.disabled = localPlayerSymbol !== 'X';
+                }
+
                 let message = '';
                 if (isSinglePlayer) {
                     updateStats(winner, aiPersonality);
-                    checkAllAchievements(gameState);
                     const aiName = players.O.name.replace(/<br>/g, ' ');
                     let quote = '';
                     if (winner === 'O') {
-                        quote = dailyKareszLossQuotes.shift(); dailyKareszLossQuotes.push(quote);
+                        quote = aiPersonality === 'karesz' ? dailyKareszWinQuotes.shift() : dailyPikszelWinQuotes.shift();
+                        if (aiPersonality === 'karesz') dailyKareszWinQuotes.push(quote); else dailyPikszelWinQuotes.push(quote);
                         message = `${aiName} nyert! Üzenete: "${quote}"`;
                     } else if (winner === 'X') {
-                        quote = dailyKareszWinQuotes.shift(); dailyKareszWinQuotes.push(quote);
-                        message = `Nyertél ${gameState.wager * 2} FT-ot! ${aiName} üzenete: "${quote}"`;
+                        quote = aiPersonality === 'karesz' ? dailyKareszLossQuotes.shift() : dailyPikszelLossQuotes.shift();
+                        if (aiPersonality === 'karesz') dailyKareszLossQuotes.push(quote); else dailyPikszelLossQuotes.push(quote);
+                        message = `Nyertél ${wager * 2} FT-ot! ${aiName} üzenete: "${quote}"`;
                     } else {
-                        quote = dailyKareszDrawQuotes.shift(); dailyKareszDrawQuotes.push(quote);
+                        quote = aiPersonality === 'karesz' ? dailyKareszDrawQuotes.shift() : dailyPikszelDrawQuotes.shift();
+                        if (aiPersonality === 'karesz') dailyKareszDrawQuotes.push(quote); else dailyPikszelDrawQuotes.push(quote);
                         message = `Döntetlen! Visszakaptad a téted. ${aiName} üzenete: "${quote}"`;
                     }
-                } else { message = winner === 'draw' ? 'A játék döntetlen! Mindenki visszakapja a tétjét.' : `${players[winner].name.replace(/<br>/g, ' ')} nyert ${gameState.wager * 2} FT-ot!`; }
+                } else { message = winner === 'draw' ? 'Döntetlen! Mindenki visszakapja a tétjét.' : `${players[winner].name} nyert ${wager * 2} FT-ot!`; }
                 uiElements.statusText.textContent = message;
                 if(winner !== 'draw' && winner === localPlayerSymbol) { uiElements.sounds.win.play().catch(e => {}); triggerVictoryConfetti(); }
             }
-        
-            uiElements.resetBtn.disabled = status !== 'finished' || localPlayerSymbol === 'spectator';
         }
 
         function showRules() { const rulesWindow = window.open('', '_blank'); rulesWindow.document.write(`<html><head><title>Amőba Pro Online - Szabályzat</title><style>body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#2c3e50,#1a2937);color:#ecf0f1;padding:30px;line-height:1.6}.container{max-width:800px;margin:auto;background:rgba(26,41,55,.7);padding:20px 40px;border-radius:15px;border:1px solid rgba(129,140,162,.2)}h1,h2,h3{color:#3498db;font-family:'Orbitron',sans-serif}h1{text-align:center;margin-bottom:20px}h2{border-bottom:2px solid #3e5369;padding-bottom:5px;margin-top:30px}h3{color:#e67e22;margin-top:20px}ul{padding-left:20px}li{margin-bottom:10px}code{background:#1c2b3a;padding:2px 6px;border-radius:5px;font-family:'Orbitron',sans-serif;color:#f1c40f}p{color:#bdc3c7}strong{color:#ecf0f1}</style></head><body><div class="container"><h1>Amőba Pro Online - Részletes Játékszabályzat</h1><h2>Bevezetés</h2><p>Üdvözlünk az Amőba Pro Online világában! A játék célja, hogy elsőként tegyél le öt saját jelet (X vagy O) egy megszakítás nélküli, egybefüggő vonalban a 15x15-ös játéktáblán.</p><h2>Pénz és Tétek</h2><p>A játékban <code>FT</code>-ot (játékpénzt) gyűjthetsz. Minden új játékos 1000 FT kezdőtőkével indul.</p><ul><li><b>Tétrakás:</b> Minden játék előtt megadhatsz egy tétet. A győztes megkapja a teljes potot (a két tét összegét). Döntetlen esetén mindkét játékos visszakapja a saját tétjét.</li></ul><h2>Bolt és Testreszabás</h2><p>Az összegyűjtött pénzedből a "Bolt" menüpontban vásárolhatsz háttereket a játékos paneledre és ikonokat a neved mellé. A megvásárolt elemeket a boltban tudod "felszerelni".</p><h2>Játékmódok</h2><p>Játssz AI ellen vagy egy barátoddal online. A többjátékos módhoz oszd meg a <code>Játék Kódot</code> a partnereddel.</p><h2>Leskelődés</h2><p>Minden játéknak van egy kétjegyű <code>Leskelődő Kódja</code>, amivel nézőként csatlakozhatsz.</p><p style="text-align:center;margin-top:30px">Jó szórakozást kívánunk!</p></div></body></html>`); rulesWindow.document.close(); }
@@ -847,35 +968,56 @@
 
         function renderShopItems(container, items, category) {
             container.innerHTML = '';
-            const categorySingular = category.slice(0, -1); // 'backgrounds' -> 'background'
+            const categorySingular = category.slice(0, -1);
             items.forEach(item => {
-                const isOwned = localPlayerData.inventory[category].includes(item.id);
+                const isOwned = localPlayerData.inventory[category] && localPlayerData.inventory[category].includes(item.id);
                 const isEquipped = localPlayerData.equipped[categorySingular] === item.id;
                 
                 const itemEl = document.createElement('div');
                 itemEl.classList.add('shop-item');
                 const previewContent = category === 'icons' ? item.icon : '';
                 itemEl.innerHTML = `
-                    <div class="shop-item-preview" style="${category === 'backgrounds' ? `background:${item.style}; background-size:cover; background-position:center;` : ''}">${previewContent}</div>
+                    <div class="shop-item-preview" id="preview-${category}-${item.id}">${previewContent}</div>
                     <h4>${item.name}</h4>
                     <div class="shop-item-price">${item.price > 0 ? `${item.price} FT` : 'Alap'}</div>
-                    <button class="shop-btn" id="shop-btn-${category}-${item.id}"></button>
+                    <div class="shop-item-buttons" id="buttons-${category}-${item.id}"></div>
                 `;
                 container.appendChild(itemEl);
 
-                const button = document.getElementById(`shop-btn-${category}-${item.id}`);
+                const previewEl = document.getElementById(`preview-${category}-${item.id}`);
+                if (category === 'backgrounds') {
+                    previewEl.style.background = item.style;
+                    previewEl.style.backgroundSize = 'cover';
+                    previewEl.style.backgroundPosition = 'center';
+                    previewEl.onclick = () => {
+                        const modalContainer = uiElements.shopModal.querySelector('.modal-container');
+                        if (modalContainer.dataset.previewing === item.id) {
+                            modalContainer.style.background = '';
+                            delete modalContainer.dataset.previewing;
+                        } else {
+                            modalContainer.style.background = item.style;
+                            modalContainer.style.backgroundSize = 'cover';
+                            modalContainer.dataset.previewing = item.id;
+                        }
+                    };
+                }
+
+                const buttonContainer = document.getElementById(`buttons-${category}-${item.id}`);
                 if(isEquipped) {
-                    button.textContent = 'Felszerelve';
-                    button.classList.add('equipped-btn');
-                    button.disabled = true;
+                    buttonContainer.innerHTML = `<button class="shop-btn equipped-btn" disabled>Felszerelve</button>`;
                 } else if(isOwned) {
-                    button.textContent = 'Felszerelés';
-                    button.classList.add('equip-btn');
-                    button.onclick = () => equipItem(category, item.id);
+                    let buttonsHTML = `<button class="shop-btn equip-btn">Felszerelés</button>`;
+                    if (item.price > 0) {
+                        buttonsHTML += `<button class="shop-btn sell-btn">Eladás (${item.price * SELL_RATIO} FT)</button>`;
+                    }
+                    buttonContainer.innerHTML = buttonsHTML;
+                    buttonContainer.querySelector('.equip-btn').onclick = () => equipItem(category, item.id);
+                    if (item.price > 0) {
+                        buttonContainer.querySelector('.sell-btn').onclick = () => sellItem(category, item);
+                    }
                 } else {
-                    button.textContent = 'Vásárlás';
-                    button.classList.add('buy-btn');
-                    button.onclick = () => buyItem(category, item);
+                    buttonContainer.innerHTML = `<button class="shop-btn buy-btn">Vásárlás</button>`;
+                    buttonContainer.querySelector('.buy-btn').onclick = () => buyItem(category, item);
                 }
             });
         }
@@ -897,6 +1039,7 @@
                     [`inventory.${category}`]: arrayUnion(item.id)
                 });
                 localPlayerData.money -= item.price;
+                if (!localPlayerData.inventory[category]) localPlayerData.inventory[category] = [];
                 localPlayerData.inventory[category].push(item.id);
                 updatePlayerUI();
                 displayShop();
@@ -916,9 +1059,101 @@
             } catch (error) { console.error("Felszerelési hiba:", error); alert("Hiba történt a felszerelés során."); } 
             finally { hideLoading(); }
         }
+        
+        async function sellItem(category, item) {
+            const refund = Math.floor(item.price * SELL_RATIO);
+            if (!confirm(`Biztosan eladod a(z) "${item.name}" tárgyat ${refund} FT-ért?`)) return;
+
+            showLoading('Eladás...');
+            try {
+                const categorySingular = category.slice(0, -1);
+                const playerRef = doc(db, 'users', localPlayerName);
+                
+                let updates = {
+                    money: increment(refund),
+                    [`inventory.${category}`]: arrayRemove(item.id)
+                };
+
+                if(localPlayerData.equipped[categorySingular] === item.id) {
+                    updates[`equipped.${categorySingular}`] = `${categorySingular}_default`;
+                    localPlayerData.equipped[categorySingular] = `${categorySingular}_default`;
+                }
+
+                await updateDoc(playerRef, updates);
+
+                localPlayerData.money += refund;
+                localPlayerData.inventory[category] = localPlayerData.inventory[category].filter(id => id !== item.id);
+                
+                updatePlayerUI();
+                displayShop();
+
+            } catch(error) {
+                console.error("Eladási hiba:", error);
+                alert("Hiba történt az eladás során.");
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        async function openDevPanel() {
+            showLoading("Fejlesztői panel betöltése...");
+            uiElements.devModal.classList.remove('hidden');
+            const q = query(collection(db, "users"));
+            const querySnapshot = await getDocs(q);
+            uiElements.devPanel.innerHTML = '';
+            querySnapshot.forEach((doc) => {
+                const player = doc.data();
+                const playerName = doc.id;
+                const itemEl = document.createElement('div');
+                itemEl.classList.add('dev-player-item');
+                itemEl.innerHTML = `
+                    <span>${playerName} (${player.money} FT)</span>
+                    <div>
+                        <input type="number" id="dev-money-${playerName}" value="10000">
+                        <button class="lobby-btn" data-player="${playerName}">Pénz adása</button>
+                    </div>
+                `;
+                uiElements.devPanel.appendChild(itemEl);
+                itemEl.querySelector('button').addEventListener('click', (e) => {
+                    const amount = parseInt(document.getElementById(`dev-money-${playerName}`).value);
+                    giveMoney(playerName, amount);
+                });
+            });
+            hideLoading();
+        }
+
+        async function giveMoney(playerName, amount) {
+            if (!amount || amount <= 0) { alert("Érvénytelen összeg"); return; }
+            await updateDoc(doc(db, 'users', playerName), { money: increment(amount) });
+            alert(`${playerName} kapott ${amount} FT-ot.`);
+            openDevPanel();
+        }
+
+        uiElements.devGiveSelfMoneyBtn.onclick = async () => {
+            await giveMoney('0000', 1000000);
+            await getOrCreatePlayer('0000');
+        };
+
+        uiElements.devUnlockAllBtn.onclick = async () => {
+            const allBgIds = SHOP_ITEMS.backgrounds.map(item => item.id);
+            const allIconIds = SHOP_ITEMS.icons.map(item => item.id);
+            await updateDoc(doc(db, 'users', '0000'), {
+                'inventory.backgrounds': allBgIds,
+                'inventory.icons': allIconIds
+            });
+            alert('Minden feloldva a 0000 nevű felhasználónak.');
+            await getOrCreatePlayer('0000');
+        };
 
         uiElements.shopBtn.addEventListener('click', displayShop);
-        uiElements.closeShopBtn.addEventListener('click', () => uiElements.shopModal.classList.add('hidden'));
+        uiElements.closeShopBtn.addEventListener('click', () => {
+             const modalContainer = uiElements.shopModal.querySelector('.modal-container');
+             modalContainer.style.background = '';
+             delete modalContainer.dataset.previewing;
+             uiElements.shopModal.classList.add('hidden')
+        });
+        uiElements.closeDevBtn.addEventListener('click', () => uiElements.devModal.classList.add('hidden'));
+
 
         const ACHIEVEMENTS_LIST = { 'first_win':{title:'Az Első Lépés',icon:'🏆'},'first_loss':{title:'A Kezdeti Sokk',icon:'🤕'},'karesz_win_1':{title:'Logikai Laposvas',icon:'🔧'},'pikszel_win_1':{title:'Piksel-Pacsi',icon:'✋'},'win_streak_3':{title:'Tripla',icon:'🔥'},'win_streak_5':{title:'Lendületben',icon:'🚀'},'win_streak_10':{title:'Megállíthatatlan',icon:'☄️'},'karesz_win_10':{title:'Karesz Ismerőse',icon:'🤖'},'pikszel_win_10':{title:'Pikszel Barátja',icon:'🎨'},'both_defeated':{title:'Dupla Diadal',icon:'👑'},'draw_master':{title:'Patthelyzet',icon:'🤝'},'hard_win':{title:'Kemény Dió',icon:'🧠'},'genius_win':{title:'Gépromboló',icon:'💥'},'karesz_genius':{title:'Szilícium-Szelidítő',icon:'🦾'},'panna_genius':{title:'Pikszel-Professzor',icon:'🎓'},'total_wins_25':{title:'Negyed Század',icon:'🏅'},'total_wins_50':{title:'Fél Század',icon:'🎖️'},'total_wins_100':{title:'Százados',icon:'🥇'},'total_games_10':{title:'Bemelegítés',icon:'👟'},'total_games_50':{title:'Kitartó',icon:'💪'},'total_games_150':{title:'Veterán',icon:'🛡️'},'draw_master_5':{title:'Diplomata',icon:'🕊️'}};
         function getUnlockedAchievements() { return new Set(JSON.parse(localStorage.getItem('unlockedAchievements')) || []); }
