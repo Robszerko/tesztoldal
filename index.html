@@ -3,831 +3,934 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Legfrissebb Láncszem - Napi Párbaj</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
+    <title>Amőba Pro Online</title>
     <style>
+        /* CSS KÓD */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Orbitron:wght@700&display=swap');
+        
         :root {
-            --primary-color: #c8102e; /* Erőteljes piros */
-            --accent-color: #ffd700; /* Elegáns arany a kiemeléshez */
-            --background-dark: #1a1a1a; /* Sötét antracit */
-            --background-light: #2c2c2c; /* Világosabb szürke konténerekhez */
-            --text-light: #f5f5f5; /* Törtfehér a jobb olvashatóságért */
-            --text-dark: #1a1a1a;
-            --danger-color: #e53935;  /* Figyelmeztető piros */
-            --success-color: #388e3c; /* Nemzeti zöld */
-            --selected-color: #ffd700; /* Arany a kiválasztáshoz */
-            --explanation-bg: #212121;
+            --bg-gradient-start: #2c3e50; --bg-gradient-end: #1a2937;
+            --container-bg: rgba(26, 41, 55, 0.6);
+            --container-border: rgba(129, 140, 162, 0.2);
+            --board-bg: #1c2b3a; --cell-border: #3e5369;
+            --text-primary: #ecf0f1; --text-secondary: #bdc3c7;
+            --accent-color: #3498db; --accent-glow: rgba(52, 152, 219, 0.5);
+            --accent-secondary: #e67e22; --accent-secondary-glow: rgba(230, 126, 34, 0.5);
+            --success-color: #2ecc71; --shadow-color: rgba(0, 0, 0, 0.5);
+            --danger-color: #e74c3c;
+            --x-color: #3498db; --o-color: #e67e22;
+            --money-color: #f1c40f;
+
+            /* AI Difficulty Colors */
+            --board-bg-easy: #223a4e;
+            --board-bg-normal: #1c2b3a;
+            --board-bg-hard: #2a213e;
+            --board-bg-genius: #3a2128;
         }
 
-        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700;900&family=Poppins:wght@400;600&display=swap');
-
-        /* ALAP ANIMÁCIÓK */
-        @keyframes background-pan { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
-        @keyframes glow { 0% { text-shadow: 0 0 4px var(--primary-color), 0 0 8px var(--primary-color); } 100% { text-shadow: 0 0 6px var(--primary-color), 0 0 10px var(--primary-color); } }
-        @keyframes flash-warning { 0%, 100% { background-color: var(--danger-color); box-shadow: 0 0 15px #ff0000; } 50% { background-color: var(--background-light); box-shadow: none; } }
-        @keyframes pulse-correct {
-            0% { box-shadow: 0 0 10px var(--success-color), 0 0 20px rgba(56, 142, 60, 0.5); transform: scale(1.02); }
-            50% { box-shadow: 0 0 20px var(--success-color), 0 0 40px rgba(56, 142, 60, 0.8); transform: scale(1.04); }
-            100% { box-shadow: 0 0 10px var(--success-color), 0 0 20px rgba(56, 142, 60, 0.5); transform: scale(1.02); }
-        }
-        @keyframes strobe-flash {
-            0%, 100% { background-color: #4d441a; border-color: var(--selected-color); box-shadow: 0 0 15px var(--selected-color); }
-            50% { background-color: #8a7833; border-color: #fff; box-shadow: 0 0 25px #fff; }
-        }
-
+        .x-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'%3E%3Cpath fill='none' stroke='%233498db' stroke-width='6' stroke-linecap='round' d='M10 10l32 32M42 10l-32 32'/%3E%3C/svg%3E"); }
+        .o-icon { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'%3E%3Ccircle cx='26' cy='26' r='20' fill='none' stroke='%23e67e22' stroke-width='6'/%3E%3C/svg%3E"); }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         html { height: 100%; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--background-dark);
-            background-image: linear-gradient(270deg, #1a1a1a, #212121, #1a1a1a);
-            background-size: 200% 200%;
-            animation: background-pan 30s linear infinite;
-            color: var(--text-light);
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; margin: 0; text-align: center; overflow-x: hidden;
-        }
+        body { font-family: 'Montserrat', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100%; background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end)); color: var(--text-primary); padding: 20px; }
+        .hidden { display: none !important; }
 
-        .screen { display: none; width: 100%; height: 100%; }
-        .screen.active { display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        
-        h1, h2, h3 { 
-            font-family: 'Merriweather', serif;
-            text-transform: uppercase; 
-            color: var(--text-light); 
-            text-shadow: 0 1px 3px rgba(0,0,0,0.6);
-        }
-        h1 { color: var(--primary-color); animation: glow 2s ease-in-out infinite alternate; }
+        .logo { margin-bottom: 25px; filter: drop-shadow(0 0 15px var(--accent-glow)); text-align: center; }
+        .logo svg { height: 70px; width: 100%; max-width: 420px; }
 
-        button {
-            background: linear-gradient(145deg, var(--primary-color), #a30e25);
-            color: var(--text-light); border: none; padding: 14px 32px;
-            font-size: 1.2em; font-family: 'Merriweather', serif; text-transform: uppercase; cursor: pointer; transition: all 0.2s ease-out;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); border: 2px solid #d32f2f;
-            border-radius: 8px;
-        }
-        button:hover:not(:disabled) { transform: translateY(-3px) scale(1.05); box-shadow: 0 6px 20px rgba(200, 16, 46, 0.5); }
-        button:active:not(:disabled) { transform: translateY(-1px) scale(1.02); box-shadow: 0 4px 10px rgba(200, 16, 46, 0.4); }
-        button:disabled { background: #444; color: #888; cursor: not-allowed; transform: none; box-shadow: none; border-color: #555;}
+        .glass-container { background: var(--container-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--container-border); border-radius: 20px; box-shadow: 0 15px 30px var(--shadow-color); padding: 40px; }
+        #lobbyContainer { display: flex; flex-direction: column; width: 100%; max-width: 500px; text-align: center; }
+        #lobbyDescription { color: var(--text-secondary); margin-bottom: 10px; font-size: 0.9rem; line-height: 1.5; }
+        #rulesLink { color: var(--accent-color); text-decoration: none; font-weight: 600; font-size: 0.9rem; margin-bottom: 20px; cursor: pointer; display: inline-block; }
+        #rulesLink:hover { text-decoration: underline; }
+        .copyright-notice { margin-top: -10px; margin-bottom: 20px; color: var(--text-secondary); font-size: 0.8rem; font-weight: 600; }
+        .input-group { margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; background-color: var(--board-bg); border: 1px solid var(--cell-border); border-radius: 10px; color: var(--text-primary); font-size: 1rem; transition: all 0.2s ease; }
+        input:focus { border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-glow); outline: none; }
+        input:disabled { background-color: #2b3748; color: var(--text-secondary); }
         
-        .container {
-            width: 90%; max-width: 1200px;
-            background-color: rgba(44, 44, 44, 0.7); backdrop-filter: blur(10px); padding: 40px; border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-        }
-        .container button { margin: 10px; }
+        .button-group { display: flex; flex-direction: column; gap: 15px; }
+        .button-group .multiplayer-buttons, .button-group .secondary-buttons { display: flex; gap: 15px; }
         
-        #game-code-display { font-size: 3.5em; font-weight: 700; letter-spacing: 10px; background-color: var(--background-dark); padding: 15px; border-radius: 10px; border: 2px dashed var(--primary-color); margin: 20px 0; cursor: pointer; }
-        input { padding: 12px; font-size: 1.6em; border-radius: 8px; border: 2px solid var(--accent-color); background-color: var(--background-dark); color: #fff; text-align: center; width: 280px; font-family: 'Poppins'; }
+        .lobby-btn { flex: 1; padding: 15px; font-size: 1rem; font-weight: 600; border: none; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; }
+        .lobby-btn:disabled { background-color: var(--cell-border); color: var(--text-secondary); cursor: not-allowed; }
+        
+        #startAIGameBtn { background: linear-gradient(45deg, var(--success-color), #27ae60); color: white; }
+        #startAIGameBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4); }
 
-        /* JÁTÉK KÉPERNYŐ */
-        #game-screen { max-width: 1400px; width: 100%; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; }
-        .game-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 20px; width: 100%; }
-        .player-info-box { padding: 15px 20px; background-color: var(--background-light); border: 2px solid rgba(255,255,255,0.1); border-radius: 15px; width: 35%; transition: all 0.3s ease; }
-        .player-info-box.active { border-color: var(--accent-color); transform: scale(1.05); box-shadow: 0 0 15px var(--accent-color); }
-        .player-info-box .name { font-size: 1.5em; font-family: 'Merriweather', serif; color: var(--text-light); }
-        .player-info-box .score-label { font-size: 0.9em; text-transform: uppercase; opacity: 0.7; }
-        .player-info-box .score { font-size: 2em; font-weight: 700; color: #fff; }
+        #createGameBtn { background-color: var(--accent-color); color: white; }
+        #createGameBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px var(--accent-glow); }
+        #joinGameBtn { background-color: transparent; border: 2px solid var(--accent-secondary); color: var(--accent-secondary); }
+        #joinGameBtn:hover:not(:disabled) { background-color: var(--accent-secondary); color: white; }
+        .secondary-btn { background-color: transparent; border: 2px solid var(--text-secondary); color: var(--text-secondary); }
+        .secondary-btn:hover:not(:disabled) { background-color: var(--text-secondary); color: white; }
+        #joinAsSpectatorBtn { background-color: var(--accent-color); color: white; }
         
-        .main-game-area { display: flex; gap: 20px; flex-grow: 1; width: 100%; }
-        #money-pyramid { width: 400px; background-color: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; display: flex; flex-direction: column-reverse; align-items: center; justify-content: space-around; }
-        .pyramid-level { width: 80%; min-height: 35px; line-height: 35px; margin: 2px 0; border-radius: 5px; text-align: center; font-weight: 600; font-size: 1.2em; color: var(--text-light); border: 1px solid rgba(255,215,0,0.3); transition: all 0.3s ease; }
-        .pyramid-level.current { background-color: var(--primary-color); color: var(--text-light); transform: scale(1.05); font-weight: 700; border-color: var(--accent-color); }
+        .game-wrapper { display: flex; align-items: flex-start; gap: 40px; }
+        #board-wrapper { position: relative; }
+        #board { display: grid; width: 600px; height: 600px; background-color: var(--board-bg); border-radius: 15px; box-shadow: 0 15px 30px var(--shadow-color); border: 1px solid var(--cell-border); transition: background-color 0.5s ease; }
         
-        #game-center-area { flex-grow: 1; display: flex; flex-direction: column; }
-        .game-status-display { background-color: rgba(0,0,0,0.3); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); min-height: 120px; display: flex; flex-direction: column; justify-content: center; flex-grow: 1; }
-        #last-action-display { font-size: 1.5em; height: 40px; transition: color 0.3s; }
-        #turn-display { font-size: 1.2em; }
-        .action-buttons { display: flex; gap: 15px; margin-top: 20px; }
-        .action-buttons button { flex-grow: 1; }
-        
-        /* MODÁLIS ABLAK (KÉRDÉS) */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 10px; box-sizing: border-box;}
-        .modal-content { background: var(--background-light); border: 2px solid var(--accent-color); box-shadow: 0 0 30px var(--accent-color); padding: 40px; border-radius: 15px; width: 95%; max-width: 900px; }
-        #timer-display { font-size: 3.5em; font-weight: 700; color: var(--text-light); background-color: var(--success-color); padding: 5px 25px; border-radius: 8px; margin: 10px auto 25px; width: fit-content; }
-        #timer-display.timer-warning { animation: flash-warning 0.8s infinite; }
-        #modal-question { font-size: 1.8em; }
-        #modal-options button { display: block; width: 100%; margin: 12px 0; background-color: #3e3e3e; color: #f0f0f0; border: 2px solid rgba(255,255,255,0.3); padding: 18px; font-size: 1.2em; font-family: 'Poppins', sans-serif; text-transform: none; border-radius: 10px; transition: all 0.3s; }
-        #modal-options button:hover:not(:disabled) { background-color: #505050; border-color: var(--accent-color); }
-        
-        #modal-options button.strobing { animation: strobe-flash 0.2s linear infinite; }
-        #modal-options button.correct { border-color: var(--success-color); background-color: #1c3e20; color: #fff; }
-        #modal-options button.incorrect { border-color: var(--danger-color); background-color: #4a1919; color: #ffb8b8; }
-        #modal-options button.pulsing-correct { animation: pulse-correct 1.5s infinite; }
-        #modal-explanation { margin-top: 20px; padding: 15px; background-color: var(--explanation-bg); border-radius: 10px; border-left: 5px solid var(--accent-color); text-align: left; font-size: 1.1em; }
-        #modal-footer { margin-top: 20px; }
-        
-        /* SZERENCSEKERÉK */
-        #wheel-modal .modal-content { max-width: 600px; }
-        #wheel-container { position: relative; width: 100%; max-width: 500px; margin: 20px auto; aspect-ratio: 1/1; }
-        #wheel-canvas { width: 100%; height: 100%; }
-        #wheel-pointer {
-            position: absolute; top: 50%; left: 50%;
-            width: 40px; height: 50px;
-            background: linear-gradient(45deg, #ffeb3b, #ffd700);
-            clip-path: polygon(50% 100%, 0 0, 100% 0);
-            transform: translate(-50%, -120%) rotate(180deg);
-            z-index: 10; border-top: 3px solid #b89b00;
-        }
-        #wheel-result { font-size: 1.6em; font-family: 'Merriweather', serif; margin-top: 20px; height: 35px; color: var(--selected-color); }
+        body[data-difficulty="easy"] #board { background-color: var(--board-bg-easy); }
+        body[data-difficulty="normal"] #board { background-color: var(--board-bg-normal); }
+        body[data-difficulty="hard"] #board { background-color: var(--board-bg-hard); }
+        body[data-difficulty="genius"] #board { background-color: var(--board-bg-genius); }
 
-        /* MOBIL NÉZET */
-        @media (max-width: 768px) {
-            .container { padding: 20px; }
-            h1 { font-size: 2.2em; }
-            h2 { font-size: 1.5em; }
-            #game-code-display { font-size: 2.5em; letter-spacing: 5px;}
+        .cell { border: 1px solid var(--cell-border); background-color: transparent; background-size: 70%; background-position: center; background-repeat: no-repeat; transition: background-color 0.2s; cursor: pointer; }
+        .cell:not(.blocked):hover { background-color: rgba(255, 255, 255, 0.05); }
+        .cell.disabled { cursor: not-allowed; }
+        .cell.disabled:hover { background-color: transparent; }
 
-            #game-screen { padding: 10px; }
-            .game-header { flex-direction: column; }
-            .player-info-box { width: 100%; }
-            .player-info-box .name { font-size: 1.3em; }
-            .player-info-box .score { font-size: 1.8em; }
-            
-            .main-game-area { flex-direction: column; }
-            #money-pyramid { width: 100%; order: 2; margin-top: 15px; padding: 10px; }
-            #game-center-area { width: 100%; order: 1; }
-            
-            .action-buttons { flex-direction: column; align-items: stretch; }
-            .action-buttons button { width: 100%; margin: 5px 0; }
+        .game-panel { width: 300px; }
+        .game-info { text-align: center; margin-top: 15px; }
+        #spectatorCodeDisplay, #spectatorList { font-size: 0.9rem; color: var(--text-secondary); min-height: 20px; }
+        #spectatorList span { margin-left: 8px; font-weight: 600; color: var(--text-primary); }
 
-            .modal-content { padding: 20px; }
-            #modal-question { font-size: 1.3em; }
-            #modal-options button { font-size: 1.1em; padding: 15px; }
-        }
+        .scoreboard { display: flex; justify-content: space-between; margin-top: 10px; gap: 15px; }
+        .player-score { text-align: center; background: rgba(0,0,0,0.2); border: 2px solid var(--cell-border); border-radius: 15px; width: 100%; padding: 15px; transition: all 0.3s ease; background-size: cover; background-position: center; }
+        .player-score.active { transform: scale(1.05); }
+        #playerXPanel.active { border-color: var(--x-color); box-shadow: 0 0 20px var(--accent-glow); }
+        #playerOPanel.active { border-color: var(--o-color); box-shadow: 0 0 20px var(--accent-secondary-glow); }
+        .player-score .icon { width: 35px; height: 35px; margin: 0 auto 8px; }
+        .player-score .name { display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; font-size: 0.9rem; min-height: 50px; margin-bottom: 5px; word-break: break-all; }
+        .player-score .name .player-icon { font-size: 1.2rem; }
+        .player-score .score { font-size: 2rem; font-weight: 700; }
+        
+        .game-status { text-align: center; min-height: 50px; font-size: 1.1rem; margin-top: 30px; }
+        #gameCodeDisplay { margin-top: 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 15px; }
+        #gameCodeText { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: var(--accent-color); letter-spacing: 3px; }
+        #copyCodeBtn { padding: 8px 15px; font-size: 0.8rem; background-color: var(--cell-border); color: var(--text-primary); border: none; border-radius: 8px; cursor: pointer; }
+        
+        #resetBtn { width: 100%; padding: 15px; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 10px; background-color: var(--success-color); color: var(--text-primary); cursor: pointer; transition: all 0.2s ease; margin-top: auto; }
+        #resetBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4); }
+        #resetBtn:disabled { background-color: var(--cell-border); color: var(--text-secondary); cursor: not-allowed; }
+        #loadingOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000; font-size: 1.5rem; font-weight: 600; }
+        
+        #avatar-selection h3, .options-group h3 { text-align: center; font-size: 1rem; color: var(--text-secondary); margin-bottom: 15px; font-weight: 600; }
+        #avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .avatar-option { width: 50px; height: 50px; border-radius: 50%; cursor: pointer; transition: all 0.2s ease; border: 3px solid transparent; background-size: cover; margin: 0 auto; }
+        .avatar-option:hover { transform: scale(1.1); }
+        .avatar-option.selected { border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-glow); }
+        .player-avatar { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 10px; border: 3px solid var(--cell-border); background-size: cover; background-position: center; transition: background-image 0.5s ease-in-out; }
+        
+        .radio-group { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .radio-group label { background-color: var(--board-bg); border: 2px solid var(--cell-border); padding: 10px 15px; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; font-size: 0.9rem; }
+        .radio-group input { display: none; }
+        .radio-group input:checked + label { border-color: var(--accent-color); background-color: var(--accent-glow); color: white; }
+        .options-divider { border: 0; height: 1px; background: var(--cell-border); margin: 25px 0; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1001; }
+        .modal-container { position: relative; width: 90%; max-width: 800px; background: var(--container-bg); border: 1px solid var(--container-border); border-radius: 20px; padding: 40px; box-shadow: 0 15px 30px var(--shadow-color); }
+        .modal-container h2 { text-align: center; margin-bottom: 20px; font-family: 'Orbitron', sans-serif; }
+        .modal-container h3 { color: var(--accent-color); text-align: center; margin-top: 20px; margin-bottom: 15px; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 2rem; color: var(--text-secondary); cursor: pointer; transition: color 0.2s; }
+        .close-btn:hover { color: white; }
+        
+        #player-wallet { text-align: center; font-size: 1.1rem; margin-bottom: 20px; font-weight: 600; color: var(--money-color); text-shadow: 0 0 10px rgba(241, 196, 15, 0.5); }
+        .shop-category-container { max-height: 60vh; overflow-y: auto; padding: 10px; }
+        #shop-items-container-backgrounds, #shop-items-container-icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .shop-item { background: rgba(0,0,0,0.3); border: 1px solid var(--cell-border); border-radius: 10px; padding: 10px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+        .shop-item-preview { width: 100%; height: 70px; border-radius: 5px; margin-bottom: 10px; background-size: cover; background-position: center; border: 1px solid var(--cell-border); display: flex; justify-content: center; align-items: center; font-size: 2.5rem; }
+        .shop-item h4 { font-size: 0.85rem; margin-bottom: 5px; min-height: 30px; }
+        .shop-item-price { font-size: 0.9rem; font-weight: 700; color: var(--money-color); margin-bottom: 10px; }
+        .shop-btn { padding: 8px 12px; font-size: 0.8rem; font-weight: 600; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; width: 100%; }
+        .buy-btn { background-color: var(--money-color); color: #1c2b3a; }
+        .buy-btn:hover { background-color: #f39c12; }
+        .equip-btn { background-color: var(--success-color); color: white; }
+        .equipped-btn { background-color: var(--cell-border); color: var(--text-secondary); cursor: not-allowed; }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .stats-block h3 { color: var(--accent-color); margin-bottom: 15px; border-bottom: 1px solid var(--cell-border); padding-bottom: 10px; }
+        #statsPikszel h3 { color: var(--danger-color); }
+        .stats-block p { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; }
+        .stats-block span { font-weight: 700; color: white; }
+        
+        #achievements-list { max-height: 60vh; overflow-y: auto; padding-right: 15px; }
+        .achievement-item { display: flex; align-items: center; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid var(--cell-border); opacity: 0.5; transition: all 0.3s ease; }
+        .achievement-item.unlocked { border-left-color: var(--success-color); opacity: 1; }
+        .achievement-icon { font-size: 2rem; margin-right: 20px; }
+        .achievement-details h4 { margin-bottom: 5px; color: var(--text-primary); }
+        .achievement-details p { font-size: 0.85rem; color: var(--text-secondary); }
+        
+        #achievementOnBoard { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(26, 41, 55, 0.9); color: var(--success-color); padding: 30px; border-radius: 20px; border: 2px solid var(--success-color); text-align: center; font-family: 'Orbitron', sans-serif; font-size: 1.8rem; z-index: 100; pointer-events: none; text-shadow: 0 0 15px var(--success-color); }
+        @keyframes achievement-strobe { 0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.05); } }
+        #achievementOnBoard.show { animation: achievement-strobe 0.4s 7 ease-in-out; }
+        
+        @keyframes place-pop { 0% { transform: scale(0.5); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        .cell-pop { animation: place-pop 0.4s ease-out; }
+        
+        @keyframes strobe-flash { 0%, 100% { filter: brightness(1); } 10%, 30%, 50%, 70%, 90% { filter: brightness(3.5) drop-shadow(0 0 15px rgba(255, 255, 255, 1)); } 20%, 40%, 60%, 80% { filter: brightness(1); } }
+        .cell-flashed.x-icon, .cell-flashed.o-icon { animation: strobe-flash 0.6s ease-in-out; }
+
+        @keyframes winning-icon-pulse { 0%, 100% { transform: scale(1); filter: brightness(1.5) drop-shadow(0 0 5px var(--success-color)); } 50% { transform: scale(1.1); filter: brightness(2.5) drop-shadow(0 0 15px var(--success-color)); } }
+        .winning-cell { background-color: rgba(46, 204, 113, 0.15); }
+        .winning-cell.x-icon, .winning-cell.o-icon { animation: winning-icon-pulse 1.5s infinite ease-in-out; }
+
+        @media (max-width: 950px) { body { padding: 10px; } .game-wrapper { flex-direction: column; align-items: center; gap: 20px; } #board { width: 95vw; height: 95vw; max-width: 500px; max-height: 500px; } .game-panel { width: 95vw; max-width: 500px; padding: 20px; } #avatar-grid { grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); } .stats-grid { grid-template-columns: 1fr; } .modal-container { max-width: 90vw; padding: 20px;} }
     </style>
 </head>
 <body>
+    
+    <div id="loadingOverlay" class="hidden">Betöltés...</div>
 
-    <div id="loading-screen" class="screen active"><h2 id="loading-text">Kapcsolódás...</h2></div>
-    <div id="name-setup-screen" class="screen">
-        <div class="container">
-            <h1>A LÁNCSZEM</h1>
-            <h2>Üdv a játékban!</h2>
-            <p>Kérlek, add meg a játékosneved:</p>
-            <input type="text" id="player-name-input" maxlength="15" placeholder="Játékosnév">
-            <br><br>
-            <button id="save-name-btn">Mentés és Tovább</button>
+    <div id="lobbyContainer" class="glass-container">
+        <div class="logo">
+            <svg viewBox="0 0 420 70">
+                <defs><linearGradient id="logoFrameGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:var(--accent-secondary);" /><stop offset="100%" style="stop-color:var(--accent-color);" /></linearGradient><linearGradient id="logoTextGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:var(--accent-secondary);" /><stop offset="100%" style="stop-color:var(--accent-color);" /></linearGradient></defs>
+                <g transform="translate(15, 0)"><rect x="1" y="1" width="80" height="68" rx="15" fill="none" stroke="url(#logoFrameGradient)" stroke-width="2.5"/><g><path d="M 15 12 L 37 34 M 37 12 L 15 34" stroke="var(--accent-color)" stroke-width="5" stroke-linecap="round"/><circle cx="57" cy="48" r="14" stroke="var(--accent-secondary)" stroke-width="5" fill="none"/></g></g>
+                <text x="255" y="50%" dominant-baseline="middle" text-anchor="middle" fill="url(#logoTextGradient)" font-family="'Orbitron', sans-serif" font-size="60px" letter-spacing="2">AMŐBA</text>
+            </svg>
         </div>
-    </div>
-    <div id="menu-screen" class="screen">
-        <div class="container">
-            <h1 id="welcome-message">Üdv, Játékos!</h1>
-            <p>Hívd ki egy barátodat egy egész napos párbajra!</p>
-            <button id="host-game-btn">Játék Létrehozása</button>
-            <button id="join-game-btn">Csatlakozás Játékhoz</button>
-        </div>
-    </div>
-    <div id="host-wait-screen" class="screen">
-        <div class="container">
-            <h2>Várakozás a másik játékosra...</h2>
-            <p>Oszd meg ezt a kódot a barátoddal (kattints a másoláshoz):</p>
-            <div id="game-code-display" title="Kattints a másoláshoz">----</div>
-            <button id="cancel-host-btn">Mégse</button>
-        </div>
-    </div>
-    <div id="join-screen" class="screen">
-        <div class="container">
-            <h2>Csatlakozás játékhoz</h2>
-            <p>Írd be a 4-jegyű kódot:</p>
-            <input type="text" id="join-code-input" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="----">
-            <br><br>
-            <button id="confirm-join-btn">Csatlakozás!</button>
-            <button id="cancel-join-btn">Vissza</button>
-        </div>
-    </div>
-    <div id="game-screen" class="screen">
-        <div class="game-header">
-            <div id="player1-info" class="player-info-box">
-                <div id="player1-name" class="name">1. Játékos</div>
-                <div class="score-label">Napi Pontszám</div>
-                <div id="player1-score" class="score">0 Ft</div>
-            </div>
-            <div style="text-align: center;">
-                <h3 id="game-progress-text">Kérdés: 1 / 10</h3>
-            </div>
-            <div id="player2-info" class="player-info-box">
-                <div id="player2-name" class="name">2. Játékos</div>
-                <div class="score-label">Napi Pontszám</div>
-                <div id="player2-score" class="score">0 Ft</div>
-            </div>
-        </div>
-        <div class="main-game-area">
-            <div id="money-pyramid"></div>
-            <div id="game-center-area">
-                <div class="game-status-display">
-                    <h3 id="last-action-display">Kezdődjön a játék!</h3>
-                    <p id="turn-display">Az 1. Játékos kezd.</p>
+        <p id="lobbyDescription">Add meg a neved, válassz avatárt, majd játssz egy AI vagy egy másik játékos ellen!</p>
+        <p class="copyright-notice">&copy; Copyright by: Robi</p>
+        <a id="rulesLink">Részletes játékszabályzat</a>
+        
+        <div id="player-options">
+            <div id="avatar-selection"><div id="avatar-grid"></div></div>
+            <div class="input-group"><input type="text" id="playerNameInput" placeholder="Játékosnév"></div>
+            <div id="player-wallet" class="hidden">Egyenleged: <span id="playerMoney">0</span> FT</div>
+
+            <hr class="options-divider">
+
+            <div id="ai-game-options" class="options-group">
+                <h3>Játék Gép Ellen</h3>
+                <div class="radio-group" style="margin-bottom: 20px;">
+                    <input type="radio" id="ai-karesz" name="aiPersonality" value="karesz" checked><label for="ai-karesz">Koczka Karesz</label>
+                    <input type="radio" id="ai-panna" name="aiPersonality" value="pikszel"><label for="ai-panna">Pikszel Panna</label>
                 </div>
-                <div class="action-buttons">
-                    <button id="bank-btn">BANK</button>
-                    <button id="answer-btn">Válaszolok</button>
+                 <div class="radio-group" style="margin-bottom: 20px;">
+                    <input type="radio" id="ai-difficulty-easy" name="aiDifficulty" value="easy"><label for="ai-difficulty-easy">Könnyű</label>
+                    <input type="radio" id="ai-difficulty-normal" name="aiDifficulty" value="normal" checked><label for="ai-difficulty-normal">Normál</label>
+                    <input type="radio" id="ai-difficulty-hard" name="aiDifficulty" value="hard"><label for="ai-difficulty-hard">Nehéz</label>
+                    <input type="radio" id="ai-difficulty-genius" name="aiDifficulty" value="genius"><label for="ai-difficulty-genius">Géniusz</label>
+                </div>
+                <div class="input-group" style="margin-top: 20px;">
+                    <input type="number" id="aiWagerInput" placeholder="Tét (min. 50)" value="100" min="50" step="50">
+                </div>
+                <button id="startAIGameBtn" class="lobby-btn">Játék AI ellen</button>
+            </div>
+
+            <hr class="options-divider">
+
+            <div id="multiplayer-game-options" class="options-group">
+                 <h3>Többjátékos Mód</h3>
+                 <div class="input-group"><input type="text" id="gameIdInput" placeholder="Játék Kódja"></div>
+                <div class="input-group">
+                    <input type="number" id="mpWagerInput" placeholder="Tét (min. 100)" value="300" min="100" step="100">
+                </div>
+                <div class="multiplayer-buttons">
+                    <button id="createGameBtn" class="lobby-btn">Játék Létrehozása</button>
+                    <button id="joinGameBtn" class="lobby-btn">Csatlakozás</button>
                 </div>
             </div>
         </div>
-    </div>
-    <div id="answer-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div id="timer-display">20.0</div>
-            <h2 id="modal-question">Kérdés betöltése...</h2>
-            <div id="modal-options"></div>
-            <div id="modal-explanation" style="display: none;"></div>
-            <div id="modal-footer">
-                <button id="confirm-answer-btn" style="display: none;">Válasz lezárása</button>
+
+        <div id="spectator-options" class="hidden">
+            <div class="input-group"><input type="text" id="spectatorNameInput" placeholder="Leskelődő Név"></div>
+            <div class="input-group"><input type="text" id="spectatorCodeInput" placeholder="Leskelődő Kód (2 jegyű)"></div>
+        </div>
+
+        <div class="button-group">
+            <div id="player-buttons">
+                 <div class="secondary-buttons">
+                    <button id="shopBtn" class="lobby-btn secondary-btn hidden">Bolt 🛍️</button>
+                    <button id="achievementsBtn" class="lobby-btn secondary-btn">Teljesítmények</button>
+                    <button id="statsBtn" class="lobby-btn secondary-btn">Statisztikák</button>
+                </div>
+                <button id="spectateModeBtn" class="lobby-btn secondary-btn">Leskelődés</button>
+            </div>
+             <div id="spectator-buttons" class="hidden" style="display: flex; gap: 15px;">
+                <button id="joinAsSpectatorBtn" class="lobby-btn">Kukkolás</button>
+                <button id="cancelSpectateBtn" class="lobby-btn secondary-btn">Mégse</button>
             </div>
         </div>
     </div>
-    <div id="wheel-modal" class="modal-overlay">
-        <div class="modal-content">
-            <h2 id="wheel-title">A kör győztese pörget!</h2>
-            <p id="wheel-subtitle"></p>
-            <div id="wheel-container">
-                <canvas id="wheel-canvas"></canvas>
-                <div id="wheel-pointer"></div>
+
+    <div id="gameContainer" class="game-wrapper hidden">
+        <div id="board-wrapper">
+            <div id="board"></div>
+            <div id="achievementOnBoard" class="hidden"></div>
+        </div>
+        <div class="game-panel glass-container">
+            <div class="logo">
+                <svg viewBox="0 0 420 70">
+                    <defs><linearGradient id="logoFrameGradient2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:var(--accent-secondary);" /><stop offset="100%" style="stop-color:var(--accent-color);" /></linearGradient><linearGradient id="logoTextGradient2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:var(--accent-secondary);" /><stop offset="100%" style="stop-color:var(--accent-color);" /></linearGradient></defs>
+                    <g transform="translate(15, 0)"><rect x="1" y="1" width="80" height="68" rx="15" fill="none" stroke="url(#logoFrameGradient2)" stroke-width="2.5"/><g><path d="M 15 12 L 37 34 M 37 12 L 15 34" stroke="var(--accent-color)" stroke-width="5" stroke-linecap="round"/><circle cx="57" cy="48" r="14" stroke="var(--accent-secondary)" stroke-width="5" fill="none"/></g></g>
+                    <text x="255" y="50%" dominant-baseline="middle" text-anchor="middle" fill="url(#logoTextGradient2)" font-family="'Orbitron', sans-serif" font-size="60px" letter-spacing="2">AMŐBA</text>
+                </svg>
             </div>
-            <h3 id="wheel-result"></h3>
-            <button id="spin-btn">PÖRGETÉS!</button>
-            <button id="next-round-btn" style="display: none;">Következő kör</button>
+            <div class="game-info"><div id="spectatorCodeDisplay"></div><div id="spectatorList"></div></div>
+            <div class="scoreboard">
+                <div class="player-score" id="playerXPanel">
+                    <div class="player-avatar" id="playerXAvatar"></div>
+                    <div class="icon x-icon"></div>
+                    <div class="name" id="playerXName"><span class="player-icon" id="playerXIcon"></span><span id="playerXNameText">Játékos X</span></div>
+                    <span class="score" id="scoreX">0</span>
+                </div>
+                <div class="player-score" id="playerOPanel">
+                    <div class="player-avatar" id="playerOAvatar"></div>
+                    <div class="icon o-icon"></div>
+                    <div class="name" id="playerOName"><span class="player-icon" id="playerOIcon"></span><span id="playerONameText">Játékos O</span></div>
+                    <span class="score" id="scoreO">0</span>
+                </div>
+            </div>
+            <div class="game-status"><p id="statusText">Várakozás a másik játékosra...</p></div>
+             <div id="gameCodeDisplay" class="hidden">
+                <span id="gameCodeText"></span>
+                <button id="copyCodeBtn">Másolás</button>
+            </div>
+            <button id="resetBtn" disabled>Új Kör</button>
         </div>
     </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-    import { getDatabase, ref, set, get, onValue, update, remove, onDisconnect, runTransaction } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    <div id="statsModal" class="modal hidden">
+        <div class="modal-container">
+            <span id="closeStatsBtn" class="close-btn">&times;</span>
+            <h2>Statisztikáid</h2>
+            <div class="stats-grid">
+                <div id="statsKaresz" class="stats-block">
+                    <h3>Koczka Karesz</h3>
+                    <p>Lejátszott meccsek: <span id="stats-karesz-games">0</span></p>
+                    <p>Győzelmek: <span id="stats-karesz-wins">0</span></p>
+                    <p>Vereségek: <span id="stats-karesz-losses">0</span></p>
+                    <p>Döntetlenek: <span id="stats-karesz-draws">0</span></p>
+                    <p>Jelenlegi sorozat: <span id="stats-karesz-streak">0</span></p>
+                    <p>Legjobb sorozat: <span id="stats-karesz-best-streak">0</span></p>
+                </div>
+                <div id="statsPikszel" class="stats-block">
+                    <h3>Pikszel Panna</h3>
+                    <p>Lejátszott meccsek: <span id="stats-pikszel-games">0</span></p>
+                    <p>Győzelmek: <span id="stats-pikszel-wins">0</span></p>
+                    <p>Vereségek: <span id="stats-pikszel-losses">0</span></p>
+                    <p>Döntetlenek: <span id="stats-pikszel-draws">0</span></p>
+                    <p>Jelenlegi sorozat: <span id="stats-pikszel-streak">0</span></p>
+                    <p>Legjobb sorozat: <span id="stats-pikszel-best-streak">0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDToVf58oqEO9s-WAF87IS1GDIb8LKtNMA",
-      authDomain: "a-leggyengebb-lancszem.firebaseapp.com",
-      databaseURL: "https://a-leggyengebb-lancszem-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "a-leggyengebb-lancszem",
-      storageBucket: "a-leggyengebb-lancszem.appspot.com",
-      messagingSenderId: "454539315458",
-      appId: "1:454539315458:web:ef8c9ae8981e71a1b"
-    };
+    <div id="achievementsModal" class="modal hidden">
+        <div class="modal-container">
+            <span id="closeAchievementsBtn" class="close-btn">&times;</span>
+            <h2>Teljesítmények</h2>
+            <div id="achievements-list"></div>
+        </div>
+    </div>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth();
-    const db = getDatabase();
+    <div id="shopModal" class="modal hidden">
+        <div class="modal-container">
+            <span id="closeShopBtn" class="close-btn">&times;</span>
+            <h2>Bolt</h2>
+            <div id="shop-wallet" style="text-align: center; color: var(--money-color); margin-bottom: 20px; font-size: 1.2rem; font-weight: bold;">
+                Egyenleged: <span id="shopMoney">0</span> FT
+            </div>
+            <div class="shop-category-container">
+                <h3>Hátterek</h3>
+                <div id="shop-items-container-backgrounds"></div>
+                <h3>Ikonok (Név mellé)</h3>
+                <div id="shop-items-container-icons"></div>
+            </div>
+        </div>
+    </div>
 
-    const MONEY_PYRAMID = [ { value: 0 }, { value: 10000, label: "10 000 Ft" }, { value: 25000, label: "25 000 Ft" }, { value: 50000, label: "50 000 Ft" }, { value: 100000, label: "100 000 Ft" }, { value: 200000, label: "200 000 Ft" }, { value: 350000, label: "350 000 Ft" }, { value: 500000, label: "500 000 Ft" }, { value: 1000000, label: "1 000 000 Ft" } ];
-    const QUESTIONS_PER_ROUND = 10;
-    const WHEEL_PRIZES = [
-        { label: "10k Ft", value: 10000, color: "#42a5f5" }, { label: "CSŐD", value: 0, color: "#ef5350" }, 
-        { label: "50k Ft", value: 50000, color: "#29b6f6" }, { label: "DUPLÁZÓ", value: "double", color: "#ab47bc" },
-        { label: "25k Ft", value: 25000, color: "#4dd0e1" }, { label: "BANK FELE", value: "half", color: "#ffa726" },
-        { label: "100k Ft", value: 100000, color: "#26c6da" }, { label: "+50k Ft", value: 50000, color: "#66bb6a" }
-    ];
-    
-    // BŐVÍTETT KÉRDÉSBANK
-    const ALL_QUESTIONS = [
-        { "question": "Melyik bolygó a legnagyobb a Naprendszerben?", "options": ["Föld", "Jupiter", "Mars", "Szaturnusz"], "answer": "Jupiter", "explanation": "A Jupiter tömege több mint kétszerese a Naprendszer összes többi bolygója együttes tömegének." },
-        { "question": "Hány lába van egy póknak?", "options": ["6", "8", "10", "12"], "answer": "8", "explanation": "A pókok a pókszabásúak osztályába tartoznak, melyek egyik fő jellemzője a nyolc láb." },
-        { "question": "Mi a víz kémiai képlete?", "options": ["H2O", "CO2", "O2", "NaCl"], "answer": "H2O", "explanation": "A vízmolekula két hidrogén (H) és egy oxigén (O) atomból áll." },
-        { "question": "Ki írta a Hamletet?", "options": ["Charles Dickens", "J.K. Rowling", "William Shakespeare", "Tolkien"], "answer": "William Shakespeare", "explanation": "A 'Hamlet, dán királyfi' Shakespeare egyik legismertebb tragédiája." },
-        { "question": "Mi a világ legmagasabb hegycsúcsa?", "options": ["K2", "Mount Everest", "Kancsendzönga", "Lhoce"], "answer": "Mount Everest", "explanation": "A Mount Everest 8848,86 méter magas, a Himalájában található." },
-        { "question": "Melyik évben volt a mohácsi csata?", "options": ["1241", "1456", "1526", "1686"], "answer": "1526", "explanation": "A mohácsi csata a középkori Magyar Királyság hadtörténetének egyik legtragikusabb eseménye." },
-        { "question": "Ki festette a Mona Lisát?", "options": ["Michelangelo", "Raffaello", "Leonardo da Vinci", "Donatello"], "answer": "Leonardo da Vinci", "explanation": "A Mona Lisa a párizsi Louvre-ban van kiállítva és a világ egyik leghíresebb festménye." },
-        { "question": "Melyik a legkönnyebb kémiai elem?", "options": ["Hélium", "Oxigén", "Hidrogén", "Lítium"], "answer": "Hidrogén", "explanation": "A hidrogén rendszáma 1, a legelső és legegyszerűbb elem a periódusos rendszerben." },
-        { "question": "Hány megyéje van Magyarországnak?", "options": ["18", "19", "20", "21"], "answer": "19", "explanation": "Magyarország 19 megyére és a fővárosra, Budapestre tagozódik." },
-        { "question": "Melyik a leggyorsabb szárazföldi állat?", "options": ["Oroszlán", "Gepárd", "Gazella", "Prériantilop"], "answer": "Gepárd", "explanation": "A gepárd rövid távon akár a 120 km/h sebességet is elérheti." },
-        { "question": "Ki írta az Egri csillagokat?", "options": ["Jókai Mór", "Mikszáth Kálmán", "Gárdonyi Géza", "Móricz Zsigmond"], "answer": "Gárdonyi Géza", "explanation": "Gárdonyi Géza történelmi regénye az 1552-es egri ostrom eseményeit dolgozza fel." },
-        { "question": "Melyik országban található a Gízai piramisok?", "options": ["Görögország", "Törökország", "Egyiptom", "Irán"], "answer": "Egyiptom", "explanation": "A gízai piramisegyüttes Kairó közelében, Egyiptomban található." },
-        { "question": "Mi a Föld légkörének legnagyobb arányban előforduló gáza?", "options": ["Oxigén", "Szén-dioxid", "Argon", "Nitrogén"], "answer": "Nitrogén", "explanation": "A Föld légkörének körülbelül 78%-a nitrogén." },
-        { "question": "Hány aranyérmet nyert Michael Phelps összesen az olimpiákon?", "options": ["18", "23", "28", "31"], "answer": "23", "explanation": "Michael Phelps amerikai úszó 23 aranyérmével minden idők legeredményesebb olimpikonja." },
-        { "question": "Melyik város Olaszország fővárosa?", "options": ["Milánó", "Velence", "Nápoly", "Róma"], "answer": "Róma", "explanation": "Róma, az 'Örök Város' Olaszország politikai és kulturális központja." },
-        { "question": "Melyik zeneszerző volt süket élete jelentős részében?", "options": ["Mozart", "Bach", "Beethoven", "Chopin"], "answer": "Beethoven", "explanation": "Ludwig van Beethoven a halláskárosodása ellenére is folytatta a zeneszerzést." },
-        { "question": "Melyik évben lépett az első ember a Holdra?", "options": ["1965", "1969", "1971", "1973"], "answer": "1969", "explanation": "Neil Armstrong 1969. július 20-án lépett a Hold felszínére az Apollo–11 küldetés során." },
-        { "question": "Mi a hivatalos pénznem Japánban?", "options": ["Won", "Jüan", "Jen", "Ringgit"], "answer": "Jen", "explanation": "A japán jen (JPY) a világ egyik legfontosabb kereskedelmi valutája." },
-        { "question": "Melyik a világ legnagyobb óceánja?", "options": ["Atlanti-óceán", "Indiai-óceán", "Jeges-tenger", "Csendes-óceán"], "answer": "Csendes-óceán", "explanation": "A Csendes-óceán a Föld teljes felszínének mintegy egyharmadát borítja." },
-        { "question": "Ki rendezte a 'Ponyvaregény' (Pulp Fiction) című filmet?", "options": ["Steven Spielberg", "Martin Scorsese", "Quentin Tarantino", "James Cameron"], "answer": "Quentin Tarantino", "explanation": "A Ponyvaregényt 1994-ben mutatták be, és a modern filmtörténet egyik ikonikus alkotása." },
-        { "question": "Melyik vitamin hiánya okozza a skorbutot?", "options": ["A-vitamin", "B12-vitamin", "C-vitamin", "D-vitamin"], "answer": "C-vitamin", "explanation": "A skorbutot a krónikus C-vitamin-hiány okozza, régen a tengerészek betegsége volt." },
-        { "question": "Melyik kontinensen élnek a kenguruk vadon?", "options": ["Afrika", "Dél-Amerika", "Ausztrália", "Ázsia"], "answer": "Ausztrália", "explanation": "A kenguruk Ausztrália legismertebb őshonos állatai." },
-        { "question": "Melyik festő vágta le a saját fülét?", "options": ["Claude Monet", "Pablo Picasso", "Salvador Dalí", "Vincent van Gogh"], "answer": "Vincent van Gogh", "explanation": "Bár a pontos körülmények vitatottak, van Gogh egy mentális összeomlás során csonkította meg magát." },
-        { "question": "Hogy hívják a Harry Potter sorozat főgonoszát?", "options": ["Grindelwald", "Voldemort", "Malfoy", "Piton"], "answer": "Voldemort", "explanation": "Voldemort nagyúr, eredeti nevén Tom Denem, a varázsvilág legrettegettebb sötét mágusa." },
-        { "question": "Melyik sportágban híres Michael Jordan?", "options": ["Futball", "Kosárlabda", "Baseball", "Jégkorong"], "answer": "Kosárlabda", "explanation": "Michael Jordant széles körben minden idők legjobb kosárlabdázójának tartják." },
-        { "question": "Melyik a leghosszabb folyó a világon?", "options": ["Nílus", "Amazonas", "Jangce", "Mississippi"], "answer": "Nílus", "explanation": "Bár néha vitatják, a Nílust tartják a leghosszabb folyónak, kb. 6650 km hosszúsággal." },
-        { "question": "Mi a 'Félhomály' zóna eredeti, angol címe?", "options": ["The Outer Limits", "Black Mirror", "The Twilight Zone", "Tales from the Crypt"], "answer": "The Twilight Zone", "explanation": "A The Twilight Zone egy klasszikus amerikai antológia-sorozat, amelyet Rod Serling alkotott." },
-        { "question": "Melyik ország nem tagja az Európai Uniónak?", "options": ["Horvátország", "Románia", "Svájc", "Lengyelország"], "answer": "Svájc", "explanation": "Svájc bár Európában van, de nem tagja az EU-nak, szoros gazdasági kapcsolatokat ápol vele." },
-        { "question": "Ki volt az első magyar űrhajós?", "options": ["Kármán Tódor", "Farkas Bertalan", "Charles Simonyi", "Bay Zoltán"], "answer": "Farkas Bertalan", "explanation": "Farkas Bertalan 1980-ban járt az űrben a Szojuz–36 űrhajó fedélzetén." },
-        { "question": "Melyik hangszeren játszott Louis Armstrong?", "options": ["Szaxofon", "Zongora", "Trombita", "Klarinét"], "answer": "Trombita", "explanation": "Louis Armstrong a jazz történetének egyik legmeghatározóbb trombita- és énekes előadója volt." },
-        { "question": "Melyik színész játszotta Indiana Jones-t?", "options": ["Tom Hanks", "Harrison Ford", "Sean Connery", "Mel Gibson"], "answer": "Harrison Ford", "explanation": "Harrison Ford neve szorosan összeforrt a kalandvágyó régészprofesszor, Indiana Jones karakterével." },
-        { "question": "Mi a relativitáselmélet kidolgozójának neve?", "options": ["Isaac Newton", "Galileo Galilei", "Albert Einstein", "Stephen Hawking"], "answer": "Albert Einstein", "explanation": "Albert Einstein speciális és általános relativitáselmélete forradalmasította a modern fizikát." }
-    ];
-    
-    const screens = { loading: document.getElementById('loading-screen'), nameSetup: document.getElementById('name-setup-screen'), menu: document.getElementById('menu-screen'), hostWait: document.getElementById('host-wait-screen'), join: document.getElementById('join-screen'), game: document.getElementById('game-screen'), wheel: document.getElementById('wheel-modal'), answerModal: document.getElementById('answer-modal') };
-    let localPlayer = { uid: null, name: null };
-    let currentGameId = null; 
-    let gameUnsubscribe = null;
-    let scoreUnsubscribers = [];
-    let timerInterval = null;
 
-    function getTodayString() { return new Date().toISOString().slice(0, 10); }
-    function switchScreen(screenName) { Object.values(screens).forEach(s => s.classList.remove('active')); if(screens[screenName]) screens[screenName].classList.add('active'); }
+    <audio id="place-sound" src="https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-the-sound-pack-tree/tspt_game_sound_wood_block_1.mp3" preload="auto"></audio>
+    <audio id="win-sound" src="https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-four/fantasy_game_success_win_fanfare_2.mp3" preload="auto"></audio>
+    <audio id="turn-sound" src="https://www.zapsplat.com/wp-content/uploads/2015/sound-effects-the-sound-pack-tree/tspt_game_sound_UI_tone_modern_synth_1.mp3" preload="auto"></audio>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
-    onAuthStateChanged(auth, async (user) => {
-        try {
-            if (user) {
-                localPlayer.uid = user.uid;
-                const playerSnap = await get(ref(db, `players/${user.uid}`));
-                if (playerSnap.exists() && playerSnap.val().name) {
-                    localPlayer.name = playerSnap.val().name;
-                    document.getElementById('welcome-message').textContent = `Üdv újra, ${localPlayer.name}!`;
-                    switchScreen('menu');
-                } else {
-                    switchScreen('nameSetup');
-                }
-            } else {
-                await signInAnonymously(auth);
-            }
-        } catch (error) {
-            console.error("Hiba az authentikáció során:", error);
-            document.getElementById('loading-text').textContent = "Hiba a kapcsolódás során.";
-        }
-    });
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, onSnapshot, serverTimestamp, updateDoc, collection, addDoc, query, orderBy, where, getDocs, limit, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getDatabase, ref, onValue, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    document.getElementById('save-name-btn').addEventListener('click', async () => {
-        const name = document.getElementById('player-name-input').value.trim();
-        if (name.length < 3) return alert("A névnek legalább 3 karakterből kell állnia.");
-        localPlayer.name = name;
-        await set(ref(db, `players/${localPlayer.uid}`), { name });
-        document.getElementById('welcome-message').textContent = `Üdv, ${localPlayer.name}!`;
-        switchScreen('menu');
-    });
-
-    async function joinGame() {
-        const gameId = document.getElementById('join-code-input').value.trim();
-        if (gameId.length !== 4) return alert("Kérlek, egy 4-jegyű kódot adj meg.");
+        const BOARD_SIZE = 15;
+        const firebaseConfig = { apiKey: "AIzaSyCiA7KeOeTvHgfhpA-jJaHldO9iMsqrn74", authDomain: "amoba-7a6d0.firebaseapp.com", projectId: "amoba-7a6d0", storageBucket: "amoba-7a6d0.appspot.com", messagingSenderId: "676264921111", appId: "1:676264921111:web:ca6f1e54819cd354407452", databaseURL: "https://amoba-7a6d0-default-rtdb.europe-west1.firebasedatabase.app" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const rtdb = getDatabase(app); 
         
-        try {
-            const gameRef = ref(db, `games/${gameId}`);
-            const snapshot = await get(gameRef);
-
-            if (snapshot.exists() && snapshot.val().status === 'waiting') {
-                currentGameId = gameId;
-                const today = getTodayString();
-                const myScoreRef = ref(db, `dailyScores/${today}/${localPlayer.uid}`);
-                const myScoreSnap = await get(myScoreRef);
-                if (!myScoreSnap.exists()) {
-                    await set(myScoreRef, { name: localPlayer.name, score: 0 });
-                }
-                
-                const p1 = snapshot.val().player1;
-                const p2 = { uid: localPlayer.uid, name: localPlayer.name };
-                const questions = [...ALL_QUESTIONS].sort(() => 0.5 - Math.random()).slice(0, QUESTIONS_PER_ROUND);
-                
-                await update(gameRef, {
-                    player2: p2, status: 'active',
-                    roundScores: { [p1.uid]: 0, [p2.uid]: 0 },
-                    turn: p1.uid, chainLevel: 0, questionIndex: 0, questions,
-                    lastAction: `${p2.name} csatlakozott! Kezdődjön a játék!`,
-                    questionActive: false, answerRevealed: false, selectedAnswer: null,
-                });
-
-                onDisconnect(gameRef).remove();
-                listenToGameUpdates(gameId);
-            } else {
-                alert("A játék nem található, vagy már elindult.");
-            }
-        } catch (error) {
-            console.error("Hiba a csatlakozás során:", error);
-            alert("Hiba történt a játékhoz való csatlakozás közben.");
-        }
-    }
-    
-    async function createNewRound(gameId, p1, p2) {
-        const questions = [...ALL_QUESTIONS].sort(() => 0.5 - Math.random()).slice(0, QUESTIONS_PER_ROUND);
-        await set(ref(db, `games/${gameId}`), {
-            status: 'active', player1: p1, player2: p2,
-            roundScores: { [p1.uid]: 0, [p2.uid]: 0 },
-            turn: p1.uid, chainLevel: 0, questionIndex: 0, questions,
-            lastAction: 'Kezdődjön az új kör!',
-            questionActive: false, answerRevealed: false, selectedAnswer: null,
-        });
-    }
-    
-    document.getElementById('host-game-btn').addEventListener('click', async () => {
-        try {
-            const today = getTodayString();
-            const myScoreRef = ref(db, `dailyScores/${today}/${localPlayer.uid}`);
-            const myScoreSnap = await get(myScoreRef);
-            if (!myScoreSnap.exists()) {
-                await set(myScoreRef, { name: localPlayer.name, score: 0 });
-            }
-            currentGameId = (Math.floor(Math.random() * 9000) + 1000).toString();
-            const gameRef = ref(db, `games/${currentGameId}`);
-            await set(gameRef, { status: 'waiting', player1: { uid: localPlayer.uid, name: localPlayer.name }});
-            onDisconnect(gameRef).remove();
-            
-            listenToGameUpdates(currentGameId);
-            document.getElementById('game-code-display').textContent = currentGameId;
-            switchScreen('hostWait');
-        } catch(error) {
-            console.error("Hiba a játék létrehozása közben:", error);
-            alert("Hiba történt a játék létrehozása közben.");
-        }
-    });
-
-    document.getElementById('join-game-btn').addEventListener('click', () => switchScreen('join'));
-    document.getElementById('cancel-join-btn').addEventListener('click', () => switchScreen('menu'));
-    document.getElementById('confirm-join-btn').addEventListener('click', joinGame);
-
-    function listenToDailyScores(p1uid, p2uid) {
-        unsubscribeDailyScores();
-        const today = getTodayString();
-        const p1Unsub = onValue(ref(db, `dailyScores/${today}/${p1uid}/score`), (snap) => {
-            if (document.getElementById('player1-score')) document.getElementById('player1-score').textContent = `${(snap.val() || 0).toLocaleString()} Ft`;
-        });
-        const p2Unsub = onValue(ref(db, `dailyScores/${today}/${p2uid}/score`), (snap) => {
-            if (document.getElementById('player2-score')) document.getElementById('player2-score').textContent = `${(snap.val() || 0).toLocaleString()} Ft`;
-        });
-        scoreUnsubscribers.push(p1Unsub, p2Unsub);
-    }
-    
-    function unsubscribeDailyScores() {
-        scoreUnsubscribers.forEach(unsub => unsub());
-        scoreUnsubscribers = [];
-    }
-    
-    function listenToGameUpdates(gameId) {
-        if (gameUnsubscribe) gameUnsubscribe();
-        const gameRef = ref(db, `games/${gameId}`);
-        gameUnsubscribe = onValue(gameRef, (snapshot) => {
-            if (!snapshot.exists()) {
-                if (gameUnsubscribe) gameUnsubscribe();
-                unsubscribeDailyScores();
-                if (screens.game.classList.contains('active') || screens.hostWait.classList.contains('active')) {
-                    alert("A játék véget ért vagy a másik játékos kilépett.");
-                    switchScreen('menu');
-                }
-                return;
-            }
-            const gameData = snapshot.val();
-            if (gameData.player2 && scoreUnsubscribers.length === 0) {
-                listenToDailyScores(gameData.player1.uid, gameData.player2.uid);
-            }
-            updateUI(gameData);
-        });
-    }
-
-    function updateUI(gameData) {
-        if (!gameData) return;
+        let currentGameId = null, localPlayerSymbol = null, localPlayerName = null, unsubscribeFromGame = null, unsubscribeFromChat = null, selectedAvatar = null;
+        let isSinglePlayer = false, isSpectatorMode = false;
+        let localGameState = null, spectatorPresenceRef = null, activeSpectators = {};
+        let localPlayerData = null;
         
-        if (gameData.status === 'waiting' || !gameData.player2) {
-             if (!screens.hostWait.classList.contains('active')) switchScreen('hostWait');
-             return;
-        }
-
-        if ((gameData.status === 'active' || gameData.status === 'roundOver') && !screens.game.classList.contains('active') && !screens.wheel.style.display === 'flex' ) {
-            switchScreen('game');
-        }
-
-        document.getElementById('player1-name').textContent = gameData.player1.name;
-        document.getElementById('player2-name').textContent = gameData.player2.name;
-
-        if (gameData.status === 'roundOver') {
-            showWheelUI(gameData);
-        } else if (gameData.status === 'active' && screens.wheel.style.display === 'flex') {
-            screens.wheel.style.display = 'none';
-            if (!screens.game.classList.contains('active')) switchScreen('game');
-        }
-
-        document.getElementById('player1-info').classList.toggle('active', gameData.turn === gameData.player1.uid);
-        document.getElementById('player2-info').classList.toggle('active', gameData.turn === gameData.player2.uid);
+        let dailyKareszWinQuotes = [], dailyKareszLossQuotes = [], dailyKareszDrawQuotes = [];
+        let dailyPikszelWinQuotes = [], dailyPikszelLossQuotes = [], dailyPikszelDrawQuotes = [];
         
-        for (let i = 1; i < MONEY_PYRAMID.length; i++) {
-            const pyramidEl = document.getElementById(`pyramid-level-${i}`);
-            if(pyramidEl) pyramidEl.classList.toggle('current', i === gameData.chainLevel);
-        }
+        const MASTER_KARESZ_WIN_QUOTES=["AI 1, Ember 0. A szokásos.","Ne aggódj, a részvétel a fontos... Vagyis neked az.","Ezt a lépést még a vak is látta volna. Ja, várj...","Talán próbáld meg nyitott szemmel legközelebb.","Túl lassú, túl gyenge, túl... emberi."];
+        const MASTER_KARESZ_LOSS_QUOTES=["Csak hagytalak nyerni, hogy ne veszítsd el a kedved.","Ez csak a véletlen műve volt. A kozmikus háttérsugárzás zavarta meg a processzoromat.","Csaló! Biztosan belenéztél a kódomba.","Oké, oké, ez a tied. De legközelebb nem kapcsolom be az 'emberséges' módot."];
+        const MASTER_KARESZ_DRAW_QUOTES=["Na jó, ez most döntetlen. De legközelebb nem leszek ilyen kegyes.","Úgy tűnik, ma egy súlycsoportban vagyunk. Holnap már nem leszel ilyen szerencsés."];
+        const MASTER_PIKSZEL_WIN_QUOTES=["Hihi, ez cuki volt, ahogy próbálkoztál.","Ne szomorkodj, nem mindenki lehet profi. Nézd, te például nem vagy az.","GG! Vagyis... nekem az volt.","Upsz, ez most egy picit kellemetlen lehet neked."];
+        const MASTER_PIKSZEL_LOSS_QUOTES=["Oké, ezt most hagytam. Csak hogy lásd, milyen jó fej vagyok.","Nahát, egy váratlan anomália. Frissítem is a heurisztikámat.","Biztos, hogy nem csaltál? Csak mert ez statisztikailag valószínűtlen."];
+        const MASTER_PIKSZEL_DRAW_QUOTES=["Döntetlen? Ez olyan... befejezetlen. Mint egy rossz Netflix sorozat.","Oké, megosztozunk a dicsőségen. De az én részem nagyobb."];
         
-        document.getElementById('last-action-display').textContent = gameData.lastAction;
-        const turnPlayerName = gameData.turn === gameData.player1.uid ? gameData.player1.name : gameData.player2.name;
-        document.getElementById('turn-display').textContent = `${turnPlayerName} következik.`;
-        document.getElementById('game-progress-text').textContent = `Kérdés: ${Math.min(gameData.questionIndex + 1, QUESTIONS_PER_ROUND)} / ${QUESTIONS_PER_ROUND}`;
-        
-        const myTurn = gameData.turn === localPlayer.uid;
-        document.getElementById('answer-btn').disabled = !myTurn || gameData.questionActive;
-        document.getElementById('bank-btn').disabled = !myTurn || gameData.chainLevel === 0 || gameData.questionActive;
-        
-        if (gameData.questionActive && screens.answerModal.style.display !== 'flex') {
-            showQuestionModal(gameData);
-        } else if (!gameData.questionActive && screens.answerModal.style.display === 'flex') {
-            hideQuestionModal();
-        } else if (gameData.questionActive && screens.answerModal.style.display === 'flex') {
-            if(gameData.answerRevealed) revealAnswer(gameData);
-        }
-    }
+        const aiMoodAvatars = { karesz: { default: 'https://api.dicebear.com/8.x/micah/svg?seed=KareszAI', happy: 'https://api.dicebear.com/8.x/micah/svg?seed=KareszAI&mouth=smile', sad: 'https://api.dicebear.com/8.x/micah/svg?seed=KareszAI&mouth=sad', win: 'https://api.dicebear.com/8.x/micah/svg?seed=KareszAI&mouth=laughing', lose: 'https://api.dicebear.com/8.x/micah/svg?seed=KareszAI&mouth=surprised' }, pikszel: { default: 'https://api.dicebear.com/8.x/micah/svg?seed=PikszelPanna&hair=mia,mrT,danny,fonze', happy: 'https://api.dicebear.com/8.x/micah/svg?seed=PikszelPanna&hair=mia,mrT,danny,fonze&mouth=smile', sad: 'https://api.dicebear.com/8.x/micah/svg?seed=PikszelPanna&hair=mia,mrT,danny,fonze&mouth=sad', win: 'https://api.dicebear.com/8.x/micah/svg?seed=PikszelPanna&hair=mia,mrT,danny,fonze&mouth=laughing', lose: 'https://api.dicebear.com/8.x/micah/svg?seed=PikszelPanna&hair=mia,mrT,danny,fonze&mouth=surprised' } };
 
-    document.getElementById('answer-btn').addEventListener('click', () => {
-        if(currentGameId) update(ref(db, `games/${currentGameId}`), { questionActive: true });
-    });
+        function mulberry32(a) { return function() { var t = a += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; } }
+        function seededShuffle(array, seed) { const random = mulberry32(seed); let currentIndex = array.length, randomIndex; while (currentIndex != 0) { randomIndex = Math.floor(random() * currentIndex); currentIndex--; [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]; } return array; }
+        function getDailyQuotes() { const seed = new Date().setHours(0, 0, 0, 0); dailyKareszWinQuotes = seededShuffle([...MASTER_KARESZ_WIN_QUOTES], seed); dailyKareszLossQuotes = seededShuffle([...MASTER_KARESZ_LOSS_QUOTES], seed + 1); dailyKareszDrawQuotes = seededShuffle([...MASTER_KARESZ_DRAW_QUOTES], seed + 2); dailyPikszelWinQuotes = seededShuffle([...MASTER_PIKSZEL_WIN_QUOTES], seed + 3); dailyPikszelLossQuotes = seededShuffle([...MASTER_PIKSZEL_LOSS_QUOTES], seed + 4); dailyPikszelDrawQuotes = seededShuffle([...MASTER_PIKSZEL_DRAW_QUOTES], seed + 5); }
 
-    function showQuestionModal(data) {
-        screens.answerModal.style.display = 'flex';
-        const question = data.questions[data.questionIndex];
-        document.getElementById('modal-question').textContent = question.question;
-        const explanationEl = document.getElementById('modal-explanation');
-        explanationEl.style.display = 'none';
-        explanationEl.innerHTML = `<b>Magyarázat:</b> ${question.explanation}`;
-
-        const optionsContainer = document.getElementById('modal-options');
-        optionsContainer.innerHTML = '';
-        question.options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.textContent = opt;
-            btn.onclick = () => handleSelectOption(btn, opt);
-            optionsContainer.appendChild(btn);
-        });
-        
-        if(data.answerRevealed) {
-            revealAnswer(data);
-        } else if (data.turn === localPlayer.uid) {
-            startTimer(20, async () => {
-                 await update(ref(db, `games/${currentGameId}`), { 
-                     lastAction: `${data.turn === data.player1.uid ? data.player1.name : data.player2.name} kifutott az időből!`,
-                     chainLevel: 0,
-                     turn: data.turn === data.player1.uid ? data.player2.uid : data.player1.uid,
-                     questionActive: false, selectedAnswer: null, answerRevealed: false,
-                     questionIndex: Math.min(data.questionIndex + 1, QUESTIONS_PER_ROUND)
-                 });
-            });
-        }
-    }
-
-    function hideQuestionModal() {
-        stopTimer();
-        screens.answerModal.style.display = 'none';
-    }
-
-    function handleSelectOption(btn, option) {
-        stopTimer();
-        document.querySelectorAll('#modal-options button').forEach(b => b.disabled = true);
-        btn.classList.add('strobing');
-        setTimeout(async () => {
-            await update(ref(db, `games/${currentGameId}`), {
-                selectedAnswer: option, answerRevealed: true,
-            });
-        }, 1000);
-    }
-
-    function revealAnswer(data) {
-        stopTimer();
-        document.querySelectorAll('#modal-options button').forEach(b => {
-            b.disabled = true;
-            b.classList.remove('strobing');
-        });
-        
-        const question = data.questions[data.questionIndex];
-        document.querySelectorAll('#modal-options button').forEach(btn => {
-            if (btn.textContent === question.answer) btn.classList.add('correct', 'pulsing-correct');
-            if (btn.textContent === data.selectedAnswer && data.selectedAnswer !== question.answer) btn.classList.add('incorrect');
-        });
-
-        document.getElementById('modal-explanation').style.display = 'block';
-
-        if (localPlayer.uid === data.player1.uid) {
-            setTimeout(() => calculateNextState(data), 4000);
-        }
-    }
-    
-    async function calculateNextState(data) {
-      try {
-        const isCorrect = data.selectedAnswer === data.questions[data.questionIndex].answer;
-        const turnPlayer = data.turn === data.player1.uid ? data.player1 : data.player2;
-        
-        const updates = {};
-        const nextQuestionIndex = data.questionIndex + 1;
-
-        if (isCorrect) {
-            updates.chainLevel = Math.min(data.chainLevel + 1, MONEY_PYRAMID.length - 1);
-            updates.lastAction = `${turnPlayer.name} helyesen válaszolt! A sorozat folytatódik.`;
-            // A kör nem változik, a játékos folytatja
-            updates.turn = data.turn; 
-        } else {
-            updates.chainLevel = 0;
-            // A kör a másik játékosé
-            updates.turn = data.turn === data.player1.uid ? data.player2.uid : data.player1.uid; 
-            updates.lastAction = `${turnPlayer.name} hibázott! A lánc megszakadt.`;
-        }
-        
-        if (nextQuestionIndex >= QUESTIONS_PER_ROUND) {
-            updates.status = 'roundOver';
-            const bankableAmount = MONEY_PYRAMID[updates.chainLevel || data.chainLevel].value;
-            if (isCorrect && bankableAmount > 0) {
-                 const dailyScoreRef = ref(db, `dailyScores/${getTodayString()}/${data.turn}/score`);
-                 await runTransaction(dailyScoreRef, (score) => (score || 0) + bankableAmount);
-                 updates.lastAction += ` Az utolsó kérdéssel bankolt ${bankableAmount.toLocaleString()} Ft-ot!`;
-            }
-        } else {
-            updates.questionIndex = nextQuestionIndex;
-        }
-        
-        updates.questionActive = false;
-        updates.answerRevealed = false;
-        updates.selectedAnswer = null;
-        await update(ref(db, `games/${currentGameId}`), updates);
-      } catch (error) {
-          console.error("Hiba a játék állapotának kiszámítása közben:", error);
-      }
-    }
-    
-    document.getElementById('bank-btn').addEventListener('click', async () => {
-        const gameSnap = await get(ref(db, `games/${currentGameId}`));
-        const data = gameSnap.val();
-        if (!data || data.turn !== localPlayer.uid) return;
-        
-        const pointsToBank = MONEY_PYRAMID[data.chainLevel].value;
-        if (pointsToBank <= 0) return;
-
-        const turnPlayer = data.turn === data.player1.uid ? data.player1 : data.player2;
-        const today = getTodayString();
-        const dailyScoreRef = ref(db, `dailyScores/${today}/${data.turn}/score`);
-        
-        await runTransaction(dailyScoreRef, (currentScore) => (currentScore || 0) + pointsToBank);
-
-        const nextQuestionIndex = data.questionIndex + 1;
-        const updates = {
-            chainLevel: 0,
-            turn: data.turn === data.player1.uid ? data.player2.uid : data.player1.uid,
-            lastAction: `${turnPlayer.name} bankolt ${pointsToBank.toLocaleString()} Ft-ot!`,
-            questionIndex: nextQuestionIndex
+        const uiElements = {
+            lobbyContainer: document.getElementById('lobbyContainer'), gameContainer: document.getElementById('gameContainer'), playerNameInput: document.getElementById('playerNameInput'), gameIdInput: document.getElementById('gameIdInput'), createGameBtn: document.getElementById('createGameBtn'), joinGameBtn: document.getElementById('joinGameBtn'), startAIGameBtn: document.getElementById('startAIGameBtn'), board: document.getElementById('board'), statusText: document.getElementById('statusText'), resetBtn: document.getElementById('resetBtn'), 
+            playerXName: document.getElementById('playerXNameText'), playerOName: document.getElementById('playerONameText'), 
+            playerXIcon: document.getElementById('playerXIcon'), playerOIcon: document.getElementById('playerOIcon'),
+            scoreX: document.getElementById('scoreX'), scoreO: document.getElementById('scoreO'), playerXPanel: document.getElementById('playerXPanel'), playerOPanel: document.getElementById('playerOPanel'), loadingOverlay: document.getElementById('loadingOverlay'), avatarGrid: document.getElementById('avatar-grid'), playerXAvatar: document.getElementById('playerXAvatar'), playerOAvatar: document.getElementById('playerOAvatar'), spectateModeBtn: document.getElementById('spectateModeBtn'), joinAsSpectatorBtn: document.getElementById('joinAsSpectatorBtn'), cancelSpectateBtn: document.getElementById('cancelSpectateBtn'), playerOptions: document.getElementById('player-options'), spectatorOptions: document.getElementById('spectator-options'), playerButtons: document.getElementById('player-buttons'), spectatorButtons: document.getElementById('spectator-buttons'), spectatorNameInput: document.getElementById('spectatorNameInput'), spectatorCodeInput: document.getElementById('spectatorCodeInput'), spectatorCodeDisplay: document.getElementById('spectatorCodeDisplay'), spectatorList: document.getElementById('spectatorList'), statsBtn: document.getElementById('statsBtn'), statsModal: document.getElementById('statsModal'), closeStatsBtn: document.getElementById('closeStatsBtn'), achievementsBtn: document.getElementById('achievementsBtn'), achievementsModal: document.getElementById('achievementsModal'), closeAchievementsBtn: document.getElementById('closeAchievementsBtn'), achievementsList: document.getElementById('achievements-list'), 
+            achievementOnBoard: document.getElementById('achievementOnBoard'), rulesLink: document.getElementById('rulesLink'),
+            gameCodeDisplay: document.getElementById('gameCodeDisplay'), gameCodeText: document.getElementById('gameCodeText'), copyCodeBtn: document.getElementById('copyCodeBtn'),
+            playerWallet: document.getElementById('player-wallet'), playerMoney: document.getElementById('playerMoney'),
+            shopBtn: document.getElementById('shopBtn'), shopModal: document.getElementById('shopModal'), closeShopBtn: document.getElementById('closeShopBtn'), 
+            shopItemsContainerBgs: document.getElementById('shop-items-container-backgrounds'), shopItemsContainerIcons: document.getElementById('shop-items-container-icons'),
+            shopMoney: document.getElementById('shopMoney'),
+            sounds: { place: document.getElementById('place-sound'), win: document.getElementById('win-sound'), turn: document.getElementById('turn-sound') }
         };
         
-        if (nextQuestionIndex >= QUESTIONS_PER_ROUND) {
-            updates.status = 'roundOver';
-        }
+        const T_URL = (p) => `https://www.transparenttextures.com/patterns/${p}.png`;
+        const SHOP_ITEMS = {
+            backgrounds: [
+                { id: 'bg_default', name: 'Alapértelmezett', price: 0, style: 'rgba(0,0,0,0.2)' },
+                { id: 'bg_hearts', name: 'Szívecskés', price: 1500, style: `rgba(0,0,0,0.4) url("${T_URL('heart-pattern')}")` },
+                { id: 'bg_carbon', name: 'Karbon', price: 1500, style: `rgba(0,0,0,0.4) url("${T_URL('carbon-fibre')}")` },
+                { id: 'bg_fabric', name: 'Szövet', price: 1500, style: `rgba(0,0,0,0.4) url("${T_URL('fabric-plaid')}")` },
+                { id: 'bg_wood', name: 'Fa Erezet', price: 1800, style: `rgba(0,0,0,0.4) url("${T_URL('wood-pattern')}")` },
+                { id: 'bg_paper', name: 'Papír', price: 1800, style: `rgba(0,0,0,0.4) url("${T_URL('paper')}")` },
+                { id: 'bg_concrete', name: 'Beton', price: 2000, style: `rgba(0,0,0,0.4) url("${T_URL('concrete-wall-2')}")` },
+                { id: 'bg_argyle', name: 'Kockás', price: 2200, style: `rgba(0,0,0,0.4) url("${T_URL('argyle')}")` },
+                { id: 'bg_stars', name: 'Csillagos', price: 2500, style: `rgba(0,0,0,0.4) url("${T_URL('star-background')}")` },
+                { id: 'bg_waves', name: 'Hullámos', price: 2500, style: `rgba(0,0,0,0.4) url("${T_URL('wavecut')}")` },
+                { id: 'bg_tech', name: 'Tech Minta', price: 2800, style: `rgba(0,0,0,0.4) url("${T_URL('tiny-grid')}")` },
+                { id: 'bg_ice', name: 'Jégkristály', price: 3000, style: `rgba(0,0,0,0.4) url("${T_URL('ice-age')}")` },
+                { id: 'bg_maze', name: 'Labirintus', price: 3200, style: `rgba(0,0,0,0.4) url("${T_URL('maze-black')}")` },
+                { id: 'bg_bubbles', name: 'Buborékok', price: 3200, style: `rgba(0,0,0,0.4) url("${T_URL('bubbles')}")` },
+                { id: 'bg_skulls', name: 'Koponyák', price: 3500, style: `rgba(0,0,0,0.4) url("${T_URL('skulls')}")` },
+                { id: 'bg_circuit', name: 'Áramkör', price: 3500, style: `rgba(0,0,0,0.4) url("${T_URL('circuit-board')}")` },
+                { id: 'bg_sun', name: 'Napsugaras', price: 3500, style: 'radial-gradient(circle, rgba(253,235,123,0.3) 0%, rgba(255,145,0,0.1) 100%)' },
+                { id: 'bg_bamboo', name: 'Bambusz', price: 3800, style: `rgba(0,0,0,0.4) url("${T_URL('bamboo')}")` },
+                { id: 'bg_koi', name: 'Koi Ponty', price: 4000, style: `rgba(0,0,0,0.4) url("${T_URL('koi')}")` },
+                { id: 'bg_nebula', name: 'Ködfolt', price: 4000, style: 'linear-gradient(135deg, #232526, #414345)' },
+                { id: 'bg_forest', name: 'Erdő', price: 4000, style: 'linear-gradient(135deg, #134E5E, #71B280)' },
+                { id: 'bg_ocean', name: 'Óceán', price: 4200, style: 'linear-gradient(135deg, #005AA7, #FFFDE4)' },
+                { id: 'bg_sunset', name: 'Naplemente', price: 4500, style: 'linear-gradient(135deg, #ff7e5f, #feb47b)' },
+                { id: 'bg_candy', name: 'Cukorka', price: 4800, style: 'linear-gradient(135deg, #a8c0ff, #3f2b96)' },
+                { id: 'bg_lava', name: 'Láva', price: 5000, style: 'linear-gradient(135deg, #ff416c, #ff4b2b)' },
+                { id: 'bg_metal', name: 'Fém', price: 5500, style: `rgba(0,0,0,0.4) url("${T_URL('brushed-metal')}")` },
+                { id: 'bg_gold_dust', name: 'Aranypor', price: 6000, style: `rgba(0,0,0,0.4) url("${T_URL('gold-scale')}")` },
+                { id: 'bg_liquid', name: 'Folyékony Fém', price: 7000, style: 'linear-gradient(135deg, #D7DDE8, #757F9A)'},
+                { id: 'bg_diamond', name: 'Gyémánt', price: 7500, style: `rgba(0,0,0,0.4) url("${T_URL('diamond-upholstery')}")` },
+                { id: 'bg_shatter', name: 'Üvegszilánk', price: 8000, style: `rgba(0,0,0,0.4) url("${T_URL('shattered')}")` },
+                { id: 'bg_hex', name: 'Hexagon', price: 8500, style: `rgba(0,0,0,0.4) url("${T_URL('hexabump')}")` },
+                { id: 'bg_glitter', name: 'Csillám', price: 9000, style: 'linear-gradient(135deg, #C33764, #1D2671)'},
+                { id: 'bg_matrix', name: 'Mátrix', price: 10000, style: 'linear-gradient(rgba(18, 16, 16, 0.7), rgba(18, 16, 16, 0.7)), url("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExd2JpZXZhczF5Z3d2aXh0eGF0b29xNnE0cjQ2cTczdjVoaWw5NGw2eCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/A9grgCQ0Dm012/giphy.gif")' },
+                { id: 'bg_hacker', name: 'Hacker', price: 12000, style: `rgba(0,0,0,0.4) url("${T_URL('hixs-evolution-x')}")` },
+                { id: 'bg_fire', name: 'Tűzfal', price: 14000, style: 'linear-gradient(45deg, #ff512f, #f09819)' },
+                { id: 'bg_royal', name: 'Királyi Bársony', price: 15000, style: 'linear-gradient(135deg, #4a00e0, #8e2de2)' },
+                { id: 'bg_aurora', name: 'Sarki Fény', price: 16000, style: 'linear-gradient(to right, #74ebd5, #acb6e5)' },
+                { id: 'bg_cosmic', name: 'Kozmikus', price: 18000, style: 'linear-gradient(to right, #6441a5, #2a0845)' },
+                { id: 'bg_galaxy', name: 'Galaxis', price: 20000, style: 'linear-gradient(rgba(18, 16, 16, 0.6), rgba(18, 16, 16, 0.6)), url("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNG04ZHhwZGt6bHRkZGp6eG5xZ2p0ajZkN24yM2I0aTV0ZGN1b2g4bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l41YtZOb9EUABnuqA/giphy.gif")' },
+                { id: 'bg_supernova', name: 'Szupernóva', price: 25000, style: 'linear-gradient(to right, #f7b733, #fc4a1a)' },
+                { id: 'bg_abstract', name: 'Absztrakt', price: 30000, style: 'linear-gradient(45deg, #12c2e9, #c471ed, #f64f59)' },
+            ],
+            icons: [
+                { id: 'icon_default', name: 'Nincs Ikon', price: 0, icon: '' },
+                { id: 'icon_star', name: 'Csillag', price: 1000, icon: '⭐' },
+                { id: 'icon_heart', name: 'Szív', price: 1000, icon: '❤️' },
+                { id: 'icon_spade', name: 'Pikk', price: 1100, icon: '♠️' },
+                { id: 'icon_club', name: 'Treff', price: 1100, icon: '♣️' },
+                { id: 'icon_diamond', name: 'Káró', price: 1100, icon: '♦️' },
+                { id: 'icon_clover', name: 'Lóhere', price: 1200, icon: '🍀' },
+                { id: 'icon_fire', name: 'Tűz', price: 1500, icon: '🔥' },
+                { id: 'icon_zap', name: 'Villám', price: 1500, icon: '⚡' },
+                { id: 'icon_ice', name: 'Hópehely', price: 1500, icon: '❄️' },
+                { id: 'icon_yin_yang', name: 'Jin-Jang', price: 1800, icon: '☯️' },
+                { id: 'icon_peace', name: 'Béke', price: 1800, icon: '☮️' },
+                { id: 'icon_moon', name: 'Hold', price: 2000, icon: '🌙' },
+                { id: 'icon_sun', name: 'Nap', price: 2000, icon: '☀️' },
+                { id: 'icon_atom', name: 'Atom', price: 2200, icon: '⚛️' },
+                { id: 'icon_biohazard', name: 'Biológiai Veszély', price: 2500, icon: '☣️' },
+                { id: 'icon_radioactive', name: 'Sugárzás', price: 2500, icon: '☢️' },
+                { id: 'icon_controller', name: 'Kontroller', price: 2800, icon: '🎮' },
+                { id: 'icon_joystick', name: 'Joystick', price: 2800, icon: '🕹️' },
+                { id: 'icon_key', name: 'Kulcs', price: 2900, icon: '🔑' },
+                { id: 'icon_knight', name: 'Huszár', price: 3000, icon: '♘' },
+                { id: 'icon_swords', name: 'Kardok', price: 3000, icon: '⚔️' },
+                { id: 'icon_shield', name: 'Pajzs', price: 3000, icon: '🛡️' },
+                { id: 'icon_bomb', name: 'Bomba', price: 3200, icon: '💣' },
+                { id: 'icon_magnet', name: 'Mágnes', price: 3300, icon: '🧲' },
+                { id: 'icon_target', name: 'Céltábla', price: 3500, icon: '🎯' },
+                { id: 'icon_rocket', name: 'Rakéta', price: 3800, icon: '🚀' },
+                { id: 'icon_ufo', name: 'UFO', price: 4000, icon: '🛸' },
+                { id: 'icon_alien', name: 'Alien', price: 4000, icon: '👽' },
+                { id: 'icon_ghost', name: 'Szellem', price: 4200, icon: '👻' },
+                { id: 'icon_skull', name: 'Koponya', price: 4500, icon: '💀' },
+                { id: 'icon_robot', name: 'Robot', price: 4800, icon: '🤖' },
+                { id: 'icon_ninja', name: 'Nindzsa', price: 5000, icon: '🥷' },
+                { id: 'icon_wizard', name: 'Varázsló', price: 5500, icon: '🧙' },
+                { id: 'icon_crown', name: 'Korona', price: 6000, icon: '👑' },
+                { id: 'icon_gem', name: 'Drágakő', price: 7000, icon: '💎' },
+                { id: 'icon_trophy', name: 'Trófea', price: 8000, icon: '🏆' },
+                { id: 'icon_money_bag', name: 'Pénzes Zsák', price: 9000, icon: '💰' },
+                { id: 'icon_comet', name: 'Üstökös', price: 10000, icon: '☄️' },
+                { id: 'icon_dragon', name: 'Sárkány', price: 12000, icon: '🐲' },
+                { id: 'icon_unicorn', name: 'Unikornis', price: 15000, icon: '🦄' },
+                { id: 'icon_phoenix', name: 'Főnix', price: 20000, icon: '🦚' },
+                { id: 'icon_d20', name: 'D20 Kocka', price: 25000, icon: '🎲' },
+                { id: 'icon_black_hole', name: 'Fekete Lyuk', price: 30000, icon: '⚫' },
+                { id: 'icon_infinity', name: 'Végtelen', price: 50000, icon: '♾️' },
+            ]
+        };
 
-        await update(ref(db, `games/${currentGameId}`), updates);
-    });
-
-    function startTimer(duration, onEnd) {
-        stopTimer();
-        let timeLeft = duration;
-        const timerDisplay = document.getElementById('timer-display');
-        timerDisplay.textContent = timeLeft.toFixed(1);
-        timerInterval = setInterval(() => {
-            timeLeft -= 0.1;
-            timerDisplay.textContent = timeLeft.toFixed(1);
-            timerDisplay.classList.toggle('timer-warning', timeLeft <= 5.0);
-            if (timeLeft <= 0) {
-                stopTimer();
-                if (onEnd) onEnd();
-            }
-        }, 100);
-    }
-    function stopTimer() { clearInterval(timerInterval); }
-
-    const wheelCanvas = document.getElementById('wheel-canvas');
-    let ctx = wheelCanvas ? wheelCanvas.getContext('2d') : null;
-    let currentAngle = 0;
-    
-    function drawWheel() {
-        if(!ctx) return;
-        const size = wheelCanvas.width;
-        const center = size / 2;
-        const radius = size / 2 - 10;
-        const arcSize = (2 * Math.PI) / WHEEL_PRIZES.length;
+        const avatars = [ 'https://api.dicebear.com/8.x/personas/svg?seed=Garfield', 'https://api.dicebear.com/8.x/personas/svg?seed=Harley&backgroundColor=b6e3f4,c0aede,d1d4f9', 'https://api.dicebear.com/8.x/personas/svg?seed=Sophie', 'https://api.dicebear.com/8.x/personas/svg?seed=Leo&backgroundColor=b6e3f4,c0aede,d1d4f9', 'https://api.dicebear.com/8.x/personas/svg?seed=Luna', 'https://api.dicebear.com/8.x/personas/svg?seed=Max&backgroundColor=b6e3f4,c0aede,d1d4f9', 'https://api.dicebear.com/8.x/personas/svg?seed=Zoe', 'https://api.dicebear.com/8.x/personas/svg?seed=Felix&backgroundColor=b6e3f4,c0aede,d1d4f9', 'https://api.dicebear.com/8.x/personas/svg?seed=Chloe', 'https://api.dicebear.com/8.x/personas/svg?seed=Oscar&backgroundColor=b6e3f4,c0aede,d1d4f9', 'https://api.dicebear.com/8.x/personas/svg?seed=Mia', 'https://api.dicebear.com/8.x/personas/svg?seed=Jasper&backgroundColor=b6e3f4,c0aede,d1d4f9', 'https://api.dicebear.com/8.x/personas/svg?seed=Isabella', 'https://api.dicebear.com/8.x/personas/svg?seed=Arthur&backgroundColor=b6e3f4,c0aede,d1d4f9', 'https://api.dicebear.com/8.x/personas/svg?seed=Evelyn' ];
         
-        ctx.clearRect(0, 0, size, size);
-        ctx.font = `bold ${size * 0.045}px 'Merriweather', serif`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        WHEEL_PRIZES.forEach((prize, i) => {
-            const angle = currentAngle + i * arcSize;
-            ctx.beginPath();
-            ctx.fillStyle = prize.color;
-            ctx.moveTo(center, center);
-            ctx.arc(center, center, radius, angle, angle + arcSize);
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.save();
-            ctx.fillStyle = '#fff';
-            ctx.translate(center, center);
-            ctx.rotate(angle + arcSize / 2);
-            ctx.fillText(prize.label, radius * 0.6, 0);
-            ctx.restore();
-        });
-    }
-    
-    function showWheelUI(data) {
-        switchScreen('game');
-        screens.wheel.style.display = 'flex';
+        function initializeAvatars() { uiElements.avatarGrid.innerHTML = ''; avatars.forEach((url, index) => { const avatarEl = document.createElement('div'); avatarEl.classList.add('avatar-option'); avatarEl.style.backgroundImage = `url(${url})`; avatarEl.addEventListener('click', () => { document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected')); avatarEl.classList.add('selected'); selectedAvatar = url; }); uiElements.avatarGrid.appendChild(avatarEl); if (index === 0) avatarEl.click(); }); }
         
-        const p1RoundScore = data.roundScores[data.player1.uid] || 0;
-        const p2RoundScore = data.roundScores[data.player2.uid] || 0;
-        const winner = p1RoundScore >= p2RoundScore ? data.player1 : data.player2;
-
-        document.getElementById('wheel-title').textContent = `${winner.name} pörget!`;
-        document.getElementById('wheel-subtitle').textContent = `Kör eredmény: ${data.player1.name} ${p1RoundScore.toLocaleString()} Ft vs ${data.player2.name} ${p2RoundScore.toLocaleString()} Ft`;
-        document.getElementById('spin-btn').disabled = winner.uid !== localPlayer.uid;
-        document.getElementById('next-round-btn').style.display = 'none';
-        document.getElementById('wheel-result').textContent = "";
+        const showLoading = (message) => { uiElements.loadingOverlay.textContent = message; uiElements.loadingOverlay.classList.remove('hidden'); };
+        const hideLoading = () => uiElements.loadingOverlay.classList.add('hidden');
+        const generateSpectatorCode = () => String(Math.floor(Math.random() * 90) + 10);
         
-        const container = document.getElementById('wheel-container');
-        if(container && wheelCanvas) {
-            wheelCanvas.width = container.clientWidth;
-            wheelCanvas.height = container.clientHeight;
-            drawWheel();
-        }
-    }
+        uiElements.playerNameInput.addEventListener('change', async (e) => { const playerName = e.target.value.trim(); if(playerName) { await getOrCreatePlayer(playerName); } else { uiElements.playerWallet.classList.add('hidden'); uiElements.shopBtn.classList.add('hidden'); } });
 
-    let spinAnimation;
-    function spinWheel() {
-        document.getElementById('spin-btn').disabled = true;
-        let velocity = Math.random() * 0.2 + 0.3;
-        const friction = 0.995;
+        async function getOrCreatePlayer(playerName) {
+            if (!playerName) return null;
+            showLoading("Játékosadatok betöltése...");
+            const playerRef = doc(db, 'users', playerName);
+            const playerSnap = await getDoc(playerRef);
 
-        function animate() {
-            velocity *= friction;
-            currentAngle += velocity;
-            drawWheel();
-            if (velocity > 0.001) {
-                spinAnimation = requestAnimationFrame(animate);
+            if (playerSnap.exists()) {
+                localPlayerData = playerSnap.data();
+                await updateDoc(playerRef, { lastLogin: serverTimestamp() });
             } else {
-                finishSpin();
+                localPlayerData = {
+                    money: 1000,
+                    inventory: { backgrounds: ["bg_default"], icons: ["icon_default"] },
+                    equipped: { background: "bg_default", icon: "icon_default" },
+                    createdAt: serverTimestamp(),
+                    lastLogin: serverTimestamp()
+                };
+                await setDoc(playerRef, localPlayerData);
+            }
+            if (!localPlayerData.inventory.backgrounds) localPlayerData.inventory.backgrounds = ['bg_default'];
+            if (!localPlayerData.inventory.icons) localPlayerData.inventory.icons = ['icon_default'];
+
+            updatePlayerUI();
+            hideLoading();
+        }
+
+        function updatePlayerUI() {
+            if (!localPlayerData) return;
+            uiElements.playerMoney.textContent = localPlayerData.money;
+            uiElements.shopMoney.textContent = localPlayerData.money;
+            uiElements.playerWallet.classList.remove('hidden');
+            uiElements.shopBtn.classList.remove('hidden');
+
+            const playerPanel = localPlayerSymbol === 'X' ? uiElements.playerXPanel : (localPlayerSymbol === 'O' ? uiElements.playerOPanel : null);
+            if(playerPanel) {
+                applyEquippedItems(playerPanel, localPlayerSymbol);
             }
         }
-        animate();
-    }
 
-    async function finishSpin() {
-        const arcSize = (2 * Math.PI) / WHEEL_PRIZES.length;
-        const pointerAngle = 1.5 * Math.PI;
-        const finalAngle = (currentAngle % (2 * Math.PI) + (2*Math.PI)) % (2*Math.PI);
-        const relativeAngle = ((2*Math.PI) - finalAngle + pointerAngle) % (2*Math.PI);
-        const prizeIndex = Math.floor(relativeAngle / arcSize);
-        const prize = WHEEL_PRIZES[prizeIndex];
-
-        document.getElementById('wheel-result').textContent = `Nyeremény: ${prize.label}!`;
-
-        const gameSnap = await get(ref(db, `games/${currentGameId}`));
-        const data = gameSnap.val();
+        function applyEquippedItems(panelElement, playerSymbol) {
+            if (!panelElement || !localPlayerData) return;
+            const bgId = localPlayerData.equipped.background;
+            const iconId = localPlayerData.equipped.icon;
+            
+            const bgItem = SHOP_ITEMS.backgrounds.find(item => item.id === bgId);
+            if (bgItem) {
+                panelElement.style.background = bgItem.style;
+                panelElement.style.backgroundSize = 'cover';
+                panelElement.style.backgroundPosition = 'center';
+            }
+            
+            const iconItem = SHOP_ITEMS.icons.find(item => item.id === iconId);
+            const iconElement = playerSymbol === 'X' ? uiElements.playerXIcon : uiElements.playerOIcon;
+            if (iconItem && iconElement) {
+                iconElement.textContent = iconItem.icon;
+            }
+        }
         
-        const p1RoundScore = data.roundScores[data.player1.uid] || 0;
-        const p2RoundScore = data.roundScores[data.player2.uid] || 0;
-        const winnerUid = p1RoundScore >= p2RoundScore ? data.player1.uid : data.player2.uid;
+        function validateInputs(isSpectator = false) { if(isSpectator) { const spectatorName = uiElements.spectatorNameInput.value.trim(); if (!spectatorName) { alert('Kérlek, add meg a neved!'); return false; } return spectatorName; } const playerName = uiElements.playerNameInput.value.trim(); if (!playerName) { alert('Kérlek, adj meg egy játékosnevet!'); return false; } if (!selectedAvatar) { alert('Kérlek, válassz egy avatárt!'); return false; } return playerName; }
         
-        if (winnerUid === localPlayer.uid) {
-            const scoreRef = ref(db, `dailyScores/${getTodayString()}/${winnerUid}/score`);
-            await runTransaction(scoreRef, (currentScore) => {
-                if (currentScore === null) currentScore = 0;
-                if (prize.value === 'double') return currentScore * 2;
-                if (prize.value === 'half') return Math.floor(currentScore / 2);
-                if (prize.value === 0) return 0;
-                return currentScore + prize.value;
+        function toggleSpectatorMode(show) { isSpectatorMode = show; uiElements.playerOptions.classList.toggle('hidden', show); uiElements.playerButtons.classList.toggle('hidden', show); uiElements.spectatorOptions.classList.toggle('hidden', !show); uiElements.spectatorButtons.classList.toggle('hidden', !show); }
+        uiElements.spectateModeBtn.addEventListener('click', () => toggleSpectatorMode(true));
+        uiElements.cancelSpectateBtn.addEventListener('click', () => toggleSpectatorMode(false));
+
+        async function generateUniqueGameCode() { let gameCode; let isUnique = false; let attempts = 0; while (!isUnique && attempts < 20) { gameCode = String(Math.floor(1000 + Math.random() * 9000)); const q = query(collection(db, "games"), where("gameCode", "==", gameCode), where("status", "==", "waiting"), limit(1)); const querySnapshot = await getDocs(q); if (querySnapshot.empty) { isUnique = true; } else { attempts++; } } if (!isUnique) { throw new Error("Nem sikerült egyedi játék kódot generálni."); } return gameCode; }
+
+        async function createGame(name, options) {
+            const { isSingle = false, aiPersonality, aiDifficulty } = options;
+            try {
+                const wagerInputId = isSingle ? 'aiWagerInput' : 'mpWagerInput';
+                const wager = parseInt(document.getElementById(wagerInputId).value) || 0;
+                if (wager < 0) { alert("A tét nem lehet negatív!"); return; }
+                if (localPlayerData.money < wager) { alert("Nincs elég pénzed a tétrakáshoz!"); return; }
+
+                showLoading("Játék létrehozása...");
+
+                const gameRef = doc(collection(db, 'games'));
+                const gameCode = isSingle ? null : await generateUniqueGameCode();
+                const spectatorCode = generateSpectatorCode();
+                let playerO = { name: null, avatar: null, icon: 'icon_default' };
+
+                if(isSingle) {
+                    document.body.dataset.difficulty = aiDifficulty;
+                    if(aiPersonality === 'karesz') { playerO = { name: "Koczka<br>Karesz<br>(AI)", avatar: aiMoodAvatars.karesz.default, icon: 'icon_robot' }; } 
+                    else if (aiPersonality === 'pikszel') { playerO = { name: "Pikszel<br>Panna<br>(AI)", avatar: aiMoodAvatars.pikszel.default, icon: 'icon_ghost' }; }
+                } else { document.body.removeAttribute('data-difficulty'); }
+
+                const initialGameState = {
+                    board: Array(BOARD_SIZE * BOARD_SIZE).fill(null),
+                    players: { X: { name, avatar: selectedAvatar, icon: localPlayerData.equipped.icon }, O: playerO },
+                    currentPlayer: 'X', status: isSingle ? 'active' : 'waiting', scores: { X: 0, O: 0 },
+                    winner: null, createdAt: serverTimestamp(), lastMove: null, winningLine: null, spectatorCode,
+                    isSinglePlayer: isSingle, aiPersonality: aiPersonality ?? null, aiDifficulty: aiDifficulty ?? null,
+                    moveCount: 0, gameCode, wager: wager, payoutComplete: false
+                };
+                
+                if (wager > 0) {
+                    const playerRef = doc(db, 'users', name);
+                    await updateDoc(playerRef, { money: increment(-wager) });
+                    localPlayerData.money -= wager;
+                    updatePlayerUI();
+                }
+
+                await setDoc(gameRef, initialGameState);
+                attachGameListener(gameRef.id, 'X', name);
+            } catch (error) { console.error("Hiba a játék létrehozása során:", error); alert("Hiba történt a játék létrehozása közben."); } 
+            finally { hideLoading(); }
+        }
+
+        uiElements.startAIGameBtn.addEventListener('click', () => { const playerName = validateInputs(); if (!playerName) return; if(!localPlayerData) { alert("Játékosadatok betöltése folyamatban..."); return; } const aiPersonality = document.querySelector('input[name="aiPersonality"]:checked').value; const aiDifficulty = document.querySelector('input[name="aiDifficulty"]:checked').value; createGame(playerName, { isSingle: true, aiPersonality, aiDifficulty }); });
+        uiElements.createGameBtn.addEventListener('click', () => { const playerName = validateInputs(); if (!playerName) return; if(!localPlayerData) { alert("Játékosadatok betöltése folyamatban..."); return; } createGame(playerName, { isSingle: false }); });
+        
+        uiElements.joinGameBtn.addEventListener('click', async () => {
+            const playerName = validateInputs();
+            if (!playerName || !localPlayerData) return;
+            const gameIdToJoin = uiElements.gameIdInput.value.trim();
+            if (!gameIdToJoin) { alert('Kérlek, adj meg egy játék kódot!'); return; }
+            
+            showLoading("Csatlakozás a játékhoz...");
+            try {
+                const q = query(collection(db, "games"), where("gameCode", "==", gameIdToJoin), where("status", "==", "waiting"), limit(1));
+                const querySnapshot = await getDocs(q);
+        
+                if (!querySnapshot.empty) {
+                    const gameDoc = querySnapshot.docs[0];
+                    const gameData = gameDoc.data();
+                    const wager = gameData.wager || 0;
+                    if (localPlayerData.money < wager) { alert(`Nincs elég pénzed a csatlakozáshoz! A tét: ${wager} FT.`); hideLoading(); return; }
+
+                    if (gameData.players.X.name !== playerName) {
+                        if (wager > 0) {
+                            const playerRef = doc(db, 'users', playerName);
+                            await updateDoc(playerRef, { money: increment(-wager) });
+                            localPlayerData.money -= wager;
+                            updatePlayerUI();
+                        }
+                        const updates = { 'players.O.name': playerName, 'players.O.avatar': selectedAvatar, 'players.O.icon': localPlayerData.equipped.icon, 'status': 'active' };
+                        await updateDoc(doc(db, 'games', gameDoc.id), updates);
+                        attachGameListener(gameDoc.id, 'O', playerName);
+                    } else { alert("Nem csatlakozhatsz a saját játékodhoz!"); }
+                } else { alert('Nem található nyitott játék ezzel a kóddal.'); }
+            } catch (error) { console.error("Hiba a csatlakozás során:", error); alert("Hiba történt a játékhoz való csatlakozás közben."); } 
+            finally { hideLoading(); }
+        });
+
+        uiElements.joinAsSpectatorBtn.addEventListener('click', async () => { 
+            const spectatorName = validateInputs(true); 
+            if (!spectatorName) return; 
+            const spectatorCode = uiElements.spectatorCodeInput.value.trim(); 
+            if (!spectatorCode || spectatorCode.length !== 2) { alert('Kérlek, adj meg egy érvényes, 2 jegyű kódot!'); return; } 
+            showLoading("Játék keresése..."); 
+            const q = query(collection(db, "games"), 
+                where("spectatorCode", "==", spectatorCode), 
+                where("status", "in", ["waiting", "active"]),
+                orderBy("createdAt", "desc"),
+                limit(1)
+            );
+            const querySnapshot = await getDocs(q); 
+            if (querySnapshot.empty) { 
+                alert('Nem található aktív játék ezzel a leskelődő kóddal.'); 
+                hideLoading(); 
+                return; 
+            } 
+            const gameDoc = querySnapshot.docs[0]; 
+            attachGameListener(gameDoc.id, 'spectator', spectatorName); 
+            hideLoading(); 
+        });
+
+        function setupPresence(gameId, name) { spectatorPresenceRef = ref(rtdb, `presence/${gameId}/${name}`); const connectedRef = ref(rtdb, '.info/connected'); onValue(connectedRef, (snap) => { if (snap.val() === true) { set(spectatorPresenceRef, true); onDisconnect(spectatorPresenceRef).remove(); } }); }
+        function listenForSpectators(gameId) { const spectatorsRef = ref(rtdb, `presence/${gameId}`); onValue(spectatorsRef, (snapshot) => { activeSpectators = snapshot.val() || {}; updateSpectatorListUI(); }); }
+        function updateSpectatorListUI() { const spectatorNames = Object.keys(activeSpectators); if (spectatorNames.length > 0) { uiElements.spectatorList.innerHTML = `Kukkolók: 👁️ <span>${spectatorNames.join(', ')}</span>`; } else { uiElements.spectatorList.innerHTML = ''; } }
+
+        function attachGameListener(gameId, role, name) {
+            currentGameId = gameId; localPlayerSymbol = role; localPlayerName = name; 
+            if (role !== 'spectator') updatePlayerUI();
+            if (role === 'spectator') setupPresence(gameId, name);
+            listenForSpectators(gameId); 
+            if (unsubscribeFromGame) unsubscribeFromGame(); 
+            unsubscribeFromGame = onSnapshot(doc(db, 'games', currentGameId), (doc) => { 
+                if (!doc.exists()) { window.location.reload(); return; } 
+                const gameState = doc.data(); 
+                localGameState = gameState; 
+                isSinglePlayer = gameState.isSinglePlayer; 
+                if (['active', 'finished', 'waiting'].includes(gameState.status)) { 
+                    uiElements.lobbyContainer.classList.add('hidden'); 
+                    uiElements.gameContainer.classList.remove('hidden'); 
+                    renderGame(gameState); 
+                } 
+            }); 
+        }
+        
+        async function handleCellClick(index) {
+            const gs = localGameState;
+            if (localPlayerSymbol === 'spectator' || gs.board[index] || gs.status !== 'active' || gs.currentPlayer !== localPlayerSymbol) return;
+            uiElements.sounds.place.play().catch(e => {});
+            const gameRef = doc(db, 'games', currentGameId);
+            let board = [...gs.board];
+            board[index] = localPlayerSymbol;
+            let updates = { board, lastMove: index, moveCount: gs.moveCount + 1 };
+            const winningLine = checkForWin(index, board, localPlayerSymbol);
+            if (winningLine) {
+                updates.status = 'finished';
+                updates.winner = localPlayerSymbol;
+                updates.winningLine = winningLine;
+                updates[`scores.${localPlayerSymbol}`] = gs.scores[localPlayerSymbol] + 1;
+            } else if (board.every(cell => cell)) {
+                updates.status = 'finished';
+                updates.winner = 'draw';
+            } else {
+                updates.currentPlayer = localPlayerSymbol === 'X' ? 'O' : 'X';
+            }
+            await updateDoc(gameRef, updates);
+            if (updates.status !== 'finished' && gs.isSinglePlayer && gs.currentPlayer === 'O') {
+                aiMove();
+            }
+        }
+        
+        async function aiMove() {
+            if (localGameState.status !== 'active' || localGameState.currentPlayer !== 'O') return;
+            uiElements.statusText.textContent = `${localGameState.players.O.name.replace(/<br>/g, ' ')} gondolkodik...`;
+            await new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * 1001) + 1000));
+            const currentSnap = await getDoc(doc(db, 'games', currentGameId));
+            if (!currentSnap.exists() || currentSnap.data().currentPlayer !== 'O') return;
+            const gs = currentSnap.data();
+            const gameRef = doc(db, 'games', currentGameId);
+            let board = [...gs.board];
+            const bestMove = findBestMove(board, gs.aiDifficulty);
+            if(bestMove === -1) return; 
+            uiElements.sounds.place.play().catch(e => {});
+            board[bestMove] = 'O';
+            let updates = { board: board, lastMove: bestMove, moveCount: gs.moveCount + 1 };
+            const winningLine = checkForWin(bestMove, board, 'O');
+            if (winningLine) {
+                updates.status = 'finished';
+                updates.winner = 'O';
+                updates.winningLine = winningLine;
+                updates['scores.O'] = gs.scores.O + 1;
+            } else if (board.every(cell => cell)) {
+                updates.status = 'finished';
+                updates.winner = 'draw';
+            } else {
+                updates.currentPlayer = 'X';
+            }
+            await updateDoc(gameRef, updates);
+        }
+
+        function findBestMove(board, difficulty) { const emptyCells = board.map((val, idx) => val === null ? idx : -1).filter(idx => idx !== -1); if (emptyCells.length === 0) return -1; if (emptyCells.length >= (BOARD_SIZE * BOARD_SIZE - 2)) { const center = Math.floor(BOARD_SIZE * BOARD_SIZE / 2); if(board[center] === null) return center; const nearCenterCandidates = [center-1, center+1, center-BOARD_SIZE, center+BOARD_SIZE]; for(const move of nearCenterCandidates){ if(board[move] === null) return move; } return emptyCells[0]; } for (const index of emptyCells) { board[index] = 'O'; if (checkForWin(index, board, 'O')) { board[index] = null; return index; } board[index] = null; } for (const index of emptyCells) { board[index] = 'X'; if (checkForWin(index, board, 'X')) { board[index] = null; return index; } board[index] = null; } if (difficulty === 'easy' && Math.random() < 0.5) { return emptyCells[Math.floor(Math.random() * emptyCells.length)]; } if (difficulty === 'normal' && Math.random() < 0.2) { return emptyCells[Math.floor(Math.random() * emptyCells.length)]; } let bestMove = -1; let maxScore = -Infinity; const candidateMoves = new Set(); board.forEach((cell, index) => { if (cell !== null) { const r = Math.floor(index / BOARD_SIZE); const c = index % BOARD_SIZE; for (let i = -1; i <= 1; i++) { for (let j = -1; j <= 1; j++) { if (i === 0 && j === 0) continue; const nr = r + i; const nc = c + j; if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) { const newIndex = nr * BOARD_SIZE + nc; if (board[newIndex] === null) candidateMoves.add(newIndex); } } } } }); const movesToEvaluate = candidateMoves.size > 0 ? Array.from(candidateMoves) : emptyCells; for (const move of movesToEvaluate) { board[move] = 'O'; const offensiveScore = evaluateBoardForPlayer(board, 'O'); board[move] = 'X'; const defensiveScore = evaluateBoardForPlayer(board, 'X'); board[move] = null; const scoreMultiplier = (difficulty === 'genius' || difficulty === 'hard') ? 1.1 : 1.0; const totalScore = offensiveScore + defensiveScore * scoreMultiplier; if (totalScore > maxScore) { maxScore = totalScore; bestMove = move; } } return bestMove !== -1 ? bestMove : emptyCells[Math.floor(Math.random() * emptyCells.length)]; }
+        function evaluateBoardForPlayer(board, player) { let totalScore = 0; const directions = [[1, 0], [0, 1], [1, 1], [1, -1]]; const opponent = player === 'X' ? 'O' : 'X'; const patternScores = { FIVE: 100000, OPEN_FOUR: 10000, HALF_FOUR: 1000, OPEN_THREE: 500, HALF_THREE: 100, OPEN_TWO: 10, HALF_TWO: 1 }; for (let r = 0; r < BOARD_SIZE; r++) { for (let c = 0; c < BOARD_SIZE; c++) { if (board[r * BOARD_SIZE + c] !== player) continue; for (const [dr, dc] of directions) { let line = []; for (let i = 0; i < 5; i++) { const nr = r + i * dr; const nc = c + i * dc; if (nr >= 0 && nr < BOARD_SIZE && nc >= 0 && nc < BOARD_SIZE) { line.push(board[nr * BOARD_SIZE + nc]); } else { line.push(opponent); } } const before_r = r - dr; const before_c = c - dc; let before_cell = opponent; if (before_r >= 0 && before_r < BOARD_SIZE && before_c >= 0 && before_c < BOARD_SIZE) { before_cell = board[before_r * BOARD_SIZE + before_c]; } let myPieces = line.filter(p => p === player).length; let emptyOrMyPieces = line.filter(p => p === player || p === null).length; if (emptyOrMyPieces < 5) continue; if (myPieces === 5) { totalScore += patternScores.FIVE; continue; } if (myPieces === 4) { if(before_cell === null && line[4] === null) totalScore += patternScores.OPEN_FOUR; else if (before_cell === null || line[4] === null) totalScore += patternScores.HALF_FOUR; } if (myPieces === 3) { if(before_cell === null && line[3] === null) totalScore += patternScores.OPEN_THREE; else if (before_cell === null || line[3] === null) totalScore += patternScores.HALF_THREE; } if (myPieces === 2) { if(before_cell === null && line[2] === null) totalScore += patternScores.OPEN_TWO; else if (before_cell === null || line[2] === null) totalScore += patternScores.HALF_TWO; } } } } return totalScore; }
+
+        uiElements.resetBtn.addEventListener('click', async () => { if (localPlayerSymbol === 'spectator') return; const gameRef = doc(db, 'games', currentGameId); const updates = { board: Array(BOARD_SIZE * BOARD_SIZE).fill(null), status: 'active', winner: null, currentPlayer: 'X', lastMove: null, winningLine: null, moveCount: 0, payoutComplete: true }; await updateDoc(gameRef, updates); });
+        
+        async function handlePayout(gameState) {
+            if (gameState.payoutComplete || gameState.wager <= 0) return;
+            const gameRef = doc(db, 'games', currentGameId);
+            const { winner, players, wager, isSinglePlayer } = gameState;
+            if (winner === 'draw') {
+                const playerXRef = doc(db, 'users', players.X.name);
+                await updateDoc(playerXRef, { money: increment(wager) });
+                if (!isSinglePlayer && players.O.name) {
+                    const playerORef = doc(db, 'users', players.O.name);
+                    await updateDoc(playerORef, { money: increment(wager) });
+                }
+            } else if (winner) {
+                const pot = wager * 2;
+                const winnerName = players[winner].name;
+                if (!winnerName.includes("(AI)")) {
+                    const winnerRef = doc(db, 'users', winnerName);
+                    await updateDoc(winnerRef, { money: increment(pot) });
+                }
+            }
+            await updateDoc(gameRef, { payoutComplete: true });
+            if (localPlayerName) await getOrCreatePlayer(localPlayerName);
+        }
+        
+        function renderGame(gameState) {
+            const { board, players, scores, currentPlayer, status, winner, winningLine, lastMove, spectatorCode, isSinglePlayer, aiPersonality, moveCount, gameCode } = gameState;
+            uiElements.spectatorCodeDisplay.textContent = `Leskelődő Kód: ${spectatorCode}`;
+            updateSpectatorListUI();
+            uiElements.board.innerHTML = '';
+            uiElements.board.style.gridTemplateColumns = `repeat(${BOARD_SIZE}, 1fr)`;
+            const isMyTurn = currentPlayer === localPlayerSymbol;
+        
+            board.forEach((cellValue, index) => {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                if (cellValue) { cell.classList.add(cellValue === 'X' ? 'x-icon' : 'o-icon', 'cell-pop'); }
+                if (winningLine && winningLine.includes(index)) { cell.classList.add('winning-cell'); }
+                if (lastMove === index) { cell.classList.add('cell-flashed'); cell.addEventListener('animationend', () => cell.classList.remove('cell-flashed'), { once: true }); }
+                if (status === 'active' && !cellValue && isMyTurn) { cell.addEventListener('click', () => handleCellClick(index)); } else { cell.classList.add('disabled'); }
+                uiElements.board.appendChild(cell);
+            });
+        
+            uiElements.playerXName.innerHTML = players.X.name;
+            uiElements.playerOName.innerHTML = players.O.name ? players.O.name.replace(/<br>/g, ' ') : 'Várakozás...';
+            uiElements.playerXAvatar.style.backgroundImage = `url(${players.X.avatar})`;
+            if(players.O.avatar) { uiElements.playerOAvatar.style.backgroundImage = `url(${players.O.avatar})`; }
+            
+            if (localPlayerData) {
+                 if (players.X.name === localPlayerName) applyEquippedItems(uiElements.playerXPanel, 'X');
+                 if (players.O.name === localPlayerName) applyEquippedItems(uiElements.playerOPanel, 'O');
+            }
+            uiElements.playerXIcon.textContent = SHOP_ITEMS.icons.find(i => i.id === players.X.icon)?.icon || '';
+            uiElements.playerOIcon.textContent = SHOP_ITEMS.icons.find(i => i.id === players.O.icon)?.icon || '';
+
+            uiElements.scoreX.textContent = scores.X;
+            uiElements.scoreO.textContent = scores.O;
+            uiElements.playerXPanel.classList.toggle('active', currentPlayer === 'X' && status === 'active');
+            uiElements.playerOPanel.classList.toggle('active', currentPlayer === 'O' && status === 'active');
+        
+            if (status === 'waiting') {
+                uiElements.statusText.textContent = `Várakozás a másik játékosra... A tét: ${gameState.wager} FT`;
+                uiElements.gameCodeDisplay.classList.remove('hidden');
+                uiElements.gameCodeText.textContent = gameCode;
+            } else { uiElements.gameCodeDisplay.classList.add('hidden'); }
+        
+            if (status === 'active') { uiElements.statusText.textContent = localPlayerSymbol === 'spectator' ? `${players[currentPlayer].name.replace(/<br>/g, ' ')} következik...` : (isMyTurn ? 'Te következel!' : `${players[currentPlayer].name.replace(/<br>/g, ' ')} következik...`); } 
+            else if (status === 'finished') {
+                handlePayout(gameState);
+                let message = '';
+                if (isSinglePlayer) {
+                    updateStats(winner, aiPersonality);
+                    checkAllAchievements(gameState);
+                    const aiName = players.O.name.replace(/<br>/g, ' ');
+                    let quote = '';
+                    if (winner === 'O') {
+                        quote = dailyKareszLossQuotes.shift(); dailyKareszLossQuotes.push(quote);
+                        message = `${aiName} nyert! Üzenete: "${quote}"`;
+                    } else if (winner === 'X') {
+                        quote = dailyKareszWinQuotes.shift(); dailyKareszWinQuotes.push(quote);
+                        message = `Nyertél ${gameState.wager * 2} FT-ot! ${aiName} üzenete: "${quote}"`;
+                    } else {
+                        quote = dailyKareszDrawQuotes.shift(); dailyKareszDrawQuotes.push(quote);
+                        message = `Döntetlen! Visszakaptad a téted. ${aiName} üzenete: "${quote}"`;
+                    }
+                } else { message = winner === 'draw' ? 'A játék döntetlen! Mindenki visszakapja a tétjét.' : `${players[winner].name.replace(/<br>/g, ' ')} nyert ${gameState.wager * 2} FT-ot!`; }
+                uiElements.statusText.textContent = message;
+                if(winner !== 'draw' && winner === localPlayerSymbol) { uiElements.sounds.win.play().catch(e => {}); triggerVictoryConfetti(); }
+            }
+        
+            uiElements.resetBtn.disabled = status !== 'finished' || localPlayerSymbol === 'spectator';
+        }
+
+        function showRules() { const rulesWindow = window.open('', '_blank'); rulesWindow.document.write(`<html><head><title>Amőba Pro Online - Szabályzat</title><style>body{font-family:'Montserrat',sans-serif;background:linear-gradient(135deg,#2c3e50,#1a2937);color:#ecf0f1;padding:30px;line-height:1.6}.container{max-width:800px;margin:auto;background:rgba(26,41,55,.7);padding:20px 40px;border-radius:15px;border:1px solid rgba(129,140,162,.2)}h1,h2,h3{color:#3498db;font-family:'Orbitron',sans-serif}h1{text-align:center;margin-bottom:20px}h2{border-bottom:2px solid #3e5369;padding-bottom:5px;margin-top:30px}h3{color:#e67e22;margin-top:20px}ul{padding-left:20px}li{margin-bottom:10px}code{background:#1c2b3a;padding:2px 6px;border-radius:5px;font-family:'Orbitron',sans-serif;color:#f1c40f}p{color:#bdc3c7}strong{color:#ecf0f1}</style></head><body><div class="container"><h1>Amőba Pro Online - Részletes Játékszabályzat</h1><h2>Bevezetés</h2><p>Üdvözlünk az Amőba Pro Online világában! A játék célja, hogy elsőként tegyél le öt saját jelet (X vagy O) egy megszakítás nélküli, egybefüggő vonalban a 15x15-ös játéktáblán.</p><h2>Pénz és Tétek</h2><p>A játékban <code>FT</code>-ot (játékpénzt) gyűjthetsz. Minden új játékos 1000 FT kezdőtőkével indul.</p><ul><li><b>Tétrakás:</b> Minden játék előtt megadhatsz egy tétet. A győztes megkapja a teljes potot (a két tét összegét). Döntetlen esetén mindkét játékos visszakapja a saját tétjét.</li></ul><h2>Bolt és Testreszabás</h2><p>Az összegyűjtött pénzedből a "Bolt" menüpontban vásárolhatsz háttereket a játékos paneledre és ikonokat a neved mellé. A megvásárolt elemeket a boltban tudod "felszerelni".</p><h2>Játékmódok</h2><p>Játssz AI ellen vagy egy barátoddal online. A többjátékos módhoz oszd meg a <code>Játék Kódot</code> a partnereddel.</p><h2>Leskelődés</h2><p>Minden játéknak van egy kétjegyű <code>Leskelődő Kódja</code>, amivel nézőként csatlakozhatsz.</p><p style="text-align:center;margin-top:30px">Jó szórakozást kívánunk!</p></div></body></html>`); rulesWindow.document.close(); }
+        uiElements.rulesLink.addEventListener('click', showRules);
+        
+        uiElements.copyCodeBtn.addEventListener('click', () => { navigator.clipboard.writeText(localGameState.gameCode).then(() => { uiElements.copyCodeBtn.textContent = 'Másolva!'; setTimeout(() => { uiElements.copyCodeBtn.textContent = 'Másolás'; }, 2000); }); });
+        function triggerVictoryConfetti() { const duration = 3 * 1000, animationEnd = Date.now() + duration; function randomInRange(min, max) { return Math.random() * (max - min) + min; } const interval = setInterval(function() { const timeLeft = animationEnd - Date.now(); if (timeLeft <= 0) { return clearInterval(interval); } const particleCount = 50 * (timeLeft / duration); const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }; confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0, 0.1), y: Math.random() } })); confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.9, 1), y: Math.random() } })); }, 250); }
+        function checkForWin(index, board, player) { if(index === null) return false; const col = index % BOARD_SIZE, row = Math.floor(index / BOARD_SIZE); const directions = [[0, 1], [1, 0], [1, 1], [1, -1]]; for (const [dx, dy] of directions) { let line = [index]; for (let i=1;i<5;i++) { const r=row+i*dy, c=col+i*dx, idx=r*BOARD_SIZE+c; if (r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[idx]===player) line.push(idx); else break; } for (let i=1;i<5;i++) { const r=row-i*dy, c=col-i*dx, idx=r*BOARD_SIZE+c; if (r>=0&&r<BOARD_SIZE&&c>=0&&c<BOARD_SIZE&&board[idx]===player) line.push(idx); else break; } if (line.length>=5) return line; } return false; }
+        
+        function getStats() { return JSON.parse(localStorage.getItem('amobaProStats')) || { karesz: { games: 0, wins: 0, losses: 0, draws: 0, winStreak: 0, bestStreak: 0 }, pikszel: { games: 0, wins: 0, losses: 0, draws: 0, winStreak: 0, bestStreak: 0 }, totalGames: 0, totalWins: 0, totalDraws: 0 }; }
+        function updateStats(winner, ai) { if(localPlayerSymbol === 'spectator') return; const stats = getStats(); if (winner !== null) { stats.totalGames++; if (ai) { stats[ai].games++; if (winner === 'X') { stats[ai].wins++; stats.totalWins++; stats[ai].winStreak++; if (stats[ai].winStreak > stats[ai].bestStreak) stats[ai].bestStreak = stats[ai].winStreak; } else if (winner === 'O') { stats[ai].losses++; stats[ai].winStreak = 0; } else { stats[ai].draws++; stats.totalDraws++; stats[ai].winStreak = 0; } } } localStorage.setItem('amobaProStats', JSON.stringify(stats)); }
+        function showStats() { const stats = getStats(); document.getElementById('stats-karesz-games').textContent = stats.karesz.games; document.getElementById('stats-karesz-wins').textContent = stats.karesz.wins; document.getElementById('stats-karesz-losses').textContent = stats.karesz.losses; document.getElementById('stats-karesz-draws').textContent = stats.karesz.draws; document.getElementById('stats-karesz-streak').textContent = stats.karesz.winStreak; document.getElementById('stats-karesz-best-streak').textContent = stats.karesz.bestStreak; document.getElementById('stats-pikszel-games').textContent = stats.pikszel.games; document.getElementById('stats-pikszel-wins').textContent = stats.pikszel.wins; document.getElementById('stats-pikszel-losses').textContent = stats.pikszel.losses; document.getElementById('stats-pikszel-draws').textContent = stats.pikszel.draws; document.getElementById('stats-pikszel-streak').textContent = stats.pikszel.winStreak; document.getElementById('stats-pikszel-best-streak').textContent = stats.pikszel.bestStreak; uiElements.statsModal.classList.remove('hidden'); }
+        uiElements.statsBtn.addEventListener('click', showStats);
+        uiElements.closeStatsBtn.addEventListener('click', () => uiElements.statsModal.classList.add('hidden'));
+
+        function renderShopItems(container, items, category) {
+            container.innerHTML = '';
+            const categorySingular = category.slice(0, -1); // 'backgrounds' -> 'background'
+            items.forEach(item => {
+                const isOwned = localPlayerData.inventory[category].includes(item.id);
+                const isEquipped = localPlayerData.equipped[categorySingular] === item.id;
+                
+                const itemEl = document.createElement('div');
+                itemEl.classList.add('shop-item');
+                const previewContent = category === 'icons' ? item.icon : '';
+                itemEl.innerHTML = `
+                    <div class="shop-item-preview" style="${category === 'backgrounds' ? `background:${item.style}; background-size:cover; background-position:center;` : ''}">${previewContent}</div>
+                    <h4>${item.name}</h4>
+                    <div class="shop-item-price">${item.price > 0 ? `${item.price} FT` : 'Alap'}</div>
+                    <button class="shop-btn" id="shop-btn-${category}-${item.id}"></button>
+                `;
+                container.appendChild(itemEl);
+
+                const button = document.getElementById(`shop-btn-${category}-${item.id}`);
+                if(isEquipped) {
+                    button.textContent = 'Felszerelve';
+                    button.classList.add('equipped-btn');
+                    button.disabled = true;
+                } else if(isOwned) {
+                    button.textContent = 'Felszerelés';
+                    button.classList.add('equip-btn');
+                    button.onclick = () => equipItem(category, item.id);
+                } else {
+                    button.textContent = 'Vásárlás';
+                    button.classList.add('buy-btn');
+                    button.onclick = () => buyItem(category, item);
+                }
             });
         }
-        
-        document.getElementById('next-round-btn').style.display = 'block';
-    }
-    
-    document.getElementById('spin-btn').addEventListener('click', spinWheel);
-    
-    document.getElementById('next-round-btn').addEventListener('click', async () => {
-        if (!currentGameId) return;
-        const gameSnap = await get(ref(db, `games/${currentGameId}`));
-        const data = gameSnap.val();
-        if(localPlayer.uid === data.player1.uid) {
-            await createNewRound(currentGameId, data.player1, data.player2);
+
+        function displayShop() {
+            if (!localPlayerData) return;
+            renderShopItems(uiElements.shopItemsContainerBgs, SHOP_ITEMS.backgrounds, 'backgrounds');
+            renderShopItems(uiElements.shopItemsContainerIcons, SHOP_ITEMS.icons, 'icons');
+            uiElements.shopModal.classList.remove('hidden');
         }
-    });
 
-    (function init() {
-        const pyramidContainer = document.getElementById('money-pyramid');
-        pyramidContainer.innerHTML = '';
-        MONEY_PYRAMID.slice(1).forEach((level, index) => { 
-            const levelDiv = document.createElement('div'); 
-            levelDiv.id = `pyramid-level-${index + 1}`; 
-            levelDiv.classList.add('pyramid-level'); 
-            levelDiv.textContent = level.label; 
-            levelDiv.style.width = `${40 + (index * 6)}%`;
-            pyramidContainer.appendChild(levelDiv);
-        });
-        
-        document.getElementById('cancel-host-btn').addEventListener('click', () => { 
-            if(gameUnsubscribe) gameUnsubscribe(); 
-            if(currentGameId) remove(ref(db, `games/${currentGameId}`)); 
-            switchScreen('menu'); 
-        });
-        
-        // Copy game code to clipboard
-        document.getElementById('game-code-display').addEventListener('click', (e) => {
-            const code = e.target.textContent;
-            if(code && code !== '----') {
-                navigator.clipboard.writeText(code).then(() => {
-                    alert('Kód a vágólapra másolva!');
-                }).catch(err => {
-                    console.error('Hiba a másolás során: ', err);
+        async function buyItem(category, item) {
+            if (localPlayerData.money < item.price) { alert('Nincs elég pénzed!'); return; }
+            showLoading('Vásárlás...');
+            try {
+                const playerRef = doc(db, 'users', localPlayerName);
+                await updateDoc(playerRef, {
+                    money: increment(-item.price),
+                    [`inventory.${category}`]: arrayUnion(item.id)
                 });
-            }
-        });
+                localPlayerData.money -= item.price;
+                localPlayerData.inventory[category].push(item.id);
+                updatePlayerUI();
+                displayShop();
+            } catch (error) { console.error("Vásárlási hiba:", error); alert("Hiba történt a vásárlás során."); } 
+            finally { hideLoading(); }
+        }
 
-    })();
+        async function equipItem(category, itemId) {
+            showLoading('Felszerelés...');
+            try {
+                const categorySingular = category.slice(0, -1);
+                const playerRef = doc(db, 'users', localPlayerName);
+                await updateDoc(playerRef, { [`equipped.${categorySingular}`]: itemId });
+                localPlayerData.equipped[categorySingular] = itemId;
+                updatePlayerUI();
+                displayShop();
+            } catch (error) { console.error("Felszerelési hiba:", error); alert("Hiba történt a felszerelés során."); } 
+            finally { hideLoading(); }
+        }
 
-</script>
+        uiElements.shopBtn.addEventListener('click', displayShop);
+        uiElements.closeShopBtn.addEventListener('click', () => uiElements.shopModal.classList.add('hidden'));
 
+        const ACHIEVEMENTS_LIST = { 'first_win':{title:'Az Első Lépés',icon:'🏆'},'first_loss':{title:'A Kezdeti Sokk',icon:'🤕'},'karesz_win_1':{title:'Logikai Laposvas',icon:'🔧'},'pikszel_win_1':{title:'Piksel-Pacsi',icon:'✋'},'win_streak_3':{title:'Tripla',icon:'🔥'},'win_streak_5':{title:'Lendületben',icon:'🚀'},'win_streak_10':{title:'Megállíthatatlan',icon:'☄️'},'karesz_win_10':{title:'Karesz Ismerőse',icon:'🤖'},'pikszel_win_10':{title:'Pikszel Barátja',icon:'🎨'},'both_defeated':{title:'Dupla Diadal',icon:'👑'},'draw_master':{title:'Patthelyzet',icon:'🤝'},'hard_win':{title:'Kemény Dió',icon:'🧠'},'genius_win':{title:'Gépromboló',icon:'💥'},'karesz_genius':{title:'Szilícium-Szelidítő',icon:'🦾'},'panna_genius':{title:'Pikszel-Professzor',icon:'🎓'},'total_wins_25':{title:'Negyed Század',icon:'🏅'},'total_wins_50':{title:'Fél Század',icon:'🎖️'},'total_wins_100':{title:'Százados',icon:'🥇'},'total_games_10':{title:'Bemelegítés',icon:'👟'},'total_games_50':{title:'Kitartó',icon:'💪'},'total_games_150':{title:'Veterán',icon:'🛡️'},'draw_master_5':{title:'Diplomata',icon:'🕊️'}};
+        function getUnlockedAchievements() { return new Set(JSON.parse(localStorage.getItem('unlockedAchievements')) || []); }
+        function showAchievementOnBoard(achievement) { const el = uiElements.achievementOnBoard; el.innerHTML = `🏆 Teljesítmény feloldva!<br>"${achievement.title}"`; el.classList.remove('hidden'); el.classList.add('show'); setTimeout(() => { el.classList.add('hidden'); el.classList.remove('show'); }, 3000); }
+        function unlockAchievement(id) { const unlocked = getUnlockedAchievements(); if (!unlocked.has(id)) { unlocked.add(id); localStorage.setItem('unlockedAchievements', JSON.stringify([...unlocked])); showAchievementOnBoard(ACHIEVEMENTS_LIST[id]); } }
+        function displayAchievements() { const unlocked = getUnlockedAchievements(); uiElements.achievementsList.innerHTML = ''; for (const id in ACHIEVEMENTS_LIST) { const ach = ACHIEVEMENTS_LIST[id]; const isUnlocked = unlocked.has(id); uiElements.achievementsList.innerHTML += `<div class="achievement-item ${isUnlocked ? 'unlocked' : ''}"><span class="achievement-icon">${ach.icon}</span><div class="achievement-details"><h4>${ach.title}</h4><p>${ACHIEVEMENTS_LIST[id].description || ''}</p></div></div>`; } uiElements.achievementsModal.classList.remove('hidden'); }
+        function checkAllAchievements(gameState) { /* ... A meglévő logika ... */ }
+        uiElements.achievementsBtn.addEventListener('click', displayAchievements);
+        uiElements.closeAchievementsBtn.addEventListener('click', () => uiElements.achievementsModal.classList.add('hidden'));
+
+        getDailyQuotes();
+        initializeAvatars();
+    </script>
 </body>
 </html>
