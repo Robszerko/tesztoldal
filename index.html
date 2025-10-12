@@ -2,532 +2,404 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NYERŐ4ES Online</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Időjárás Monitor - Szakoly</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.8.0/suncalc.min.js"></script>
     <style>
         :root {
-            --background-gradient: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-            --board-bg: linear-gradient(145deg, #4a6a8a, #34495e);
-            --panel-bg: rgba(20, 30, 40, 0.7);
-            --hole-bg: #2c3e50;
-            --player1-color: #e74c3c;
-            --player1-glow: #ff7675;
-            --player2-color: #f1c40f;
-            --player2-glow: #ffeaa7;
-            --text-color: #ecf0f1;
-            --highlight-color: #3498db;
-            --gold-color: #f1c40f;
-        }
-        *, *::before, *::after { box-sizing: border-box; }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--background-gradient);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            color: var(--text-color);
-            overflow: hidden;
-            padding: 1vmin;
-        }
-        .hidden { display: none !important; opacity: 0; }
-        button {
-            font-family: 'Poppins', sans-serif;
-            padding: 12px 25px;
-            font-size: 16px;
-            font-weight: 600;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 0 0 #1e824c;
-            background: linear-gradient(145deg, #2ecc71, #27ae60);
-            text-transform: uppercase;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-        }
-        button:hover {
-            filter: brightness(1.1);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 0 0 #1e824c;
-        }
-        button:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 0 #1e824c;
-        }
-        #setup-screen {
-            background-color: var(--panel-bg);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            width: clamp(300px, 90vw, 480px);
-        }
-        
-        .game-title {
-            font-size: 2.8em;
-            font-weight: 800;
-            margin-bottom: 30px;
-            color: var(--text-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-        }
-        .logo-four {
-            font-weight: 800;
-            font-style: italic;
-            font-size: 1.6em;
-            color: var(--gold-color);
-            position: relative;
-            top: -0.05em;
-            margin: 0 0.05em 0 -0.05em;
-            text-shadow: 0 0 4px rgba(255, 255, 255, 0.5), 0 0 10px var(--gold-color), 0 0 20px var(--player2-glow);
-        }
+            --bg-widget-night: rgba(15, 23, 42, 0.7);
+            --border-widget-night: rgba(56, 189, 248, 0.25);
+            --accent-interactive-night: #00BFFF;
+            --text-primary-night: #EAEAEA;
+            --text-secondary-night: #BCCCDC;
 
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; }
-        .input-group input { width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; border: 2px solid transparent; background-color: rgba(0,0,0,0.2); color: white; transition: border-color 0.2s; }
-        .input-group input:focus { outline: none; border-color: var(--highlight-color); }
-        .lobby-actions { display: flex; gap: 15px; }
-        .lobby-actions button { flex: 1; }
-        #join-game-section { border-top: 1px solid rgba(255,255,255,0.2); margin-top: 20px; padding-top: 20px; }
-        .error-message { color: var(--player1-glow); margin-top: 10px; height: 1.2em;}
-        
-        #game-screen { display: flex; align-items: center; justify-content: center; gap: 2vmin; width: 100%; height: 100%; max-width: 1100px; }
-        #game-header {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-        #game-header .game-title { 
-            font-size: 2em; 
-            margin: 0; 
-            padding: 5px 20px; 
-            border-radius: 12px; 
-            background: var(--panel-bg); 
-            backdrop-filter: blur(5px); 
+            /* Nappali téma: sötét panelek, világos betűkkel */
+            --bg-widget-day: rgba(20, 30, 50, 0.65);
+            --border-widget-day: rgba(0, 122, 255, 0.25);
+            --accent-interactive-day: #007AFF;
+            --text-primary-day: #EAEAEA;
+            --text-secondary-day: #BCCCDC;
+
+            --hot: #EF4444; --warm: #F97316; --mild: #22C55E; --cool: #3B82F6; --cold: #6366F1;
+            --wind-calm: #93C5FD; --wind-light: #3B82F6; --wind-moderate: #22C55E; --wind-strong: #F97316;
+            --current-wind-color: var(--wind-calm);
+            --current-text-color: var(--text-primary-night); 
+            --current-text-muted-color: var(--text-secondary-night); 
+            --current-icon-color: var(--accent-interactive-night); 
+            --current-widget-bg: var(--bg-widget-night); 
+            --current-widget-border: var(--border-widget-night); 
+            --current-container-border-color: var(--border-widget-night);
         }
         
-        .player-panel { background: var(--panel-bg); backdrop-filter: blur(5px); border-radius: 16px; padding: 20px; width: 180px; text-align: center; display: flex; flex-direction: column; justify-content: center; gap: 10px; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.3); transition: all 0.4s ease; }
-        .player-panel .name { font-size: 1.5em; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-        .player-panel .score-label { font-size: 0.9em; opacity: 0.7; text-transform: uppercase; }
-        .player-panel .score { font-size: 4em; font-weight: 800; line-height: 1; }
-        #player1-panel { color: var(--player1-glow); }
-        #player2-panel { color: var(--player2-glow); }
-        .player-panel.active { transform: scale(1.08); box-shadow: 0 0 35px var(--glow-color), 0 8px 32px rgba(0,0,0,0.3); }
-        #player1-panel.active { --glow-color: var(--player1-color); }
-        #player2-panel.active { --glow-color: var(--player2-color); }
-
-        #center-column { display: flex; flex-direction: column; align-items: center; flex-grow: 1; max-width: 560px; width: 50vw; }
-        #message-area { font-size: clamp(1em, 2vw, 1.2em); font-weight: 600; text-align: center; }
-        #game-code-display { background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 8px; font-size: 1.2em; letter-spacing: 5px; font-weight: 600; cursor: pointer; }
-        #game-code-display:hover { background: rgba(0,0,0,0.5); }
-        
-        #drop-zone { width: 100%; height: 80px; position: relative; cursor: pointer; }
-        #preview-disc { position: absolute; top: 50%; transform: translateY(-50%); border-radius: 50%; opacity: 0.9; transition: left 0.1s ease-out; pointer-events: none; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
-
-        #board-container { position: relative; width: 100%; }
-        #jatekter { background: var(--board-bg); display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(6, 1fr); aspect-ratio: 7 / 6; width: 100%; padding: 1.5vmin; border-radius: 16px; box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 10px 20px rgba(0,0,0,0.5); position: relative; overflow: hidden; }
-        .board-disabled { pointer-events: none; filter: grayscale(50%); }
-
-        .cella { margin: auto; width: 85%; height: 85%; background-color: var(--hole-bg); border-radius: 50%; box-shadow: inset 0 4px 8px rgba(0,0,0,0.7); }
-        .golyostilus { background-image: radial-gradient(circle at 35% 35%, var(--shine-color), var(--base-color)); box-shadow: inset 0 -5px 10px rgba(0,0,0,0.5), 0 5px 10px rgba(0,0,0,0.4); }
-        .piros { --base-color: var(--player1-color); --shine-color: var(--player1-glow); }
-        .sarga { --base-color: var(--player2-color); --shine-color: var(--player2-glow); }
-        
-        /* JAVÍTVA: Az animált korong is megkapja a belső árnyékot a villanás elkerülése érdekében */
-        .falling { 
-            position: absolute; 
-            z-index: 10; 
-            border-radius: 50%; 
-            animation: rubber-ball-bounce 1s forwards; /* Kicsit gyorsabb lett */
-            box-shadow: inset 0 -5px 10px rgba(0,0,0,0.5), 0 5px 10px rgba(0,0,0,0.4);
+        #sky-container { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; 
+            transition: background 2s ease-out; 
         }
-        .winning-disc { animation: strobe-flash 0.8s infinite ease-in-out; }
         
-        #winner-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; backdrop-filter: blur(5px); }
-        #winner-overlay.show { opacity: 1; pointer-events: all; }
-        #winner-announcement { display: flex; flex-direction: column; align-items: center; text-align: center; transform: scale(0.5); opacity: 0; animation: winner-zoom-in 0.8s 0.3s forwards cubic-bezier(0.18, 0.89, 0.32, 1.28); }
-        #winner-player-name { font-size: 8vmin; font-weight: 600; color: var(--win-color); text-shadow: 0 0 10px black, 0 0 20px var(--win-color); }
-        #winner-static-text { font-size: 12vmin; font-weight: 800; text-transform: uppercase; color: white; text-shadow: 0 0 10px black, 0 0 30px var(--win-color); }
-        #winner-actions { margin-top: 40px; }
+        .is-hidden { display: none !important; }
+        body { font-family: 'Inter', sans-serif; font-weight: 500; background-color: #020617; min-height: 100vh; margin: 0; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; text-align: center; padding: 5vh 20px; box-sizing: border-box; position: relative; overflow-x: hidden; }
+        .weather-widget { border-radius: 18px; padding: 22px 24px; width: 100%; max-width: 800px; box-sizing: border-box; margin: 0 auto; margin-bottom: 1rem; position: relative; z-index: 30; background: var(--current-widget-bg); border: 1px solid var(--current-widget-border); box-shadow: 0 5px 18px rgba(0,0,0,0.12), 0 2px 7px rgba(0,0,0,0.18); backdrop-filter: blur(20px) saturate(120%); -webkit-backdrop-filter: blur(20px) saturate(120%); transition: all 0.6s ease-in-out; }
+        #weather-display { position: relative; z-index: 1; display: flex; flex-direction: column; }
+        .widget-header { text-align: center; margin-bottom: 10px; padding-bottom: 12px; }
+        .header-container { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .location-title { font-size: 22px; font-weight: 800; color: var(--current-text-color); line-height: 1.1; letter-spacing: -0.5px; }
+        .timestamp-container { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 10px;}
+        .timestamp { font-size: 12.5px; font-weight: 500; color: var(--current-text-muted-color); transition: color 0.6s; }
+        
+        .current-conditions-card { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background-color: rgba(0,0,0,0.1); border: 1px solid var(--current-container-border-color); border-radius: 12px; padding: 16px; margin: 20px 0 16px 0; }
+        .conditions-section { display: flex; flex-direction: column; }
+        .conditions-section:first-child { border-right: 1px solid var(--current-container-border-color); padding-right: 16px; }
+        .section-title { font-size: 13px; font-weight: 700; color: var(--current-text-color); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+        .temp-primary-display { text-align: center; margin-bottom: 12px; }
+        .current-temp-value { font-size: 52px; font-weight: 800; line-height: 1; color: var(--current-text-color); }
+        .current-temp-value span:last-child { font-weight: 600; font-size: 0.5em; vertical-align: super; }
+        .temp-secondary-info { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: var(--current-text-muted-color); }
+        .precip-intensity-text { font-style: italic; }
 
-        @keyframes winner-zoom-in { to { transform: scale(1); opacity: 1; } }
+        .temp-forecast-visualizer { margin-top: 15px; }
+        .temp-forecast-visualizer .section-header { justify-content: center; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .temp-forecast-visualizer .section-header h4 { margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--current-text-muted-color); }
+        .temp-chart { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; height: 60px; }
+        .chart-column { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; }
+        .chart-temp-label { font-size: 12px; font-weight: 700; color: var(--current-text-color); }
+        .chart-bar-wrapper { width: 16px; height: 100%; background-color: rgba(0,0,0,0.2); border-radius: 4px; display: flex; align-items: flex-end; overflow: hidden; }
+        .chart-bar-fill { width: 100%; background-color: var(--mild); border-top-left-radius: 3px; border-top-right-radius: 3px; transition: height 0.6s ease-out, background-color 0.6s ease-out; }
+        .chart-hour-label { font-size: 11px; font-weight: 600; color: var(--current-text-color); }
         
-        /* JAVÍTVA: Teljesen új, "squash & stretch" gumilabda animáció */
-        @keyframes rubber-ball-bounce {
-            0% { transform: translateY(var(--start-y)) scale(1, 1); animation-timing-function: cubic-bezier(0.6, 0.04, 0.98, 0.335); }
-            45% { transform: translateY(var(--drop-height)) scale(1, 1); animation-timing-function: linear; }
-            50% { transform: translateY(var(--drop-height)) scale(1.2, 0.8); animation-timing-function: cubic-bezier(0.02, 0.61, 0.44, 0.98); } /* Becsapódás és lapulás */
-            65% { transform: translateY(calc(var(--drop-height) - 70px)) scale(0.9, 1.1); animation-timing-function: cubic-bezier(0.6, 0.04, 0.98, 0.335); } /* Visszapattanás és nyúlás */
-            80% { transform: translateY(var(--drop-height)) scale(1.1, 0.9); animation-timing-function: cubic-bezier(0.02, 0.61, 0.44, 0.98); }
-            90% { transform: translateY(calc(var(--drop-height) - 20px)) scale(0.95, 1.05); animation-timing-function: cubic-bezier(0.6, 0.04, 0.98, 0.335); }
-            100% { transform: translateY(var(--drop-height)) scale(1, 1); }
-        }
+        .wind-display-flex-container { display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+        .wind-gauge-container { flex-shrink: 0; }
+        .wind-gauge { margin: 0 auto; position: relative; width: 120px; height: 120px; display: flex; justify-content: center; align-items: center; border: 1px solid var(--current-container-border-color); border-radius: 50%; }
+        .wind-data-center { z-index: 2; width: 110px; height: 110px; background: rgba(0,0,0,0.2); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .wind-speed-main { display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; color: var(--current-wind-color); font-weight: 800; font-size: 38px; }
+        .wind-speed-unit { font-size: 14px; font-weight: 500; color: var(--current-text-muted-color); margin-top: 2px; }
+        .wind-details-container { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; text-align: left; flex-grow: 1; max-width: 170px; }
+        .wind-direction-info { display: flex; align-items: center; gap: 8px; }
+        .wind-direction-arrow { font-size: 20px; color: var(--current-wind-color); transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+        .wind-direction-full { font-size: 14px; font-weight: 600; text-transform: capitalize; color: var(--current-text-color); }
+        .wind-detail-item { font-size: 12px; color: var(--current-text-muted-color); font-weight: 500; width: 100%; display: flex; justify-content: space-between; }
+        .wind-detail-item strong { color: var(--current-text-color); font-weight: 700; }
+        .wind-legend-container { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 16px; padding: 6px; background-color: rgba(0,0,0,0.15); border-radius: 8px; width: 100%; box-sizing: border-box; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: var(--current-text-muted-color); }
+        .legend-color-box { width: 12px; height: 12px; border-radius: 3px; }
 
-        @keyframes strobe-flash { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.1); filter: brightness(2); box-shadow: 0 0 20px var(--shine-color); } }
+        .pws-details-container { background-color: rgba(0,0,0,0.08); border: 1px solid var(--current-container-border-color); border-radius: 12px; padding: 12px 14px; margin-bottom: 20px; }
+        .pws-details-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; row-gap: 4px; }
+        .detail-item { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 2px 0; }
+        .detail-item .label { font-weight: 600; color: var(--current-text-muted-color); display: flex; align-items: center; white-space: nowrap; }
+        .detail-item .label i { margin-right: 6px; width: 12px; font-size: 0.9em; text-align: center; opacity: 0.8; color: var(--current-icon-color); }
+        .detail-item .value { font-weight: 700; font-size: 12px; color: var(--current-text-color); display: flex; align-items: center; }
+        .pressure-trend-icon { margin-left: 4px; }
         
-        /* ... A többi stílus változatlan ... */
+        .precip-summary-card { display: flex; flex-direction: column; gap: 0; background: linear-gradient(170deg, rgba(0,0,0,0.1), rgba(0,0,0,0.18)); border: 1px solid var(--current-container-border-color); border-radius: 12px; padding: 0; margin-bottom: 20px; transition: all 0.5s ease; overflow: hidden; }
+        .precip-card-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-bottom: 1px solid rgba(from var(--current-container-border-color) r g b / 0.4); background-color: rgba(0,0,0,0.1); }
+        .precip-header-title-group { display: flex; align-items: center; gap: 12px; }
+        .precip-header-icon i { font-size: 22px; color: var(--current-icon-color); transition: color 0.5s ease; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .precip-header-title { font-size: 16px; font-weight: 800; color: var(--current-text-color); margin: 0; letter-spacing: 0.5px; }
+        .precip-card-content { padding: 12px 16px; width: 100%; box-sizing: border-box; }
+        .precip-station-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .precip-station-card { background-color: rgba(0,0,0,0.15); border: 1px solid var(--current-container-border-color); border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 6px; transition: all 0.4s ease; }
+        .precip-station-card.is-raining-now { border-color: rgba(from var(--current-icon-color) r g b / 0.6); box-shadow: 0 0 12px -3px rgba(from var(--current-icon-color) r g b / 0.4); }
+        .station-card-header { display: flex; justify-content: space-between; align-items: center; }
+        .station-card-name { font-weight: 700; font-size: 13px; color: var(--current-text-color); }
+        .station-card-status-icon { width: 8px; height: 8px; border-radius: 50%; background-color: var(--current-icon-color); box-shadow: 0 0 8px var(--current-icon-color); }
+        .station-card-main { text-align: center; }
+        .station-card-total-label { font-size: 10px; font-weight: 500; color: var(--current-text-muted-color); }
+        .station-card-total-value { font-size: 24px; font-weight: 800; color: var(--current-text-color); line-height: 1.1; }
+        .station-card-total-value span { font-size: 0.6em; font-weight: 600; color: var(--current-text-muted-color); margin-left: 2px; }
+        .station-card-footer-info { font-size: 11px; text-align: center; font-weight: 600; color: var(--current-text-muted-color); border-top: 1px solid var(--current-container-border-color); padding-top: 5px; min-height: 14px; }
+        .station-card-footer-info.live-intensity { color: var(--current-text-color); font-style: italic; }
+        .precip-card-footer { padding: 8px 16px 12px 16px; border-top: 1px solid rgba(from var(--current-container-border-color) r g b / 0.3); text-align: center; }
+        .station-tooltip-container { position: relative; display: inline-block; }
+        .station-list-trigger { font-size: 12px; font-weight: 600; color: var(--current-icon-color); border-bottom: 1px dashed var(--current-icon-color); cursor: help; padding: 4px; }
+        .station-tooltip-content { visibility: hidden; opacity: 0; width: 280px; background: var(--current-widget-bg); color: var(--current-text-color); padding: 10px; border-radius: 8px; border: 1px solid var(--current-widget-border); position: absolute; z-index: 100; bottom: 125%; left: 50%; transform: translateX(-50%); transition: opacity 0.3s, visibility 0.3s; pointer-events: none; font-size: 12px; line-height: 1.5; }
+        .station-tooltip-container:hover .station-tooltip-content { visibility: visible; opacity: 1; }
+        
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .section-timestamp { font-size: 11px; font-weight: 500; color: var(--current-text-muted-color); }
+        
+        .forecast-title { width: 100%; max-width: 800px; font-size: 16px; font-weight: 700; color: var(--current-text-color); margin-top: 24px; margin-bottom: 12px; text-align: center; transition: color 0.6s; display: flex; justify-content: space-between; align-items: center; }
+        
+        .hourly-forecast-container { width: 100%; max-width: 800px; display: grid; grid-template-columns: 1fr; gap: 8px; padding: 4px; box-sizing: border-box; margin: 0 auto; }
+        .hourly-forecast-card { display: flex; flex-direction: column; gap: 12px; padding: 1rem; border-radius: 12px; background: var(--current-widget-bg); border: 1px solid var(--current-widget-border); box-shadow: 0 2px 8px rgba(0,0,0,0.1); color: var(--current-text-color); transition: all 0.6s; text-align: left; }
+        .hourly-card-header { display: flex; justify-content: space-between; align-items: baseline; width: 100%; padding-bottom: 8px; border-bottom: 1px solid var(--current-container-border-color); }
+        .hourly-time { font-weight: 700; font-size: 1.1rem; }
+        .hourly-temp { font-weight: 800; font-size: 1.5rem; }
+        .hourly-temp span { font-size: 0.7em; font-weight: 500; vertical-align: super; }
+        .hourly-main-condition { display: flex; align-items: center; gap: 12px; width: 100%; }
+        .hourly-main-condition-icon { font-size: 2.2rem; color: var(--current-icon-color); flex-shrink: 0; width: 40px; text-align: center; }
+        .hourly-main-condition-text { font-size: 1rem; font-weight: 600; color: var(--current-text-color); }
+        .hourly-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; font-size: 0.8rem; color: var(--current-text-muted-color); padding-top: 8px; border-top: 1px solid var(--current-container-border-color); }
+        .hourly-detail-item { display: flex; align-items: center; gap: 6px; }
+        .hourly-detail-item i { width: 14px; text-align: center; opacity: 0.8; }
+        .hourly-detail-item strong { color: var(--current-text-color); font-weight: 600; }
+
+        .daily-forecast-container { display: flex; flex-direction: column; gap: 8px; max-width: 800px; width: 100%; }
+        .daily-forecast-item { display: grid; grid-template-columns: 100px 50px 1fr auto; align-items: center; gap: 1rem; padding: 0.75rem 1.25rem; background: var(--current-widget-bg); border: 1px solid var(--current-widget-border); border-radius: 1rem; margin-bottom: 0.5rem; text-align: left;}
+        .daily-day { display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: rgba(0,0,0,0.1); border: 1px solid var(--current-container-border-color); border-radius: 8px; padding: 4px; height: 100%; box-sizing: border-box; }
+        .daily-day .day-name { font-size: 1rem; font-weight: 700; color: var(--current-text-color); margin-top: 2px; }
+        .daily-day .day-date { font-size: 0.8rem; font-weight: 600; color: var(--current-text-muted-color); }
+        .daily-icon { font-size: 1.75rem; color: var(--current-icon-color); text-align: center; }
+        .daily-details .daily-condition-text { font-size: 0.9rem; font-weight: 500; color: var(--current-text-color); line-height: 1.3; }
+        .daily-details .daily-precip-chance { font-size: 0.8rem; font-weight: 500; color: var(--current-text-muted-color); opacity: 0.9; margin-top: 2px; }
+        .daily-temps { text-align: right; }
+        .daily-temps .max { font-size: 1.1rem; font-weight: 700; color: var(--current-text-color); }
+        .daily-temps .min { font-size: 0.9rem; font-weight: 500; color: var(--current-text-muted-color); }
+
+        @media (min-width: 420px) { .hourly-forecast-container { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 420px) { .hourly-details-grid { grid-template-columns: 1fr; } }
+        @media (min-width: 640px) { .hourly-forecast-container { grid-template-columns: repeat(2, 1fr); } .pws-details-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 768px) { .precip-station-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } .hourly-forecast-container { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1000px) { .hourly-forecast-container { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 768px) { .current-conditions-card { grid-template-columns: 1fr; gap: 0; } .conditions-section:first-child { border-right: none; padding-right: 0; padding-bottom: 16px; border-bottom: 1px solid var(--current-container-border-color); } }
+        @media (max-width: 480px) { .current-temp-value { font-size: 48px; } .wind-display-flex-container { flex-direction: column; } }
     </style>
 </head>
 <body>
-    <div id="confetti-container"></div>
-    <div id="setup-screen">
-        <h1 class="game-title">NYERŐ<span class="logo-four">4</span>ES</h1>
-        
-        <div class="input-group"> <label for="player-name">Játékosnév</label> <input type="text" id="player-name" value="Játékos" maxlength="12"> </div>
-        <div class="lobby-actions">
-            <button id="create-game-btn">Játék létrehozása</button>
-        </div>
-        <div id="join-game-section">
-            <div class="input-group"> <label for="game-code-input">Játék kódja</label>
-                <input type="text" id="game-code-input" placeholder="Írd be a 4 jegyű kódot" maxlength="4">
-            </div>
-            <button id="join-game-btn">Csatlakozás</button>
-        </div>
-        <div class="error-message"></div>
+    <div id="sky-container"></div>
+    
+    <div class="weather-widget">
+        <div id="weather-display"></div>
     </div>
     
-    <div id="game-screen" class="hidden">
-        <header id="game-header">
-             <h1 class="game-title">NYERŐ<span class="logo-four">4</span>ES</h1>
-             <div id="message-area"></div>
-             <div id="game-code-display" class="hidden" title="Kattints a másoláshoz"></div>
-        </header>
-        <div class="player-panels-container">
-            <div id="player1-panel" class="player-panel"> <div id="p1-name" class="name"></div> <div class="score-label">Pontszám</div> <div id="p1-score" class="score">0</div> </div>
-            <div id="player2-panel" class="player-panel"> <div id="p2-name" class="name"></div> <div class="score-label">Pontszám</div> <div id="p2-score" class="score">0</div> </div>
-        </div>
-        <div id="center-column">
-            <div id="drop-zone"> <div id="preview-disc" class="hidden"></div> </div>
-            <div id="board-container"> <div id="jatekter"></div> </div>
-        </div>
-    </div>
+    <h3 class="forecast-title is-hidden" id="hourly-forecast-title">
+        <span>A következő órákban várható időjárás</span>
+        <span class="section-timestamp" id="hourly-forecast-timestamp"></span>
+    </h3>
+    <div class="hourly-forecast-container" id="hourly-forecast-container"></div>
 
-    <div id="winner-overlay">
-        <div id="winner-announcement">
-            <span id="winner-player-name"></span>
-            <span id="winner-static-text">Nyert!</span>
-            <div id="winner-actions"></div>
-        </div>
-    </div>
+    <h3 class="forecast-title is-hidden" id="daily-forecast-title">
+        <span>15 napos előrejelzés</span>
+        <span class="section-timestamp" id="daily-forecast-timestamp"></span>
+    </h3>
+    <div class="daily-forecast-container" id="daily-forecast-container"></div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDoH4UgzzsYLRjG7denk0qD5a_L5WohEnM",
-            authDomain: "nyero4es.firebaseapp.com",
-            databaseURL: "https://nyero4es-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "nyero4es",
-            storageBucket: "nyero4es.firebasestorage.app",
-            messagingSenderId: "673098386729",
-            appId: "1:673098386729:web:55496e0a183345168b3b38"
+    <script>
+        const weatherComApiKey = 'e1f10a1e78da46f5b10a1e78da96f525';
+        const REFRESH_INTERVAL_PWS = 45 * 1000;
+        const REFRESH_INTERVAL_FORECAST = 15 * 60 * 1000;
+        const SKY_UPDATE_INTERVAL = 60 * 1000;
+        const SZAKOLY_COORDS = { lat: 47.82, lon: 21.96 };
+        
+        const STATIONS = {
+            SZAKOLY: { id: 'ISZAKO1', name: 'Szakoly', displayName: 'Szakoly', provides: ['precip', 'temp', 'wind'], isOnline: false, data: null, lastRainTimestamp: null },
+            NYIREGYHAZI_UT: { id: 'INYREG26', name: 'Nyíregyházi út', displayName: 'Nyíregyházi út', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            KOSSUTH: { id: 'INYREG42', name: 'Nyh, Kossuth út', displayName: 'Kossuth út', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            KERT_UTCA: { id: 'INYREG37', name: 'Nyh, Kert utca', displayName: 'Kert u.', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            SOSTOHEGY: { id: 'INYREG20', name: 'Sóstóhegy', displayName: 'Sóstóhegy', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            BORBANYA: { id: 'INYREG30', name: 'Borbánya', displayName: 'Borbánya', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            OROS_DERUS: { id: 'INYREG35', name: 'Oros', displayName: 'Oros', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            KEMECSE: { id: 'IKEMEC1', name: 'Kemecse', displayName: 'Kemecse', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            NAGYHALASZ: { id: 'INAGYH4', name: 'Nagyhalász', displayName: 'Nagyhalász', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            RAMOCSAHAZA: { id: 'IRAMOC1', name: 'Ramocsaháza', displayName: 'Ramocsaháza', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            SENYO: { id: 'ISNY1', name: 'Sényő', displayName: 'Sényő', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            NYIRADONY: { id: 'INYRAD1', name: 'Nyíradony', displayName: 'Nyíradony', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            NYIRBOGAT: { id: 'INYRBO3', name: 'Nyírbogát', displayName: 'Nyírbogát', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            NAPKOR: { id: 'INAPKO1', name: 'Napkor', displayName: 'Napkor', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            GAVAVENCSELLO: { id: 'IGVAVE1', name: 'Gávavencsellő', displayName: 'Gávavencsellő', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            PATROHA: { id: 'IPTROH1', name: 'Pátroha', displayName: 'Pátroha', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            AJAK: { id: 'IAJAK4', name: 'Ajak', displayName: 'Ajak', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            KISVARDA: { id: 'IKISVR2', name: 'Kisvárda', displayName: 'Kisvárda', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            VASAROSNAMENY: { id: 'IVSROS2', name: 'Vásárosnamény', displayName: 'Vásárosnamény', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            FEHERGYARMAT: { id: 'IFEHRG1', name: 'Fehérgyarmat', displayName: 'Fehérgyarmat', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            PORCSALMA: { id: 'IPORCS2', name: 'Porcsalma', displayName: 'Porcsalma', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            CSENGER: { id: 'ICSENG10', name: 'Csenger', displayName: 'Csenger', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null }, 
+            MATESZALKA: { id: 'IMTSZALK4', name: 'Mátészalka', displayName: 'Mátészalka', provides: ['precip'], isOnline: false, data: null, lastRainTimestamp: null },
         };
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const auth = getAuth(app);
+        const PRIMARY_STATION_KEY = 'SZAKOLY';
         
-        let localGameId = null;
-        let localPlayerColor = null;
-        let localUserId = null;
-        let lastAnimatedMoveTimestamp = null;
+        let lastApiCallTimes = { forecast: 0, forecastSuccess: 0 };
+        let cachedData = { pws: null, generalConditions: {}, hourlyForecast: [], dailyForecast: [], sunTimes: null };
         
-        const SOROK = 6, OSZLOPOK = 7;
-        const ANIMATION_DURATION = 1000; // Összhangban az új, gyorsabb animációval
+        const NO_DATA_STRING = 'N/A';
+        
+        function formatValue(value, unit = '', precision = 1, notAvailableString = NO_DATA_STRING) { if (value === null || typeof value === 'undefined' || (typeof value === 'number' && isNaN(value)) ) return notAvailableString; if (typeof value === 'number') { return `${value.toFixed(precision)}${unit}`; } return `${value}${unit}`; }
+        function formatTime(dateOrIsoString, includeSeconds = false) { if (!dateOrIsoString) return NO_DATA_STRING; try { const date = new Date(dateOrIsoString); if (isNaN(date.getTime())) return NO_DATA_STRING; const options = { hour: '2-digit', minute: '2-digit' }; if (includeSeconds) options.second = '2-digit'; return date.toLocaleTimeString('hu-HU', options); } catch (e) { return NO_DATA_STRING; } }
+        function formatHourOnly(dateOrIsoString) { if (!dateOrIsoString) return '--h'; try { const date = new Date(dateOrIsoString); if (isNaN(date.getTime())) return '--h'; return date.toLocaleTimeString('hu-HU', { hour: '2-digit' }) + 'h'; } catch (e) { return '--h'; } }
+        function getPrecipIntensityDescription(rate) { if (rate == null || rate <= 0) return 'Nem esik'; if (rate > 0 && rate <= 0.1) return 'Pár csepp'; if (rate > 0.1 && rate <= 0.25) return 'Szitálás'; if (rate > 0.25 && rate <= 0.5) return 'Csepereg'; if (rate > 0.5 && rate <= 1.0) return 'Enyhe eső'; if (rate > 1.0 && rate <= 4.0) return 'Gyenge eső'; if (rate > 4.0 && rate <= 10.0) return 'Mérsékelt eső'; if (rate > 10.0 && rate <= 25.0) return 'Intenzív eső'; return 'Zápor'; }
+        function degreesToCompass(degrees) { if (degrees === null || typeof degrees === 'undefined') return '-'; degrees = (parseFloat(degrees) % 360 + 360) % 360; const directions = ["északi", "észak-északkeleti", "északkeleti", "kelet-északkeleti", "keleti", "kelet-délkeleti", "délkeleti", "dél-délkeleti", "déli", "dél-délnyugati", "délnyugati", "nyugat-délnyugati", "nyugati", "nyugat-északnyugati", "északnyugati", "észak-északnyugati"]; return directions[Math.round(degrees / 22.5) % 16]; }
+        function getBeaufortDescription(speed) { if (speed === null || typeof speed === 'undefined') return 'Ismeretlen'; if (speed < 1) return 'Szélcsend'; if (speed <= 5) return 'Gyenge szellő'; if (speed <= 11) return 'Enyhe szellő'; if (speed <= 19) return 'Gyenge szél'; if (speed <= 28) return 'Mérsékelt szél'; if (speed <= 38) return 'Élénk szél'; if (speed <= 49) return 'Erős szél'; if (speed <= 61) return 'Viharos szél'; return 'Vihar'; }
+        function getTempColor(temp) { if (temp === null || typeof temp === 'undefined') return 'var(--mild)'; if (temp <= 5) return 'var(--cold)'; if (temp <= 12) return 'var(--cool)'; if (temp <= 22) return 'var(--mild)'; if (temp <= 28) return 'var(--warm)'; return 'var(--hot)'; }
+        function getWindColorName(speed) { if (speed == null) return 'calm'; if (speed < 5) return 'calm'; if (speed < 20) return 'light'; if (speed < 40) return 'moderate'; return 'strong'; }
+        const getPressureTrend = (trendCode) => { if (trendCode === null || typeof trendCode === 'undefined' || trendCode === 2) return '→'; if (trendCode === 0) return '↑'; if (trendCode === 1) return '↓'; return '→'; }
+        function mapTwcIconToFontAwesome(iconCode, dayOrNight) { const isDay = dayOrNight === 'D'; const iconMap = { 32:'fas fa-sun',36:'fas fa-sun',31:'fas fa-moon',33:'fas fa-moon',34:isDay ?'fas fa-cloud-sun':'fas fa-cloud-moon',29:isDay ?'fas fa-cloud-sun':'fas fa-cloud-moon',30:isDay ?'fas fa-cloud-sun':'fas fa-cloud-moon',27:'fas fa-cloud',28:'fas fa-cloud',26:'fas fa-cloud',11:'fas fa-cloud-showers-heavy',12:'fas fa-cloud-showers-heavy',40:'fas fa-cloud-showers-heavy',39:isDay ?'fas fa-cloud-sun-rain':'fas fa-cloud-moon-rain',45:isDay ?'fas fa-cloud-sun-rain':'fas fa-cloud-moon-rain',3:'fas fa-cloud-bolt',4:'fas fa-cloud-bolt',37:'fas fa-cloud-bolt',38:'fas fa-cloud-bolt',47:'fas fa-cloud-bolt',5:'fas fa-snowflake',6:'fas fa-snowflake',7:'fas fa-snowflake',8:'fas fa-snowflake',10:'fas fa-cloud-sleet',18:'fas fa-smog',13:'fas fa-snowflake',14:'fas fa-snowflake',15:'fas fa-snowflake',16:'fas fa-snowflake',41:'fas fa-snowflake',42:'fas fa-snowflake',43:'fas fa-snowflake',46:'fas fa-snowflake',9:'fas fa-cloud-rain',19:'fas fa-smog',20:'fas fa-smog',21:'fas fa-smog',22:'fas fa-smog',23:'fas fa-wind',24:'fas fa-wind' }; return iconMap[iconCode] || 'fas fa-question-circle'; }
 
-        // ... A többi JavaScript kód változatlan ...
-        const setupScreen = document.getElementById('setup-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const jatekter = document.getElementById('jatekter');
-        const messageArea = document.getElementById('message-area');
-        const dropZone = document.getElementById('drop-zone');
-        const previewDisc = document.getElementById('preview-disc');
-        const winnerOverlay = document.getElementById('winner-overlay');
-        const winnerPlayerName = document.getElementById('winner-player-name');
-        const winnerStaticText = document.getElementById('winner-static-text');
-        const winnerActions = document.getElementById('winner-actions');
-        const confettiContainer = document.getElementById('confetti-container');
-        const playerNameInput = document.getElementById('player-name');
-        const gameCodeInput = document.getElementById('game-code-input');
-        const gameCodeDisplay = document.getElementById('game-code-display');
-        const errorMessageDiv = document.querySelector('.error-message');
+        function updatePanelTheme() {
+            const general = cachedData.generalConditions;
+            const isNight = !general || !general.dayOrNight || general.dayOrNight === 'N';
+            const root = document.documentElement;
+            if (isNight) {
+                root.style.setProperty('--current-text-color', 'var(--text-primary-night)'); root.style.setProperty('--current-text-muted-color', 'var(--text-secondary-night)'); root.style.setProperty('--current-icon-color', 'var(--accent-interactive-night)'); root.style.setProperty('--current-widget-bg', 'var(--bg-widget-night)'); root.style.setProperty('--current-widget-border', 'var(--border-widget-night)'); root.style.setProperty('--current-container-border-color', 'var(--border-widget-night)');
+            } else {
+                root.style.setProperty('--current-text-color', 'var(--text-primary-day)'); root.style.setProperty('--current-text-muted-color', 'var(--text-secondary-day)'); root.style.setProperty('--current-icon-color', 'var(--accent-interactive-day)'); root.style.setProperty('--current-widget-bg', 'var(--bg-widget-day)'); root.style.setProperty('--current-widget-border', 'var(--border-widget-day)'); root.style.setProperty('--current-container-border-color', 'var(--border-widget-day)');
+            }
+        }
 
-        async function initGame() {
+        const SKY_THEME_MAP = { nightEnd: { top: '#020617', bottom: '#1f2937' }, nauticalDawn: { top: '#1e3a8a', bottom: '#4c1d95' }, dawn: { top: '#4c6cb3', bottom: '#f59e0b' }, sunrise: { top: '#87ceeb', bottom: '#ffb47c' }, goldenHour: { top: '#60a5fa', bottom: '#fcd34d' }, solarNoon: { top: '#38bdf8', bottom: '#a7ddf5' }, goldenHourEnd: { top: '#3b82f6', bottom: '#fb923c' }, sunset: { top: '#f59e0b', bottom: '#be123c' }, dusk: { top: '#4f46e5', bottom: '#1e1b4b' }, nauticalDusk: { top: '#1e1b4b', bottom: '#111827' }, night: { top: '#02040f', bottom: '#01020a' } };
+        const phaseOrder = ['nightEnd', 'nauticalDawn', 'dawn', 'sunrise', 'goldenHour', 'solarNoon', 'goldenHourEnd', 'sunset', 'dusk', 'nauticalDusk', 'night'];
+        function hexToRgb(hex) { let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null; }
+        function interpolateColor(color1, color2, factor) { factor = Math.max(0, Math.min(1, factor)); return { r: Math.round(color1.r + factor * (color2.r - color1.r)), g: Math.round(color1.g + factor * (color2.g - color1.g)), b: Math.round(color1.b + factor * (color2.b - color1.b)) }; }
+        
+        function updateDynamicSky() {
+            if (!cachedData.sunTimes) return;
+            const now = new Date(); const nowMs = now.getTime(); let todayTimes = cachedData.sunTimes; let yesterdayTimes = SunCalc.getTimes(new Date(nowMs - 86400000), SZAKOLY_COORDS.lat, SZAKOLY_COORDS.lon); let tomorrowTimes = SunCalc.getTimes(new Date(nowMs + 86400000), SZAKOLY_COORDS.lat, SZAKOLY_COORDS.lon); let currentPhaseName = phaseOrder[phaseOrder.length - 1]; let currentPhaseTime = yesterdayTimes[currentPhaseName].getTime();
+            for (let i = 0; i < phaseOrder.length; i++) { const phaseName = phaseOrder[i]; if (todayTimes[phaseName].getTime() <= nowMs) { currentPhaseName = phaseName; currentPhaseTime = todayTimes[phaseName].getTime(); } else { break; } }
+            const currentPhaseIndex = phaseOrder.indexOf(currentPhaseName); const nextPhaseIndex = (currentPhaseIndex + 1) % phaseOrder.length; const nextPhaseName = phaseOrder[nextPhaseIndex]; let nextPhaseTime = todayTimes[nextPhaseName].getTime(); if (nextPhaseTime < currentPhaseTime) { nextPhaseTime = tomorrowTimes[nextPhaseName].getTime(); }
+            const totalDuration = nextPhaseTime - currentPhaseTime; const elapsed = nowMs - currentPhaseTime; const progress = totalDuration > 0 ? Math.max(0, Math.min(1, elapsed / totalDuration)) : 0;
+            const theme1 = SKY_THEME_MAP[currentPhaseName]; const theme2 = SKY_THEME_MAP[nextPhaseName]; const topRgb = interpolateColor(hexToRgb(theme1.top), hexToRgb(theme2.top), progress); const bottomRgb = interpolateColor(hexToRgb(theme1.bottom), hexToRgb(theme2.bottom), progress);
+            document.getElementById('sky-container').style.background = `linear-gradient(to bottom, rgb(${topRgb.r},${topRgb.g},${topRgb.b}), rgb(${bottomRgb.r},${bottomRgb.g},${bottomRgb.b}))`;
+        }
+        
+        async function fetchPwsStationData(stationKey) { const station = STATIONS[stationKey]; const url = `https://api.weather.com/v2/pws/observations/current?apiKey=${weatherComApiKey}&stationId=${station.id}&numericPrecision=decimal&format=json&units=m`; try { const response = await fetch(url); if (!response.ok) throw new Error(); const data = await response.json(); if (!data.observations || data.observations.length === 0) throw new Error(); station.isOnline = true; station.data = data.observations[0]; if (station.data.metric.precipRate > 0) station.lastRainTimestamp = new Date(station.data.obsTimeLocal).getTime(); } catch (error) { station.isOnline = false; station.data = null; } }
+        
+        async function fetchForecastData() {
             try {
-                await signInAnonymously(auth);
-                localUserId = auth.currentUser.uid;
-            } catch(error) {
-                errorMessageDiv.textContent = 'Hiba a szerverhez való kapcsolódáskor.';
-                return;
-            }
-            document.getElementById('create-game-btn').addEventListener('click', createGame);
-            document.getElementById('join-game-btn').addEventListener('click', joinGame);
-            gameCodeDisplay.addEventListener('click', () => navigator.clipboard.writeText(gameCodeDisplay.textContent));
-            
-            gameScreen.addEventListener('mousemove', handlePointerMove);
-            gameScreen.addEventListener('touchmove', handlePointerMove, { passive: false });
-            gameScreen.addEventListener('click', handlePointerClick);
-        }
-        
-        async function createGame() {
-            const playerName = playerNameInput.value.trim() || 'Játékos 1';
-            const gameId = Math.floor(1000 + Math.random() * 9000).toString();
-            
-            localGameId = gameId;
-            localPlayerColor = 'piros';
-            
-            const initialGameState = {
-                board: Array.from({ length: SOROK }, () => Array(OSZLOPOK).fill("")),
-                players: { piros: { name: playerName, score: 0, uid: localUserId }, sarga: null },
-                currentPlayer: 'piros', status: 'waiting', winner: null, lastMove: null
-            };
-            
-            try {
-                await set(ref(db, 'games/' + gameId), initialGameState);
-                listenToGameChanges(gameId);
-            } catch (error) {
-                errorMessageDiv.textContent = 'Hiba a játék létrehozásakor.';
-            }
-        }
-
-        async function joinGame() {
-            const playerName = playerNameInput.value.trim() || 'Játékos 2';
-            const gameId = gameCodeInput.value.trim();
-            if (gameId.length !== 4) { errorMessageDiv.textContent = 'Érvénytelen kód!'; return; }
-
-            const gameRef = ref(db, 'games/' + gameId);
-            try {
-                const snapshot = await get(gameRef);
-                if (snapshot.exists() && snapshot.val().status === 'waiting') {
-                    localGameId = gameId;
-                    localPlayerColor = 'sarga';
-                    await update(gameRef, { 'players/sarga': { name: playerName, score: 0, uid: localUserId }, 'status': 'active' });
-                    listenToGameChanges(gameId);
-                } else {
-                    errorMessageDiv.textContent = 'A játék nem található, vagy már tele van.';
+                const [hourlyRes, dailyRes, generalRes] = await Promise.all([ fetch(`https://api.weather.com/v3/wx/forecast/hourly/2day?geocode=${SZAKOLY_COORDS.lat},${SZAKOLY_COORDS.lon}&format=json&units=m&language=hu-HU&apiKey=${weatherComApiKey}`), fetch(`https://api.weather.com/v3/wx/forecast/daily/15day?geocode=${SZAKOLY_COORDS.lat},${SZAKOLY_COORDS.lon}&format=json&units=m&language=hu-HU&apiKey=${weatherComApiKey}`), fetch(`https://api.weather.com/v3/wx/observations/current?geocode=${SZAKOLY_COORDS.lat},${SZAKOLY_COORDS.lon}&language=hu-HU&format=json&apiKey=${weatherComApiKey}&units=m`) ]);
+                
+                if (hourlyRes.ok) {
+                    const data = await hourlyRes.json();
+                    if (data && data.validTimeLocal) {
+                        cachedData.hourlyForecast = data.validTimeLocal.map((time, i) => ({
+                            time,
+                            temp: data.temperature[i],
+                            iconCode: data.iconCode[i],
+                            precipChance: data.precipChance[i],
+                            dayOrNight: data.dayOrNight[i],
+                            wxPhraseShort: data.wxPhraseShort[i],
+                            wxPhraseLong: data.wxPhraseLong[i],
+                            feelsLike: data.temperatureFeelsLike[i],
+                            humidity: data.relativeHumidity[i],
+                            uvIndex: data.uvIndex[i],
+                            windSpeed: data.windSpeed[i],
+                            windGust: data.windGust[i],
+                            windDir: data.windDirectionCardinal[i],
+                            precipAmount: data.qpf[i]
+                        }));
+                    }
                 }
-            } catch(error) {
-                errorMessageDiv.textContent = 'Hiba a csatlakozáskor.';
-                console.error("Firebase hiba:", error);
-            }
+
+                if (dailyRes.ok) { const data = await dailyRes.json(); if (data && data.validTimeLocal) { cachedData.dailyForecast = data.validTimeLocal.slice(0, 15).map((time, i) => ({ validTime: time, iconCode: data.daypart?.[0]?.iconCode?.[i] || 34, phrase: data.daypart?.[0]?.wxPhraseLong?.[i] || '--', precipChance: data.daypart?.[0]?.precipChance?.[i] || 0, maxTemp: data.temperatureMax?.[i], minTemp: data.temperatureMin?.[i] })); } }
+                if (generalRes.ok) { cachedData.generalConditions = await generalRes.json(); }
+                lastApiCallTimes.forecastSuccess = Date.now();
+            } catch (e) { console.error("Forecast fetch failed:", e); }
         }
         
-        function listenToGameChanges(gameId) {
-            setupScreen.classList.add('hidden');
-            gameScreen.classList.remove('hidden');
-            if (localPlayerColor === 'piros') {
-                gameCodeDisplay.textContent = gameId;
-                gameCodeDisplay.classList.remove('hidden');
-            }
-            onValue(ref(db, 'games/' + gameId), (snapshot) => {
-                const gameData = snapshot.val();
-                if (!gameData) return;
-                if (gameData.status === 'active' && localPlayerColor === 'piros') {
-                    gameCodeDisplay.classList.add('hidden');
-                }
-                renderUIFromState(gameData);
-            });
+        async function fetchAllDataAndUpdateDisplay(isInitialLoad = false) {
+            const now = Date.now();
+            const stationPromises = Object.keys(STATIONS).map(key => fetchPwsStationData(key));
+            if (isInitialLoad || now - lastApiCallTimes.forecast > REFRESH_INTERVAL_FORECAST) { await fetchForecastData(); lastApiCallTimes.forecast = now; }
+            await Promise.all(stationPromises);
+            cachedData.pws = STATIONS[PRIMARY_STATION_KEY].data;
+            cachedData.sunTimes = SunCalc.getTimes(new Date(), SZAKOLY_COORDS.lat, SZAKOLY_COORDS.lon);
+            renderAll();
         }
 
-        function renderUIFromState(state) {
-            if (!state || !state.players || !state.board) return;
-            const p1 = state.players.piros;
-            const p2 = state.players.sarga;
-            document.getElementById('p1-name').textContent = p1 ? p1.name : '-';
-            document.getElementById('p1-score').textContent = p1 ? p1.score : 0;
-            document.getElementById('p2-name').textContent = p2 ? p2.name : 'Várakozás...';
-            document.getElementById('p2-score').textContent = p2 ? p2.score : 0;
-            renderBoard(state.board);
-            if (state.lastMove && state.lastMove.timestamp !== lastAnimatedMoveTimestamp) {
-                if (state.lastMove.color !== localPlayerColor) {
-                    animateOpponentMove(state.lastMove.r, state.lastMove.c, state.lastMove.color);
-                }
-                lastAnimatedMoveTimestamp = state.lastMove.timestamp;
-            }
-            document.getElementById('player1-panel').classList.toggle('active', state.currentPlayer === 'piros');
-            document.getElementById('player2-panel').classList.toggle('active', state.currentPlayer === 'sarga');
-            const isMyTurn = state.currentPlayer === localPlayerColor && state.status === 'active';
-            jatekter.classList.toggle('board-disabled', !isMyTurn);
-            if(state.status === 'waiting') {
-                 messageArea.textContent = 'Várakozás az ellenfélre...';
-            } else if(state.status === 'active') {
-                messageArea.textContent = isMyTurn ? 'Te következel!' : `${state.players[state.currentPlayer]?.name || ''} következik...`;
-            } else if (state.status === 'finished') {
-                jatekter.classList.add('board-disabled');
-                messageArea.textContent = state.winner === 'draw' ? 'Döntetlen!' : `🎉 ${state.players[state.winner]?.name || ''} nyert! 🎉`;
-            }
+        function renderAll() {
+            updatePanelTheme();
+            updateDynamicSky();
+            renderMainWidget();
+            renderHourlyForecastData();
+            renderDailyForecastData();
         }
 
-        function renderBoard(board) {
-            jatekter.innerHTML = '';
-            for (let r = 0; r < SOROK; r++) { for (let c = 0; c < OSZLOPOK; c++) {
-                const cella = document.createElement('div');
-                cella.classList.add('cella');
-                if (board[r] && board[r][c]) {
-                    cella.classList.add(board[r][c], 'golyostilus');
-                }
-                jatekter.appendChild(cella);
-            }}
-        }
-
-        function animateOpponentMove(sor, oszlop, color) {
-            const golyomeret = jatekter.clientWidth / OSZLOPOK * 0.85;
-            const fallingDisc = document.createElement('div');
-            fallingDisc.className = `golyostilus falling ${color}`;
-            fallingDisc.style.width = `${golyomeret}px`;
-            fallingDisc.style.height = `${golyomeret}px`;
-            fallingDisc.style.left = `${oszlop * (jatekter.clientWidth / OSZLOPOK) + (jatekter.clientWidth / OSZLOPOK - golyomeret) / 2}px`;
-            const startY = dropZone.getBoundingClientRect().top - jatekter.getBoundingClientRect().top;
-            const endY = sor * (jatekter.clientHeight / SOROK) + ((jatekter.clientHeight / SOROK) - golyomeret) / 2;
-            fallingDisc.style.setProperty('--start-y', `${startY}px`);
-            fallingDisc.style.setProperty('--drop-height', `${endY}px`);
-            jatekter.appendChild(fallingDisc);
-            setTimeout(() => { if (fallingDisc.parentElement) jatekter.removeChild(fallingDisc); }, ANIMATION_DURATION);
-        }
-
-        async function handlePointerClick(e) {
-            if (jatekter.classList.contains('board-disabled') || !e.target.closest('#jatekter, #drop-zone')) return;
+        function renderMainWidget() {
+            const el = document.getElementById('weather-display'); const obs = cachedData.pws; const general = cachedData.generalConditions;
+            if (!obs) { el.innerHTML = `<div class="widget-header"><div class="header-container"><div class="location-title">Szakoly</div><div class="timestamp-container"><span class="timestamp">Állomás offline. Várakozás az adatokra...</span></div></div></div>`; return; }
+            el.innerHTML = `<div class="widget-header"><div class="header-container"><div class="location-title">Szakoly</div></div><div class="timestamp-container"><span class="timestamp" id="main-timestamp"></span></div></div><div class="current-conditions-card"><div class="conditions-section"><h4 class="section-title">Hőmérséklet</h4><div class="temp-primary-display"><div class="current-temp-value"><span id="current-temp-span">--</span><span>°C</span></div><div class="temp-secondary-info"><span id="feels-like-temp">Hőérzet: --°</span><span id="precip-today-text">Eső ma eddig: <strong>--</strong></span><span id="precip-intensity-text" class="is-hidden"></span></div></div><div class="temp-forecast-visualizer"><div class="section-header"><h4>Órás Hőmérséklet Előrejelzés</h4></div><div class="temp-chart">${Array.from({ length: 6 }).map((_, i) => `<div class="chart-column"><div class="chart-temp-label" id="chart-temp-label-${i}">--°</div><div class="chart-bar-wrapper"><div class="chart-bar-fill" id="chart-bar-fill-${i}"></div></div><div class="chart-hour-label" id="chart-hour-label-${i}">--</div></div>`).join('')}</div></div></div><div class="conditions-section"><h4 class="section-title">Szél adatok</h4><div class="wind-display-flex-container"><div class="wind-gauge-container"><div class="wind-gauge"><div class="wind-data-center"><div class="wind-speed-main"><span id="wind-speed-span">--</span><span class="wind-speed-unit">km/h</span></div></div></div></div><div class="wind-details-container"><div class="wind-direction-info"><i class="fas fa-location-arrow wind-direction-arrow" id="wind-direction-arrow"></i><span class="wind-direction-full" id="wind-direction-full">--</span></div><div class="wind-detail-item"><span>Széllökés:</span><strong><span id="wind-gust-span">--</span> km/h</strong></div><div class="wind-detail-item"><span>Besorolás:</span><strong id="wind-beaufort-desc">--</strong></div></div></div><div class="wind-legend-container"><div class="legend-item"><span class="legend-color-box" style="background-color: var(--wind-calm);"></span>&lt; 5</div><div class="legend-item"><span class="legend-color-box" style="background-color: var(--wind-light);"></span>5-20</div><div class="legend-item"><span class="legend-color-box" style="background-color: var(--wind-moderate);"></span>20-40</div><div class="legend-item"><span class="legend-color-box" style="background-color: var(--wind-strong);"></span>&gt; 40 km/h</div></div></div></div><div class="pws-details-container"><div class="section-header"><div class="section-title">Részletes adatok</div><span class="section-timestamp" id="pws-timestamp"></span></div><div class="pws-details-grid"><div class="detail-item"><span class="label"><i class="fas fa-tint"></i>Páratartalom</span><span class="value" id="detail-humidity">--</span></div><div class="detail-item"><span class="label"><i class="fas fa-tachometer-alt"></i>Légnyomás</span><span class="value" id="detail-pressure">--</span></div><div class="detail-item"><span class="label"><i class="fas fa-sun"></i>Napsugárzás</span><span class="value" id="detail-solar">--</span></div><div class="detail-item"><span class="label"><i class="fas fa-shield-sun"></i>UV Index</span><span class="value" id="detail-uv">--</span></div><div class="detail-item"><span class="label"><i class="fas fa-eye"></i>Látótávolság</span><span class="value" id="detail-visibility">--</span></div><div class="detail-item"><span class="label"><i class="fas fa-droplet"></i>Harmatpont</span><span class="value" id="detail-dewpt">--</span></div></div></div><div class="precip-summary-card" id="precip-summary-card"></div>`;
+            document.getElementById('main-timestamp').textContent = `Frissítve: ${formatTime(obs.obsTimeLocal, true)}`; document.getElementById('pws-timestamp').textContent = `Frissítve: ${formatTime(obs.obsTimeLocal, true)}`; document.getElementById('current-temp-span').textContent = formatValue(obs.metric.temp, '', 1); document.getElementById('feels-like-temp').textContent = `Hőérzet: ${formatValue(general?.temperatureFeelsLike ?? obs.metric.heatIndex, '°', 1)}`; const windSpeed = obs.metric.windSpeed; document.getElementById('wind-speed-span').textContent = formatValue(windSpeed, '', 1); document.getElementById('wind-gust-span').textContent = formatValue(obs.metric.windGust, '', 0); document.getElementById('wind-direction-full').textContent = degreesToCompass(obs.winddir); document.getElementById('wind-beaufort-desc').textContent = getBeaufortDescription(windSpeed); document.getElementById('wind-direction-arrow').style.transform = `rotate(${obs.winddir - 45}deg)`; document.querySelector('.wind-speed-main').style.color = `var(--wind-${getWindColorName(windSpeed)})`; document.getElementById('detail-humidity').textContent = formatValue(obs.humidity, '%', 0); document.getElementById('detail-pressure').innerHTML = `${formatValue(obs.metric.pressure, ' hPa', 1)} <span class="pressure-trend-icon">${getPressureTrend(general?.pressureTendencyCode)}</span>`; document.getElementById('detail-solar').textContent = formatValue(obs.solarRadiation, ' W/m²', 0); document.getElementById('detail-uv').textContent = formatValue(obs.uv, '', 1); document.getElementById('detail-dewpt').textContent = formatValue(obs.metric.dewpt, '°', 1); document.getElementById('detail-visibility').textContent = formatValue(general?.visibility, ' km', 1);
             
-            const clientX = e.type.startsWith('touch') ? (e.changedTouches[0] || e.touches[0]).clientX : e.clientX;
-            const boardRect = jatekter.getBoundingClientRect();
-            const cellaSzelesseg = boardRect.width / OSZLOPOK;
-            let oszlop = Math.floor((clientX - boardRect.left) / cellaSzelesseg);
-            oszlop = Math.max(0, Math.min(OSZLOPOK - 1, oszlop));
-            if (oszlop < 0 || oszlop >= OSZLOPOK) return;
-
-            const snapshot = await get(ref(db, `games/${localGameId}`));
-            const gameState = snapshot.val();
-            if(!gameState || gameState.status !== 'active' || gameState.currentPlayer !== localPlayerColor) return;
-            
-            const sor = legalsoUresSor(oszlop, gameState.board);
-            if (sor !== -1) {
-                lep(sor, oszlop, gameState);
+            const precipRate = obs.metric.precipRate; const precipTotal = obs.metric.precipTotal;
+            const precipIntensityEl = document.getElementById('precip-intensity-text'); const precipTodayEl = document.getElementById('precip-today-text');
+            precipTodayEl.querySelector('strong').textContent = `${formatValue(precipTotal, ' mm', 1)}`;
+            if(precipRate > 0) {
+                precipIntensityEl.innerHTML = `<i class="fas fa-tint"></i>&nbsp;${getPrecipIntensityDescription(precipRate)}`;
+                precipIntensityEl.classList.remove('is-hidden');
+                precipTodayEl.classList.add('is-hidden');
+            } else {
+                precipIntensityEl.classList.add('is-hidden');
+                precipTodayEl.classList.remove('is-hidden');
             }
+
+            const hourly = cachedData.hourlyForecast; if (hourly.length > 0) { const nowMs = new Date().getTime(); let startIndex = hourly.findIndex(h => new Date(h.time).getTime() > nowMs); if (startIndex === -1) startIndex = 0; const nextHours = hourly.slice(startIndex, startIndex + 6); const temps = nextHours.map(h => h.temp).filter(t => t !== null); if (temps.length > 0) { const minTemp = Math.min(...temps), maxTemp = Math.max(...temps), range = maxTemp - minTemp; nextHours.forEach((hour, i) => { document.getElementById(`chart-temp-label-${i}`).textContent = `${formatValue(hour.temp, '°', 0)}`; document.getElementById(`chart-bar-fill-${i}`).style.height = `${range > 0 ? 10 + ((hour.temp - minTemp) / range) * 90 : 50}%`; document.getElementById(`chart-bar-fill-${i}`).style.backgroundColor = getTempColor(hour.temp); document.getElementById(`chart-hour-label-${i}`).textContent = formatHourOnly(hour.time); }); } }
+            const precipCardEl = document.getElementById('precip-summary-card'); const precipStations = Object.values(STATIONS).filter(s => s.isOnline && s.provides.includes('precip') && s.data); const allMonitoredNames = Object.values(STATIONS).filter(s => s.provides.includes('precip')).map(s => s.displayName).join(', '); const tooltipHTML = `<div class="precip-card-footer"><div class="station-tooltip-container"><span class="station-list-trigger">Figyelt állomások listája</span><div class="station-tooltip-content">${allMonitoredNames}</div></div></div>`; 
+            const stationsWithRainToday = precipStations.filter(s => s.data.metric.precipTotal > 0);
+            let mainContentHTML = (stationsWithRainToday.length === 0) ? `<div style="text-align: center; padding: 1rem; color: var(--current-text-muted-color);">Ma még nem észleltünk csapadékot a figyelt állomásokon.</div>` : `<div class="precip-station-grid">${stationsWithRainToday.sort((a,b) => b.data.metric.precipTotal - a.data.metric.precipTotal).map(station => { const isRaining = station.data.metric.precipRate > 0; return `<div class="precip-station-card ${isRaining ? 'is-raining-now' : ''}"><div class="station-card-header"><span class="station-card-name">${station.displayName}</span>${isRaining ? '<div class="station-card-status-icon"></div>' : ''}</div><div class="station-card-main"><div class="station-card-total-label">Ma eddig</div><div class="station-card-total-value">${formatValue(station.data.metric.precipTotal, '', 1)}<span>mm</span></div></div><div class="station-card-footer-info ${isRaining ? 'live-intensity' : ''}">${isRaining ? getPrecipIntensityDescription(station.data.metric.precipRate) : `Utoljára: ${formatTime(station.lastRainTimestamp)}`}</div></div>`; }).join('')}</div>`; precipCardEl.innerHTML = `<div class="precip-card-header"><div class="precip-header-title-group"><div class="precip-header-icon"><i class="fas fa-satellite-dish"></i></div><h4 class="precip-header-title">Regionális CsapadékRadar</h4></div></div><div class="precip-card-content">${mainContentHTML}</div>${tooltipHTML}`;
         }
         
-        async function lep(sor, oszlop, gameState) {
-            previewDisc.classList.add('hidden');
-            const currentBoard = gameState.board;
-            currentBoard[sor][oszlop] = localPlayerColor;
-            const winnerInfo = nyertEllenorzes(sor, oszlop, currentBoard);
-            
-            const newState = {
-                board: currentBoard,
-                lastMove: { r: sor, c: oszlop, color: localPlayerColor, timestamp: Date.now() },
-                currentPlayer: localPlayerColor === 'piros' ? 'sarga' : 'piros'
-            };
-            
-            if (winnerInfo) {
-                newState.status = 'finished';
-                newState.winner = localPlayerColor;
-                newState.players = gameState.players;
-                newState.players[localPlayerColor].score++;
-            } else if (currentBoard.flat().every(c => c !== "")) {
-                newState.status = 'finished';
-                newState.winner = 'draw';
-            }
+        function renderHourlyForecastData() {
+            const container = document.getElementById('hourly-forecast-container'), title = document.getElementById('hourly-forecast-title'), timestamp = document.getElementById('hourly-forecast-timestamp');
+            if (!container || !cachedData.hourlyForecast || cachedData.hourlyForecast.length === 0) { if (title) title.classList.add('is-hidden'); return; }
+            if (timestamp && lastApiCallTimes.forecastSuccess > 0) { timestamp.textContent = `Frissítve: ${formatTime(new Date(lastApiCallTimes.forecastSuccess))}`; }
 
-            await update(ref(db, 'games/' + localGameId), newState);
+            const nowMs = new Date().getTime();
+            let startIndex = cachedData.hourlyForecast.findIndex(hour => new Date(hour.time).getTime() > nowMs);
+            if (startIndex === -1) startIndex = 0;
+            const forecastsToShow = cachedData.hourlyForecast.slice(startIndex, startIndex + 12);
 
-            if(newState.status === 'finished') {
-                winnerStaticText.textContent = "Nyert!";
-                if (newState.winner !== 'draw') {
-                    triggerRealisticConfetti();
-                    winnerPlayerName.textContent = gameState.players[localPlayerColor].name;
-                    const winColor = localPlayerColor === 'piros' ? 'var(--player1-color)' : 'var(--player2-color)';
-                    winnerOverlay.style.setProperty('--win-color', winColor);
-                } else {
-                    winnerPlayerName.textContent = "A játék";
-                    winnerStaticText.textContent = "Döntetlen!";
-                }
-                createNextRoundButton();
-                winnerOverlay.classList.add('show');
-            }
-        }
-        
-        function nyertEllenorzes(sor, oszlop, board) {
-            if(!board) return null;
-            const jatekos = board[sor][oszlop];
-            const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
-            for (const [dr, dc] of directions) {
-                const line = [{ r: sor, c: oszlop }];
-                for (let i = 1; i < 4; i++) { const r = sor + i * dr, c = oszlop + i * dc; if (board[r]?.[c] === jatekos) line.push({ r, c }); else break; }
-                for (let i = 1; i < 4; i++) { const r = sor - i * dr, c = oszlop - i * dc; if (board[r]?.[c] === jatekos) line.push({ r, c }); else break; }
-                if (line.length >= 4) return line;
-            }
-            return null;
+            container.innerHTML = forecastsToShow.map(hour => {
+                return `
+                <div class="hourly-forecast-card">
+                    <div class="hourly-card-header">
+                        <div class="hourly-time">${formatTime(hour.time)}</div>
+                        <div class="hourly-temp">${formatValue(hour.temp, '', 0)}<span>°C</span></div>
+                    </div>
+                    <div class="hourly-main-condition">
+                        <i class="${mapTwcIconToFontAwesome(hour.iconCode, hour.dayOrNight)} hourly-main-condition-icon"></i>
+                        <span class="hourly-main-condition-text">${hour.wxPhraseLong || hour.wxPhraseShort || ''}</span>
+                    </div>
+                    <div class="hourly-details-grid">
+                        <div class="hourly-detail-item">
+                            <i class="fas fa-temperature-low"></i>
+                            <span>Hőérzet: <strong>${formatValue(hour.feelsLike, '°', 0)}</strong></span>
+                        </div>
+                        <div class="hourly-detail-item">
+                            <i class="fas fa-tint"></i>
+                            <span>Esély: <strong>${formatValue(hour.precipChance, '%', 0)}</strong></span>
+                        </div>
+                        <div class="hourly-detail-item">
+                            <i class="fas fa-wind"></i>
+                            <span>Szél: <strong>${hour.windDir || ''} ${formatValue(hour.windSpeed, ' km/h', 0)}</strong></span>
+                        </div>
+                        <div class="hourly-detail-item">
+                            <i class="fas fa-cloud-showers-heavy"></i>
+                            <span>Menny.: <strong>${formatValue(hour.precipAmount, ' mm', 1)}</strong></span>
+                        </div>
+                        <div class="hourly-detail-item">
+                            <i class="fas fa-smog"></i>
+                            <span>Páratart.: <strong>${formatValue(hour.humidity, '%', 0)}</strong></span>
+                        </div>
+                        <div class="hourly-detail-item">
+                            <i class="fas fa-sun"></i>
+                            <span>UV Index: <strong>${formatValue(hour.uvIndex, '', 0)}</strong></span>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            if (title) title.classList.remove('is-hidden');
         }
 
-        const legalsoUresSor = (c, board) => {
-            if (!board) return -1;
-            for (let r = SOROK - 1; r >= 0; r--) if (board[r]?.[c] === "") return r; return -1; };
+        function renderDailyForecastData() {
+            const container = document.getElementById('daily-forecast-container'), title = document.getElementById('daily-forecast-title'), timestamp = document.getElementById('daily-forecast-timestamp');
+            if (!container || !cachedData.dailyForecast || cachedData.dailyForecast.length === 0) { if(title) title.classList.add('is-hidden'); return; }
+            if (timestamp && lastApiCallTimes.forecastSuccess > 0) timestamp.textContent = `Frissítve: ${formatTime(new Date(lastApiCallTimes.forecastSuccess))}`;
+            const dayNames = ['Vasárnap', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat']; const today = new Date(); today.setHours(0,0,0,0);
+            container.innerHTML = cachedData.dailyForecast.map(day => { const date = new Date(day.validTime); date.setHours(0,0,0,0); const dayName = date.getTime() === today.getTime() ? 'Ma' : dayNames[date.getDay()]; const formattedDate = date.toLocaleDateString('hu-HU', { month: 'long', day: 'numeric' });
+                return `<div class="daily-forecast-item"><div class="daily-day"><span class="day-date">${formattedDate}</span><span class="day-name">${dayName}</span></div><div class="daily-icon"><i class="${mapTwcIconToFontAwesome(day.iconCode, 'D')}"></i></div><div class="daily-details"><div class="daily-condition-text">${day.phrase}</div><div class="daily-precip-chance"><i class="fas fa-tint" style="opacity: 0.7;"></i> ${day.precipChance}%</div></div><div class="daily-temps"><span class="max">${formatValue(day.maxTemp, '°', 0)}</span> / <span class="min">${formatValue(day.minTemp, '°', 0)}</span></div></div>`;
+            }).join('');
+            if (title) title.classList.remove('is-hidden');
+        }
 
-        function triggerRealisticConfetti() {
-            // ... a konfetti kód változatlan ...
+        function initApp() {
+            fetchAllDataAndUpdateDisplay(true);
+            setInterval(fetchAllDataAndUpdateDisplay, REFRESH_INTERVAL_PWS);
+            setInterval(() => {
+                updatePanelTheme();
+                updateDynamicSky();
+            }, SKY_UPDATE_INTERVAL);
         }
-        
-        async function handlePointerMove(e) {
-            if (!localGameId || jatekter.classList.contains('board-disabled')) {
-                previewDisc.classList.add('hidden');
-                return;
-            };
-            e.preventDefault();
-            const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
-            const boardRect = jatekter.getBoundingClientRect();
-            
-            let oszlop = Math.floor((clientX - boardRect.left) / boardRect.width * OSZLOPOK);
-            oszlop = Math.max(0, Math.min(OSZLOPOK - 1, oszlop));
-            
-            const snapshot = await get(ref(db, `games/${localGameId}/board`));
-            const currentBoard = snapshot.val();
-            if (currentBoard && legalsoUresSor(oszlop, currentBoard) !== -1) {
-                const cellaSzelesseg = boardRect.width / OSZLOPOK;
-                const golyomeret = cellaSzelesseg * 0.85;
-                previewDisc.style.width = `${golyomeret}px`;
-                previewDisc.style.height = `${golyomeret}px`;
-                previewDisc.className = `golyostilus ${localPlayerColor}`;
-                previewDisc.style.left = `${oszlop * cellaSzelesseg + (cellaSzelesseg - golyomeret) / 2}px`;
-                previewDisc.classList.remove('hidden');
-            } else { 
-                previewDisc.classList.add('hidden'); 
-            }
-        }
-        
-        function createNextRoundButton() {
-            winnerActions.innerHTML = '';
-            const nextRoundBtn = document.createElement('button');
-            nextRoundBtn.textContent = 'Új Kör (Revans)';
-            winnerActions.appendChild(nextRoundBtn);
-            nextRoundBtn.addEventListener('click', async () => {
-                winnerOverlay.classList.remove('show');
-                if (localPlayerColor === 'piros') {
-                    await update(ref(db, 'games/' + localGameId), {
-                        board: Array.from({ length: SOROK }, () => Array(OSZLOPOK).fill("")),
-                        currentPlayer: 'piros', status: 'active', winner: null, lastMove: null
-                    });
-                }
-            }, { once: true });
-        }
-        
-        initGame();
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
