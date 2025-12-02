@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V75 (Massive Weather & Brand Promo)</title>
+    <title>Aurora News Ticker - V80 (Night Mode Features)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,10 +74,10 @@
             perspective: 1000px;
         }
 
-        /* --- FLIP MECHANICS --- */
+        /* --- FLIP MECHANICS (BOUNCY!) --- */
         .panel-flipper {
             width: 100%; height: 100%;
-            transition: transform 0.8s cubic-bezier(0.4, 2, 0.5, 0.5);
+            transition: transform 1.2s cubic-bezier(0.3, 2.5, 0.6, 0.8);
             transform-style: preserve-3d;
             position: relative;
         }
@@ -142,6 +142,18 @@
         .news-panel.has-image .news-image-overlay { opacity: 0.12; }
         .news-card.breaking { background: linear-gradient(90deg, rgba(220, 38, 38, 0.25), rgba(220, 38, 38, 0.05)); border-left: 4px solid var(--accent-danger); }
 
+        /* NIGHT INFO CARD STYLE */
+        .news-card.night-info {
+            background: radial-gradient(circle at top left, #312e81, #1e1b4b);
+            border-left: 4px solid #a855f7;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .ni-icon { font-size: 3rem; margin-bottom: 10px; animation: float 6s ease-in-out infinite; }
+        .ni-text { font-family: var(--font-head); font-size: 1.1rem; color: #fff; line-height: 1.5; font-weight: 600; max-width: 80%; }
+        .ni-sub { font-size: 0.8rem; color: var(--accent-color); margin-top: 10px; font-weight: 700; text-transform: uppercase; }
+
         .goodbye-card { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, #334155 0%, #020617 100%); opacity: 0; visibility: hidden; transition: opacity 1s; z-index: 100; }
         .goodbye-card.active { opacity: 1; visibility: visible; }
         .gb-moon { font-size: 3rem; margin-bottom: 8px; filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5)); animation: float 6s ease-in-out infinite; }
@@ -156,9 +168,26 @@
         .program-badge { position: absolute; top: 12px; right: 12px; font-family: var(--font-head); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); text-transform: uppercase; background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; z-index: 10; }
         .program-badge.breaking-mode { background: var(--accent-danger); color: #fff; border-color: transparent; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); animation: pulseRed 1s infinite; }
 
+        .night-sub-label { position: absolute; top: 38px; right: 12px; font-family: var(--font-mono); font-size: 0.55rem; color: var(--accent-warm); text-transform: uppercase; font-weight: 700; background: rgba(0,0,0,0.7); padding: 2px 5px; border-radius: 3px; z-index: 9; opacity: 0; transition: opacity 0.5s; pointer-events: none; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .night-sub-label.active { opacity: 1; }
+
         .controls-bar { height: 28px; border-top: 1px solid var(--glass-border); display: flex; align-items: center; padding: 0 10px; background: rgba(0,0,0,0.3); font-size: 0.7rem; z-index: 5; position: relative; justify-content: space-between; }
-        .next-prog-alert { display: none; align-items: center; gap: 5px; color: var(--accent-next); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; animation: pulseText 2s infinite; }
+        
+        .next-prog-alert { 
+            display: none; 
+            align-items: center; 
+            gap: 5px; 
+            color: var(--accent-next); 
+            font-weight: 700; 
+            font-size: 0.65rem; 
+            text-transform: uppercase; 
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
         .next-prog-alert.active { display: flex; }
+        
         .progress-line-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.1); z-index: 6; }
         .progress-line { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-color), var(--accent-warm)); box-shadow: 0 0 8px var(--accent-color); }
         .animate-progress { animation: progressFill linear forwards; }
@@ -285,6 +314,7 @@
 
             <div class="news-viewport" id="news-viewport">
                 <div id="program-badge" class="program-badge">BETÖLTÉS...</div>
+                <div id="night-sub-label" class="night-sub-label">AZ ELŐZŐ NAP HÍREINEK ÖSSZEFOGLALÓJA</div>
                 <div id="track-a" class="news-card"></div>
                 <div id="track-b" class="news-card"></div>
             </div>
@@ -493,6 +523,7 @@
             newsContainer: document.getElementById('news-container'),
             newsViewport: document.getElementById('news-viewport'),
             badge: document.getElementById('program-badge'),
+            nightSubLabel: document.getElementById('night-sub-label'),
             sky: document.getElementById('sky-bg'),
             weatherHeader: document.querySelector('.weather-location-header'),
             scheduleHeaderText: document.getElementById('schedule-header-text'),
@@ -531,7 +562,8 @@
             currentDuration: 18000,
             remainingTime: 0,
             seenBreakingLinks: new Set(),
-            lastBreakingCheckTime: Date.now()
+            lastBreakingCheckTime: Date.now(),
+            lastNightInfoTime: 0 
         };
 
         // --- UTILITIES ---
@@ -866,6 +898,13 @@
                 refreshNews();
             }
 
+            // Éjszakai Műszak al-felirat kezelése
+            if(state.block.type === 'summary_yesterday') {
+                el.nightSubLabel.classList.add('active');
+            } else {
+                el.nightSubLabel.classList.remove('active');
+            }
+
             const min = now.getMinutes();
             if((min === 0 || min === 20 || min === 40) && now.getSeconds() === 0 && min !== state.lastScheduleMin) {
                 state.lastScheduleMin = min; displaySchedule();
@@ -879,7 +918,11 @@
             if (diff < 0) diff += 1440; 
             
             if(diff <= 15 && diff > 0) {
-                el.nextProgAlert.textContent = `KÖVETKEZIK: ${nextBlock.name}`;
+                const nH = Math.floor(nextBlock.start);
+                const nM = Math.round((nextBlock.start % 1) * 60);
+                const nTime = `${String(nH).padStart(2,'0')}:${String(nM).padStart(2,'0')}`;
+                
+                el.nextProgAlert.textContent = `KÖVETKEZIK: ${nTime} ${nextBlock.name}`;
                 el.nextProgAlert.classList.add('active');
             } else {
                 el.nextProgAlert.classList.remove('active');
@@ -988,6 +1031,7 @@
             if(state.breaking) return;
             clearTimeout(state.flipTimer);
             
+            // 1. BREAKING NEWS CHECK
             if(state.nextIsBreaking && state.breakingItem) {
                 state.breaking = true;
                 state.nextIsBreaking = false;
@@ -998,6 +1042,22 @@
                 state.cardStartTime = Date.now();
                 state.flipTimer = setTimeout(() => { state.breaking = false; showNextItem(false); }, 30000);
                 return;
+            }
+
+            // 2. NIGHT INFO CARD CHECK (10 mins)
+            if(state.block.type === 'summary_yesterday') {
+                const now = Date.now();
+                if (now - state.lastNightInfoTime > 600000) { // 10 perc
+                    renderNightInfoCard();
+                    state.lastNightInfoTime = now;
+                    // Normál időtartam
+                    el.progressBar.style.animationDuration = '18s';
+                    state.currentDuration = 18000;
+                    state.cardStartTime = Date.now();
+                    // Nem léptetjük a currentIndex-et, így a következő hívásnál folytatódik a hír
+                    state.flipTimer = setTimeout(() => showNextItem(false), 18000); 
+                    return;
+                }
             }
 
             if(state.updatePending && !state.breaking) {
@@ -1017,7 +1077,6 @@
             // --- BIZTONSÁGI ELLENŐRZÉS: Ne legyen ugyanaz a hír egymás után ---
             let item = state.items[state.currentIndex % state.items.length];
             if(state.currentItem && (item.link === state.currentItem.link || item.title === state.currentItem.title)) {
-                // Ha ugyanaz, ugorjunk egyet
                 state.currentIndex++;
                 item = state.items[state.currentIndex % state.items.length];
             }
@@ -1031,12 +1090,40 @@
             state.flipTimer = setTimeout(() => showNextItem(true), 18000);
         }
 
+        // Night Info Card Render
+        function renderNightInfoCard() {
+            const nextTrack = el[state.activeTrack === 'a' ? 'trackB' : 'trackA'];
+            const currentTrack = el[state.activeTrack === 'a' ? 'trackA' : 'trackB'];
+            
+            el.badge.textContent = state.block.name;
+            el.badge.classList.remove('breaking-mode');
+
+            const html = `
+                <div class="ni-icon">🌙</div>
+                <div class="ni-text">Jelenleg az előző nap híreit olvassa, de ha friss hír érkezik az éjszaka folyamán akkor az azonnal megjelenik.</div>
+                <div class="ni-sub">TKP NEWS Éjszakai Ügyelet</div>
+            `;
+            nextTrack.innerHTML = html;
+            
+            nextTrack.classList.add('night-info'); // Add specific class
+            nextTrack.classList.remove('breaking');
+            el.newsBg.parentElement.classList.remove('has-image');
+
+            currentTrack.classList.remove('visible'); nextTrack.classList.add('visible');
+            state.activeTrack = state.activeTrack === 'a' ? 'b' : 'a';
+            
+            el.progressBar.classList.remove('animate-progress'); void el.progressBar.offsetWidth; el.progressBar.classList.add('animate-progress');
+        }
+
         function renderCard(item, isBreaking) {
             const nextTrack = el[state.activeTrack === 'a' ? 'trackB' : 'trackA'];
             const currentTrack = el[state.activeTrack === 'a' ? 'trackA' : 'trackB'];
             const fav = getFavicon(item.link);
             const displaySource = getSourceName(item.link);
             const timeStr = item.date.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
+
+            // Reset night info class
+            nextTrack.classList.remove('night-info');
 
             if(isBreaking) {
                 el.badge.textContent = "MOST ÉRKEZETT!"; el.badge.classList.add('breaking-mode');
