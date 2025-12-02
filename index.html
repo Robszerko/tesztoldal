@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V82 (Double Spin & Mega Weather)</title>
+    <title>Aurora News Ticker - V83 (Timed Animations & Bye Card)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -77,20 +77,16 @@
         /* --- EXTRÉM FLIP ANIMÁCIÓ --- */
         .panel-flipper {
             width: 100%; height: 100%;
-            /* 2 másodperces animáció, 2 forgás + flip, rugalmas érkezés */
             transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-style: preserve-3d;
             position: relative;
         }
-        /* 180 (alap flip) + 360 (1. kör) + 360 (2. kör) = 900 fok */
         .panel-flipper.flipped { transform: rotateX(900deg); }
-        
         .panel-face {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             backface-visibility: hidden; -webkit-backface-visibility: hidden;
             display: flex; flex-direction: column; background: var(--glass-bg);
         }
-        /* A hátlapot 900 fokhoz igazítjuk (vagyis 180 fokos eltolás a fronthoz képest) */
         .panel-face.back { transform: rotateX(180deg); display: flex; align-items: center; justify-content: center; }
 
         /* --- IDENTITY --- */
@@ -146,33 +142,37 @@
         .news-panel.has-image .news-image-overlay { opacity: 0.12; }
         .news-card.breaking { background: linear-gradient(90deg, rgba(220, 38, 38, 0.25), rgba(220, 38, 38, 0.05)); border-left: 4px solid var(--accent-danger); }
 
-        /* NIGHT INFO CARD STYLE */
+        /* NIGHT INFO CARD STYLE - FIX */
         .news-card.night-info {
             background: radial-gradient(circle at top left, #312e81, #1e1b4b);
             border-left: 4px solid #a855f7;
             align-items: center;
             justify-content: center;
             text-align: center;
+            padding-bottom: 25px; /* Hely az alján */
         }
         .ni-icon { font-size: 3rem; margin-bottom: 10px; animation: float 6s ease-in-out infinite; }
-        .ni-text { font-family: var(--font-head); font-size: 1.1rem; color: #fff; line-height: 1.5; font-weight: 600; max-width: 80%; }
+        .ni-text { font-family: var(--font-head); font-size: 1.0rem; color: #fff; line-height: 1.5; font-weight: 600; max-width: 90%; }
         .ni-sub { font-size: 0.8rem; color: var(--accent-color); margin-top: 10px; font-weight: 700; text-transform: uppercase; }
 
         .goodbye-card { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, #334155 0%, #020617 100%); opacity: 0; visibility: hidden; transition: opacity 1s; z-index: 100; }
         .goodbye-card.active { opacity: 1; visibility: visible; }
         .gb-moon { font-size: 3rem; margin-bottom: 8px; filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5)); animation: float 6s ease-in-out infinite; }
-        .gb-title { font-family: var(--font-head); font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
-        .gb-sub { font-size: 0.8rem; color: var(--accent-color); font-family: var(--font-mono); }
+        .gb-title { font-family: var(--font-head); font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 4px; text-align: center; }
+        
+        .gb-brand-lockup { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+        .gb-brand-lockup svg { width: 24px; height: 24px; fill: var(--accent-color); }
+        .gb-brand-text { font-family: var(--font-head); font-weight: 800; font-size: 1rem; color: #fff; }
 
         .big-clock-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .big-clock-layer.active { opacity: 1; pointer-events: all; }
         .bc-time { font-family: var(--font-mono); font-size: 4rem; font-weight: 700; color: #fff; text-shadow: 0 0 30px rgba(56, 189, 248, 0.5); }
         .bc-label { color: var(--accent-warm); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 10px; }
 
-        .program-badge { position: absolute; top: 12px; right: 12px; font-family: var(--font-head); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); text-transform: uppercase; background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; z-index: 10; }
+        .program-badge { position: absolute; top: 12px; right: 12px; font-family: var(--font-head); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); text-transform: uppercase; background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); transition: opacity 1s; z-index: 10; }
         .program-badge.breaking-mode { background: var(--accent-danger); color: #fff; border-color: transparent; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); animation: pulseRed 1s infinite; }
 
-        .night-sub-label { position: absolute; top: 38px; right: 12px; font-family: var(--font-mono); font-size: 0.55rem; color: var(--accent-warm); text-transform: uppercase; font-weight: 700; background: rgba(0,0,0,0.7); padding: 2px 5px; border-radius: 3px; z-index: 9; opacity: 0; transition: opacity 0.5s; pointer-events: none; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .night-sub-label { position: absolute; top: 38px; right: 12px; font-family: var(--font-mono); font-size: 0.55rem; color: var(--accent-warm); text-transform: uppercase; font-weight: 700; background: rgba(0,0,0,0.7); padding: 2px 5px; border-radius: 3px; z-index: 9; opacity: 0; transition: opacity 1s; pointer-events: none; border: 1px solid rgba(251, 191, 36, 0.2); }
         .night-sub-label.active { opacity: 1; }
 
         .controls-bar { height: 28px; border-top: 1px solid var(--glass-border); display: flex; align-items: center; padding: 0 10px; background: rgba(0,0,0,0.3); font-size: 0.7rem; z-index: 5; position: relative; justify-content: space-between; }
@@ -310,8 +310,11 @@
 
             <div class="goodbye-card" id="goodbye-card">
                 <div class="gb-moon">🌙</div>
-                <div class="gb-title">JÓ ÉJSZAKÁT!</div>
-                <div class="gb-sub">A TKP NEWS ELKÖSZÖN MÁRA</div>
+                <div class="gb-title">Nyugodalmas éjszakát kíván a</div>
+                <div class="gb-brand-lockup">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    <div class="gb-brand-text">TKP NEWS</div>
+                </div>
             </div>
 
             <div id="news-bg-image" class="news-image-overlay"><img id="bg-img-element" src="" alt=""></div>
@@ -421,7 +424,7 @@
 
         const PWS_MAP = { "ISRVR13": "Sárvár", "IOSZK4": "Oszkó", "ISZNTD6": "Szántód", "IBALAT149": "Balatonszemes", "IBUZSK1": "Csisztapuszta", "ISZEKS12": "Szekszárd", "IJNOSH2": "Jánoshalma", "IPCS52": "Pécs", "IPPRD1": "Páprád", "IKISKU42": "Kiskunhalas", "INEMES10": "Nemesnádudvar", "ISZEGE67": "Szeged", "IBKSCS12": "Békéscsaba", "IFZESG2": "Füzesgyarmat", "IMIKEP2": "Mikepércs", "ITGLS2": "Téglás", "IGACSL1": "Gacsály", "IFLESD1": "Fülesd", "IKISSZ3": "Kisszekeres", "ILEVEL2": "Levelek", "IKEMEC2": "Kemecse", "INAGYC6": "Nagycserkesz", "ITISZA15": "Tiszavasvári", "INEMES19": "Nemesbikk", "IEGERS22": "Egerszólát", "IBKKSZ5": "Bükkszenterzsébet", "IPSZT1": "Pásztó", "IPALOT13": "Palotás", "IGDLL37": "Gödöllő", "IZSMBK6": "Zsámbék", "ICSORN6": "Csorna", "IGAGYV1": "Gagyvendégi", "IMARTO122": "Martonyi", "IKAZIN14": "Kazincbarcika", "IPUTNO1": "Putnok", "IZABAR1": "Zabar", "ISALGT1": "Salgótarján", "IKARAN11": "Karancslapujtő", "IBEKLC3": "Bekölce", "IMTRAB1": "Mátraballa", "IVC267": "Vác", "IPILIS37": "Pilisvörösvár", "IFELCS4": "Felcsút", "IBUDAK6": "Budakeszi", "IBIATO9": "Biatorbágy", "ICSKVR4": "Csákvár", "IOROSZ2": "Oroszlány", "IBALINKA2": "Bakony", "ISR67": "Súr", "IPANNO3": "Pannonhalma", "IKAJRP2": "Kajárpéc", "IPPA11": "Pápa", "ICELLD14": "Celldömölk", "IHEVES2": "Heves", "IGYNGY22": "Gyöngyös", "ISZCSN9": "Szécsény", "ITAHIT11": "Tahitótfalu", "IESZTE5": "Esztergom", "ITATA16": "Tata", "IKARTAL4": "Kartal", "IMARTO67": "Martonvásár", "ISZOLNOK10": "Szolnok", "ISZOLN13": "Szolnok", "INAGYK59": "Nagykőrös", "IKECSK31": "Kecskemét", "IKALOCSA2": "Kalocsa", "IBONYH1": "Bonyhád", "ISZENT114": "Szentlőrinc", "ILJUBL47": "Ljubljana", "IBAKTA4": "Baktalórántháza", "IJFEHR1": "Újfehértó", "IPAPOS6": "Papos", "ISONKD1": "Sonkád", "INAPKO1": "Napkor", "IHARSN4": "Harsány", "IBKKSZ2": "Bükkszentkereszt", "INYREG37": "Nyíregyháza", "IPUSZT3": "Pusztadobos", "ITISZA93": "Tiszaújváros", "IEGER76": "Eger", "IHAJDD7": "Hajdúdorog", "IGYULA12": "Gyula", "IMAGYA4": "Magyarcsanád", "IHDMEZ21": "Hódmezővásárhely", "ISZEGE23": "Szeged-Rókus", "ICSENG9": "Csengele", "INAGYN1": "Nagynyárád", "IKIRLY1": "Királyegyháza", "ITAMSI1": "Tamási", "IZALAE45": "Zalaegerszeg", "IFARKA7": "Farkasgyepű", "INYRAC1": "Nyíracsád", "ISZAMO11": "Szamosújlak", "IGVAVE1": "Gávavencsellő", "IEDELN2": "Edelény", "INYRI1": "Nyíri", "IBTTS1": "Büttös", "IZD2": "Ózd" };
         
-        // 50 Magyar Város (Open-Meteo) - KIBŐVÍTVE
+        // 50 Magyar Város (Open-Meteo)
         const HUNGARIAN_CITIES_OM = [
             { name: 'Debrecen', lat: 47.53, lon: 21.62 }, { name: 'Miskolc', lat: 48.10, lon: 20.78 }, 
             { name: 'Szombathely', lat: 47.23, lon: 16.62 }, { name: 'Győr', lat: 47.68, lon: 17.63 },
@@ -450,7 +453,7 @@
             { name: 'Szentes', lat: 46.65, lon: 20.26 }
         ];
 
-        // 90+ Külföldi Város (Open-Meteo) - KIBŐVÍTVE
+        // 90+ Külföldi Város (Open-Meteo)
         const FOREIGN_CITIES = [ 
             { name: 'London', lat: 51.50, lon: -0.12 }, { name: 'New York', lat: 40.71, lon: -74.00 }, { name: 'Tokió', lat: 35.68, lon: 139.69 }, 
             { name: 'Peking', lat: 39.90, lon: 116.40 }, { name: 'Moszkva', lat: 55.75, lon: 37.61 }, { name: 'Sydney', lat: -33.86, lon: 151.20 }, 
@@ -913,8 +916,31 @@
             const h = now.getHours() + now.getMinutes()/60;
             let currentBlock = THEMATIC_BLOCKS.findLast(b => h >= b.start) || THEMATIC_BLOCKS[THEMATIC_BLOCKS.length-1];
             
-            if(currentBlock.name === 'Elköszönés') el.goodbyeCard.classList.add('active');
-            else el.goodbyeCard.classList.remove('active');
+            // GOODBYE CARD LOGIC
+            const min = now.getMinutes();
+            const sec = now.getSeconds();
+            
+            if (min === 59) {
+                if (sec >= 0 && sec < 50) {
+                    el.goodbyeCard.classList.add('active');
+                    el.bigClockLayer.classList.remove('active');
+                } else if (sec >= 50) {
+                    el.goodbyeCard.classList.remove('active');
+                    el.bigClockLayer.classList.add('active');
+                    el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+                    if(sec === 50) showCredits();
+                }
+            } else {
+                if(el.bigClockLayer.classList.contains('active')) {
+                    el.bigClockLayer.classList.remove('active');
+                    el.goodbyeCard.classList.remove('active');
+                    if(state.block.type !== 'summary_yesterday') {
+                        state.currentIndex = 0; 
+                        if(state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems = []; }
+                        showNextItem(false); 
+                    }
+                }
+            }
 
             if (!state.block || state.block.name !== currentBlock.name) {
                 state.block = currentBlock;
@@ -922,15 +948,16 @@
                 refreshNews();
             }
 
-            // Éjszakai Műszak al-felirat kezelése
-            if(state.block.type === 'summary_yesterday') {
+            // Éjszakai Műszak al-felirat kezelése (Csak ha NEM Breaking News)
+            if(state.block.type === 'summary_yesterday' && !state.breaking && !state.wasBreaking) {
                 el.nightSubLabel.classList.add('active');
             } else {
-                el.nightSubLabel.classList.remove('active');
+                // Ha Breaking News van, vagy visszatérés alatt állunk, vagy nem éjszaka van, rejtsük el
+                // (A visszatérés logikát a showNextItem kezeli)
+                if(!state.wasBreaking) el.nightSubLabel.classList.remove('active');
             }
 
-            const min = now.getMinutes();
-            if((min === 0 || min === 20 || min === 40) && now.getSeconds() === 0 && min !== state.lastScheduleMin) {
+            if((min === 0 || min === 20 || min === 40) && sec === 0 && min !== state.lastScheduleMin) {
                 state.lastScheduleMin = min; displaySchedule();
             }
             
@@ -952,23 +979,8 @@
                 el.nextProgAlert.classList.remove('active');
             }
 
-            if((min === 0 || min === 15 || min === 30 || min === 45) && now.getSeconds() === 50) {
+            if((min === 0 || min === 15 || min === 30 || min === 45) && sec === 50) {
                 refreshNews(true);
-            }
-            
-            if(min === 59 && now.getSeconds() >= 50) {
-                el.bigClockLayer.classList.add('active');
-                el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-                if(now.getSeconds() === 50) showCredits();
-            } else {
-                if(el.bigClockLayer.classList.contains('active')) {
-                    el.bigClockLayer.classList.remove('active');
-                    if(state.block.type !== 'summary_yesterday') {
-                        state.currentIndex = 0; 
-                        if(state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems = []; }
-                        showNextItem(false); 
-                    }
-                }
             }
         }
 
@@ -1064,14 +1076,17 @@
                 el.progressBar.style.animationDuration = '30s';
                 state.currentDuration = 30000;
                 state.cardStartTime = Date.now();
-                state.flipTimer = setTimeout(() => { state.breaking = false; showNextItem(false); }, 30000);
+                state.flipTimer = setTimeout(() => { 
+                    state.breaking = false; 
+                    showNextItem(false); 
+                }, 30000);
                 return;
             }
 
-            // 2. NIGHT INFO CARD CHECK (10 mins)
+            // 2. NIGHT INFO CARD CHECK (5 mins = 300000ms)
             if(state.block.type === 'summary_yesterday') {
                 const now = Date.now();
-                if (now - state.lastNightInfoTime > 600000) { 
+                if (now - state.lastNightInfoTime > 300000) { 
                     renderNightInfoCard();
                     state.lastNightInfoTime = now;
                     el.progressBar.style.animationDuration = '18s';
@@ -1096,7 +1111,6 @@
             
             if(advance) state.currentIndex++;
             
-            // --- BIZTONSÁGI ELLENŐRZÉS: Ne legyen ugyanaz a hír egymás után ---
             let item = state.items[state.currentIndex % state.items.length];
             if(state.currentItem && (item.link === state.currentItem.link || item.title === state.currentItem.title)) {
                 state.currentIndex++;
@@ -1146,14 +1160,42 @@
 
             nextTrack.classList.remove('night-info');
 
+            // --- ANIMÁLT VISSZATÉRÉS LOGIKA ---
             if(isBreaking) {
-                el.badge.textContent = "MOST ÉRKEZETT!"; el.badge.classList.add('breaking-mode');
+                // Breaking indul: Badge azonnal "MOST ÉRKEZETT", Sub-label azonnal eltűnik
+                el.badge.textContent = "MOST ÉRKEZETT!"; 
+                el.badge.classList.add('breaking-mode');
+                el.badge.style.opacity = '1';
+                el.nightSubLabel.style.opacity = '0';
+                el.nightSubLabel.classList.remove('active'); // Biztos, ami biztos
             } else if (state.wasBreaking) {
-                el.badge.classList.remove('breaking-mode'); el.badge.textContent = state.block.name; el.badge.style.opacity = '0';
-                setTimeout(() => { el.badge.classList.add('strobe-effect'); el.badge.style.opacity = '1'; }, 5000);
+                // Visszatérés Breaking-ről
                 state.wasBreaking = false;
+                
+                // 1. Állapot: Üres badge, nincs felirat
+                el.badge.classList.remove('breaking-mode'); 
+                el.badge.textContent = state.block.name; // Beállítjuk a szöveget, de elrejtjük
+                el.badge.style.opacity = '0';
+                el.nightSubLabel.style.opacity = '0';
+
+                // 2. 5 mp múlva megjelenik a műsorcím
+                setTimeout(() => { 
+                    el.badge.style.opacity = '1'; 
+                }, 5000);
+
+                // 3. 7 mp múlva megjelenik az éjszakai felirat (ha éjszaka van)
+                setTimeout(() => {
+                    if(state.block.type === 'summary_yesterday') {
+                        el.nightSubLabel.classList.add('active'); // CSS class kezeli az opacity-t, de itt segítünk
+                        el.nightSubLabel.style.opacity = '1';
+                    }
+                }, 7000);
             } else {
-                el.badge.textContent = state.block.name; el.badge.classList.remove('breaking-mode');
+                // Normál üzem
+                el.badge.textContent = state.block.name; 
+                el.badge.classList.remove('breaking-mode');
+                el.badge.style.opacity = '1';
+                if(state.block.type === 'summary_yesterday') el.nightSubLabel.style.opacity = '1';
             }
 
             const html = `
@@ -1181,7 +1223,6 @@
             el.progressBar.classList.remove('animate-progress'); void el.progressBar.offsetWidth; el.progressBar.classList.add('animate-progress');
         }
 
-        // --- MOUSE INTERACTION LOGIC (FIXED) ---
         el.newsViewport.addEventListener('mouseenter', () => {
             if(!state.isPaused) {
                 clearTimeout(state.flipTimer);
@@ -1199,14 +1240,12 @@
                 state.cardStartTime = Date.now(); 
                 state.currentDuration = state.remainingTime;
                 
-                // JAVÍTÁS: Ha éppen Breaking News volt kint, és levesszük az egeret,
-                // a timer végén biztosítani kell, hogy a rendszer kilépjen a breaking módból
                 state.flipTimer = setTimeout(() => {
                     if (state.breaking) {
                         state.breaking = false;
-                        showNextItem(false); // Következő normál hír betöltése
+                        showNextItem(false); 
                     } else {
-                        showNextItem(true); // Normál lapozás
+                        showNextItem(true); 
                     }
                 }, state.remainingTime);
             }
@@ -1219,7 +1258,6 @@
             onValue(feedsRef, (snap) => { state.rssFeeds = snap.val() || {}; refreshNews(); });
             
             fetchWeatherData();
-            // 2.5 percenként újratöltjük az időjárás playlistet
             setInterval(fetchWeatherData, 150000); 
             setInterval(displayWeather, 6000);
             
