@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V80 (Night Mode Features)</title>
+    <title>Aurora News Ticker - V82 (Double Spin & Mega Weather)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -74,19 +74,23 @@
             perspective: 1000px;
         }
 
-        /* --- FLIP MECHANICS (BOUNCY!) --- */
+        /* --- EXTRÉM FLIP ANIMÁCIÓ --- */
         .panel-flipper {
             width: 100%; height: 100%;
-            transition: transform 1.2s cubic-bezier(0.3, 2.5, 0.6, 0.8);
+            /* 2 másodperces animáció, 2 forgás + flip, rugalmas érkezés */
+            transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-style: preserve-3d;
             position: relative;
         }
-        .panel-flipper.flipped { transform: rotateX(180deg); }
+        /* 180 (alap flip) + 360 (1. kör) + 360 (2. kör) = 900 fok */
+        .panel-flipper.flipped { transform: rotateX(900deg); }
+        
         .panel-face {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             backface-visibility: hidden; -webkit-backface-visibility: hidden;
             display: flex; flex-direction: column; background: var(--glass-bg);
         }
+        /* A hátlapot 900 fokhoz igazítjuk (vagyis 180 fokos eltolás a fronthoz képest) */
         .panel-face.back { transform: rotateX(180deg); display: flex; align-items: center; justify-content: center; }
 
         /* --- IDENTITY --- */
@@ -417,7 +421,7 @@
 
         const PWS_MAP = { "ISRVR13": "Sárvár", "IOSZK4": "Oszkó", "ISZNTD6": "Szántód", "IBALAT149": "Balatonszemes", "IBUZSK1": "Csisztapuszta", "ISZEKS12": "Szekszárd", "IJNOSH2": "Jánoshalma", "IPCS52": "Pécs", "IPPRD1": "Páprád", "IKISKU42": "Kiskunhalas", "INEMES10": "Nemesnádudvar", "ISZEGE67": "Szeged", "IBKSCS12": "Békéscsaba", "IFZESG2": "Füzesgyarmat", "IMIKEP2": "Mikepércs", "ITGLS2": "Téglás", "IGACSL1": "Gacsály", "IFLESD1": "Fülesd", "IKISSZ3": "Kisszekeres", "ILEVEL2": "Levelek", "IKEMEC2": "Kemecse", "INAGYC6": "Nagycserkesz", "ITISZA15": "Tiszavasvári", "INEMES19": "Nemesbikk", "IEGERS22": "Egerszólát", "IBKKSZ5": "Bükkszenterzsébet", "IPSZT1": "Pásztó", "IPALOT13": "Palotás", "IGDLL37": "Gödöllő", "IZSMBK6": "Zsámbék", "ICSORN6": "Csorna", "IGAGYV1": "Gagyvendégi", "IMARTO122": "Martonyi", "IKAZIN14": "Kazincbarcika", "IPUTNO1": "Putnok", "IZABAR1": "Zabar", "ISALGT1": "Salgótarján", "IKARAN11": "Karancslapujtő", "IBEKLC3": "Bekölce", "IMTRAB1": "Mátraballa", "IVC267": "Vác", "IPILIS37": "Pilisvörösvár", "IFELCS4": "Felcsút", "IBUDAK6": "Budakeszi", "IBIATO9": "Biatorbágy", "ICSKVR4": "Csákvár", "IOROSZ2": "Oroszlány", "IBALINKA2": "Bakony", "ISR67": "Súr", "IPANNO3": "Pannonhalma", "IKAJRP2": "Kajárpéc", "IPPA11": "Pápa", "ICELLD14": "Celldömölk", "IHEVES2": "Heves", "IGYNGY22": "Gyöngyös", "ISZCSN9": "Szécsény", "ITAHIT11": "Tahitótfalu", "IESZTE5": "Esztergom", "ITATA16": "Tata", "IKARTAL4": "Kartal", "IMARTO67": "Martonvásár", "ISZOLNOK10": "Szolnok", "ISZOLN13": "Szolnok", "INAGYK59": "Nagykőrös", "IKECSK31": "Kecskemét", "IKALOCSA2": "Kalocsa", "IBONYH1": "Bonyhád", "ISZENT114": "Szentlőrinc", "ILJUBL47": "Ljubljana", "IBAKTA4": "Baktalórántháza", "IJFEHR1": "Újfehértó", "IPAPOS6": "Papos", "ISONKD1": "Sonkád", "INAPKO1": "Napkor", "IHARSN4": "Harsány", "IBKKSZ2": "Bükkszentkereszt", "INYREG37": "Nyíregyháza", "IPUSZT3": "Pusztadobos", "ITISZA93": "Tiszaújváros", "IEGER76": "Eger", "IHAJDD7": "Hajdúdorog", "IGYULA12": "Gyula", "IMAGYA4": "Magyarcsanád", "IHDMEZ21": "Hódmezővásárhely", "ISZEGE23": "Szeged-Rókus", "ICSENG9": "Csengele", "INAGYN1": "Nagynyárád", "IKIRLY1": "Királyegyháza", "ITAMSI1": "Tamási", "IZALAE45": "Zalaegerszeg", "IFARKA7": "Farkasgyepű", "INYRAC1": "Nyíracsád", "ISZAMO11": "Szamosújlak", "IGVAVE1": "Gávavencsellő", "IEDELN2": "Edelény", "INYRI1": "Nyíri", "IBTTS1": "Büttös", "IZD2": "Ózd" };
         
-        // 30 Magyar Város (Open-Meteo)
+        // 50 Magyar Város (Open-Meteo) - KIBŐVÍTVE
         const HUNGARIAN_CITIES_OM = [
             { name: 'Debrecen', lat: 47.53, lon: 21.62 }, { name: 'Miskolc', lat: 48.10, lon: 20.78 }, 
             { name: 'Szombathely', lat: 47.23, lon: 16.62 }, { name: 'Győr', lat: 47.68, lon: 17.63 },
@@ -433,10 +437,20 @@
             { name: 'Cegléd', lat: 47.17, lon: 19.80 }, { name: 'Vác', lat: 47.78, lon: 19.13 },
             { name: 'Gödöllő', lat: 47.60, lon: 19.35 }, { name: 'Ózd', lat: 48.22, lon: 20.29 },
             { name: 'Pápa', lat: 47.33, lon: 17.47 }, { name: 'Gyula', lat: 46.65, lon: 21.28 },
-            { name: 'Hajdúböszörmény', lat: 47.67, lon: 21.51 }, { name: 'Nyíregyháza', lat: 47.95, lon: 21.71 }
+            { name: 'Hajdúböszörmény', lat: 47.67, lon: 21.51 }, { name: 'Nyíregyháza', lat: 47.95, lon: 21.71 },
+            { name: 'Balatonfüred', lat: 46.96, lon: 17.89 }, { name: 'Keszthely', lat: 46.76, lon: 17.24 },
+            { name: 'Siófok', lat: 46.90, lon: 18.05 }, { name: 'Komárom', lat: 47.74, lon: 18.11 },
+            { name: 'Esztergom', lat: 47.79, lon: 18.74 }, { name: 'Tata', lat: 47.65, lon: 18.31 },
+            { name: 'Mohács', lat: 45.99, lon: 18.68 }, { name: 'Paks', lat: 46.62, lon: 18.86 },
+            { name: 'Kalocsa', lat: 46.53, lon: 18.98 }, { name: 'Kiskunfélegyháza', lat: 46.71, lon: 19.85 },
+            { name: 'Jászberény', lat: 47.50, lon: 19.91 }, { name: 'Hatvan', lat: 47.66, lon: 19.67 },
+            { name: 'Gyöngyös', lat: 47.78, lon: 19.93 }, { name: 'Kazincbarcika', lat: 48.25, lon: 20.62 },
+            { name: 'Sátoraljaújhely', lat: 48.40, lon: 21.65 }, { name: 'Kisvárda', lat: 48.22, lon: 22.08 },
+            { name: 'Mátészalka', lat: 47.95, lon: 22.32 }, { name: 'Makó', lat: 46.22, lon: 20.47 },
+            { name: 'Szentes', lat: 46.65, lon: 20.26 }
         ];
 
-        // 60+ Külföldi Város (Open-Meteo)
+        // 90+ Külföldi Város (Open-Meteo) - KIBŐVÍTVE
         const FOREIGN_CITIES = [ 
             { name: 'London', lat: 51.50, lon: -0.12 }, { name: 'New York', lat: 40.71, lon: -74.00 }, { name: 'Tokió', lat: 35.68, lon: 139.69 }, 
             { name: 'Peking', lat: 39.90, lon: 116.40 }, { name: 'Moszkva', lat: 55.75, lon: 37.61 }, { name: 'Sydney', lat: -33.86, lon: 151.20 }, 
@@ -461,7 +475,17 @@
             { name: 'Melbourne', lat: -37.81, lon: 144.96 }, { name: 'Auckland', lat: -36.84, lon: 174.76 }, { name: 'Brüsszel', lat: 50.85, lon: 4.35 },
             { name: 'Genf', lat: 46.20, lon: 6.14 }, { name: 'München', lat: 48.13, lon: 11.58 }, { name: 'Milánó', lat: 45.46, lon: 9.19 },
             { name: 'Nápoly', lat: 40.85, lon: 14.26 }, { name: 'Velence', lat: 45.44, lon: 12.31 }, { name: 'Lyon', lat: 45.76, lon: 4.83 },
-            { name: 'Marseille', lat: 43.29, lon: 5.36 }
+            { name: 'Marseille', lat: 43.29, lon: 5.36 }, { name: 'Las Vegas', lat: 36.16, lon: -115.13 }, { name: 'Miami', lat: 25.76, lon: -80.19 },
+            { name: 'Boston', lat: 42.36, lon: -71.05 }, { name: 'Seattle', lat: 47.60, lon: -122.33 }, { name: 'Denver', lat: 39.73, lon: -104.99 },
+            { name: 'Havanna', lat: 23.11, lon: -82.36 }, { name: 'Panamaváros', lat: 8.98, lon: -79.51 }, { name: 'Caracas', lat: 10.48, lon: -66.90 },
+            { name: 'La Paz', lat: -16.50, lon: -68.11 }, { name: 'Kijev', lat: 50.45, lon: 30.52 }, { name: 'Minszk', lat: 53.90, lon: 27.56 },
+            { name: 'Bukarest', lat: 44.42, lon: 26.10 }, { name: 'Belgrád', lat: 44.78, lon: 20.44 }, { name: 'Zágráb', lat: 45.81, lon: 15.98 },
+            { name: 'Szlovénia', lat: 46.05, lon: 14.50 }, { name: 'Pozsony', lat: 48.14, lon: 17.10 }, { name: 'Krakkó', lat: 50.06, lon: 19.94 },
+            { name: 'Gdansk', lat: 54.35, lon: 18.64 }, { name: 'Hamburg', lat: 53.55, lon: 9.99 }, { name: 'Frankfurt', lat: 50.11, lon: 8.68 },
+            { name: 'Köln', lat: 50.93, lon: 6.96 }, { name: 'Stuttgart', lat: 48.77, lon: 9.18 }, { name: 'Manchester', lat: 53.48, lon: -2.24 },
+            { name: 'Birmingham', lat: 52.48, lon: -1.89 }, { name: 'Glasgow', lat: 55.86, lon: -4.25 }, { name: 'Edinburgh', lat: 55.95, lon: -3.18 },
+            { name: 'Valencia', lat: 39.46, lon: -0.37 }, { name: 'Sevilla', lat: 37.38, lon: -5.98 }, { name: 'Porto', lat: 41.15, lon: -8.62 },
+            { name: 'Tel Aviv', lat: 32.08, lon: 34.78 }, { name: 'Doha', lat: 25.28, lon: 51.53 }, { name: 'Abu Dhabi', lat: 24.45, lon: 54.37 }
         ];
 
         const BACKUP_FEEDS = {
@@ -1047,14 +1071,12 @@
             // 2. NIGHT INFO CARD CHECK (10 mins)
             if(state.block.type === 'summary_yesterday') {
                 const now = Date.now();
-                if (now - state.lastNightInfoTime > 600000) { // 10 perc
+                if (now - state.lastNightInfoTime > 600000) { 
                     renderNightInfoCard();
                     state.lastNightInfoTime = now;
-                    // Normál időtartam
                     el.progressBar.style.animationDuration = '18s';
                     state.currentDuration = 18000;
                     state.cardStartTime = Date.now();
-                    // Nem léptetjük a currentIndex-et, így a következő hívásnál folytatódik a hír
                     state.flipTimer = setTimeout(() => showNextItem(false), 18000); 
                     return;
                 }
@@ -1105,7 +1127,7 @@
             `;
             nextTrack.innerHTML = html;
             
-            nextTrack.classList.add('night-info'); // Add specific class
+            nextTrack.classList.add('night-info'); 
             nextTrack.classList.remove('breaking');
             el.newsBg.parentElement.classList.remove('has-image');
 
@@ -1122,7 +1144,6 @@
             const displaySource = getSourceName(item.link);
             const timeStr = item.date.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
 
-            // Reset night info class
             nextTrack.classList.remove('night-info');
 
             if(isBreaking) {
@@ -1160,6 +1181,7 @@
             el.progressBar.classList.remove('animate-progress'); void el.progressBar.offsetWidth; el.progressBar.classList.add('animate-progress');
         }
 
+        // --- MOUSE INTERACTION LOGIC (FIXED) ---
         el.newsViewport.addEventListener('mouseenter', () => {
             if(!state.isPaused) {
                 clearTimeout(state.flipTimer);
@@ -1176,7 +1198,17 @@
                 state.isPaused = false;
                 state.cardStartTime = Date.now(); 
                 state.currentDuration = state.remainingTime;
-                state.flipTimer = setTimeout(() => showNextItem(true), state.remainingTime);
+                
+                // JAVÍTÁS: Ha éppen Breaking News volt kint, és levesszük az egeret,
+                // a timer végén biztosítani kell, hogy a rendszer kilépjen a breaking módból
+                state.flipTimer = setTimeout(() => {
+                    if (state.breaking) {
+                        state.breaking = false;
+                        showNextItem(false); // Következő normál hír betöltése
+                    } else {
+                        showNextItem(true); // Normál lapozás
+                    }
+                }, state.remainingTime);
             }
         });
 
