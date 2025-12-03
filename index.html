@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V89 (Weather Start Fix)</title>
+    <title>Aurora News Ticker - V90 (Economy Added)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -98,16 +98,43 @@
             background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.4));
         }
         
-        .credits-content {
+        /* Back Face Container - Holds both Credits and Economy */
+        .back-face-container {
+            width: 100%; height: 100%; position: relative;
+        }
+
+        .credits-content, .economy-content {
             width: 100%; height: 100%; display: flex; flex-direction: column; 
             align-items: center; justify-content: center; padding: 10px; text-align: center;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
+            position: absolute; top: 0; left: 0;
+            transition: opacity 0.3s;
         }
+        
+        .credits-content { background: linear-gradient(135deg, #0f172a, #1e293b); opacity: 0; z-index: 1; pointer-events: none;}
+        .credits-content.active { opacity: 1; z-index: 2; pointer-events: all; }
+
+        .economy-content { 
+            background: linear-gradient(135deg, #0a1829, #162a42); 
+            opacity: 0; z-index: 1; pointer-events: none;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+        .economy-content.active { opacity: 1; z-index: 2; pointer-events: all; }
         
         .cr-logo { font-size: 1.5rem; margin-bottom: 5px; color: var(--accent-warm); animation: pulseLogo 2s infinite; }
         .cr-head { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 2px;}
         .cr-dev { font-family: var(--font-head); font-size: 1.3rem; font-weight: 900; color: #fff; margin: 0 0 8px 0; background: linear-gradient(to right, #fff, var(--accent-warm)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .cr-ft { font-size: 0.5rem; font-family: var(--font-mono); color: #64748b; border-top: 1px solid #334155; padding-top: 4px; width: 85%; }
+
+        /* Economy Styles */
+        .eco-header { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; width: 100%; justify-content: center; }
+        .eco-header svg { width: 16px; height: 16px; fill: var(--accent-warm); }
+        .eco-title { font-family: var(--font-head); font-weight: 800; font-size: 0.8rem; color: #fff; letter-spacing: 0.5px; }
+        .eco-list { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+        .eco-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 4px; }
+        .eco-curr { display: flex; align-items: center; gap: 5px; font-family: var(--font-head); font-weight: 700; color: var(--accent-color); font-size: 0.85rem; }
+        .eco-flag { width: 16px; border-radius: 2px; }
+        .eco-val { font-family: var(--font-mono); font-weight: 700; color: #fff; font-size: 0.9rem; }
+        .eco-loader { font-size: 0.7rem; color: var(--text-muted); font-style: italic; }
 
         .brand-wrapper { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
         .brand-logo svg { width: 24px; height: 24px; fill: var(--accent-color); filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.6)); animation: pulseLogo 3s infinite ease-in-out; }
@@ -271,7 +298,7 @@
 
     <section class="ticker-container">
         
-        <!-- PANEL 1: IDENTITY (Flippable) -->
+        <!-- PANEL 1: IDENTITY & ECONOMY (Flippable) -->
         <div class="glass-panel identity-panel">
             <div class="panel-flipper" id="id-flipper">
                 <!-- Front: ID -->
@@ -287,13 +314,38 @@
                         <div class="manual-refresh" id="manual-refresh-trigger"></div>
                     </div>
                 </div>
-                <!-- Back: Credits -->
+                <!-- Back: Credits & Economy -->
                 <div class="panel-face back">
-                    <div class="credits-content">
-                        <div class="cr-logo">✦</div>
-                        <div class="cr-head">FEJLESZTÉS ÉS DESIGN</div>
-                        <div class="cr-dev">Robi</div>
-                        <div class="cr-ft">&copy; <span id="cr-year">2025</span> Minden jog fenntartva</div>
+                    <div class="back-face-container">
+                        <!-- Credits Content -->
+                        <div class="credits-content" id="credits-content">
+                            <div class="cr-logo">✦</div>
+                            <div class="cr-head">FEJLESZTÉS ÉS DESIGN</div>
+                            <div class="cr-dev">Robi</div>
+                            <div class="cr-ft">&copy; <span id="cr-year">2025</span> Minden jog fenntartva</div>
+                        </div>
+                        
+                        <!-- Economy Content (New) -->
+                        <div class="economy-content" id="economy-content">
+                            <div class="eco-header">
+                                <div class="brand-logo" style="transform: scale(0.6);"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
+                                <div class="eco-title">ÁRFOLYAM</div>
+                            </div>
+                            <div class="eco-list">
+                                <div class="eco-item">
+                                    <div class="eco-curr"><img src="https://flagcdn.com/w20/eu.png" class="eco-flag"> EUR</div>
+                                    <div class="eco-val" id="rate-eur">---.--</div>
+                                </div>
+                                <div class="eco-item">
+                                    <div class="eco-curr"><img src="https://flagcdn.com/w20/us.png" class="eco-flag"> USD</div>
+                                    <div class="eco-val" id="rate-usd">---.--</div>
+                                </div>
+                                <div class="eco-item">
+                                    <div class="eco-curr"><img src="https://flagcdn.com/w20/ch.png" class="eco-flag"> CHF</div>
+                                    <div class="eco-val" id="rate-chf">---.--</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -403,6 +455,9 @@
         const WUNDERGROUND_API_KEY = "e1f10a1e78da46f5b10a1e78da96f525"; 
         const NYIREGYHAZA_COORDS = { lat: 47.95, lon: 21.71 };
         const NYIREGYHAZA_ID = "INYREG37"; 
+        
+        // --- ALPHA VANTAGE KEYS (Economy) ---
+        const AV_KEYS = ['4E5FW0E8H9BOEZS3', 'YP3VYIF03PGIM0ND', 'DHP4BBF68UVU0I3L'];
         
         const ICONS = {
             CLEAR: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-warm)" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
@@ -562,7 +617,14 @@
             bigClockLayer: document.getElementById('big-clock-layer'),
             bcTime: document.getElementById('bc-time-display'),
             nextProgAlert: document.getElementById('next-prog-alert'),
-            crYear: document.getElementById('cr-year')
+            crYear: document.getElementById('cr-year'),
+            // Left Panel Content Containers
+            creditsContent: document.getElementById('credits-content'),
+            economyContent: document.getElementById('economy-content'),
+            // Rates Elements
+            rateEur: document.getElementById('rate-eur'),
+            rateUsd: document.getElementById('rate-usd'),
+            rateChf: document.getElementById('rate-chf')
         };
 
         let state = {
@@ -594,7 +656,11 @@
             lastBreakingCheckTime: Date.now(),
             lastNightInfoTime: 0,
             retryQueue: [], 
-            retryInterval: null 
+            retryInterval: null,
+            // Economy State
+            economyVisible: false,
+            economyRates: { EUR: null, USD: null, CHF: null },
+            economyKeyIndex: 0
         };
 
         // --- UTILITIES ---
@@ -640,10 +706,66 @@
             else flipper.classList.remove('flipped');
         }
 
-        // --- CREDITS LOGIC ---
+        // --- CREDITS & ECONOMY LOGIC ---
         function showCredits() {
+            if(state.economyVisible) return; // Don't interrupt economy
+            
+            // Set content to credits
+            el.creditsContent.classList.add('active');
+            el.economyContent.classList.remove('active');
+            
             flipPanel('identity', true);
             setTimeout(() => { flipPanel('identity', false); }, 10000);
+        }
+
+        function showEconomy() {
+            state.economyVisible = true;
+            // Set content to economy
+            el.creditsContent.classList.remove('active');
+            el.economyContent.classList.add('active');
+            
+            flipPanel('identity', true);
+            setTimeout(() => { 
+                flipPanel('identity', false); 
+                state.economyVisible = false;
+            }, 20000); // 20 seconds visible
+        }
+
+        async function fetchExchangeRates() {
+            const currencies = ['EUR', 'USD', 'CHF'];
+            let fetchedCount = 0;
+            
+            // Try keys loop
+            for (let i = 0; i < currencies.length; i++) {
+                const curr = currencies[i];
+                let success = false;
+                let attempts = 0;
+                
+                while(!success && attempts < AV_KEYS.length) {
+                    const apiKey = AV_KEYS[state.economyKeyIndex];
+                    try {
+                        const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${curr}&to_currency=HUF&apikey=${apiKey}`;
+                        const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+                        const data = await res.json();
+                        
+                        if(data["Realtime Currency Exchange Rate"]) {
+                            const rate = parseFloat(data["Realtime Currency Exchange Rate"]["5. Exchange Rate"]).toFixed(2);
+                            state.economyRates[curr] = rate;
+                            // Update DOM immediately
+                            if(curr === 'EUR') el.rateEur.textContent = rate;
+                            if(curr === 'USD') el.rateUsd.textContent = rate;
+                            if(curr === 'CHF') el.rateChf.textContent = rate;
+                            success = true;
+                        } else if (data["Note"] || data["Error Message"]) {
+                            // Key limit or error, switch key
+                            state.economyKeyIndex = (state.economyKeyIndex + 1) % AV_KEYS.length;
+                            attempts++;
+                        }
+                    } catch(e) {
+                        attempts++;
+                    }
+                }
+            }
         }
 
         // --- SOLAR ENGINE ---
@@ -956,6 +1078,16 @@
                 state.lastScheduleMin = min; displaySchedule();
             }
             
+            // --- ECONOMY TIMING LOGIC ---
+            // Trigger fetch 30s before show (at min: 12, 32, 52)
+            if((min === 12 || min === 32 || min === 52) && sec === 30) {
+                fetchExchangeRates();
+            }
+            // Show Card (at min: 13, 33, 53)
+            if((min === 13 || min === 33 || min === 53) && sec === 0) {
+                showEconomy();
+            }
+
             const currentIndex = THEMATIC_BLOCKS.findIndex(b => b.name === state.block.name);
             const nextBlock = THEMATIC_BLOCKS[(currentIndex + 1) % THEMATIC_BLOCKS.length];
             const nextStartMin = (nextBlock.start * 60);
@@ -1251,6 +1383,9 @@
             document.getElementById('next-btn').addEventListener('click', (e) => { e.stopPropagation(); showNextItem(); });
             document.getElementById('prev-btn').addEventListener('click', (e) => { e.stopPropagation(); state.currentIndex -= 2; showNextItem(); });
             el.newsContainer.addEventListener('click', (e) => { if(e.target.closest('.controls-bar')) return; if(state.currentItem && state.currentItem.link) window.open(state.currentItem.link, '_blank'); });
+            
+            // Initial Economy Fetch (Silent)
+            setTimeout(fetchExchangeRates, 5000);
         });
     </script>
 </body>
