@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V87 (23:59 Fix)</title>
+    <title>Aurora News Ticker - V89 (Weather Start Fix)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -592,7 +592,9 @@
             remainingTime: 0,
             seenBreakingLinks: new Set(),
             lastBreakingCheckTime: Date.now(),
-            lastNightInfoTime: 0 
+            lastNightInfoTime: 0,
+            retryQueue: [], 
+            retryInterval: null 
         };
 
         // --- UTILITIES ---
@@ -710,63 +712,72 @@
         }
 
         async function fetchWeatherData() {
-            let newPWS = [];
             const stationKeys = Object.keys(PWS_MAP).sort(() => 0.5 - Math.random()).slice(0, 10);
             
-            for (const id of stationKeys) {
+            // Helper for PWS
+            const fetchPWS = async (id) => {
                 try {
                     const url = `https://api.weather.com/v2/pws/observations/current?stationId=${id}&format=json&units=m&apiKey=${WUNDERGROUND_API_KEY}&numericPrecision=decimal`;
-                    const res = await fetch(url);
-                    if(!res.ok) continue; 
+                    const res = await fetch(url, { signal: AbortSignal.timeout(3000) }); // 3s timeout
+                    if(!res.ok) return null;
                     const data = await res.json();
-                    
                     if(data.observations && data.observations.length > 0) {
                         const obs = data.observations[0];
                         if(obs.metric.temp !== null) {
-                             let iconCode = 26; 
+                             let iconCode = 26;
                              try {
                                  const wxUrl = `https://api.weather.com/v3/wx/observations/current?geocode=${obs.lat},${obs.lon}&format=json&units=m&language=hu-HU&apiKey=${WUNDERGROUND_API_KEY}`;
-                                 const wxRes = await fetch(wxUrl);
+                                 const wxRes = await fetch(wxUrl, { signal: AbortSignal.timeout(2000) });
                                  if(wxRes.ok) {
                                      const wxData = await wxRes.json();
                                      if(wxData.iconCode !== undefined) iconCode = wxData.iconCode;
                                  }
                              } catch(e) {}
-
-                             newPWS.push({
+                             
+                             return {
                                 name: PWS_MAP[id] || id, lat: obs.lat, lon: obs.lon, 
                                 temp: obs.metric.temp, hum: obs.humidity, wind: obs.metric.windSpeed, winddir: obs.winddir,
                                 press: obs.metric.pressure, precip: obs.metric.precipRate,
                                 ibmIcon: iconCode, updatedAt: new Date(), type: 'PWS'
-                            });
+                            };
                         }
                     }
-                } catch(e) {}
-            }
+                } catch(e) { return null; }
+                return null;
+            };
 
-            async function getOpenMeteoData(cityList, count) {
-                let results = [];
-                const keys = cityList.sort(() => 0.5 - Math.random()).slice(0, count);
-                for(const city of keys) {
+            // Helper for OpenMeteo
+            const fetchOM = async (cityList, count) => {
+                 const keys = cityList.sort(() => 0.5 - Math.random()).slice(0, count);
+                 const promises = keys.map(async city => {
                     try {
                         const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,weather_code,apparent_temperature`;
-                        const res = await fetch(url); const data = await res.json();
-                        results.push({
+                        const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+                        const data = await res.json();
+                        return {
                             name: city.name, lat: city.lat, lon: city.lon, 
                             temp: data.current.temperature_2m, hum: data.current.relative_humidity_2m, 
                             wind: data.current.wind_speed_10m, winddir: data.current.wind_direction_10m, 
                             press: data.current.surface_pressure, precip: 0, wmo: data.current.weather_code, 
                             feelsLike: data.current.apparent_temperature, updatedAt: new Date(), type: 'OM'
-                        });
-                    } catch(e) {}
-                }
-                return results;
-            }
+                        };
+                    } catch(e) { return null; }
+                 });
+                 const results = await Promise.allSettled(promises);
+                 return results.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
+            };
+
+            // Launch all in parallel
+            const [pwsResults, huResults, foreignResults] = await Promise.all([
+                Promise.allSettled(stationKeys.map(id => fetchPWS(id))),
+                fetchOM(HUNGARIAN_CITIES_OM, 5),
+                fetchOM(FOREIGN_CITIES, 10)
+            ]);
+
+            const validPWS = pwsResults.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
             
-            let newHuOM = await getOpenMeteoData(HUNGARIAN_CITIES_OM, 5);
-            let newForeign = await getOpenMeteoData(FOREIGN_CITIES, 10);
-            state.weatherPlaylist = [...newPWS, ...newHuOM, ...newForeign];
-            state.weatherPlaylistIndex = 0; 
+            state.weatherPlaylist = [...validPWS, ...huResults, ...foreignResults];
+            state.weatherPlaylistIndex = 0;
         }
 
         function displayWeather() {
@@ -967,57 +978,160 @@
             }
         }
 
-        async function refreshNews(silent = false) {
-            if(!silent) el.loading.classList.add('active');
-            let feeds = BACKUP_FEEDS;
-            if(Object.keys(state.rssFeeds).length > 0) feeds = { ...feeds, ...state.rssFeeds };
-            let fetchedItems = [];
-            const promises = Object.entries(feeds).map(async ([key, url]) => {
-                try {
-                    const res = await fetchWithProxyFallback(url);
-                    let txt;
-                    if(url.includes('ma.hu')) txt = new TextDecoder('iso-8859-2').decode(await res.arrayBuffer());
-                    else txt = await res.text();
-                    const xml = new DOMParser().parseFromString(txt, "text/xml");
-                    xml.querySelectorAll("item").forEach(item => {
-                        const title = item.querySelector("title")?.textContent || "";
-                        const descHtml = item.querySelector("description")?.textContent || "";
-                        const link = item.querySelector("link")?.textContent;
-                        const dateStr = item.querySelector("pubDate")?.textContent;
-                        if(title && dateStr) {
-                             fetchedItems.push({ title: title, link: link, desc: stripHtml(descHtml).substring(0, 300), source: key, date: new Date(dateStr), img: extractImageUrl(item, descHtml) });
-                        }
-                    });
-                } catch(e) {}
-            });
-            await Promise.allSettled(promises);
-            fetchedItems.sort((a,b) => b.date - a.date);
+        function filterItemsByBlock(items) {
             const now = new Date();
             let filtered = [];
             if(state.block.type === 'summary_yesterday') {
                 const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1);
                 yesterday.setHours(0,0,0,0);
                 const end = new Date(yesterday); end.setHours(23,59,59,999);
-                filtered = fetchedItems.filter(item => item.date >= yesterday && item.date <= end);
+                filtered = items.filter(item => item.date >= yesterday && item.date <= end);
                 filtered.sort((a,b) => a.date - b.date); 
             } else if(state.block.type === 'morning_catchup') {
                 let start = new Date(now); start.setHours(0,0,0,0);
-                filtered = fetchedItems.filter(item => item.date >= start);
+                filtered = items.filter(item => item.date >= start);
             } else if(state.block.type === 'fresh') {
                 let timeLimit = new Date();
                 timeLimit.setHours(now.getHours() - (state.block.timeWindowHours || 2));
-                filtered = fetchedItems.filter(item => item.date >= timeLimit);
+                filtered = items.filter(item => item.date >= timeLimit);
             } else {
                 let timeLimit = new Date(); timeLimit.setHours(0,0,0,0);
-                filtered = fetchedItems.filter(item => item.date >= timeLimit);
+                filtered = items.filter(item => item.date >= timeLimit);
             }
-            const rawItems = filtered.length > 0 ? filtered : fetchedItems.slice(0, 20);
+            return filtered;
+        }
+
+        async function attemptFetchFeed(key, url) {
+            const res = await fetchWithProxyFallback(url);
+            let txt;
+            if(url.includes('ma.hu')) txt = new TextDecoder('iso-8859-2').decode(await res.arrayBuffer());
+            else txt = await res.text();
+            const xml = new DOMParser().parseFromString(txt, "text/xml");
+            const parsedItems = [];
+            xml.querySelectorAll("item").forEach(item => {
+                const title = item.querySelector("title")?.textContent || "";
+                const descHtml = item.querySelector("description")?.textContent || "";
+                const link = item.querySelector("link")?.textContent;
+                const dateStr = item.querySelector("pubDate")?.textContent;
+                if(title && dateStr) {
+                    parsedItems.push({ title: title, link: link, desc: stripHtml(descHtml).substring(0, 300), source: key, date: new Date(dateStr), img: extractImageUrl(item, descHtml) });
+                }
+            });
+            return parsedItems;
+        }
+
+        async function processRetries() {
+            if(state.retryQueue.length === 0) return;
+            const currentQueue = [...state.retryQueue];
+            state.retryQueue = []; // Clear for next batch or re-adds
+            
+            const fetched = [];
+            for(const task of currentQueue) {
+                try {
+                    const items = await attemptFetchFeed(task.key, task.url);
+                    fetched.push(...items);
+                } catch(e) {
+                    // If still failing, re-add to queue to try later
+                    state.retryQueue.push(task);
+                }
+            }
+
+            if(fetched.length > 0) {
+                mergeNewItems(fetched);
+            }
+        }
+
+        function mergeNewItems(newItems) {
+            const currentLink = state.currentItem ? state.currentItem.link : null;
+            
+            // Combine with existing items
+            const combined = [...state.items, ...newItems];
+            
+            // Deduplicate based on link
+            const uniqueMap = new Map();
+            combined.forEach(item => uniqueMap.set(item.link, item));
+            let uniqueItems = Array.from(uniqueMap.values());
+            
+            // Filter by current block rules
+            uniqueItems = filterItemsByBlock(uniqueItems);
+            
+            // Sort by Date Descending
+            if(state.block.type !== 'summary_yesterday') {
+                uniqueItems.sort((a,b) => b.date - a.date);
+            }
+            
+            // Update items
+            state.items = uniqueItems;
+            
+            // Fix Index: Find where the current item moved to
+            if(currentLink) {
+                const newIdx = state.items.findIndex(i => i.link === currentLink);
+                if(newIdx !== -1) {
+                    state.currentIndex = newIdx;
+                } else {
+                    // Item fell out of list (e.g. too old now), keep index safe
+                    state.currentIndex = state.currentIndex % state.items.length;
+                }
+            }
+            
+            // Update counter display
+            if(state.items.length > 0) {
+                el.counter.textContent = `${(state.currentIndex % state.items.length) + 1} / ${state.items.length}`;
+            }
+        }
+
+        async function refreshNews(silent = false) {
+            if(!silent) el.loading.classList.add('active');
+            
+            // Reset Retry Queue on manual refresh
+            state.retryQueue = [];
+            if(state.retryInterval) clearInterval(state.retryInterval);
+
+            let feeds = BACKUP_FEEDS;
+            if(Object.keys(state.rssFeeds).length > 0) feeds = { ...feeds, ...state.rssFeeds };
+            
+            let fetchedItems = [];
+            const fetchPromises = Object.entries(feeds).map(async ([key, url]) => {
+                try {
+                    const items = await attemptFetchFeed(key, url);
+                    fetchedItems.push(...items);
+                } catch(e) {
+                    // Add to retry queue
+                    state.retryQueue.push({ key, url });
+                }
+            });
+
+            await Promise.allSettled(fetchPromises);
+            
+            // Initial Processing
+            fetchedItems.sort((a,b) => b.date - a.date);
+            const filtered = filterItemsByBlock(fetchedItems);
+            
+            // Deduplicate for initial load
             const uniqueItems = [];
             const seenLinks = new Set();
-            for(const item of rawItems) { if(!seenLinks.has(item.link)) { uniqueItems.push(item); seenLinks.add(item.link); } }
-            if(silent) { state.nextItems = uniqueItems; state.updatePending = true; } 
-            else { state.items = uniqueItems; if(!silent) { el.loading.classList.remove('active'); state.currentIndex = 0; showNextItem(false); } }
+            for(const item of filtered) { 
+                if(!seenLinks.has(item.link)) { 
+                    uniqueItems.push(item); 
+                    seenLinks.add(item.link); 
+                } 
+            }
+            
+            if(silent) { 
+                mergeNewItems(uniqueItems);
+            } else { 
+                state.items = uniqueItems; 
+                el.loading.classList.remove('active'); 
+                state.currentIndex = 0; 
+                showNextItem(false); 
+            }
+            
             if(state.block.type === 'summary_yesterday') generateTimeline(); else el.timelineContainer.classList.remove('visible');
+
+            // Start Retry Interval if there are failures
+            if(state.retryQueue.length > 0) {
+                state.retryInterval = setInterval(processRetries, 20000); // Try every 20s
+            }
         }
 
         function showNextItem(advance = true) {
@@ -1025,6 +1139,7 @@
             clearTimeout(state.flipTimer);
             if(state.nextIsBreaking && state.breakingItem) {
                 state.breaking = true; state.nextIsBreaking = false; state.wasBreaking = true;
+                state.currentItem = state.breakingItem;
                 renderCard(state.breakingItem, true);
                 el.progressBar.style.animationDuration = '30s'; state.currentDuration = 30000; state.cardStartTime = Date.now();
                 state.flipTimer = setTimeout(() => { state.breaking = false; showNextItem(false); }, 30000);
@@ -1040,15 +1155,18 @@
                     return;
                 }
             }
-            if(state.updatePending && !state.breaking) {
-                state.items = state.nextItems; state.nextItems = [];
-                if(state.block.type !== 'summary_yesterday') { state.currentIndex = 0; advance = false; }
-                state.updatePending = false;
-            }
+            
             if(state.items.length === 0) { el[state.activeTrack === 'a' ? 'trackA' : 'trackB'].innerHTML = `<div class="news-title">Nincs hír...</div>`; return; }
+            
             if(advance) state.currentIndex++;
             let item = state.items[state.currentIndex % state.items.length];
-            if(state.currentItem && (item.link === state.currentItem.link || item.title === state.currentItem.title)) { state.currentIndex++; item = state.items[state.currentIndex % state.items.length]; }
+            
+            // Skip if same as current (unless there's only 1 item)
+            if(state.items.length > 1 && state.currentItem && (item.link === state.currentItem.link || item.title === state.currentItem.title)) { 
+                state.currentIndex++; 
+                item = state.items[state.currentIndex % state.items.length]; 
+            }
+            
             state.currentItem = item;
             renderCard(item, false);
             el.progressBar.style.animationDuration = '18s'; state.currentDuration = 18000; state.cardStartTime = Date.now();
