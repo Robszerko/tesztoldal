@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V90 (Economy Added)</title>
+    <title>Aurora News Ticker - V95 (Smart Resume & FX)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -172,7 +172,8 @@
         .news-image-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; mask-image: linear-gradient(to right, transparent, black 15%, black 100%); opacity: 0; transition: opacity 1s ease; pointer-events: none; z-index: 1; }
         .news-image-overlay img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(30%) contrast(1.2); }
         .news-panel.has-image .news-image-overlay { opacity: 0.12; }
-        .news-card.breaking { background: linear-gradient(90deg, rgba(220, 38, 38, 0.25), rgba(220, 38, 38, 0.05)); border-left: 4px solid var(--accent-danger); }
+        
+        .news-card.breaking { /* Reset if any */ }
 
         /* NIGHT INFO CARD STYLE */
         .news-card.night-info {
@@ -205,8 +206,118 @@
         .program-badge.visible { opacity: 1; }
         .program-badge.breaking-mode { background: var(--accent-danger); color: #fff; border-color: transparent; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); animation: pulseRed 1s infinite; opacity: 1; }
 
-        .controls-bar { height: 28px; border-top: 1px solid var(--glass-border); display: flex; align-items: center; padding: 0 10px; background: rgba(0,0,0,0.3); font-size: 0.7rem; z-index: 5; position: relative; justify-content: space-between; }
+        /* MODIFIED CONTROLS BAR */
+        .controls-bar { 
+            height: 28px; border-top: 1px solid var(--glass-border); 
+            background: rgba(0,0,0,0.3); font-size: 0.7rem; z-index: 5; 
+            position: relative; overflow: hidden; /* Important for sliding/hiding */
+        }
         
+        .controls-normal-content {
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%; height: 100%; padding: 0 10px;
+            transition: opacity 0.5s;
+        }
+        .controls-bar.breaking-active .controls-normal-content { opacity: 0; pointer-events: none; }
+
+        /* Re-appearing animation */
+        .controls-bar:not(.breaking-active) .controls-normal-content > * {
+            animation: fadeInStagger 0.5s ease forwards;
+            opacity: 0;
+        }
+        .controls-bar:not(.breaking-active) .controls-normal-content > *:nth-child(1) { animation-delay: 0.1s; }
+        .controls-bar:not(.breaking-active) .controls-normal-content > *:nth-child(2) { animation-delay: 0.2s; }
+        .controls-bar:not(.breaking-active) .controls-normal-content > *:nth-child(3) { animation-delay: 0.3s; }
+        .controls-bar:not(.breaking-active) .controls-normal-content > *:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes fadeInStagger { to { opacity: 1; } }
+
+        /* Bottom Breaking Container */
+        .bottom-breaking-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            background: #020617; z-index: 20;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .controls-bar.breaking-active .bottom-breaking-container { transform: translateY(0); }
+
+        /* --- PRO BREAKING BADGE DESIGN --- */
+        .bb-alert { 
+            background: linear-gradient(135deg, #dc2626, #991b1b);
+            color: #fff; 
+            font-family: var(--font-head);
+            font-weight: 900; 
+            font-size: 0.8rem;
+            letter-spacing: 1px; 
+            text-transform: uppercase; 
+            padding: 3px 12px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.25);
+            box-shadow: 0 2px 10px rgba(220, 38, 38, 0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            animation: pulseAlert 1s infinite;
+            display: none;
+        }
+        
+        @keyframes pulseAlert {
+            0%, 100% { transform: scale(1); box-shadow: 0 2px 10px rgba(220, 38, 38, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 2px 20px rgba(220, 38, 38, 0.8); }
+        }
+
+        .bb-content { 
+            display: none; align-items: center; gap: 10px; width: 100%; padding: 0 10px; 
+            justify-content: flex-start;
+            perspective: 500px;
+        }
+        .bb-content.active { display: flex; }
+        
+        /* Flipper Animations */
+        .bb-flipper-box {
+            display: flex; align-items: center; gap: 10px; flex-grow: 1; overflow: hidden; /* For marquee */
+            transform-origin: bottom;
+        }
+        
+        .bb-content.active .bb-flipper-box { animation: rotateIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .bb-content.exit-mode .bb-flipper-box { animation: dropOut 0.5s ease-in forwards; }
+
+        @keyframes rotateIn { 
+            0% { opacity: 0; transform: rotateX(-90deg); } 
+            100% { opacity: 1; transform: rotateX(0deg); } 
+        }
+        @keyframes dropOut {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(100%); }
+        }
+        
+        .bb-count { color: #94a3b8; font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+        .bb-time { color: var(--accent-warm); font-family: var(--font-mono); font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+        .bb-source { color: #fff; background: var(--accent-color); color: #000; font-weight: 800; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; font-size: 0.6rem; white-space: nowrap; box-shadow: 0 0 5px rgba(56, 189, 248, 0.4); flex-shrink: 0; }
+        
+        .bb-headline-wrapper { flex-grow: 1; overflow: hidden; position: relative; height: 1.2em; }
+        .bb-headline { 
+            color: #fff; font-weight: 700; text-decoration: none; 
+            white-space: nowrap; font-size: 0.8rem; display: inline-block;
+            cursor: pointer; transition: color 0.2s;
+        }
+        .bb-headline:hover { color: var(--accent-warm); text-decoration: underline; }
+        .bb-headline.scrolling { animation: scrollText 12s linear infinite; animation-delay: 1s; padding-left: 0; }
+        
+        @keyframes scrollText {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(0); } /* Wait a bit */
+            100% { transform: translateX(-100%); }
+        }
+
+        .update-indicator {
+            display: none;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--accent-warm);
+            margin-right: 10px;
+            animation: pulseText 1s infinite;
+        }
+        .update-indicator.active { display: block; }
+
         .next-prog-alert { 
             display: none; 
             align-items: center; 
@@ -277,9 +388,8 @@
         .promo-brand-lockup .brand-name { font-size: 1.4rem; text-shadow: 0 0 10px rgba(0,0,0,0.5); }
         .promo-text-bottom { font-size: 0.85rem; font-weight: 700; color: #fff; letter-spacing: 0.5px; }
 
-        .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(5px); z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s; }
-        .loading-overlay.active { opacity: 1; pointer-events: all; }
-        .loader-spinner { width: 32px; height: 32px; border: 3px solid rgba(56, 189, 248, 0.3); border-radius: 50%; border-top-color: var(--accent-color); animation: spin 1s linear infinite; margin-bottom: 10px; }
+        .loading-overlay { display: none; } 
+        
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulseLogo { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.95); opacity: 0.8; } }
         @keyframes pulseRed { 0%, 100% { background-color: var(--accent-danger); box-shadow: 0 0 5px var(--accent-danger); } 50% { background-color: #dc2626; box-shadow: 0 0 20px var(--accent-danger); } }
@@ -353,10 +463,7 @@
 
         <!-- PANEL 2: NEWS CONTENT -->
         <div class="glass-panel news-panel" id="news-container">
-            <div class="loading-overlay" id="loading-overlay">
-                <div class="loader-spinner"></div>
-                <div>Hírek frissítése...</div>
-            </div>
+            <div class="loading-overlay" id="loading-overlay"></div>
             
             <div class="big-clock-layer" id="big-clock-layer">
                 <div class="bc-time" id="bc-time-display">00:00:00</div>
@@ -382,13 +489,32 @@
 
             <div class="progress-line-container"><div id="progress-bar" class="progress-line"></div></div>
 
-            <div class="controls-bar" id="controls-bar-stop-click">
-                <div id="timeline-container"></div>
-                <div id="next-prog-alert" class="next-prog-alert"></div>
-                <div class="control-group">
-                    <span id="counter-display" style="font-family:var(--font-mono); color:var(--text-muted); margin-right:5px; font-weight:700;">0/0</span>
-                    <button class="control-btn" id="prev-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-                    <button class="control-btn" id="next-btn"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <div class="controls-bar" id="controls-bar-main">
+                <!-- Normal Content -->
+                <div class="controls-normal-content" id="controls-normal">
+                    <div id="timeline-container"></div>
+                    <div id="update-indicator" class="update-indicator">FRISSÍTÉS...</div>
+                    <div id="next-prog-alert" class="next-prog-alert"></div>
+                    <div class="control-group">
+                        <span id="counter-display" style="font-family:var(--font-mono); color:var(--text-muted); margin-right:5px; font-weight:700;">0/0</span>
+                        <button class="control-btn" id="prev-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                        <button class="control-btn" id="next-btn"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                    </div>
+                </div>
+                
+                <!-- Breaking News Container (Hidden by default) -->
+                <div class="bottom-breaking-container" id="bottom-breaking">
+                    <div class="bb-alert" id="bb-alert-text">MOST ÉRKEZETT</div>
+                    <div class="bb-content" id="bb-content-box">
+                        <div class="bb-flipper-box">
+                            <span class="bb-count" id="bb-count">1/1</span>
+                            <span class="bb-time" id="bb-time">00:00</span>
+                            <span class="bb-source" id="bb-source">FORRÁS</span>
+                            <div class="bb-headline-wrapper">
+                                <a href="#" target="_blank" class="bb-headline" id="bb-headline">Headline...</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -618,13 +744,23 @@
             bcTime: document.getElementById('bc-time-display'),
             nextProgAlert: document.getElementById('next-prog-alert'),
             crYear: document.getElementById('cr-year'),
+            updateIndicator: document.getElementById('update-indicator'),
             // Left Panel Content Containers
             creditsContent: document.getElementById('credits-content'),
             economyContent: document.getElementById('economy-content'),
             // Rates Elements
             rateEur: document.getElementById('rate-eur'),
             rateUsd: document.getElementById('rate-usd'),
-            rateChf: document.getElementById('rate-chf')
+            rateChf: document.getElementById('rate-chf'),
+            // Controls & Bottom Breaking
+            controlsBar: document.getElementById('controls-bar-main'),
+            bottomBreaking: document.getElementById('bottom-breaking'),
+            bbAlert: document.getElementById('bb-alert-text'),
+            bbContent: document.getElementById('bb-content-box'),
+            bbCount: document.getElementById('bb-count'),
+            bbTime: document.getElementById('bb-time'),
+            bbSource: document.getElementById('bb-source'),
+            bbHeadline: document.getElementById('bb-headline')
         };
 
         let state = {
@@ -660,7 +796,16 @@
             // Economy State
             economyVisible: false,
             economyRates: { EUR: null, USD: null, CHF: null },
-            economyKeyIndex: 0
+            economyKeyIndex: 0,
+            // Seamless Update Flag
+            pendingListReset: false,
+            // Bottom Breaking State
+            breakingQueue: [],
+            isShowingBreakingBottom: false,
+            // Main Ticker Stability
+            isTransitioning: false,
+            // Smart Refresh Logic
+            lastRefreshTimestamp: Date.now()
         };
 
         // --- UTILITIES ---
@@ -993,6 +1138,8 @@
         async function checkBreakingNews() {
             const now = Date.now();
             const threeMinutesAgo = now - (3 * 60 * 1000); 
+            let newBreakingFound = false;
+
             for(const [src, url] of Object.entries(BACKUP_FEEDS)) {
                 try {
                     const res = await fetchWithProxyFallback(url);
@@ -1005,17 +1152,141 @@
                         if(!dateStr) continue;
                         const date = new Date(dateStr);
                         const link = item.querySelector("link")?.textContent;
+                        
                         if(date.getTime() > threeMinutesAgo && link && !state.seenBreakingLinks.has(link)) {
                             const title = item.querySelector("title")?.textContent || "";
                             state.seenBreakingLinks.add(link); 
-                            state.breakingItem = { title: title, desc: stripHtml(item.querySelector("description")?.textContent || ""), source: src, date: date, link: link };
-                            state.nextIsBreaking = true;
-                            clearTimeout(state.flipTimer);
-                            showNextItem(false);
-                            return; 
+                            
+                            // Add to Queue
+                            const breakingItem = { 
+                                title: title, 
+                                desc: stripHtml(item.querySelector("description")?.textContent || ""), 
+                                source: getSourceName(link), // Normalized source
+                                date: date, 
+                                link: link 
+                            };
+                            
+                            state.breakingQueue.push(breakingItem);
+                            newBreakingFound = true;
                         }
                     }
                 } catch(e) {}
+            }
+
+            // If found new items and not currently showing bottom ticker, start it
+            if (newBreakingFound && !state.isShowingBreakingBottom && state.breakingQueue.length > 0) {
+                playBottomBreakingNews();
+            }
+        }
+
+        function playBottomBreakingNews() {
+            if (state.breakingQueue.length === 0) return;
+            state.isShowingBreakingBottom = true;
+            
+            // 1. Activate Mode (Hides normal controls)
+            el.controlsBar.classList.add('breaking-active');
+            
+            let currentItemIndex = 0;
+            const totalItems = state.breakingQueue.length;
+
+            const displayNext = () => {
+                if (currentItemIndex >= state.breakingQueue.length) {
+                    // END OF QUEUE
+                    // Wait 4 seconds on black
+                    el.bbContent.classList.remove('active'); // Hide content
+                    el.bbAlert.style.display = 'none'; // Ensure alert is hidden
+                    
+                    setTimeout(() => {
+                        el.controlsBar.classList.remove('breaking-active'); // Fade in normal
+                        state.isShowingBreakingBottom = false;
+                        state.breakingQueue = []; // Clear queue
+                    }, 4000);
+                    return;
+                }
+
+                const item = state.breakingQueue[currentItemIndex];
+                
+                // First item only: Show alert for 2s
+                if (currentItemIndex === 0) {
+                    el.bbContent.classList.remove('active');
+                    el.bbAlert.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        showContent(item);
+                    }, 2000);
+                } else {
+                    // Remove Active to trigger exit animation on next paint
+                    el.bbContent.classList.remove('active'); 
+                    void el.bbContent.offsetWidth; // Reflow
+                    showContent(item);
+                }
+            };
+
+            const showContent = (item) => {
+                el.bbAlert.style.display = 'none';
+                
+                // Populate Content
+                el.bbCount.textContent = `${currentItemIndex + 1}/${totalItems}`;
+                el.bbTime.textContent = item.date.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
+                el.bbSource.textContent = item.source;
+                
+                // Smart Marquee Handling
+                el.bbHeadline.textContent = item.title;
+                el.bbHeadline.href = item.link;
+                el.bbHeadline.classList.remove('scrolling'); // Reset scroll
+                
+                el.bbContent.classList.remove('exit-mode');
+                el.bbContent.classList.add('active'); // Trigger Entry Animation
+
+                // Check width for marquee
+                setTimeout(() => {
+                    // Measure container width vs text width
+                    const containerWidth = el.bbHeadline.parentElement.offsetWidth;
+                    const textWidth = el.bbHeadline.scrollWidth;
+                    
+                    if(textWidth > containerWidth) {
+                        el.bbHeadline.classList.add('scrolling');
+                    }
+                }, 100);
+
+                // Exit Sequence
+                setTimeout(() => {
+                    // Trigger Fall Down
+                    el.bbContent.classList.add('exit-mode'); 
+                    
+                    // Wait for fall down to finish, then next
+                    setTimeout(() => {
+                        currentItemIndex++;
+                        displayNext();
+                    }, 500); // 0.5s for drop out
+                    
+                }, 14500); // 14.5s visible
+            };
+
+            displayNext();
+        }
+
+        // --- SMART VISIBILITY HANDLER ---
+        function handleVisibilityChange() {
+            if (document.visibilityState === 'visible') {
+                const now = Date.now();
+                const nowMin = new Date().getMinutes();
+                
+                // Calculate the last :00, :15, :30, :45 checkpoint
+                const d = new Date();
+                const remainder = d.getMinutes() % 15;
+                d.setMinutes(d.getMinutes() - remainder);
+                d.setSeconds(0);
+                d.setMilliseconds(0);
+                const lastCheckpoint = d.getTime();
+
+                // If our last actual refresh was BEFORE the last checkpoint, we missed an update!
+                // Trigger immediate refresh logic as if it was :00
+                if (state.lastRefreshTimestamp < lastCheckpoint) {
+                    console.log("Missed a scheduled refresh while away. Catching up...");
+                    state.items = []; // Force list reset
+                    refreshNews(false); // Full refresh
+                }
             }
         }
 
@@ -1105,8 +1376,15 @@
                 el.nextProgAlert.classList.remove('active');
             }
 
-            if((min === 0 || min === 15 || min === 30 || min === 45) && sec === 50) {
-                refreshNews(true);
+            // --- NEWS UPDATE LOGIC ---
+            // 1. Pre-fetch 10s before (xx:50)
+            if (sec === 50 && (min === 14 || min === 29 || min === 44 || min === 59)) {
+                el.updateIndicator.classList.add('active'); // Show indicator in thin bar
+                refreshNews(true); // Silent fetch
+            }
+            // 2. Trigger Seamless Switch at :00
+            if (sec === 0 && (min === 0 || min === 15 || min === 30 || min === 45)) {
+                state.pendingListReset = true; // Set flag to swap on next card
             }
         }
 
@@ -1192,7 +1470,7 @@
                 uniqueItems.sort((a,b) => b.date - a.date);
             }
             
-            // Update items
+            // Update items silently - Do not reset timer
             state.items = uniqueItems;
             
             // Fix Index: Find where the current item moved to
@@ -1213,6 +1491,9 @@
         }
 
         async function refreshNews(silent = false) {
+            // Update timestamp for smart resume logic
+            state.lastRefreshTimestamp = Date.now();
+
             if(!silent) el.loading.classList.add('active');
             
             // Reset Retry Queue on manual refresh
@@ -1250,7 +1531,9 @@
             }
             
             if(silent) { 
-                mergeNewItems(uniqueItems);
+                // Store in nextItems for seamless swap
+                state.nextItems = uniqueItems; 
+                el.updateIndicator.classList.remove('active'); // Turn off flashing text
             } else { 
                 state.items = uniqueItems; 
                 el.loading.classList.remove('active'); 
@@ -1267,27 +1550,29 @@
         }
 
         function showNextItem(advance = true) {
-            if(state.breaking) return;
+            // SAFEGUARD: Ensure timer is cleared
             clearTimeout(state.flipTimer);
-            if(state.nextIsBreaking && state.breakingItem) {
-                state.breaking = true; state.nextIsBreaking = false; state.wasBreaking = true;
-                state.currentItem = state.breakingItem;
-                renderCard(state.breakingItem, true);
-                el.progressBar.style.animationDuration = '30s'; state.currentDuration = 30000; state.cardStartTime = Date.now();
-                state.flipTimer = setTimeout(() => { state.breaking = false; showNextItem(false); }, 30000);
-                return;
-            }
+            state.isTransitioning = true; // Flag to prevent overlaps
+
             if(state.block.type === 'summary_yesterday') {
                 const now = Date.now();
                 if (now - state.lastNightInfoTime > 300000) { 
                     renderNightInfoCard();
                     state.lastNightInfoTime = now;
-                    el.progressBar.style.animationDuration = '18s'; state.currentDuration = 18000; state.cardStartTime = Date.now();
-                    state.flipTimer = setTimeout(() => showNextItem(false), 18000); 
+                    // Timer logic handled inside render
                     return;
                 }
             }
             
+            // SEAMLESS SWAP LOGIC
+            if(state.pendingListReset && state.nextItems.length > 0) {
+                state.items = state.nextItems;
+                state.nextItems = [];
+                state.currentIndex = -1; // Reset index (will become 0 on next line)
+                advance = true; // Force advance to 0
+                state.pendingListReset = false;
+            }
+
             if(state.items.length === 0) { el[state.activeTrack === 'a' ? 'trackA' : 'trackB'].innerHTML = `<div class="news-title">Nincs hír...</div>`; return; }
             
             if(advance) state.currentIndex++;
@@ -1301,8 +1586,16 @@
             
             state.currentItem = item;
             renderCard(item, false);
-            el.progressBar.style.animationDuration = '18s'; state.currentDuration = 18000; state.cardStartTime = Date.now();
-            state.flipTimer = setTimeout(() => showNextItem(true), 18000);
+            
+            // STRICT TIMING
+            el.progressBar.style.animationDuration = '18s'; 
+            state.currentDuration = 18000; 
+            state.cardStartTime = Date.now();
+            
+            state.flipTimer = setTimeout(() => { 
+                state.isTransitioning = false;
+                showNextItem(true); 
+            }, 18000);
         }
 
         function renderNightInfoCard() {
@@ -1319,7 +1612,16 @@
             el.newsBg.parentElement.classList.remove('has-image');
             currentTrack.classList.remove('visible'); nextTrack.classList.add('visible');
             state.activeTrack = state.activeTrack === 'a' ? 'b' : 'a';
-            el.progressBar.classList.remove('animate-progress'); void el.progressBar.offsetWidth; el.progressBar.classList.add('animate-progress');
+            
+            el.progressBar.classList.remove('animate-progress'); 
+            void el.progressBar.offsetWidth; 
+            el.progressBar.style.animationDuration = '18s'; 
+            el.progressBar.classList.add('animate-progress');
+            
+            state.flipTimer = setTimeout(() => { 
+                state.isTransitioning = false;
+                showNextItem(false);
+            }, 18000);
         }
 
         function renderCard(item, isBreaking) {
@@ -1333,19 +1635,16 @@
                 <div class="provider-identity"><img src="${fav}" class="provider-icon"> ${displaySource}</div>
                 <span>${timeStr}</span>
             `;
-            if(isBreaking) {
-                el.badge.textContent = "MOST ÉRKEZETT!"; el.badge.classList.add('breaking-mode'); el.badge.classList.add('visible');
+            
+            el.badge.classList.remove('breaking-mode');
+            if(state.block.type === 'summary_yesterday') {
+                el.badge.classList.remove('visible');
+                headerHTML += `<span class="night-prog-label visible">${state.block.name}</span>`;
+                headerHTML += `<span class="night-summary-label visible">AZ ELŐZŐ NAP HÍREINEK ÖSSZEFOGLALÓJA</span>`;
             } else {
-                state.wasBreaking = false;
-                el.badge.classList.remove('breaking-mode');
-                if(state.block.type === 'summary_yesterday') {
-                    el.badge.classList.remove('visible');
-                    headerHTML += `<span class="night-prog-label visible">${state.block.name}</span>`;
-                    headerHTML += `<span class="night-summary-label visible">AZ ELŐZŐ NAP HÍREINEK ÖSSZEFOGLALÓJA</span>`;
-                } else {
-                    el.badge.textContent = state.block.name; el.badge.classList.add('visible');
-                }
+                el.badge.textContent = state.block.name; el.badge.classList.add('visible');
             }
+            
             const html = `
                 <div class="news-header-row">
                     <div class="news-meta">${headerHTML}</div>
@@ -1356,24 +1655,32 @@
                 </div>
             `;
             nextTrack.innerHTML = html;
-            if(isBreaking) nextTrack.classList.add('breaking'); else nextTrack.classList.remove('breaking');
+            nextTrack.classList.remove('breaking');
             if(item.img) { el.bgImg.src = item.img; el.newsBg.parentElement.classList.add('has-image'); } else { el.newsBg.parentElement.classList.remove('has-image'); }
             currentTrack.classList.remove('visible'); nextTrack.classList.add('visible');
             state.activeTrack = state.activeTrack === 'a' ? 'b' : 'a';
             el.counter.textContent = `${(state.currentIndex % state.items.length) + 1} / ${state.items.length}`;
             updateTimelineActive();
-            el.progressBar.classList.remove('animate-progress'); void el.progressBar.offsetWidth; el.progressBar.classList.add('animate-progress');
+            
+            // Animation Sync
+            el.progressBar.classList.remove('animate-progress'); 
+            void el.progressBar.offsetWidth; 
+            el.progressBar.classList.add('animate-progress');
         }
 
         el.newsViewport.addEventListener('mouseenter', () => {
             if(!state.isPaused) { clearTimeout(state.flipTimer); el.progressBar.style.animationPlayState = 'paused'; state.isPaused = true; const elapsed = Date.now() - state.cardStartTime; state.remainingTime = Math.max(0, state.currentDuration - elapsed); }
         });
         el.newsViewport.addEventListener('mouseleave', () => {
-            if(state.isPaused) { el.progressBar.style.animationPlayState = 'running'; state.isPaused = false; state.cardStartTime = Date.now(); state.currentDuration = state.remainingTime; state.flipTimer = setTimeout(() => { if (state.breaking) { state.breaking = false; showNextItem(false); } else { showNextItem(true); } }, state.remainingTime); }
+            if(state.isPaused) { el.progressBar.style.animationPlayState = 'running'; state.isPaused = false; state.cardStartTime = Date.now(); state.currentDuration = state.remainingTime; state.flipTimer = setTimeout(() => { showNextItem(true); }, state.remainingTime); }
         });
 
         document.addEventListener("DOMContentLoaded", () => {
             el.crYear.textContent = new Date().getFullYear(); 
+            
+            // Smart Resume Listener
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+
             setInterval(updateTimeAndState, 1000); updateTimeAndState();
             onValue(feedsRef, (snap) => { state.rssFeeds = snap.val() || {}; refreshNews(); });
             fetchWeatherData(); setInterval(fetchWeatherData, 150000); setInterval(displayWeather, 6000);
