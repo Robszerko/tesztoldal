@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V83 (Timed Animations & Bye Card)</title>
+    <title>Aurora News Ticker - V87 (23:59 Fix)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -129,10 +129,15 @@
         }
         .news-card.visible { opacity: 1; visibility: visible; transform: translateY(0); }
         
-        .news-header-row { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; width: 100%; }
-        .news-meta { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-color); font-weight: 700; }
+        .news-header-row { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; width: 100%; overflow: hidden; }
+        .news-meta { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-color); font-weight: 700; white-space: nowrap; }
         .provider-identity { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 15px; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
         .provider-icon { width: 14px; height: 14px; border-radius: 50%; }
+        
+        /* Night Shift Labels (In-row) */
+        .night-prog-label { color: #fff; font-weight: 800; margin-left: 5px; border-left: 1px solid #475569; padding-left: 8px; }
+        .night-summary-label { color: var(--accent-warm); font-size: 0.6rem; font-weight: 700; margin-left: 5px; }
+
         .news-content-wrapper { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; min-height: 0; gap: 4px; }
         .news-title { flex: 0 0 auto; font-family: var(--font-head); font-size: 1.05rem; font-weight: 700; line-height: 1.3; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; width: 90%; }
         .news-desc { flex: 0 1 auto; font-size: 0.8rem; color: #cbd5e1; font-weight: 400; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-width: 98%; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
@@ -142,14 +147,14 @@
         .news-panel.has-image .news-image-overlay { opacity: 0.12; }
         .news-card.breaking { background: linear-gradient(90deg, rgba(220, 38, 38, 0.25), rgba(220, 38, 38, 0.05)); border-left: 4px solid var(--accent-danger); }
 
-        /* NIGHT INFO CARD STYLE - FIX */
+        /* NIGHT INFO CARD STYLE */
         .news-card.night-info {
             background: radial-gradient(circle at top left, #312e81, #1e1b4b);
             border-left: 4px solid #a855f7;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding-bottom: 25px; /* Hely az alján */
+            padding-bottom: 35px;
         }
         .ni-icon { font-size: 3rem; margin-bottom: 10px; animation: float 6s ease-in-out infinite; }
         .ni-text { font-family: var(--font-head); font-size: 1.0rem; color: #fff; line-height: 1.5; font-weight: 600; max-width: 90%; }
@@ -169,11 +174,9 @@
         .bc-time { font-family: var(--font-mono); font-size: 4rem; font-weight: 700; color: #fff; text-shadow: 0 0 30px rgba(56, 189, 248, 0.5); }
         .bc-label { color: var(--accent-warm); font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; margin-top: 10px; }
 
-        .program-badge { position: absolute; top: 12px; right: 12px; font-family: var(--font-head); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); text-transform: uppercase; background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); transition: opacity 1s; z-index: 10; }
-        .program-badge.breaking-mode { background: var(--accent-danger); color: #fff; border-color: transparent; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); animation: pulseRed 1s infinite; }
-
-        .night-sub-label { position: absolute; top: 38px; right: 12px; font-family: var(--font-mono); font-size: 0.55rem; color: var(--accent-warm); text-transform: uppercase; font-weight: 700; background: rgba(0,0,0,0.7); padding: 2px 5px; border-radius: 3px; z-index: 9; opacity: 0; transition: opacity 1s; pointer-events: none; border: 1px solid rgba(251, 191, 36, 0.2); }
-        .night-sub-label.active { opacity: 1; }
+        .program-badge { position: absolute; top: 12px; right: 12px; font-family: var(--font-head); font-size: 0.65rem; font-weight: 800; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); text-transform: uppercase; background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); transition: opacity 0.5s; z-index: 10; opacity: 0; }
+        .program-badge.visible { opacity: 1; }
+        .program-badge.breaking-mode { background: var(--accent-danger); color: #fff; border-color: transparent; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); animation: pulseRed 1s infinite; opacity: 1; }
 
         .controls-bar { height: 28px; border-top: 1px solid var(--glass-border); display: flex; align-items: center; padding: 0 10px; background: rgba(0,0,0,0.3); font-size: 0.7rem; z-index: 5; position: relative; justify-content: space-between; }
         
@@ -321,7 +324,6 @@
 
             <div class="news-viewport" id="news-viewport">
                 <div id="program-badge" class="program-badge">BETÖLTÉS...</div>
-                <div id="night-sub-label" class="night-sub-label">AZ ELŐZŐ NAP HÍREINEK ÖSSZEFOGLALÓJA</div>
                 <div id="track-a" class="news-card"></div>
                 <div id="track-b" class="news-card"></div>
             </div>
@@ -406,6 +408,7 @@
             CLEAR: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-warm)" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
             CLEAR_NIGHT: `<svg viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`,
             CLOUDY: `<svg viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="1.5"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>`,
+            CLOUDY_NIGHT: `<svg viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="1.5"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><circle cx="18" cy="6" r="3" stroke="var(--accent-warm)" stroke-width="1.5" fill="none" /></svg>`,
             FOG: `<svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M4 15h16M4 12h16M4 9h16M4 18h16"/></svg>`,
             RAIN: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="1.5"><path d="M16 13v8M8 13v8M12 15v8M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>`,
             SNOW: `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5"><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/></svg>`,
@@ -550,7 +553,6 @@
             newsContainer: document.getElementById('news-container'),
             newsViewport: document.getElementById('news-viewport'),
             badge: document.getElementById('program-badge'),
-            nightSubLabel: document.getElementById('night-sub-label'),
             sky: document.getElementById('sky-bg'),
             weatherHeader: document.querySelector('.weather-location-header'),
             scheduleHeaderText: document.getElementById('schedule-header-text'),
@@ -658,7 +660,7 @@
             el.sky.style.background = `linear-gradient(135deg, ${stops[0]}, ${stops[1]}, ${stops[2]})`;
         }
 
-        // --- WEATHER (10 PWS -> 5 HU -> 10 Foreign) ---
+        // --- WEATHER ---
         function calculateFeelsLike(temp, hum, wind) {
             if (temp <= 10 && wind > 4.8) { return 13.12 + 0.6215 * temp - 11.37 * Math.pow(wind, 0.16) + 0.3965 * temp * Math.pow(wind, 0.16); }
             else if (temp >= 27 && hum >= 40) { return temp - 0.55 * (1 - (hum / 100)) * (temp - 14); }
@@ -672,8 +674,32 @@
             return sectors[Math.floor(deg / 45)];
         }
 
+        function getIconFromIBMCode(code) {
+            const c = parseInt(code);
+            if ([31, 33].includes(c)) return ICONS.CLEAR_NIGHT; 
+            if ([32, 34].includes(c)) return ICONS.CLEAR; 
+            if ([26, 27, 28].includes(c)) return ICONS.CLOUDY; 
+            if ([29].includes(c)) return ICONS.CLOUDY_NIGHT; 
+            if ([30].includes(c)) return ICONS.CLOUDY; 
+            if ([20, 21, 22, 19].includes(c)) return ICONS.FOG;
+            if ([11, 12, 39, 40, 45, 9, 10].includes(c)) return ICONS.RAIN;
+            if ([13, 14, 15, 16, 41, 42, 43, 46].includes(c)) return ICONS.SNOW;
+            if ([3, 4, 17, 35, 37, 38, 47].includes(c)) return ICONS.THUNDER;
+            return ICONS.CLOUDY; 
+        }
+
         function getIconFromWMO(code, isNight) {
-            if(code === 0) return isNight ? ICONS.CLEAR_NIGHT : ICONS.CLEAR;
+            if(isNight) {
+                if(code === 0) return ICONS.CLEAR_NIGHT;
+                if(code >= 1 && code <= 3) return ICONS.CLOUDY_NIGHT; 
+                if(code === 45 || code === 48) return ICONS.FOG;
+                if(code >= 51 && code <= 67) return ICONS.RAIN;
+                if(code >= 80 && code <= 82) return ICONS.RAIN;
+                if(code >= 71 && code <= 77) return ICONS.SNOW;
+                if(code >= 95) return ICONS.THUNDER;
+                return ICONS.CLOUDY_NIGHT;
+            }
+            if(code === 0) return ICONS.CLEAR;
             if(code >= 1 && code <= 3) return ICONS.CLOUDY;
             if(code === 45 || code === 48) return ICONS.FOG;
             if(code >= 51 && code <= 67) return ICONS.RAIN;
@@ -684,7 +710,6 @@
         }
 
         async function fetchWeatherData() {
-            // 1. lépés: Válasszunk 10 random PWS-t
             let newPWS = [];
             const stationKeys = Object.keys(PWS_MAP).sort(() => 0.5 - Math.random()).slice(0, 10);
             
@@ -694,28 +719,31 @@
                     const res = await fetch(url);
                     if(!res.ok) continue; 
                     const data = await res.json();
+                    
                     if(data.observations && data.observations.length > 0) {
                         const obs = data.observations[0];
                         if(obs.metric.temp !== null) {
-                             let wmoCode = 0; 
+                             let iconCode = 26; 
                              try {
-                                 const skyUrl = `https://api.open-meteo.com/v1/forecast?latitude=${obs.lat}&longitude=${obs.lon}&current=weather_code`;
-                                 const skyRes = await fetch(skyUrl); const skyData = await skyRes.json(); 
-                                 wmoCode = skyData.current.weather_code;
+                                 const wxUrl = `https://api.weather.com/v3/wx/observations/current?geocode=${obs.lat},${obs.lon}&format=json&units=m&language=hu-HU&apiKey=${WUNDERGROUND_API_KEY}`;
+                                 const wxRes = await fetch(wxUrl);
+                                 if(wxRes.ok) {
+                                     const wxData = await wxRes.json();
+                                     if(wxData.iconCode !== undefined) iconCode = wxData.iconCode;
+                                 }
                              } catch(e) {}
 
                              newPWS.push({
                                 name: PWS_MAP[id] || id, lat: obs.lat, lon: obs.lon, 
                                 temp: obs.metric.temp, hum: obs.humidity, wind: obs.metric.windSpeed, winddir: obs.winddir,
                                 press: obs.metric.pressure, precip: obs.metric.precipRate,
-                                wmo: wmoCode, updatedAt: new Date(), type: 'PWS'
+                                ibmIcon: iconCode, updatedAt: new Date(), type: 'PWS'
                             });
                         }
                     }
                 } catch(e) {}
             }
 
-            // Segédfüggvény Open-Meteo lekéréshez
             async function getOpenMeteoData(cityList, count) {
                 let results = [];
                 const keys = cityList.sort(() => 0.5 - Math.random()).slice(0, count);
@@ -735,71 +763,54 @@
                 return results;
             }
             
-            // 2. lépés: 5 random Magyar város (Open-Meteo)
             let newHuOM = await getOpenMeteoData(HUNGARIAN_CITIES_OM, 5);
-
-            // 3. lépés: 10 random Külföldi város (Open-Meteo)
             let newForeign = await getOpenMeteoData(FOREIGN_CITIES, 10);
-
-            // 4. lépés: Összefűzzük: PWS -> Magyar OM -> Külföldi
             state.weatherPlaylist = [...newPWS, ...newHuOM, ...newForeign];
             state.weatherPlaylistIndex = 0; 
         }
 
         function displayWeather() {
             if(state.weatherPlaylist.length === 0 || state.scheduleActive) return;
-            
-            if (state.weatherPlaylistIndex >= state.weatherPlaylist.length) { 
-                fetchWeatherData(); 
-                state.weatherPlaylistIndex = 0; 
-                if (state.weatherPlaylist.length === 0) return; 
-            }
-            
+            if (state.weatherPlaylistIndex >= state.weatherPlaylist.length) { fetchWeatherData(); state.weatherPlaylistIndex = 0; if (state.weatherPlaylist.length === 0) return; }
             const item = state.weatherPlaylist[state.weatherPlaylistIndex];
             state.weatherPlaylistIndex++;
-            
             el.weatherLocName.textContent = item.name;
             el.weatherLocTime.style.display = 'inline'; 
             el.weatherLocTime.textContent = item.updatedAt ? item.updatedAt.toLocaleTimeString('hu-HU') : '--:--:--';
-
             const temp = typeof item.temp === 'number' ? item.temp : 0;
             const hum = item.hum || 0;
             const wind = typeof item.wind === 'number' ? item.wind : 0;
             const press = typeof item.press === 'number' ? item.press : 0;
-            
             el.weatherTemp.textContent = temp.toFixed(1) + "°";
-            
             let feelsLikeVal = item.feelsLike;
             if (feelsLikeVal === undefined) { feelsLikeVal = calculateFeelsLike(temp, hum, wind); }
             el.weatherFeels.textContent = `HŐÉRZET: ${feelsLikeVal.toFixed(1)}°`;
-
             el.wdHum.textContent = hum + "%";
             const dirStr = getWindDirStr(item.winddir);
             el.wdWind.textContent = `${wind.toFixed(1)} km/h ${dirStr}`;
             el.wdPress.textContent = press.toFixed(1) + " hPa";
             
-            const now = new Date();
-            const sunTimes = SunCalc.getTimes(now, item.lat || NYIREGYHAZA_COORDS.lat, item.lon || NYIREGYHAZA_COORDS.lon);
-            const isNight = now < sunTimes.sunrise || now > sunTimes.sunset;
-            
-            el.weatherIcon.innerHTML = getIconFromWMO(item.wmo || 0, isNight);
+            if (item.type === 'PWS' && item.ibmIcon !== undefined) {
+                el.weatherIcon.innerHTML = getIconFromIBMCode(item.ibmIcon);
+            } else {
+                const now = new Date();
+                const sunTimes = SunCalc.getTimes(now, item.lat || NYIREGYHAZA_COORDS.lat, item.lon || NYIREGYHAZA_COORDS.lon);
+                const isNight = now < sunTimes.sunrise || now > sunTimes.sunset;
+                el.weatherIcon.innerHTML = getIconFromWMO(item.wmo || 0, isNight);
+            }
         }
 
         // --- SCHEDULE ---
         function displaySchedule() {
             if (!state.block || state.block.name === 'Elköszönés') return;
             state.scheduleActive = true;
-            
             const currentIndex = THEMATIC_BLOCKS.findIndex(b => b.name === state.block.name);
             let html = '';
             const labels = ["MOST", "KÖVETKEZIK", "KÉSŐBB"]; 
-            
             el.weatherLocName.textContent = "MŰSORAJÁNLÓ";
             el.weatherLocTime.style.display = 'none';
-            // Biztosítjuk, hogy látható a szöveg kezdetben
             el.scheduleHeaderText.style.opacity = '1';
             el.scheduleHeaderText.textContent = "MŰSORAJÁNLÓ";
-
             for(let i = 0; i < 3; i++) {
                 const idx = (currentIndex + i) % THEMATIC_BLOCKS.length;
                 const block = THEMATIC_BLOCKS[idx];
@@ -810,29 +821,11 @@
             }
             el.scheduleList.innerHTML = html;
             flipPanel('weather', true);
-            
             state.scheduleHighlightIndex = 0;
             updateScheduleHighlight();
             state.scheduleInterval = setInterval(updateScheduleHighlight, 5000); 
-
-            setTimeout(() => {
-                clearInterval(state.scheduleInterval);
-                el.scheduleView.style.display = "none";
-                el.promoView.style.display = "flex";
-                // Itt tüntetjük el a "MŰSORAJÁNLÓ" feliratot, hogy csak a promo látszódjon
-                el.scheduleHeaderText.style.opacity = '0';
-            }, 15000);
-
-            setTimeout(() => {
-                flipPanel('weather', false);
-                state.scheduleActive = false;
-                el.scheduleView.style.display = "flex"; 
-                el.promoView.style.display = "none";
-                // Visszaállítjuk a feliratot a következő alkalomra
-                el.scheduleHeaderText.style.opacity = '1';
-                el.scheduleHeaderText.textContent = "MŰSORAJÁNLÓ";
-                displayWeather(); 
-            }, 25000);
+            setTimeout(() => { clearInterval(state.scheduleInterval); el.scheduleView.style.display = "none"; el.promoView.style.display = "flex"; el.scheduleHeaderText.style.opacity = '0'; }, 15000);
+            setTimeout(() => { flipPanel('weather', false); state.scheduleActive = false; el.scheduleView.style.display = "flex"; el.promoView.style.display = "none"; el.scheduleHeaderText.style.opacity = '1'; el.scheduleHeaderText.textContent = "MŰSORAJÁNLÓ"; displayWeather(); }, 25000);
         }
 
         function updateScheduleHighlight() {
@@ -867,34 +860,23 @@
         async function checkBreakingNews() {
             const now = Date.now();
             const threeMinutesAgo = now - (3 * 60 * 1000); 
-            
             for(const [src, url] of Object.entries(BACKUP_FEEDS)) {
                 try {
                     const res = await fetchWithProxyFallback(url);
                     const txt = await res.text();
                     const xml = new DOMParser().parseFromString(txt, "text/xml");
                     const items = xml.querySelectorAll("item");
-                    
                     for(let i=0; i<2; i++) { 
                         const item = items[i]; if(!item) continue;
                         const dateStr = item.querySelector("pubDate")?.textContent;
                         if(!dateStr) continue;
                         const date = new Date(dateStr);
                         const link = item.querySelector("link")?.textContent;
-                        
                         if(date.getTime() > threeMinutesAgo && link && !state.seenBreakingLinks.has(link)) {
                             const title = item.querySelector("title")?.textContent || "";
-                            
                             state.seenBreakingLinks.add(link); 
-                            state.breakingItem = {
-                                title: title, 
-                                desc: stripHtml(item.querySelector("description")?.textContent || ""),
-                                source: src, 
-                                date: date, 
-                                link: link
-                            };
+                            state.breakingItem = { title: title, desc: stripHtml(item.querySelector("description")?.textContent || ""), source: src, date: date, link: link };
                             state.nextIsBreaking = true;
-                            
                             clearTimeout(state.flipTimer);
                             showNextItem(false);
                             return; 
@@ -910,17 +892,16 @@
             el.date.textContent = `${now.getFullYear()}. ${CALENDAR_DATA.honapok[now.getMonth()]} ${now.getDate()}.`;
             const key = `${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
             if(CALENDAR_DATA.nameDays[key]) el.nameday.textContent = CALENDAR_DATA.nameDays[key].join(', ') + ' névnap';
-
             updateSkyGradient();
-
             const h = now.getHours() + now.getMinutes()/60;
             let currentBlock = THEMATIC_BLOCKS.findLast(b => h >= b.start) || THEMATIC_BLOCKS[THEMATIC_BLOCKS.length-1];
             
-            // GOODBYE CARD LOGIC
+            // GOODBYE CARD LOGIC (ONLY AT 23:59)
             const min = now.getMinutes();
             const sec = now.getSeconds();
-            
-            if (min === 59) {
+            const hour = now.getHours();
+
+            if (hour === 23 && min === 59) {
                 if (sec >= 0 && sec < 50) {
                     el.goodbyeCard.classList.add('active');
                     el.bigClockLayer.classList.remove('active');
@@ -930,6 +911,11 @@
                     el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
                     if(sec === 50) showCredits();
                 }
+            } else if (min === 59 && sec >= 50) {
+                // OTHER HOURS BIG CLOCK
+                el.bigClockLayer.classList.add('active');
+                el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+                if(sec === 50) showCredits();
             } else {
                 if(el.bigClockLayer.classList.contains('active')) {
                     el.bigClockLayer.classList.remove('active');
@@ -948,13 +934,11 @@
                 refreshNews();
             }
 
-            // Éjszakai Műszak al-felirat kezelése (Csak ha NEM Breaking News)
-            if(state.block.type === 'summary_yesterday' && !state.breaking && !state.wasBreaking) {
-                el.nightSubLabel.classList.add('active');
+            // Nappal Badge látható, Éjszaka nem (a címkék vannak a sorban)
+            if(state.block.type === 'summary_yesterday') {
+                el.badge.classList.remove('visible'); 
             } else {
-                // Ha Breaking News van, vagy visszatérés alatt állunk, vagy nem éjszaka van, rejtsük el
-                // (A visszatérés logikát a showNextItem kezeli)
-                if(!state.wasBreaking) el.nightSubLabel.classList.remove('active');
+                el.badge.classList.add('visible'); 
             }
 
             if((min === 0 || min === 20 || min === 40) && sec === 0 && min !== state.lastScheduleMin) {
@@ -972,7 +956,6 @@
                 const nH = Math.floor(nextBlock.start);
                 const nM = Math.round((nextBlock.start % 1) * 60);
                 const nTime = `${String(nH).padStart(2,'0')}:${String(nM).padStart(2,'0')}`;
-                
                 el.nextProgAlert.textContent = `KÖVETKEZIK: ${nTime} ${nextBlock.name}`;
                 el.nextProgAlert.classList.add('active');
             } else {
@@ -986,10 +969,8 @@
 
         async function refreshNews(silent = false) {
             if(!silent) el.loading.classList.add('active');
-            
             let feeds = BACKUP_FEEDS;
             if(Object.keys(state.rssFeeds).length > 0) feeds = { ...feeds, ...state.rssFeeds };
-
             let fetchedItems = [];
             const promises = Object.entries(feeds).map(async ([key, url]) => {
                 try {
@@ -1004,19 +985,15 @@
                         const link = item.querySelector("link")?.textContent;
                         const dateStr = item.querySelector("pubDate")?.textContent;
                         if(title && dateStr) {
-                             fetchedItems.push({
-                                title: title, link: link, desc: stripHtml(descHtml).substring(0, 300), source: key, date: new Date(dateStr), img: extractImageUrl(item, descHtml)
-                             });
+                             fetchedItems.push({ title: title, link: link, desc: stripHtml(descHtml).substring(0, 300), source: key, date: new Date(dateStr), img: extractImageUrl(item, descHtml) });
                         }
                     });
                 } catch(e) {}
             });
             await Promise.allSettled(promises);
             fetchedItems.sort((a,b) => b.date - a.date);
-
             const now = new Date();
             let filtered = [];
-            
             if(state.block.type === 'summary_yesterday') {
                 const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1);
                 yesterday.setHours(0,0,0,0);
@@ -1034,120 +1011,64 @@
                 let timeLimit = new Date(); timeLimit.setHours(0,0,0,0);
                 filtered = fetchedItems.filter(item => item.date >= timeLimit);
             }
-
             const rawItems = filtered.length > 0 ? filtered : fetchedItems.slice(0, 20);
-            
-            // --- DUPLIKÁCIÓ SZŰRÉSE (Link alapján) ---
             const uniqueItems = [];
             const seenLinks = new Set();
-            for(const item of rawItems) {
-                if(!seenLinks.has(item.link)) {
-                    uniqueItems.push(item);
-                    seenLinks.add(item.link);
-                }
-            }
-            
-            if(silent) {
-                state.nextItems = uniqueItems;
-                state.updatePending = true;
-            } else {
-                state.items = uniqueItems;
-                if(!silent) {
-                    el.loading.classList.remove('active');
-                    state.currentIndex = 0;
-                    showNextItem(false); 
-                }
-            }
-            
-            if(state.block.type === 'summary_yesterday') generateTimeline();
-            else el.timelineContainer.classList.remove('visible');
+            for(const item of rawItems) { if(!seenLinks.has(item.link)) { uniqueItems.push(item); seenLinks.add(item.link); } }
+            if(silent) { state.nextItems = uniqueItems; state.updatePending = true; } 
+            else { state.items = uniqueItems; if(!silent) { el.loading.classList.remove('active'); state.currentIndex = 0; showNextItem(false); } }
+            if(state.block.type === 'summary_yesterday') generateTimeline(); else el.timelineContainer.classList.remove('visible');
         }
 
         function showNextItem(advance = true) {
             if(state.breaking) return;
             clearTimeout(state.flipTimer);
-            
-            // 1. BREAKING NEWS CHECK
             if(state.nextIsBreaking && state.breakingItem) {
-                state.breaking = true;
-                state.nextIsBreaking = false;
-                state.wasBreaking = true;
+                state.breaking = true; state.nextIsBreaking = false; state.wasBreaking = true;
                 renderCard(state.breakingItem, true);
-                el.progressBar.style.animationDuration = '30s';
-                state.currentDuration = 30000;
-                state.cardStartTime = Date.now();
-                state.flipTimer = setTimeout(() => { 
-                    state.breaking = false; 
-                    showNextItem(false); 
-                }, 30000);
+                el.progressBar.style.animationDuration = '30s'; state.currentDuration = 30000; state.cardStartTime = Date.now();
+                state.flipTimer = setTimeout(() => { state.breaking = false; showNextItem(false); }, 30000);
                 return;
             }
-
-            // 2. NIGHT INFO CARD CHECK (5 mins = 300000ms)
             if(state.block.type === 'summary_yesterday') {
                 const now = Date.now();
                 if (now - state.lastNightInfoTime > 300000) { 
                     renderNightInfoCard();
                     state.lastNightInfoTime = now;
-                    el.progressBar.style.animationDuration = '18s';
-                    state.currentDuration = 18000;
-                    state.cardStartTime = Date.now();
+                    el.progressBar.style.animationDuration = '18s'; state.currentDuration = 18000; state.cardStartTime = Date.now();
                     state.flipTimer = setTimeout(() => showNextItem(false), 18000); 
                     return;
                 }
             }
-
             if(state.updatePending && !state.breaking) {
-                state.items = state.nextItems;
-                state.nextItems = [];
-                if(state.block.type !== 'summary_yesterday') {
-                    state.currentIndex = 0; 
-                    advance = false;
-                }
+                state.items = state.nextItems; state.nextItems = [];
+                if(state.block.type !== 'summary_yesterday') { state.currentIndex = 0; advance = false; }
                 state.updatePending = false;
             }
-
             if(state.items.length === 0) { el[state.activeTrack === 'a' ? 'trackA' : 'trackB'].innerHTML = `<div class="news-title">Nincs hír...</div>`; return; }
-            
             if(advance) state.currentIndex++;
-            
             let item = state.items[state.currentIndex % state.items.length];
-            if(state.currentItem && (item.link === state.currentItem.link || item.title === state.currentItem.title)) {
-                state.currentIndex++;
-                item = state.items[state.currentIndex % state.items.length];
-            }
-            
+            if(state.currentItem && (item.link === state.currentItem.link || item.title === state.currentItem.title)) { state.currentIndex++; item = state.items[state.currentIndex % state.items.length]; }
             state.currentItem = item;
             renderCard(item, false);
-            
-            el.progressBar.style.animationDuration = '18s';
-            state.currentDuration = 18000;
-            state.cardStartTime = Date.now();
+            el.progressBar.style.animationDuration = '18s'; state.currentDuration = 18000; state.cardStartTime = Date.now();
             state.flipTimer = setTimeout(() => showNextItem(true), 18000);
         }
 
-        // Night Info Card Render
         function renderNightInfoCard() {
             const nextTrack = el[state.activeTrack === 'a' ? 'trackB' : 'trackA'];
             const currentTrack = el[state.activeTrack === 'a' ? 'trackA' : 'trackB'];
-            
-            el.badge.textContent = state.block.name;
-            el.badge.classList.remove('breaking-mode');
-
+            el.badge.classList.remove('visible');
             const html = `
                 <div class="ni-icon">🌙</div>
                 <div class="ni-text">Jelenleg az előző nap híreit olvassa, de ha friss hír érkezik az éjszaka folyamán akkor az azonnal megjelenik.</div>
                 <div class="ni-sub">TKP NEWS Éjszakai Ügyelet</div>
             `;
             nextTrack.innerHTML = html;
-            
-            nextTrack.classList.add('night-info'); 
-            nextTrack.classList.remove('breaking');
+            nextTrack.classList.add('night-info'); nextTrack.classList.remove('breaking');
             el.newsBg.parentElement.classList.remove('has-image');
-
             currentTrack.classList.remove('visible'); nextTrack.classList.add('visible');
             state.activeTrack = state.activeTrack === 'a' ? 'b' : 'a';
-            
             el.progressBar.classList.remove('animate-progress'); void el.progressBar.offsetWidth; el.progressBar.classList.add('animate-progress');
         }
 
@@ -1157,53 +1078,27 @@
             const fav = getFavicon(item.link);
             const displaySource = getSourceName(item.link);
             const timeStr = item.date.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
-
             nextTrack.classList.remove('night-info');
-
-            // --- ANIMÁLT VISSZATÉRÉS LOGIKA ---
+            let headerHTML = `
+                <div class="provider-identity"><img src="${fav}" class="provider-icon"> ${displaySource}</div>
+                <span>${timeStr}</span>
+            `;
             if(isBreaking) {
-                // Breaking indul: Badge azonnal "MOST ÉRKEZETT", Sub-label azonnal eltűnik
-                el.badge.textContent = "MOST ÉRKEZETT!"; 
-                el.badge.classList.add('breaking-mode');
-                el.badge.style.opacity = '1';
-                el.nightSubLabel.style.opacity = '0';
-                el.nightSubLabel.classList.remove('active'); // Biztos, ami biztos
-            } else if (state.wasBreaking) {
-                // Visszatérés Breaking-ről
-                state.wasBreaking = false;
-                
-                // 1. Állapot: Üres badge, nincs felirat
-                el.badge.classList.remove('breaking-mode'); 
-                el.badge.textContent = state.block.name; // Beállítjuk a szöveget, de elrejtjük
-                el.badge.style.opacity = '0';
-                el.nightSubLabel.style.opacity = '0';
-
-                // 2. 5 mp múlva megjelenik a műsorcím
-                setTimeout(() => { 
-                    el.badge.style.opacity = '1'; 
-                }, 5000);
-
-                // 3. 7 mp múlva megjelenik az éjszakai felirat (ha éjszaka van)
-                setTimeout(() => {
-                    if(state.block.type === 'summary_yesterday') {
-                        el.nightSubLabel.classList.add('active'); // CSS class kezeli az opacity-t, de itt segítünk
-                        el.nightSubLabel.style.opacity = '1';
-                    }
-                }, 7000);
+                el.badge.textContent = "MOST ÉRKEZETT!"; el.badge.classList.add('breaking-mode'); el.badge.classList.add('visible');
             } else {
-                // Normál üzem
-                el.badge.textContent = state.block.name; 
+                state.wasBreaking = false;
                 el.badge.classList.remove('breaking-mode');
-                el.badge.style.opacity = '1';
-                if(state.block.type === 'summary_yesterday') el.nightSubLabel.style.opacity = '1';
+                if(state.block.type === 'summary_yesterday') {
+                    el.badge.classList.remove('visible');
+                    headerHTML += `<span class="night-prog-label visible">${state.block.name}</span>`;
+                    headerHTML += `<span class="night-summary-label visible">AZ ELŐZŐ NAP HÍREINEK ÖSSZEFOGLALÓJA</span>`;
+                } else {
+                    el.badge.textContent = state.block.name; el.badge.classList.add('visible');
+                }
             }
-
             const html = `
                 <div class="news-header-row">
-                    <div class="news-meta">
-                        <div class="provider-identity"><img src="${fav}" class="provider-icon"> ${displaySource}</div>
-                        <span>${timeStr}</span>
-                    </div>
+                    <div class="news-meta">${headerHTML}</div>
                 </div>
                 <div class="news-content-wrapper">
                     <div class="news-title">${item.title}</div>
@@ -1211,69 +1106,33 @@
                 </div>
             `;
             nextTrack.innerHTML = html;
-            
             if(isBreaking) nextTrack.classList.add('breaking'); else nextTrack.classList.remove('breaking');
             if(item.img) { el.bgImg.src = item.img; el.newsBg.parentElement.classList.add('has-image'); } else { el.newsBg.parentElement.classList.remove('has-image'); }
-
             currentTrack.classList.remove('visible'); nextTrack.classList.add('visible');
             state.activeTrack = state.activeTrack === 'a' ? 'b' : 'a';
             el.counter.textContent = `${(state.currentIndex % state.items.length) + 1} / ${state.items.length}`;
-            
             updateTimelineActive();
             el.progressBar.classList.remove('animate-progress'); void el.progressBar.offsetWidth; el.progressBar.classList.add('animate-progress');
         }
 
         el.newsViewport.addEventListener('mouseenter', () => {
-            if(!state.isPaused) {
-                clearTimeout(state.flipTimer);
-                el.progressBar.style.animationPlayState = 'paused';
-                state.isPaused = true;
-                const elapsed = Date.now() - state.cardStartTime;
-                state.remainingTime = Math.max(0, state.currentDuration - elapsed);
-            }
+            if(!state.isPaused) { clearTimeout(state.flipTimer); el.progressBar.style.animationPlayState = 'paused'; state.isPaused = true; const elapsed = Date.now() - state.cardStartTime; state.remainingTime = Math.max(0, state.currentDuration - elapsed); }
         });
-
         el.newsViewport.addEventListener('mouseleave', () => {
-            if(state.isPaused) {
-                el.progressBar.style.animationPlayState = 'running';
-                state.isPaused = false;
-                state.cardStartTime = Date.now(); 
-                state.currentDuration = state.remainingTime;
-                
-                state.flipTimer = setTimeout(() => {
-                    if (state.breaking) {
-                        state.breaking = false;
-                        showNextItem(false); 
-                    } else {
-                        showNextItem(true); 
-                    }
-                }, state.remainingTime);
-            }
+            if(state.isPaused) { el.progressBar.style.animationPlayState = 'running'; state.isPaused = false; state.cardStartTime = Date.now(); state.currentDuration = state.remainingTime; state.flipTimer = setTimeout(() => { if (state.breaking) { state.breaking = false; showNextItem(false); } else { showNextItem(true); } }, state.remainingTime); }
         });
 
         document.addEventListener("DOMContentLoaded", () => {
             el.crYear.textContent = new Date().getFullYear(); 
-            setInterval(updateTimeAndState, 1000);
-            updateTimeAndState();
+            setInterval(updateTimeAndState, 1000); updateTimeAndState();
             onValue(feedsRef, (snap) => { state.rssFeeds = snap.val() || {}; refreshNews(); });
-            
-            fetchWeatherData();
-            setInterval(fetchWeatherData, 150000); 
-            setInterval(displayWeather, 6000);
-            
-            setInterval(checkBreakingNews, 60000); 
-            setTimeout(checkBreakingNews, 5000);
-
+            fetchWeatherData(); setInterval(fetchWeatherData, 150000); setInterval(displayWeather, 6000);
+            setInterval(checkBreakingNews, 60000); setTimeout(checkBreakingNews, 5000);
             setInterval(showCredits, 300000); 
-
             document.getElementById('manual-refresh-trigger').addEventListener('click', () => refreshNews());
             document.getElementById('next-btn').addEventListener('click', (e) => { e.stopPropagation(); showNextItem(); });
             document.getElementById('prev-btn').addEventListener('click', (e) => { e.stopPropagation(); state.currentIndex -= 2; showNextItem(); });
-            
-            el.newsContainer.addEventListener('click', (e) => {
-                if(e.target.closest('.controls-bar')) return;
-                if(state.currentItem && state.currentItem.link) window.open(state.currentItem.link, '_blank');
-            });
+            el.newsContainer.addEventListener('click', (e) => { if(e.target.closest('.controls-bar')) return; if(state.currentItem && state.currentItem.link) window.open(state.currentItem.link, '_blank'); });
         });
     </script>
 </body>
