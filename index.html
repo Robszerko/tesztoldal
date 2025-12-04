@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V103 (Creative Credits & Refined UI)</title>
+    <title>Aurora News Ticker - V108 (Final Credit Fix)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@500;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;700;800;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js" type="module"></script>
@@ -37,6 +37,8 @@
             --font-head: 'Montserrat', sans-serif;
             --font-body: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+            /* Premium Serif for contrast */
+            --font-serif: 'Playfair Display', serif;
             
             --card-radius: 12px;
             --bar-height: 170px; 
@@ -64,7 +66,8 @@
         }
         @keyframes skyFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        .ticker-container { width: 100%; max-width: 1200px; height: var(--bar-height); display: flex; gap: 10px; position: relative; }
+        /* INCREASED MAX-WIDTH FOR LARGER SCREENS */
+        .ticker-container { width: 100%; max-width: 1600px; height: var(--bar-height); display: flex; gap: 10px; position: relative; }
         @media (max-width: 900px) { .ticker-container { height: auto; flex-direction: column; } }
 
         .glass-panel {
@@ -160,67 +163,71 @@
             width: 100%; height: 100%; position: relative;
         }
 
-        /* CREATIVE CREDITS DESIGN */
+        /* --- FINAL CREDITS DESIGN (Compact & Organized) --- */
         .credits-content { 
-            background: radial-gradient(circle at top right, #1e293b, #020617);
+            background: #050b14; /* Premium Deep Dark */
             opacity: 0; z-index: 1; pointer-events: none;
-            width: 100%; height: 100%; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; padding: 10px; text-align: center;
-            position: absolute; top: 0; left: 0; transition: opacity 0.3s;
+            width: 100%; height: 100%; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            padding: 10px; text-align: center;
+            position: absolute; top: 0; left: 0; 
+            transition: opacity 0.6s ease;
         }
         .credits-content.active { opacity: 1; z-index: 2; pointer-events: all; }
 
-        .cr-inner-wrapper {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 12px; transform: translateY(-2px);
+        .cr-layout {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 10px; /* Nice tight spacing */
+            transform: translateY(-2px); /* Slight visual optical center */
         }
 
-        /* Pill Shape Badge for Role */
-        .cr-role-badge {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 4px 12px;
-            border-radius: 20px;
+        .cr-top-text {
+            font-family: var(--font-body);
             font-size: 0.55rem;
-            font-weight: 700;
+            color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: var(--accent-color);
-            display: flex; align-items: center; gap: 6px;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 2px;
         }
-        .cr-role-icon { font-size: 0.8rem; animation: spin 4s linear infinite; }
 
-        /* Name Typography */
         .cr-name-block {
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .cr-name-main {
             font-family: var(--font-head);
             font-size: 2.2rem;
             font-weight: 900;
             line-height: 1;
-            /* Gold to White Gradient */
-            background: linear-gradient(135deg, #ffffff 20%, var(--accent-warm) 100%);
+            text-transform: uppercase;
+            /* Gold/White Gradient for Premium Feel */
+            background: linear-gradient(135deg, #ffffff 30%, var(--accent-warm) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 4px 15px rgba(251, 191, 36, 0.3));
-            letter-spacing: -1px;
-        }
-        .cr-deco-line {
-            width: 40px; height: 3px;
-            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
-            margin-top: 5px;
-            border-radius: 2px;
+            filter: drop-shadow(0 2px 10px rgba(251, 191, 36, 0.2));
+            letter-spacing: 1px;
         }
 
-        /* Footer */
-        .cr-copy-text {
-            font-family: var(--font-mono);
-            font-size: 0.6rem;
-            color: #64748b;
+        .cr-divider {
+            width: 40px; height: 2px;
+            background: var(--accent-color);
+            border-radius: 2px;
             opacity: 0.8;
-            margin-top: 5px;
+            margin: 4px 0;
         }
+
+        .cr-bottom-group {
+            display: flex; flex-direction: column; gap: 2px;
+            opacity: 0.8;
+        }
+
+        .cr-copyright-row, .cr-rights-row {
+            font-family: var(--font-mono);
+            font-size: 0.55rem;
+            color: #cbd5e1;
+            letter-spacing: 0.5px;
+        }
+        .cr-rights-row { color: #64748b; }
+
 
         /* Economy Content */
         .economy-content { 
@@ -376,14 +383,17 @@
 
         .bb-content { 
             display: none; align-items: center; gap: 10px; width: 100%; padding: 0 10px; 
-            justify-content: flex-start;
+            justify-content: center; /* CENTERED */
             perspective: 500px;
         }
         .bb-content.active { display: flex; }
         
         /* Flipper Animations */
         .bb-flipper-box {
-            display: flex; align-items: center; gap: 10px; flex-grow: 1; overflow: hidden; /* For marquee */
+            display: flex; align-items: center; gap: 10px; 
+            flex-grow: 1; max-width: 90%; /* Allow expansion */
+            justify-content: center; /* Start centered */
+            overflow: hidden;
             transform-origin: bottom;
         }
         
@@ -401,9 +411,9 @@
         
         .bb-count { color: #94a3b8; font-family: var(--font-mono); font-size: 0.65rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
         .bb-time { color: var(--accent-warm); font-family: var(--font-mono); font-weight: 700; white-space: nowrap; flex-shrink: 0; }
-        .bb-source { color: #fff; background: var(--accent-color); color: #000; font-weight: 800; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; font-size: 0.6rem; white-space: nowrap; box-shadow: 0 0 5px rgba(56, 189, 248, 0.4); flex-shrink: 0; }
+        .bb-source { color: #fff; background: var(--accent-color); color: #000; font-weight: 800; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; font-size: 0.6rem; white-space: nowrap; box-shadow: 0 0 5px rgba(56, 189, 248, 0.4); flex-shrink: 0; z-index: 10; position: relative; }
         
-        .bb-headline-wrapper { flex-grow: 1; overflow: hidden; position: relative; height: 1.2em; }
+        .bb-headline-wrapper { flex: 0 1 auto; overflow: hidden; position: relative; height: 1.2em; display: flex; }
         .bb-headline { 
             color: #fff; font-weight: 700; text-decoration: none; 
             white-space: nowrap; font-size: 0.8rem; display: inline-block;
@@ -611,18 +621,16 @@
                 <!-- Back: Credits & Economy -->
                 <div class="panel-face back">
                     <div class="back-face-container">
-                        <!-- CREATIVE CREDITS Content -->
+                        <!-- FINAL FIXED CREDITS Content -->
                         <div class="credits-content" id="credits-content">
-                            <div class="cr-inner-wrapper">
-                                <div class="cr-role-badge">
-                                    <span class="cr-role-icon">✦</span>
-                                    <span>FEJLESZTÉS & DESIGN</span>
+                            <div class="cr-layout">
+                                <div class="cr-top-text">A HÍRCSÍK PANELT KÉSZÍTETTE</div>
+                                <div class="cr-name-block">ROBI</div>
+                                <div class="cr-divider"></div>
+                                <div class="cr-bottom-group">
+                                    <div class="cr-copyright-row">&copy; <span id="cr-year">2025</span> Copyright by: Robi</div>
+                                    <div class="cr-rights-row">Minden jog fenntartva!</div>
                                 </div>
-                                <div class="cr-name-block">
-                                    <div class="cr-name-main">Robi</div>
-                                    <div class="cr-deco-line"></div>
-                                </div>
-                                <div class="cr-copy-text">&copy; <span id="cr-year">2025</span> Minden jog fenntartva</div>
                             </div>
                         </div>
                         
@@ -900,16 +908,7 @@
             { name: 'Köln', lat: 50.93, lon: 6.96 }, { name: 'Stuttgart', lat: 48.77, lon: 9.18 }, { name: 'Manchester', lat: 53.48, lon: -2.24 },
             { name: 'Birmingham', lat: 52.48, lon: -1.89 }, { name: 'Glasgow', lat: 55.86, lon: -4.25 }, { name: 'Edinburgh', lat: 55.95, lon: -3.18 },
             { name: 'Valencia', lat: 39.46, lon: -0.37 }, { name: 'Sevilla', lat: 37.38, lon: -5.98 }, { name: 'Porto', lat: 41.15, lon: -8.62 },
-            { name: 'Tel Aviv', lat: 32.08, lon: 34.78 }, { name: 'Doha', lat: 25.28, lon: 51.53 }, { name: 'Abu Dhabi', lat: 24.45, lon: 54.37 },
-            // +15 New International Cities
-            { name: 'Reykjavik', lat: 64.14, lon: -21.94 }, { name: 'Tromso', lat: 69.65, lon: 18.96 },
-            { name: 'Luxemburg', lat: 49.61, lon: 6.13 }, { name: 'Bern', lat: 46.95, lon: 7.45 },
-            { name: 'Tirana', lat: 41.33, lon: 19.82 }, { name: 'Szófia', lat: 42.70, lon: 23.32 },
-            { name: 'Kijev', lat: 50.45, lon: 30.52 }, { name: 'Tbiliszi', lat: 41.72, lon: 44.78 },
-            { name: 'Jereván', lat: 40.18, lon: 44.51 }, { name: 'Baku', lat: 40.41, lon: 49.87 },
-            { name: 'Asztana', lat: 51.17, lon: 71.45 }, { name: 'Ulánbátor', lat: 47.92, lon: 106.92 },
-            { name: 'Hongkong', lat: 22.32, lon: 114.17 }, { name: 'Tajpej', lat: 25.03, lon: 121.56 },
-            { name: 'Perth', lat: -31.95, lon: 115.86 }
+            { name: 'Tel Aviv', lat: 32.08, lon: 34.78 }, { name: 'Doha', lat: 25.28, lon: 51.53 }, { name: 'Abu Dhabi', lat: 24.45, lon: 54.37 }
         ];
 
         const BACKUP_FEEDS = {
@@ -1963,7 +1962,7 @@
             fetchWeatherData(); setInterval(fetchWeatherData, 150000); setInterval(displayWeather, 6000);
             
             // BREAKING NEWS LOGIC (FAST CHECK 15-20s)
-            setInterval(checkBreakingNews, 60000); // 20s to be safe with proxies
+            setInterval(checkBreakingNews, 20000); // 20s to be safe with proxies
             setTimeout(checkBreakingNews, 5000); // Initial check
             
             setInterval(showCredits, 300000); 
