@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V99 (Refined Clock & Slower Eco)</title>
+    <title>Aurora News Ticker - V103 (Creative Credits & Refined UI)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -94,9 +94,8 @@
         
         .id-content { 
             width: 100%; height: 100%; display: flex; flex-direction: column; 
-            align-items: center; justify-content: space-between; /* Better spacing */
+            align-items: center; justify-content: space-between; 
             padding: 15px 10px; text-align: center;
-            /* Subtle top-to-bottom gradient for unity */
             background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.2) 100%);
         }
         
@@ -104,13 +103,13 @@
             display: flex; align-items: center; gap: 8px; 
             width: 100%; justify-content: center;
             padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.1); /* Subtle divider */
+            border-bottom: 1px solid rgba(255,255,255,0.1); 
             margin-bottom: 5px;
         }
         .brand-logo svg { width: 22px; height: 22px; fill: var(--accent-color); filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.6)); animation: pulseLogo 3s infinite ease-in-out; }
         .brand-name { font-family: var(--font-head); font-weight: 800; font-size: 1.0rem; letter-spacing: -0.5px; color: #fff; }
         
-        /* Unified Clock - LESS DOMINANT */
+        /* Unified Clock */
         .clock-container {
             flex-grow: 1;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -124,7 +123,7 @@
         
         .clock-hm {
             font-family: var(--font-mono); 
-            font-size: 1.7rem; /* Reduced from 2.1rem */
+            font-size: 1.7rem; 
             font-weight: 700; 
             color: #ffffff;
             line-height: 1;
@@ -134,7 +133,7 @@
         
         .clock-s {
             font-family: var(--font-mono);
-            font-size: 0.9rem; /* Reduced from 1.1rem */
+            font-size: 0.9rem; 
             font-weight: 600;
             color: var(--accent-color);
             line-height: 1;
@@ -151,39 +150,90 @@
         .footer-info {
             width: 100%; display: flex; flex-direction: column; align-items: center; gap: 5px;
             padding-top: 8px;
-            border-top: 1px solid rgba(255,255,255,0.05); /* Very subtle divider */
+            border-top: 1px solid rgba(255,255,255,0.05); 
         }
         
         .nameday-badge { background: rgba(var(--accent-warm), 0.1); color: var(--accent-warm); padding: 2px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: 700; max-width: 100%; border: 1px solid rgba(251, 191, 36, 0.15); letter-spacing: 0.5px; }
 
-        /* Back Face Container - Holds both Credits and Economy */
+        /* Back Face Container */
         .back-face-container {
             width: 100%; height: 100%; position: relative;
         }
 
-        .credits-content, .economy-content {
+        /* CREATIVE CREDITS DESIGN */
+        .credits-content { 
+            background: radial-gradient(circle at top right, #1e293b, #020617);
+            opacity: 0; z-index: 1; pointer-events: none;
+            width: 100%; height: 100%; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; padding: 10px; text-align: center;
+            position: absolute; top: 0; left: 0; transition: opacity 0.3s;
+        }
+        .credits-content.active { opacity: 1; z-index: 2; pointer-events: all; }
+
+        .cr-inner-wrapper {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 12px; transform: translateY(-2px);
+        }
+
+        /* Pill Shape Badge for Role */
+        .cr-role-badge {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.55rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-color);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .cr-role-icon { font-size: 0.8rem; animation: spin 4s linear infinite; }
+
+        /* Name Typography */
+        .cr-name-block {
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .cr-name-main {
+            font-family: var(--font-head);
+            font-size: 2.2rem;
+            font-weight: 900;
+            line-height: 1;
+            /* Gold to White Gradient */
+            background: linear-gradient(135deg, #ffffff 20%, var(--accent-warm) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 15px rgba(251, 191, 36, 0.3));
+            letter-spacing: -1px;
+        }
+        .cr-deco-line {
+            width: 40px; height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            margin-top: 5px;
+            border-radius: 2px;
+        }
+
+        /* Footer */
+        .cr-copy-text {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            color: #64748b;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        /* Economy Content */
+        .economy-content { 
             width: 100%; height: 100%; display: flex; flex-direction: column; 
             align-items: center; justify-content: center; padding: 10px; text-align: center;
             position: absolute; top: 0; left: 0;
             transition: opacity 0.3s;
-        }
-        
-        .credits-content { background: linear-gradient(135deg, #0f172a, #1e293b); opacity: 0; z-index: 1; pointer-events: none;}
-        .credits-content.active { opacity: 1; z-index: 2; pointer-events: all; }
-
-        .economy-content { 
             background: linear-gradient(135deg, #0a1829, #162a42); 
             opacity: 0; z-index: 1; pointer-events: none;
             border: 1px solid rgba(251, 191, 36, 0.2);
         }
         .economy-content.active { opacity: 1; z-index: 2; pointer-events: all; }
         
-        .cr-logo { font-size: 1.5rem; margin-bottom: 5px; color: var(--accent-warm); animation: pulseLogo 2s infinite; }
-        .cr-head { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 2px;}
-        .cr-dev { font-family: var(--font-head); font-size: 1.3rem; font-weight: 900; color: #fff; margin: 0 0 8px 0; background: linear-gradient(to right, #fff, var(--accent-warm)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .cr-ft { font-size: 0.5rem; font-family: var(--font-mono); color: #64748b; border-top: 1px solid #334155; padding-top: 4px; width: 85%; }
-
-        /* Economy Styles */
         .eco-header { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; width: 100%; justify-content: center; }
         .eco-header svg { width: 16px; height: 16px; fill: var(--accent-warm); }
         .eco-title { font-family: var(--font-head); font-weight: 800; font-size: 0.8rem; color: #fff; letter-spacing: 0.5px; }
@@ -425,15 +475,40 @@
         .wd-row { display: flex; justify-content: space-between; color: #ccc; }
         .wd-val { color: #fff; font-weight: 600; }
 
-        .schedule-view { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 10px; }
-        .schedule-list { display: flex; flex-direction: column; gap: 6px; flex-grow: 1; justify-content: center; }
-        .schedule-item { display: flex; align-items: flex-start; gap: 8px; padding: 6px; border-radius: 4px; border-left: 3px solid transparent; transition: background 0.3s, border-color 0.3s; }
+        /* --- UPDATED SCHEDULE STYLES (Fix Overlap) --- */
+        .schedule-view { 
+            width: 100%; height: 100%; display: flex; flex-direction: column; 
+            padding: 5px 10px; /* Adjusted padding */
+            justify-content: center;
+        }
+        .schedule-list { 
+            display: flex; flex-direction: column; gap: 8px; /* Increased gap */
+            flex-grow: 1; justify-content: center; 
+        }
+        .schedule-item { 
+            display: flex; align-items: flex-start; gap: 8px; 
+            padding: 4px 6px; /* Reduced inner padding */
+            border-radius: 4px; border-left: 3px solid transparent; 
+            transition: background 0.3s, border-color 0.3s; 
+        }
         .schedule-item.active-highlight { background: rgba(56, 189, 248, 0.2); border-left-color: var(--accent-color); }
         .schedule-item.active-highlight .sch-name { color: #fff; font-weight: 700; }
         .schedule-item.active-highlight .sch-label { color: var(--accent-color); }
         .sch-time { font-family: var(--font-mono); font-size: 0.75rem; color: #fff; font-weight: 700; width: 40px; flex-shrink: 0; margin-top: 2px; }
-        .sch-label { font-size: 0.6rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 2px; transition: color 0.3s;}
-        .sch-name { font-size: 0.75rem; color: #94a3b8; line-height: 1.2; white-space: normal; transition: color 0.3s; }
+        .sch-label { font-size: 0.6rem; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 1px; transition: color 0.3s;}
+        
+        /* Truncate long titles */
+        .sch-name { 
+            font-size: 0.8rem; /* Adjusted size */
+            color: #94a3b8; 
+            line-height: 1.25; 
+            white-space: normal; 
+            transition: color 0.3s;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Max 2 lines */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
 
         /* PROMO CARD DESIGN - REVISED AGAIN */
         .promo-content {
@@ -452,6 +527,13 @@
         .promo-logo-inline svg { width: 20px; height: 20px; fill: var(--accent-color); filter: drop-shadow(0 0 5px rgba(56,189,248,0.5)); }
         .promo-tkp { font-family: var(--font-head); font-weight: 900; color: #fff; font-size: 1rem; }
         
+        /* New Wrapper for Number + Badge */
+        .promo-24-wrapper {
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            margin: 5px 0;
+        }
+
         .promo-24-block {
             font-family: var(--font-head);
             font-size: 3.5rem;
@@ -462,8 +544,21 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             filter: drop-shadow(0 2px 10px rgba(56,189,248,0.3));
-            margin: 5px 0;
         }
+        
+        .promo-daynight-badge {
+            position: absolute;
+            right: -25px; /* Offset to the right of the number */
+            top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; align-items: center;
+            gap: 2px;
+        }
+        
+        .promo-dn-icon { width: 18px; height: 18px; }
+        .promo-dn-sun { fill: var(--accent-warm); filter: drop-shadow(0 0 5px rgba(251,191,36,0.6)); }
+        .promo-dn-moon { fill: #38bdf8; filter: drop-shadow(0 0 5px rgba(56,189,248,0.6)); }
+        .promo-dn-sep { width: 1px; height: 10px; background: rgba(255,255,255,0.2); }
+
         .promo-sub { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-warm); font-weight: 700; }
 
         .loading-overlay { display: none; } 
@@ -516,12 +611,19 @@
                 <!-- Back: Credits & Economy -->
                 <div class="panel-face back">
                     <div class="back-face-container">
-                        <!-- Credits Content -->
+                        <!-- CREATIVE CREDITS Content -->
                         <div class="credits-content" id="credits-content">
-                            <div class="cr-logo">✦</div>
-                            <div class="cr-head">FEJLESZTÉS ÉS DESIGN</div>
-                            <div class="cr-dev">Robi</div>
-                            <div class="cr-ft">&copy; <span id="cr-year">2025</span> Minden jog fenntartva</div>
+                            <div class="cr-inner-wrapper">
+                                <div class="cr-role-badge">
+                                    <span class="cr-role-icon">✦</span>
+                                    <span>FEJLESZTÉS & DESIGN</span>
+                                </div>
+                                <div class="cr-name-block">
+                                    <div class="cr-name-main">Robi</div>
+                                    <div class="cr-deco-line"></div>
+                                </div>
+                                <div class="cr-copy-text">&copy; <span id="cr-year">2025</span> Minden jog fenntartva</div>
+                            </div>
                         </div>
                         
                         <!-- Economy Content (Updated with Carousel) -->
@@ -652,6 +754,12 @@
                 
                 <!-- Back: Schedule OR Promo (Content swapped by JS) -->
                 <div class="panel-face back">
+                    
+                    <!-- NEW DEDICATED HEADER FOR SCHEDULE (Prevents Ghosting) -->
+                    <div class="weather-header-container" id="schedule-header">
+                        <div class="weather-location-header">MŰSORAJÁNLÓ</div>
+                    </div>
+
                     <!-- Schedule Content -->
                     <div class="schedule-view" id="schedule-view">
                          <div class="schedule-list" id="schedule-list-content"></div>
@@ -667,7 +775,17 @@
                             </div>
                             <span>oldalát a nap</span>
                         </div>
-                        <div class="promo-24-block">24</div>
+                        
+                        <div class="promo-24-wrapper">
+                            <div class="promo-24-block">24</div>
+                            <!-- Day/Night Indicator -->
+                            <div class="promo-daynight-badge">
+                                <svg class="promo-dn-icon promo-dn-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path stroke="var(--accent-warm)" stroke-width="2" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" fill="none"/></svg>
+                                <div class="promo-dn-sep"></div>
+                                <svg class="promo-dn-icon promo-dn-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="var(--accent-color)"/></svg>
+                            </div>
+                        </div>
+                        
                         <div class="promo-sub">órájában</div>
                     </div>
                 </div>
@@ -1000,7 +1118,7 @@
                 flipPanel('identity', false); 
                 state.economyVisible = false;
                 clearInterval(state.economyCarouselInterval);
-            }, 20000); // 20 seconds visible
+            }, 32000); // 32 seconds visible (4 slides * 8s)
         }
 
         function updateEconomySlide() {
@@ -1219,9 +1337,13 @@
             const currentIndex = THEMATIC_BLOCKS.findIndex(b => b.name === state.block.name);
             let html = '';
             const labels = ["MOST", "KÖVETKEZIK", "KÉSŐBB"]; 
-            el.weatherLocName.textContent = "MŰSORAJÁNLÓ";
             el.weatherLocTime.style.display = 'none';
-            // Note: Header on back face removed to avoid mirror text issue
+            
+            // Set up Back Face states
+            const backHeader = document.getElementById('schedule-header');
+            backHeader.style.display = 'flex'; // Ensure header is visible
+            el.scheduleView.style.display = 'flex';
+            el.promoView.style.display = 'none';
             
             for(let i = 0; i < 3; i++) {
                 const idx = (currentIndex + i) % THEMATIC_BLOCKS.length;
@@ -1236,8 +1358,21 @@
             state.scheduleHighlightIndex = 0;
             updateScheduleHighlight();
             state.scheduleInterval = setInterval(updateScheduleHighlight, 5000); 
-            setTimeout(() => { clearInterval(state.scheduleInterval); el.scheduleView.style.display = "none"; el.promoView.style.display = "flex"; }, 15000);
-            setTimeout(() => { flipPanel('weather', false); state.scheduleActive = false; el.scheduleView.style.display = "flex"; el.promoView.style.display = "none"; displayWeather(); }, 25000);
+            
+            setTimeout(() => { 
+                clearInterval(state.scheduleInterval); 
+                backHeader.style.display = 'none'; // HIDE HEADER FOR PROMO
+                el.scheduleView.style.display = "none"; 
+                el.promoView.style.display = "flex"; 
+            }, 15000);
+            
+            setTimeout(() => { 
+                flipPanel('weather', false); 
+                state.scheduleActive = false; 
+                el.scheduleView.style.display = "flex"; 
+                el.promoView.style.display = "none"; 
+                displayWeather(); 
+            }, 25000);
         }
 
         function updateScheduleHighlight() {
@@ -1268,7 +1403,7 @@
             el.timelineContainer.querySelectorAll('.timeline-btn').forEach(btn => { btn.classList.toggle('active', parseInt(btn.dataset.hour) === h); });
         }
 
-        // --- NEWS LOGIC ---
+        // --- NEWS LOGIC (REAL-TIME UPDATED) ---
         async function checkBreakingNews() {
             const now = Date.now();
             const threeMinutesAgo = now - (3 * 60 * 1000); 
@@ -1276,7 +1411,10 @@
 
             for(const [src, url] of Object.entries(BACKUP_FEEDS)) {
                 try {
-                    const res = await fetchWithProxyFallback(url);
+                    // CACHE BUSTING: Append a timestamp to the URL to force fresh fetch
+                    const uniqueUrl = url + (url.includes('?') ? '&' : '?') + 'cB=' + now;
+                    
+                    const res = await fetchWithProxyFallback(uniqueUrl);
                     const txt = await res.text();
                     const xml = new DOMParser().parseFromString(txt, "text/xml");
                     const items = xml.querySelectorAll("item");
@@ -1823,7 +1961,11 @@
             setInterval(updateTimeAndState, 1000); updateTimeAndState();
             onValue(feedsRef, (snap) => { state.rssFeeds = snap.val() || {}; refreshNews(); });
             fetchWeatherData(); setInterval(fetchWeatherData, 150000); setInterval(displayWeather, 6000);
-            setInterval(checkBreakingNews, 60000); setTimeout(checkBreakingNews, 5000);
+            
+            // BREAKING NEWS LOGIC (FAST CHECK 15-20s)
+            setInterval(checkBreakingNews, 60000); // 20s to be safe with proxies
+            setTimeout(checkBreakingNews, 5000); // Initial check
+            
             setInterval(showCredits, 300000); 
             document.getElementById('manual-refresh-trigger').addEventListener('click', () => refreshNews());
             document.getElementById('next-btn').addEventListener('click', (e) => { e.stopPropagation(); showNextItem(); });
