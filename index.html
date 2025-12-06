@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V141 (Razor Sharp Edition)</title>
+    <title>Aurora News Ticker - V144 (Night Label & More Weather)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +23,6 @@
             --bg-grad-3: #0f172a;
             
             /* Sharp UI - No Blur, High Contrast */
-            /* Megszüntettük az elmosást, helyette szinte teli fekete/kék háttér */
             --panel-bg: rgba(6, 10, 25, 0.96); 
             --panel-border: rgba(255, 255, 255, 0.12);
             --panel-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
@@ -40,7 +39,6 @@
             --font-mono: 'JetBrains Mono', monospace;
             --font-serif: 'Playfair Display', serif;
             
-            /* CAPSULE DESIGN VARS */
             --cap-radius-outer: 90px; 
             --cap-radius-inner: 8px; 
             --bar-height: 185px;
@@ -58,7 +56,7 @@
             align-items: center;
             justify-content: center;
             padding: 10px;
-            /* TŰÉLES BETŰK KÉNYSZERÍTÉSE */
+            /* Sharp text rendering */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             text-rendering: optimizeLegibility;
@@ -92,13 +90,11 @@
             .id-content, .weather-view { padding: 10px !important; }
         }
 
-        /* SHARP PANEL DESIGN (Removed Blur) */
+        /* SHARP PANEL DESIGN */
         .glass-panel {
             background: var(--panel-bg); 
-            /* Blur törölve a tisztaság érdekében */
             backdrop-filter: none; 
             -webkit-backdrop-filter: none;
-            
             border: 1px solid var(--panel-border); 
             box-shadow: var(--panel-shadow); position: relative;
             perspective: 1000px;
@@ -135,7 +131,7 @@
         .panel-face {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             backface-visibility: hidden; -webkit-backface-visibility: hidden;
-            display: flex; flex-direction: column; background: var(--panel-bg); /* Sharp BG */
+            display: flex; flex-direction: column; background: var(--panel-bg);
         }
         .panel-face.back { transform: rotateX(180deg); display: flex; align-items: center; justify-content: center; }
 
@@ -149,7 +145,7 @@
         .brand-wrapper { 
             display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center;
             padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 5px;
-            cursor: pointer;
+            cursor: pointer; z-index: 50; 
         }
         .brand-logo svg { width: 24px; height: 24px; fill: var(--accent-color); filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.4)); animation: pulseLogo 3s infinite ease-in-out; }
         .brand-name { font-family: var(--font-head); font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; color: #fff; }
@@ -200,29 +196,63 @@
         .news-card {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; justify-content: flex-start;
-            padding: 15px 25px; gap: 8px; opacity: 0; visibility: hidden; transform: translateY(15px);
+            padding: 15px 20px 35px 20px; 
+            gap: 0; opacity: 0; visibility: hidden; transform: translateY(15px);
             transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .news-card.visible { opacity: 1; visibility: visible; transform: translateY(0); }
-        .news-header-row { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; width: 100%; overflow: hidden; position: relative; }
-        .news-meta { display: flex; align-items: center; gap: 8px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent-color); font-weight: 700; white-space: nowrap; z-index: 2; }
+        
+        .news-content-wrapper { 
+            flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-start; 
+            min-height: 0; gap: 6px; 
+            background: linear-gradient(90deg, rgba(2,6,23,0.98) 0%, rgba(2,6,23,0.85) 45%, rgba(2,6,23,0.4) 85%, rgba(2,6,23,0.1) 100%);
+            padding: 10px 15px 5px 10px; border-radius: 8px; margin-left: -10px; margin-right: -5px;
+            height: 100%; position: relative;
+        }
+
+        /* TITLE AT TOP - PADDED FOR BADGE */
+        .news-title { 
+            flex: 0 0 auto; 
+            font-family: var(--font-head); font-size: 1.15rem; font-weight: 700; line-height: 1.35; color: #fff; 
+            text-shadow: 0 1px 2px rgba(0,0,0,1); 
+            width: 100%; 
+            z-index: 5; 
+            padding-bottom: 5px;
+            padding-right: 140px; 
+            margin-top: 0;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        /* DESC BELOW TITLE */
+        .news-desc { 
+            flex: 1 1 auto; 
+            font-size: 0.88rem; color: #e2e8f0; font-weight: 400; line-height: 1.5; 
+            display: -webkit-box; -webkit-line-clamp: 4; 
+            -webkit-box-orient: vertical; overflow: hidden; max-width: 98%; 
+            text-shadow: 0 1px 2px rgba(0,0,0,1); z-index: 5; 
+        }
+
+        /* META MOVED TO BOTTOM - SPLIT LAYOUT */
+        .news-footer-row {
+            flex: 0 0 auto;
+            display: flex; align-items: center; 
+            justify-content: space-between; /* This pushes items to left and right */
+            margin-top: auto; 
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            width: 100%;
+        }
+        
+        .news-meta { 
+            display: flex; align-items: center; gap: 8px; 
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; 
+            color: var(--accent-color); font-weight: 700; white-space: nowrap; z-index: 2; 
+        }
+        
         .provider-identity { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 15px; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
         .provider-icon { width: 16px; height: 16px; border-radius: 50%; }
-        .news-content-wrapper { 
-            flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; min-height: 0; gap: 8px; 
-            background: linear-gradient(90deg, rgba(2,6,23,0.98) 0%, rgba(2,6,23,0.85) 45%, rgba(2,6,23,0.4) 85%, rgba(2,6,23,0.1) 100%);
-            padding: 15px 20px 20px 15px; border-radius: 8px; margin-left: -10px; margin-right: -5px;
-        }
-        .news-title { 
-            flex: 0 0 auto; font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; line-height: 1.4; color: #fff; 
-            text-shadow: 0 1px 2px rgba(0,0,0,1); /* Reduced shadow spread for sharpness */
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; width: 95%; z-index: 5; padding-bottom: 2px; 
-        }
-        .news-desc { 
-            flex: 0 1 auto; font-size: 0.85rem; color: #e2e8f0; font-weight: 400; line-height: 1.5; 
-            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; max-width: 98%; 
-            text-shadow: 0 1px 2px rgba(0,0,0,1); z-index: 5; padding-bottom: 4px; 
-        }
+
+        /* Images & Backgrounds */
         .news-image-overlay { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             mask-image: linear-gradient(to right, rgba(0,0,0,0.3) 0%, black 50%); 
@@ -259,15 +289,11 @@
         .badge-sunset { background: rgba(134, 25, 143, 0.95); border-color: #e879f9; color: #fae8ff; }
         .badge-evening { background: rgba(88, 28, 135, 0.95); border-color: #c084fc; color: #f3e8ff; }
         
-        /* Centered Night Summary Label */
-        .night-summary-container {
-            position: absolute; left: 0; top: 0; width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center; pointer-events: none;
-        }
+        /* Updated Night Summary Label - Bottom Left */
         .night-summary-label { 
-            color: var(--accent-warm); font-size: 0.65rem; font-weight: 700; 
-            background: rgba(0,0,0,0.6); border: 1px solid rgba(251, 191, 36, 0.3); 
-            padding: 2px 10px; border-radius: 15px;
+            color: var(--accent-warm); font-size: 0.65rem; font-weight: 800; 
+            text-transform: uppercase; letter-spacing: 0.5px;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
         }
 
         .news-card.night-info { background: radial-gradient(circle at top left, #312e81, #1e1b4b); border-left: 4px solid #a855f7; alignItems: center; justify-content: center; text-align: center; padding-bottom: 35px; }
@@ -306,6 +332,8 @@
             background: #020617; 
             border-top: 1px solid #7f1d1d;
             box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
         
         /* Normal Controls container */
@@ -326,7 +354,6 @@
             opacity: 0; pointer-events: none; transition: opacity 0.5s;
         }
         
-        /* VILLOGÓ FELIRAT ANIMÁCIÓ */
         .bp-intro-text {
             font-family: var(--font-head); font-weight: 900; font-size: 1.2rem;
             color: #fff; letter-spacing: 2px; text-transform: uppercase;
@@ -342,6 +369,7 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; align-items: center; padding: 0 20px;
             opacity: 0; transition: opacity 0.5s;
+            -webkit-font-smoothing: antialiased;
         }
         
         .bp-badge {
@@ -365,6 +393,7 @@
             font-family: var(--font-head); font-weight: 700; color: #fff; font-size: 1.05rem;
             white-space: nowrap; position: relative;
             will-change: transform; 
+            padding-left: 25px;
         }
 
         @keyframes scrollTextLeft {
@@ -586,7 +615,7 @@
             
             <div class="big-clock-layer" id="big-clock-layer">
                 <div class="bc-time" id="bc-time-display">00:00:00</div>
-                <div class="bc-label">KÖVETKEZŐ HÍRCSOMAG BETÖLTÉSE...</div>
+                <div class="bc-label"></div>
             </div>
 
             <div class="goodbye-card" id="goodbye-card">
@@ -608,7 +637,7 @@
 
             <div class="progress-line-container"><div id="progress-bar" class="progress-line"></div></div>
 
-            <!-- SIMPLIFIED CONTROLS BAR V141 (Solid & Sharp) -->
+            <!-- SIMPLIFIED CONTROLS BAR V144 (Solid & Sharp) -->
             <div class="controls-bar" id="controls-bar-main">
                 <!-- Normal Content -->
                 <div class="controls-normal-content" id="controls-normal">
@@ -732,9 +761,19 @@
 
         const PWS_MAP = { "ISRVR13": "Sárvár", "IOSZK4": "Oszkó", "ISZNTD6": "Szántód", "IBALAT149": "Balatonszemes", "IBUZSK1": "Csisztapuszta", "ISZEKS12": "Szekszárd", "IJNOSH2": "Jánoshalma", "IPCS52": "Pécs", "IPPRD1": "Páprád", "IKISKU42": "Kiskunhalas", "INEMES10": "Nemesnádudvar", "ISZEGE67": "Szeged", "IBKSCS12": "Békéscsaba", "IFZESG2": "Füzesgyarmat", "IMIKEP2": "Mikepércs", "ITGLS2": "Téglás", "IGACSL1": "Gacsály", "IFLESD1": "Fülesd", "IKISSZ3": "Kisszekeres", "ILEVEL2": "Levelek", "IKEMEC2": "Kemecse", "INAGYC6": "Nagycserkesz", "ITISZA15": "Tiszavasvári", "INEMES19": "Nemesbikk", "IEGERS22": "Egerszólát", "IBKKSZ5": "Bükkszenterzsébet", "IPSZT1": "Pásztó", "IPALOT13": "Palotás", "IGDLL37": "Gödöllő", "IZSMBK6": "Zsámbék", "ICSORN6": "Csorna", "IGAGYV1": "Gagyvendégi", "IMARTO122": "Martonyi", "IKAZIN14": "Kazincbarcika", "IPUTNO1": "Putnok", "IZABAR1": "Zabar", "ISALGT1": "Salgótarján", "IKARAN11": "Karancslapujtő", "IBEKLC3": "Bekölce", "IMTRAB1": "Mátraballa", "IVC267": "Vác", "IPILIS37": "Pilisvörösvár", "IFELCS4": "Felcsút", "IBUDAK6": "Budakeszi", "IBIATO9": "Biatorbágy", "ICSKVR4": "Csákvár", "IOROSZ2": "Oroszlány", "IBALINKA2": "Bakony", "ISR67": "Súr", "IPANNO3": "Pannonhalma", "IKAJRP2": "Kajárpéc", "IPPA11": "Pápa", "ICELLD14": "Celldömölk", "IHEVES2": "Heves", "IGYNGY22": "Gyöngyös", "ISZCSN9": "Szécsény", "ITAHIT11": "Tahitótfalu", "IESZTE5": "Esztergom", "ITATA16": "Tata", "IKARTAL4": "Kartal", "IMARTO67": "Martonvásár", "ISZOLNOK10": "Szolnok", "ISZOLN13": "Szolnok", "INAGYK59": "Nagykőrös", "IKECSK31": "Kecskemét", "IKALOCSA2": "Kalocsa", "IBONYH1": "Bonyhád", "ISZENT114": "Szentlőrinc", "ILJUBL47": "Ljubljana", "IBAKTA4": "Baktalórántháza", "IJFEHR1": "Újfehértó", "IPAPOS6": "Papos", "ISONKD1": "Sonkád", "INAPKO1": "Napkor", "IHARSN4": "Harsány", "IBKKSZ2": "Bükkszentkereszt", "INYREG37": "Nyíregyháza", "IPUSZT3": "Pusztadobos", "ITISZA93": "Tiszaújváros", "IEGER76": "Eger", "IHAJDD7": "Hajdúdorog", "IGYULA12": "Gyula", "IMAGYA4": "Magyarcsanád", "IHDMEZ21": "Hódmezővásárhely", "ISZEGE23": "Szeged-Rókus", "ICSENG9": "Csengele", "INAGYN1": "Nagynyárád", "IKIRLY1": "Királyegyháza", "ITAMSI1": "Tamási", "IZALAE45": "Zalaegerszeg", "IFARKA7": "Farkasgyepű", "INYRAC1": "Nyíracsád", "ISZAMO11": "Szamosújlak", "IGVAVE1": "Gávavencsellő", "IEDELN2": "Edelény", "INYRI1": "Nyíri", "IBTTS1": "Büttös", "IZD2": "Ózd" };
         
-        const HUNGARIAN_CITIES_OM = [ { name: 'Debrecen', lat: 47.53, lon: 21.62 }, { name: 'Miskolc', lat: 48.10, lon: 20.78 }, { name: 'Szombathely', lat: 47.23, lon: 16.62 }, { name: 'Győr', lat: 47.68, lon: 17.63 }, { name: 'Pécs', lat: 46.07, lon: 18.23 }, { name: 'Szeged', lat: 46.25, lon: 20.15 }, { name: 'Eger', lat: 47.90, lon: 20.37 }, { name: 'Veszprém', lat: 47.09, lon: 17.91 }, { name: 'Zalaegerszeg', lat: 46.84, lon: 16.84 }, { name: 'Békéscsaba', lat: 46.68, lon: 21.09 }, { name: 'Kaposvár', lat: 46.36, lon: 17.79 }, { name: 'Tatabánya', lat: 47.57, lon: 18.40 }, { name: 'Salgótarján', lat: 48.10, lon: 19.80 }, { name: 'Szekszárd', lat: 46.35, lon: 18.70 }, { name: 'Sopron', lat: 47.68, lon: 16.58 }, { name: 'Hódmezővásárhely', lat: 46.43, lon: 20.32 }, { name: 'Nagykanizsa', lat: 46.45, lon: 16.99 }, { name: 'Dunaújváros', lat: 46.96, lon: 18.93 }, { name: 'Érd', lat: 47.38, lon: 18.91 }, { name: 'Szolnok', lat: 47.18, lon: 20.20 }, { name: 'Kecskemét', lat: 46.88, lon: 19.64 }, { name: 'Baja', lat: 46.18, lon: 18.95 }, { name: 'Cegléd', lat: 47.17, lon: 19.80 }, { name: 'Vác', lat: 47.78, lon: 19.13 }, { name: 'Gödöllő', lat: 47.60, lon: 19.35 }, { name: 'Ózd', lat: 48.22, lon: 20.29 }, { name: 'Pápa', lat: 47.33, lon: 17.47 }, { name: 'Gyula', lat: 46.65, lon: 21.28 }, { name: 'Hajdúböszörmény', lat: 47.67, lon: 21.51 }, { name: 'Nyíregyháza', lat: 47.95, lon: 21.71 }, { name: 'Balatonfüred', lat: 46.96, lon: 17.89 }, { name: 'Keszthely', lat: 46.76, lon: 17.24 }, { name: 'Siófok', lat: 46.90, lon: 18.05 }, { name: 'Komárom', lat: 47.74, lon: 18.11 }, { name: 'Esztergom', lat: 47.79, lon: 18.74 }, { name: 'Tata', lat: 47.65, lon: 18.31 }, { name: 'Mohács', lat: 45.99, lon: 18.68 }, { name: 'Paks', lat: 46.62, lon: 18.86 }, { name: 'Kalocsa', lat: 46.53, lon: 18.98 }, { name: 'Kiskunfélegyháza', lat: 46.71, lon: 19.85 }, { name: 'Jászberény', lat: 47.50, lon: 19.91 }, { name: 'Hatvan', lat: 47.66, lon: 19.67 }, { name: 'Gyöngyös', lat: 47.78, lon: 19.93 }, { name: 'Kazincbarcika', lat: 48.25, lon: 20.62 }, { name: 'Sátoraljaújhely', lat: 48.40, lon: 21.65 }, { name: 'Kisvárda', lat: 48.22, lon: 22.08 }, { name: 'Mátészalka', lat: 47.95, lon: 22.32 }, { name: 'Makó', lat: 46.22, lon: 20.47 }, { name: 'Szentes', lat: 46.65, lon: 20.26 }, { name: 'Orosháza', lat: 46.57, lon: 20.66 }, { name: 'Karcag', lat: 47.31, lon: 20.93 }, { name: 'Hajdúszoboszló', lat: 47.45, lon: 21.39 }, { name: 'Törökszentmiklós', lat: 47.17, lon: 20.41 }, { name: 'Gyál', lat: 47.38, lon: 19.22 }, { name: 'Dunakeszi', lat: 47.64, lon: 19.14 }, { name: 'Budaörs', lat: 47.46, lon: 18.96 }, { name: 'Szentendre', lat: 47.66, lon: 19.07 }, { name: 'Szigetszentmiklós', lat: 47.34, lon: 19.05 }, { name: 'Mosonmagyaróvár', lat: 47.87, lon: 17.27 }, { name: 'Bicske', lat: 47.49, lon: 18.63 }, { name: 'Monor', lat: 47.35, lon: 19.45 }, { name: 'Mezőkövesd', lat: 47.81, lon: 20.57 }, { name: 'Tiszaújváros', lat: 47.92, lon: 21.05 }, { name: 'Sárospatak', lat: 48.32, lon: 21.57 } ];
+        // Expanded Hungarian Cities List (+20 New)
+        const HUNGARIAN_CITIES_OM = [ 
+            { name: 'Debrecen', lat: 47.53, lon: 21.62 }, { name: 'Miskolc', lat: 48.10, lon: 20.78 }, { name: 'Szombathely', lat: 47.23, lon: 16.62 }, { name: 'Győr', lat: 47.68, lon: 17.63 }, { name: 'Pécs', lat: 46.07, lon: 18.23 }, { name: 'Szeged', lat: 46.25, lon: 20.15 }, { name: 'Eger', lat: 47.90, lon: 20.37 }, { name: 'Veszprém', lat: 47.09, lon: 17.91 }, { name: 'Zalaegerszeg', lat: 46.84, lon: 16.84 }, { name: 'Békéscsaba', lat: 46.68, lon: 21.09 }, { name: 'Kaposvár', lat: 46.36, lon: 17.79 }, { name: 'Tatabánya', lat: 47.57, lon: 18.40 }, { name: 'Salgótarján', lat: 48.10, lon: 19.80 }, { name: 'Szekszárd', lat: 46.35, lon: 18.70 }, { name: 'Sopron', lat: 47.68, lon: 16.58 }, { name: 'Hódmezővásárhely', lat: 46.43, lon: 20.32 }, { name: 'Nagykanizsa', lat: 46.45, lon: 16.99 }, { name: 'Dunaújváros', lat: 46.96, lon: 18.93 }, { name: 'Érd', lat: 47.38, lon: 18.91 }, { name: 'Szolnok', lat: 47.18, lon: 20.20 }, { name: 'Kecskemét', lat: 46.88, lon: 19.64 }, { name: 'Baja', lat: 46.18, lon: 18.95 }, { name: 'Cegléd', lat: 47.17, lon: 19.80 }, { name: 'Vác', lat: 47.78, lon: 19.13 }, { name: 'Gödöllő', lat: 47.60, lon: 19.35 }, { name: 'Ózd', lat: 48.22, lon: 20.29 }, { name: 'Pápa', lat: 47.33, lon: 17.47 }, { name: 'Gyula', lat: 46.65, lon: 21.28 }, { name: 'Hajdúböszörmény', lat: 47.67, lon: 21.51 }, { name: 'Nyíregyháza', lat: 47.95, lon: 21.71 }, { name: 'Balatonfüred', lat: 46.96, lon: 17.89 }, { name: 'Keszthely', lat: 46.76, lon: 17.24 }, { name: 'Siófok', lat: 46.90, lon: 18.05 }, { name: 'Komárom', lat: 47.74, lon: 18.11 }, { name: 'Esztergom', lat: 47.79, lon: 18.74 }, { name: 'Tata', lat: 47.65, lon: 18.31 }, { name: 'Mohács', lat: 45.99, lon: 18.68 }, { name: 'Paks', lat: 46.62, lon: 18.86 }, { name: 'Kalocsa', lat: 46.53, lon: 18.98 }, { name: 'Kiskunfélegyháza', lat: 46.71, lon: 19.85 }, { name: 'Jászberény', lat: 47.50, lon: 19.91 }, { name: 'Hatvan', lat: 47.66, lon: 19.67 }, { name: 'Gyöngyös', lat: 47.78, lon: 19.93 }, { name: 'Kazincbarcika', lat: 48.25, lon: 20.62 }, { name: 'Sátoraljaújhely', lat: 48.40, lon: 21.65 }, { name: 'Kisvárda', lat: 48.22, lon: 22.08 }, { name: 'Mátészalka', lat: 47.95, lon: 22.32 }, { name: 'Makó', lat: 46.22, lon: 20.47 }, { name: 'Szentes', lat: 46.65, lon: 20.26 }, { name: 'Orosháza', lat: 46.57, lon: 20.66 }, { name: 'Karcag', lat: 47.31, lon: 20.93 }, { name: 'Hajdúszoboszló', lat: 47.45, lon: 21.39 }, { name: 'Törökszentmiklós', lat: 47.17, lon: 20.41 }, { name: 'Gyál', lat: 47.38, lon: 19.22 }, { name: 'Dunakeszi', lat: 47.64, lon: 19.14 }, { name: 'Budaörs', lat: 47.46, lon: 18.96 }, { name: 'Szentendre', lat: 47.66, lon: 19.07 }, { name: 'Szigetszentmiklós', lat: 47.34, lon: 19.05 }, { name: 'Mosonmagyaróvár', lat: 47.87, lon: 17.27 }, { name: 'Bicske', lat: 47.49, lon: 18.63 }, { name: 'Monor', lat: 47.35, lon: 19.45 }, { name: 'Mezőkövesd', lat: 47.81, lon: 20.57 }, { name: 'Tiszaújváros', lat: 47.92, lon: 21.05 }, { name: 'Sárospatak', lat: 48.32, lon: 21.57 },
+            /* New additions */
+            { name: 'Kőszeg', lat: 47.38, lon: 16.54 }, { name: 'Sárvár', lat: 47.25, lon: 16.93 }, { name: 'Tapolca', lat: 46.88, lon: 17.43 }, { name: 'Hévíz', lat: 46.79, lon: 17.18 }, { name: 'Balatonboglár', lat: 46.77, lon: 17.65 }, { name: 'Fonyód', lat: 46.74, lon: 17.55 }, { name: 'Pápoc', lat: 47.42, lon: 17.13 }, { name: 'Zirc', lat: 47.26, lon: 17.87 }, { name: 'Mór', lat: 47.37, lon: 18.20 }, { name: 'Gárdony', lat: 47.19, lon: 18.60 }, { name: 'Velence', lat: 47.24, lon: 18.65 }, { name: 'Abony', lat: 47.19, lon: 20.00 }, { name: 'Nagykáta', lat: 47.41, lon: 19.74 }, { name: 'Gyömrő', lat: 47.42, lon: 19.39 }, { name: 'Pécel', lat: 47.49, lon: 19.34 }, { name: 'Üllő', lat: 47.38, lon: 19.35 }, { name: 'Vecsés', lat: 47.40, lon: 19.26 }, { name: 'Törökbálint', lat: 47.43, lon: 18.91 }, { name: 'Biatorbágy', lat: 47.47, lon: 18.82 }, { name: 'Budakeszi', lat: 47.51, lon: 18.93 }
+        ];
 
-        const FOREIGN_CITIES = [ { name: 'London', lat: 51.50, lon: -0.12 }, { name: 'New York', lat: 40.71, lon: -74.00 }, { name: 'Tokió', lat: 35.68, lon: 139.69 }, { name: 'Peking', lat: 39.90, lon: 116.40 }, { name: 'Moszkva', lat: 55.75, lon: 37.61 }, { name: 'Sydney', lat: -33.86, lon: 151.20 }, { name: 'Párizs', lat: 48.85, lon: 2.35 }, { name: 'Berlin', lat: 52.52, lon: 13.40 }, { name: 'Róma', lat: 41.90, lon: 12.49 }, { name: 'Dubai', lat: 25.20, lon: 55.27 }, { name: 'Isztambul', lat: 41.00, lon: 28.97 }, { name: 'Bécs', lat: 48.20, lon: 16.37 }, { name: 'Los Angeles', lat: 34.05, lon: -118.24 }, { name: 'Madrid', lat: 40.41, lon: -3.70 }, { name: 'Toronto', lat: 43.65, lon: -79.38 }, { name: 'Mumbai', lat: 19.07, lon: 72.87 }, { name: 'Szingapúr', lat: 1.35, lon: 103.81 }, { name: 'Kairó', lat: 30.04, lon: 31.23 }, { name: 'Rio de Janeiro', lat: -22.90, lon: -43.17 }, { name: 'Prága', lat: 50.07, lon: 14.43 }, { name: 'Amszterdam', lat: 52.36, lon: 4.90 }, { name: 'Barcelona', lat: 41.38, lon: 2.17 }, { name: 'Zürich', lat: 47.37, lon: 8.54 }, { name: 'Varsó', lat: 52.22, lon: 21.01 }, { name: 'Bangkok', lat: 13.75, lon: 100.50 }, { name: 'Szöul', lat: 37.56, lon: 126.97 }, { name: 'Mexikóváros', lat: 19.43, lon: -99.13 }, { name: 'Buenos Aires', lat: -34.60, lon: -58.38 }, { name: 'Jakarta', lat: -6.20, lon: 106.84 }, { name: 'Lima', lat: -12.04, lon: -77.04 }, { name: 'Fokváros', lat: -33.92, lon: 18.42 }, { name: 'Helsinki', lat: 60.17, lon: 24.93 }, { name: 'Oslo', lat: 59.91, lon: 10.75 }, { name: 'Stockholm', lat: 59.32, lon: 18.06 }, { name: 'Koppenhága', lat: 55.67, lon: 12.56 }, { name: 'Reykjavik', lat: 64.14, lon: -21.94 }, { name: 'Dublin', lat: 53.34, lon: -6.26 }, { name: 'Lisszabon', lat: 38.72, lon: -9.13 }, { name: 'Athén', lat: 37.98, lon: 23.72 }, { name: 'Ankara', lat: 39.93, lon: 32.85 }, { name: 'Jeruzsálem', lat: 31.76, lon: 35.21 }, { name: 'Újdelhi', lat: 28.61, lon: 77.20 }, { name: 'Chicago', lat: 41.87, lon: -87.62 }, { name: 'San Francisco', lat: 37.77, lon: -122.41 }, { name: 'Vancouver', lat: 49.28, lon: -123.12 }, { name: 'Montreal', lat: 45.50, lon: -73.56 }, { name: 'Sao Paulo', lat: -23.55, lon: -46.63 }, { name: 'Santiago', lat: -33.44, lon: -70.66 }, { name: 'Bogota', lat: 4.71, lon: -74.07 }, { name: 'Casablanca', lat: 33.57, lon: -7.58 }, { name: 'Lagos', lat: 6.52, lon: 3.37 }, { name: 'Nairobi', lat: -1.29, lon: 36.82 }, { name: 'Rijád', lat: 24.71, lon: 46.67 }, { name: 'Teherán', lat: 35.68, lon: 51.38 }, { name: 'Karacsi', lat: 24.86, lon: 67.00 }, { name: 'Sanghaj', lat: 31.23, lon: 121.47 }, { name: 'Oszaka', lat: 34.69, lon: 135.50 }, { name: 'Manila', lat: 14.59, lon: 120.98 }, { name: 'Kuala Lumpur', lat: 3.13, lon: 101.68 }, { name: 'Hanoi', lat: 21.02, lon: 105.83 }, { name: 'Melbourne', lat: -37.81, lon: 144.96 }, { name: 'Auckland', lat: -36.84, lon: 174.76 }, { name: 'Brüsszel', lat: 50.85, lon: 4.35 }, { name: 'Genf', lat: 46.20, lon: 6.14 }, { name: 'München', lat: 48.13, lon: 11.58 }, { name: 'Milánó', lat: 45.46, lon: 9.19 }, { name: 'Nápoly', lat: 40.85, lon: 14.26 }, { name: 'Velence', lat: 45.44, lon: 12.31 }, { name: 'Lyon', lat: 45.76, lon: 4.83 }, { name: 'Marseille', lat: 43.29, lon: 5.36 }, { name: 'Las Vegas', lat: 36.16, lon: -115.13 }, { name: 'Miami', lat: 25.76, lon: -80.19 }, { name: 'Boston', lat: 42.36, lon: -71.05 }, { name: 'Seattle', lat: 47.60, lon: -122.33 }, { name: 'Denver', lat: 39.73, lon: -104.99 }, { name: 'Havanna', lat: 23.11, lon: -82.36 }, { name: 'Panamaváros', lat: 8.98, lon: -79.51 }, { name: 'Caracas', lat: 10.48, lon: -66.90 }, { name: 'La Paz', lat: -16.50, lon: -68.11 }, { name: 'Kijev', lat: 50.45, lon: 30.52 }, { name: 'Minszk', lat: 53.90, lon: 27.56 }, { name: 'Bukarest', lat: 44.42, lon: 26.10 }, { name: 'Belgrád', lat: 44.78, lon: 20.44 }, { name: 'Zágráb', lat: 45.81, lon: 15.98 }, { name: 'Szlovénia', lat: 46.05, lon: 14.50 }, { name: 'Pozsony', lat: 48.14, lon: 17.10 }, { name: 'Krakkó', lat: 50.06, lon: 19.94 }, { name: 'Gdansk', lat: 54.35, lon: 18.64 }, { name: 'Hamburg', lat: 53.55, lon: 9.99 }, { name: 'Frankfurt', lat: 50.11, lon: 8.68 }, { name: 'Köln', lat: 50.93, lon: 6.96 }, { name: 'Stuttgart', lat: 48.77, lon: 9.18 }, { name: 'Manchester', lat: 53.48, lon: -2.24 }, { name: 'Birmingham', lat: 52.48, lon: -1.89 }, { name: 'Glasgow', lat: 55.86, lon: -4.25 }, { name: 'Edinburgh', lat: 55.95, lon: -3.18 }, { name: 'Valencia', lat: 39.46, lon: -0.37 }, { name: 'Sevilla', lat: 37.38, lon: -5.98 }, { name: 'Porto', lat: 41.15, lon: -8.62 }, { name: 'Tel Aviv', lat: 32.08, lon: 34.78 }, { name: 'Doha', lat: 25.28, lon: 51.53 }, { name: 'Abu Dhabi', lat: 24.45, lon: 54.37 } ];
+        // Expanded Foreign Cities List (+20 New)
+        const FOREIGN_CITIES = [ 
+            { name: 'London', lat: 51.50, lon: -0.12 }, { name: 'New York', lat: 40.71, lon: -74.00 }, { name: 'Tokió', lat: 35.68, lon: 139.69 }, { name: 'Peking', lat: 39.90, lon: 116.40 }, { name: 'Moszkva', lat: 55.75, lon: 37.61 }, { name: 'Sydney', lat: -33.86, lon: 151.20 }, { name: 'Párizs', lat: 48.85, lon: 2.35 }, { name: 'Berlin', lat: 52.52, lon: 13.40 }, { name: 'Róma', lat: 41.90, lon: 12.49 }, { name: 'Dubai', lat: 25.20, lon: 55.27 }, { name: 'Isztambul', lat: 41.00, lon: 28.97 }, { name: 'Bécs', lat: 48.20, lon: 16.37 }, { name: 'Los Angeles', lat: 34.05, lon: -118.24 }, { name: 'Madrid', lat: 40.41, lon: -3.70 }, { name: 'Toronto', lat: 43.65, lon: -79.38 }, { name: 'Mumbai', lat: 19.07, lon: 72.87 }, { name: 'Szingapúr', lat: 1.35, lon: 103.81 }, { name: 'Kairó', lat: 30.04, lon: 31.23 }, { name: 'Rio de Janeiro', lat: -22.90, lon: -43.17 }, { name: 'Prága', lat: 50.07, lon: 14.43 }, { name: 'Amszterdam', lat: 52.36, lon: 4.90 }, { name: 'Barcelona', lat: 41.38, lon: 2.17 }, { name: 'Zürich', lat: 47.37, lon: 8.54 }, { name: 'Varsó', lat: 52.22, lon: 21.01 }, { name: 'Bangkok', lat: 13.75, lon: 100.50 }, { name: 'Szöul', lat: 37.56, lon: 126.97 }, { name: 'Mexikóváros', lat: 19.43, lon: -99.13 }, { name: 'Buenos Aires', lat: -34.60, lon: -58.38 }, { name: 'Jakarta', lat: -6.20, lon: 106.84 }, { name: 'Lima', lat: -12.04, lon: -77.04 }, { name: 'Fokváros', lat: -33.92, lon: 18.42 }, { name: 'Helsinki', lat: 60.17, lon: 24.93 }, { name: 'Oslo', lat: 59.91, lon: 10.75 }, { name: 'Stockholm', lat: 59.32, lon: 18.06 }, { name: 'Koppenhága', lat: 55.67, lon: 12.56 }, { name: 'Reykjavik', lat: 64.14, lon: -21.94 }, { name: 'Dublin', lat: 53.34, lon: -6.26 }, { name: 'Lisszabon', lat: 38.72, lon: -9.13 }, { name: 'Athén', lat: 37.98, lon: 23.72 }, { name: 'Ankara', lat: 39.93, lon: 32.85 }, { name: 'Jeruzsálem', lat: 31.76, lon: 35.21 }, { name: 'Újdelhi', lat: 28.61, lon: 77.20 }, { name: 'Chicago', lat: 41.87, lon: -87.62 }, { name: 'San Francisco', lat: 37.77, lon: -122.41 }, { name: 'Vancouver', lat: 49.28, lon: -123.12 }, { name: 'Montreal', lat: 45.50, lon: -73.56 }, { name: 'Sao Paulo', lat: -23.55, lon: -46.63 }, { name: 'Santiago', lat: -33.44, lon: -70.66 }, { name: 'Bogota', lat: 4.71, lon: -74.07 }, { name: 'Casablanca', lat: 33.57, lon: -7.58 }, { name: 'Lagos', lat: 6.52, lon: 3.37 }, { name: 'Nairobi', lat: -1.29, lon: 36.82 }, { name: 'Rijád', lat: 24.71, lon: 46.67 }, { name: 'Teherán', lat: 35.68, lon: 51.38 }, { name: 'Karacsi', lat: 24.86, lon: 67.00 }, { name: 'Sanghaj', lat: 31.23, lon: 121.47 }, { name: 'Oszaka', lat: 34.69, lon: 135.50 }, { name: 'Manila', lat: 14.59, lon: 120.98 }, { name: 'Kuala Lumpur', lat: 3.13, lon: 101.68 }, { name: 'Hanoi', lat: 21.02, lon: 105.83 }, { name: 'Melbourne', lat: -37.81, lon: 144.96 }, { name: 'Auckland', lat: -36.84, lon: 174.76 }, { name: 'Brüsszel', lat: 50.85, lon: 4.35 }, { name: 'Genf', lat: 46.20, lon: 6.14 }, { name: 'München', lat: 48.13, lon: 11.58 }, { name: 'Milánó', lat: 45.46, lon: 9.19 }, { name: 'Nápoly', lat: 40.85, lon: 14.26 }, { name: 'Velence', lat: 45.44, lon: 12.31 }, { name: 'Lyon', lat: 45.76, lon: 4.83 }, { name: 'Marseille', lat: 43.29, lon: 5.36 }, { name: 'Las Vegas', lat: 36.16, lon: -115.13 }, { name: 'Miami', lat: 25.76, lon: -80.19 }, { name: 'Boston', lat: 42.36, lon: -71.05 }, { name: 'Seattle', lat: 47.60, lon: -122.33 }, { name: 'Denver', lat: 39.73, lon: -104.99 }, { name: 'Havanna', lat: 23.11, lon: -82.36 }, { name: 'Panamaváros', lat: 8.98, lon: -79.51 }, { name: 'Caracas', lat: 10.48, lon: -66.90 }, { name: 'La Paz', lat: -16.50, lon: -68.11 }, { name: 'Kijev', lat: 50.45, lon: 30.52 }, { name: 'Minszk', lat: 53.90, lon: 27.56 }, { name: 'Bukarest', lat: 44.42, lon: 26.10 }, { name: 'Belgrád', lat: 44.78, lon: 20.44 }, { name: 'Zágráb', lat: 45.81, lon: 15.98 }, { name: 'Szlovénia', lat: 46.05, lon: 14.50 }, { name: 'Pozsony', lat: 48.14, lon: 17.10 }, { name: 'Krakkó', lat: 50.06, lon: 19.94 }, { name: 'Gdansk', lat: 54.35, lon: 18.64 }, { name: 'Hamburg', lat: 53.55, lon: 9.99 }, { name: 'Frankfurt', lat: 50.11, lon: 8.68 }, { name: 'Köln', lat: 50.93, lon: 6.96 }, { name: 'Stuttgart', lat: 48.77, lon: 9.18 }, { name: 'Manchester', lat: 53.48, lon: -2.24 }, { name: 'Birmingham', lat: 52.48, lon: -1.89 }, { name: 'Glasgow', lat: 55.86, lon: -4.25 }, { name: 'Edinburgh', lat: 55.95, lon: -3.18 }, { name: 'Valencia', lat: 39.46, lon: -0.37 }, { name: 'Sevilla', lat: 37.38, lon: -5.98 }, { name: 'Porto', lat: 41.15, lon: -8.62 }, { name: 'Tel Aviv', lat: 32.08, lon: 34.78 }, { name: 'Doha', lat: 25.28, lon: 51.53 }, { name: 'Abu Dhabi', lat: 24.45, lon: 54.37 },
+            /* New additions */
+            { name: 'Salzburg', lat: 47.80, lon: 13.05 }, { name: 'Innsbruck', lat: 47.26, lon: 11.40 }, { name: 'Graz', lat: 47.07, lon: 15.43 }, { name: 'Brno', lat: 49.19, lon: 16.60 }, { name: 'Ostrava', lat: 49.82, lon: 18.26 }, { name: 'Kassa', lat: 48.71, lon: 21.25 }, { name: 'Kolozsvár', lat: 46.77, lon: 23.62 }, { name: 'Temesvár', lat: 45.74, lon: 21.20 }, { name: 'Brassó', lat: 45.64, lon: 25.59 }, { name: 'Várna', lat: 43.21, lon: 27.91 }, { name: 'Burgasz', lat: 42.50, lon: 27.46 }, { name: 'Split', lat: 43.50, lon: 16.44 }, { name: 'Dubrovnik', lat: 42.65, lon: 18.09 }, { name: 'Johannesburg', lat: -26.20, lon: 28.04 }, { name: 'Valletta', lat: 35.89, lon: 14.51 }, { name: 'Nicosia', lat: 35.18, lon: 33.38 }, { name: 'Tbiliszi', lat: 41.71, lon: 44.82 }, { name: 'Jereván', lat: 40.18, lon: 44.50 }, { name: 'Baku', lat: 40.40, lon: 49.86 }, { name: 'Asztana', lat: 51.16, lon: 71.47 }
+        ];
 
         const BACKUP_FEEDS = {
             "Telex": "https://telex.hu/rss", "Index": "https://index.hu/24ora/rss/", "24hu": "https://24.hu/feed/", "Origo": "https://www.origo.hu/contentpartner/rss/hir-cent/origo.xml",
@@ -1289,8 +1328,9 @@
         }
         window.closeDevMenu = function() { el.devMenu.style.display = 'none'; }
         
-        // Open Dev Menu Handler
-        document.querySelector('.brand-wrapper').addEventListener('click', () => {
+        // Open Dev Menu Handler - FIX: Stop Propagation
+        document.querySelector('.brand-wrapper').addEventListener('click', (e) => {
+             e.stopPropagation(); // Prevents bubbling to other elements
              const code = prompt("Fejlesztői kód:");
              if(code === "0000") el.devMenu.style.display = 'flex';
         });
@@ -1505,12 +1545,28 @@
             el.badge.className = `program-badge visible ${state.block.styleClass}`;
             el.badge.textContent = state.block.name;
 
-            let headerHTML = `<div class="provider-identity"><img src="${fav}" class="provider-icon"> ${displaySource}</div><span>${timeStr}</span>`;
+            // Updated Footer HTML structure - Puts items on opposite sides
+            let footerMetaHTML = `<div class="provider-identity"><img src="${fav}" class="provider-icon"> ${displaySource}</div><span>${timeStr}</span>`;
+            
             el.badge.classList.remove('breaking-mode');
+            
+            // Éjszakai jelző (Bal oldal)
+            let extraLabel = '';
             if(state.block.type === 'summary_yesterday') {
-                headerHTML += `<span class="night-summary-label visible">AZ ELŐZŐ NAP HÍREINEK ÖSSZEFOGLALÓJA</span>`;
+                extraLabel = `<span class="night-summary-label visible">AZ ELŐZŐ NAP HÍREI</span>`;
             }
-            const html = `<div class="news-header-row"><div class="news-meta">${headerHTML}</div></div><div class="news-content-wrapper"><div class="news-title">${item.title}</div><div class="news-desc">${item.desc}</div></div>`;
+
+            // New Layout: Title Top, Desc Middle, Meta Bottom
+            const html = `
+                <div class="news-content-wrapper">
+                    <div class="news-title">${item.title}</div>
+                    <div class="news-desc">${item.desc}</div>
+                    <div class="news-footer-row">
+                        ${extraLabel}
+                        <div class="news-meta">${footerMetaHTML}</div>
+                    </div>
+                </div>`;
+            
             nextTrack.innerHTML = html;
             nextTrack.classList.remove('breaking');
             if(item.img) { el.bgImg.src = item.img; el.newsBg.parentElement.classList.add('has-image'); } else { el.newsBg.parentElement.classList.remove('has-image'); }
