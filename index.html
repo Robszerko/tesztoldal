@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V146 (Traffic Alert System)</title>
+    <title>Aurora News Ticker - V152 (Time Fusion Edition)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -22,17 +22,19 @@
             --bg-grad-2: #1e293b;
             --bg-grad-3: #0f172a;
             
-            /* Sharp UI - No Blur, High Contrast */
+            /* Sharp UI */
             --panel-bg: rgba(6, 10, 25, 0.96); 
+            --panel-gradient: linear-gradient(160deg, #1e293b 0%, #0f172a 60%, #020617 100%);
+            
             --panel-border: rgba(255, 255, 255, 0.12);
-            --panel-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
+            --panel-shadow: 0 10px 40px -5px rgba(2, 6, 23, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
             
             --text-main: #ffffff;
             --text-muted: #94a3b8;
             --accent-color: #38bdf8;
             --accent-warm: #fbbf24;
             --accent-danger: #ef4444;
-            --accent-traffic: #f59e0b; /* Amber for Traffic */
+            --accent-traffic: #f59e0b;
             --accent-next: #a855f7; 
             
             --font-head: 'Montserrat', sans-serif;
@@ -92,13 +94,13 @@
 
         /* PREMIUM PANEL DESIGN */
         .glass-panel {
-            background: linear-gradient(160deg, #1e293b 0%, #0f172a 60%, #020617 100%);
+            background: var(--panel-gradient);
             backdrop-filter: none; 
             -webkit-backdrop-filter: none;
             border: 1px solid var(--panel-border); 
             border-top: 1px solid rgba(255,255,255,0.25);
             border-bottom: 1px solid rgba(0,0,0,0.4);
-            box-shadow: 0 10px 40px -5px rgba(2, 6, 23, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+            box-shadow: var(--panel-shadow);
             position: relative;
             perspective: 1000px;
             opacity: 0; transform: scale(0.95);
@@ -134,8 +136,7 @@
         .panel-face {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             backface-visibility: hidden; -webkit-backface-visibility: hidden;
-            display: flex; flex-direction: column; 
-            background: linear-gradient(160deg, #1e293b 0%, #0f172a 60%, #020617 100%);
+            display: flex; flex-direction: column; background: var(--panel-gradient);
         }
         .panel-face.back { transform: rotateX(180deg); display: flex; align-items: center; justify-content: center; }
 
@@ -259,7 +260,6 @@
         
         .provider-identity { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 15px; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
         .provider-icon { width: 16px; height: 16px; border-radius: 50%; }
-        /* Traffic Icon Style */
         .traffic-icon-svg { width: 16px; height: 16px; fill: var(--accent-warm); }
 
         .news-image-overlay { 
@@ -288,7 +288,6 @@
             transition: opacity 0.5s; z-index: 10; opacity: 0; 
         }
         .program-badge.visible { opacity: 1; }
-        /* Traffic Badge Override */
         .badge-traffic { background: rgba(180, 83, 9, 0.98) !important; border-color: #fcd34d !important; color: #fef3c7 !important; }
 
         /* Color Classes */
@@ -314,10 +313,20 @@
         .gb-title { font-family: var(--font-head); font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 4px; text-align: center; }
         
         /* BIG CLOCK */
-        .big-clock-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #020617 100%); z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        .big-clock-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #020617 100%); z-index: 60; display: flex; flex-direction: row; gap: 30px; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         .big-clock-layer.active { opacity: 1; pointer-events: all; }
+        .bc-digital-wrapper { display: flex; flex-direction: column; align-items: center; }
         .bc-time { font-family: var(--font-mono); font-size: 4.5rem; font-weight: 700; color: #fff; letter-spacing: -2px; animation: breathe 4s infinite ease-in-out; text-shadow: 0 0 20px rgba(56, 189, 248, 0.3); margin-bottom: 5px; font-variant-numeric: tabular-nums; }
         .bc-label { color: var(--accent-warm); font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; margin-top: 15px; font-weight: 600; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
+        
+        /* ANALOG CLOCK - "TIME FUSION" STYLE */
+        .analog-clock { width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.8); background: rgba(0,0,0,0.4); position: relative; box-shadow: 0 0 25px rgba(56, 189, 248, 0.2); backdrop-filter: blur(5px); }
+        .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; background: #fff; border-radius: 4px; box-shadow: 0 0 5px rgba(255,255,255,0.5); }
+        .hand.hour { width: 4px; height: 35px; margin-left: -2px; }
+        .hand.minute { width: 3px; height: 48px; margin-left: -1.5px; opacity: 0.9; }
+        .hand.second { width: 1px; height: 52px; margin-left: -0.5px; background: var(--accent-danger); box-shadow: none; }
+        .center-dot { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 5px rgba(255,255,255,0.8); }
+        .hour-mark { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; justify-content: center; padding-top: 4px; font-family: var(--font-serif); font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.8); pointer-events: none; }
         
         /* --- CONTROLS BAR (SHARP) --- */
         .controls-bar { 
@@ -467,6 +476,24 @@
             text-align: center; margin-top: auto; padding-bottom: 5px; width: 100%; font-weight: 400;
         }
 
+        /* --- WEATHER LOADER (RADAR STYLE) --- */
+        #weather-loading-state {
+            display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%;
+        }
+        #weather-loading-state.active { display: flex; }
+        
+        .radar-spinner {
+            width: 50px; height: 50px; border-radius: 50%;
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            border-top-color: var(--accent-color);
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+        .loading-text {
+            font-size: 0.6rem; font-weight: 700; color: var(--accent-warm); 
+            animation: pulseText 1.5s infinite; letter-spacing: 1px;
+        }
+
         /* --- SCHEDULE --- */
         .schedule-view { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 35px 55px 5px 15px; justify-content: flex-start; }
         .schedule-list { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; justify-content: flex-start; }
@@ -532,8 +559,13 @@
     <!-- DEV MENU -->
     <div id="dev-menu">
         <h3>Fejlesztői Menü</h3>
-        <button class="dev-btn" onclick="window.triggerTestBreaking()">Teszt: Rövid Hír</button>
-        <button class="dev-btn" onclick="window.triggerTestBreakingLong()">Teszt: Hosszú Hír</button>
+        <button class="dev-btn" onclick="window.triggerTestBreaking()">Teszt: Rövid Hír (Breaking)</button>
+        <button class="dev-btn" onclick="window.triggerTestBreakingLong()">Teszt: Hosszú Hír (Breaking)</button>
+        <button class="dev-btn" style="border-color: #f59e0b; color: #f59e0b;" onclick="window.triggerTestTraffic()">Teszt: Közlekedési Hír</button>
+        <button class="dev-btn" style="border-color: #fbbf24; color: #fbbf24;" onclick="window.triggerEconomyTest()">Teszt: Árfolyam Panel</button>
+        <!-- NEW BUTTON -->
+        <button class="dev-btn" style="border-color: #a855f7; color: #a855f7;" onclick="window.triggerHourChangeTest()">Teszt: Óraváltás (Analóg)</button>
+        
         <button class="dev-btn" onclick="window.location.reload()">Újratöltés</button>
         <button class="dev-btn dev-close" onclick="window.closeDevMenu()">Bezárás</button>
     </div>
@@ -607,6 +639,12 @@
                                     <div class="eco-item"><div class="eco-curr"><img src="https://flagcdn.com/w20/cn.png" class="eco-flag"> CNY</div><div class="eco-val" id="rate-cny">---.-- Ft</div></div>
                                     <div class="eco-item"><div class="eco-curr"><img src="https://flagcdn.com/w20/tr.png" class="eco-flag"> TRY</div><div class="eco-val" id="rate-try">---.-- Ft</div></div>
                                 </div>
+                                <!-- NEW 5TH SLIDE -->
+                                <div class="eco-slide" id="eco-slide-4">
+                                    <div class="eco-item"><div class="eco-curr"><img src="https://flagcdn.com/w20/se.png" class="eco-flag"> SEK</div><div class="eco-val" id="rate-sek">---.-- Ft</div></div>
+                                    <div class="eco-item"><div class="eco-curr"><img src="https://flagcdn.com/w20/no.png" class="eco-flag"> NOK</div><div class="eco-val" id="rate-nok">---.-- Ft</div></div>
+                                    <div class="eco-item"><div class="eco-curr"><img src="https://flagcdn.com/w20/dk.png" class="eco-flag"> DKK</div><div class="eco-val" id="rate-dkk">---.-- Ft</div></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -627,8 +665,31 @@
             <div class="loading-overlay" id="loading-overlay"></div>
             
             <div class="big-clock-layer" id="big-clock-layer">
-                <div class="bc-time" id="bc-time-display">00:00:00</div>
-                <div class="bc-label"></div>
+                <!-- UPDATED BIG CLOCK LAYOUT -->
+                <div class="bc-digital-wrapper">
+                    <div class="bc-time" id="bc-time-display">00:00:00</div>
+                    <div class="bc-label"></div>
+                </div>
+                <!-- ANALOG CLOCK - "TIME FUSION" -->
+                <div class="analog-clock">
+                    <div class="hour-mark" style="transform: rotate(0deg)">XII</div>
+                    <div class="hour-mark" style="transform: rotate(30deg); content: ''; width: 2px; background: rgba(255,255,255,0.3); height: 6px; top: 2px;"></div>
+                    <div class="hour-mark" style="transform: rotate(60deg); content: ''; width: 2px; background: rgba(255,255,255,0.3); height: 6px; top: 2px;"></div>
+                    <div class="hour-mark" style="transform: rotate(90deg)">III</div>
+                    <div class="hour-mark" style="transform: rotate(120deg); content: ''; width: 2px; background: rgba(255,255,255,0.3); height: 6px; top: 2px;"></div>
+                    <div class="hour-mark" style="transform: rotate(150deg); content: ''; width: 2px; background: rgba(255,255,255,0.3); height: 6px; top: 2px;"></div>
+                    <div class="hour-mark" style="transform: rotate(180deg)">VI</div>
+                    <div class="hour-mark" style="transform: rotate(210deg); content: ''; width: 2px; background: rgba(255,255,255,0.3); height: 6px; top: 2px;"></div>
+                    <div class="hour-mark" style="transform: rotate(240deg); content: ''; width: 2px; background: rgba(255,255,255,0.3); height: 6px; top: 2px;"></div>
+                    <div class="hour-mark" style="transform: rotate(270deg)">IX</div>
+                    <div class="hour-mark" style="transform: rotate(300deg); content: ''; width: 2px; background: rgba(255,255,255,0.3); height: 6px; top: 2px;"></div>
+                    <div class="hour-mark" style="transform: rotate(330deg); content: ''; width: 2px; background: rgba(255,255,255,0.3); height: 6px; top: 2px;"></div>
+                    
+                    <div class="hand hour" id="clock-hand-hour"></div>
+                    <div class="hand minute" id="clock-hand-minute"></div>
+                    <div class="hand second" id="clock-hand-second"></div>
+                    <div class="center-dot"></div>
+                </div>
             </div>
 
             <div class="goodbye-card" id="goodbye-card">
@@ -650,7 +711,7 @@
 
             <div class="progress-line-container"><div id="progress-bar" class="progress-line"></div></div>
 
-            <!-- SIMPLIFIED CONTROLS BAR V145 (Solid & Sharp) -->
+            <!-- SIMPLIFIED CONTROLS BAR V151 -->
             <div class="controls-bar" id="controls-bar-main">
                 <!-- Normal Content -->
                 <div class="controls-normal-content" id="controls-normal">
@@ -688,26 +749,33 @@
                 <div class="panel-face">
                      <div class="weather-header-container">
                         <div class="weather-location-header">
-                            <span class="wlh-loc" id="weather-loc-name">NYÍREGYHÁZA</span>
+                            <span class="wlh-loc" id="weather-loc-name">IDŐJÁRÁS KÖZPONT</span>
                         </div>
                     </div>
                     <div class="weather-view">
-                        <div class="weather-main">
-                            <div class="weather-main-left">
-                                <div class="weather-icon-big" id="weather-icon-slot"></div>
-                            </div>
-                            <div class="weather-main-right">
-                                <div class="weather-temp-big" id="weather-temp">--°</div>
-                                <div class="weather-feels" id="weather-feels"></div>
-                            </div>
+                         <div id="weather-loading-state" class="active">
+                            <div class="radar-spinner"></div>
+                            <div class="loading-text">ADATOK LETÖLTÉSE...</div>
                         </div>
-                        <div class="weather-details-list">
-                            <div class="wd-row"><span>Pára</span><span class="wd-val" id="wd-hum">--%</span></div>
-                            <div class="wd-row"><span>Szél</span><span class="wd-val" id="wd-wind">--</span></div>
-                            <div class="wd-row"><span>Nyomás</span><span class="wd-val" id="wd-press">-- hPa</span></div>
+
+                        <div id="weather-data-container" style="opacity: 0; transition: opacity 0.5s;">
+                            <div class="weather-main">
+                                <div class="weather-main-left">
+                                    <div class="weather-icon-big" id="weather-icon-slot"></div>
+                                </div>
+                                <div class="weather-main-right">
+                                    <div class="weather-temp-big" id="weather-temp">--°</div>
+                                    <div class="weather-feels" id="weather-feels"></div>
+                                </div>
+                            </div>
+                            <div class="weather-details-list">
+                                <div class="wd-row"><span>Pára</span><span class="wd-val" id="wd-hum">--%</span></div>
+                                <div class="wd-row"><span>Szél</span><span class="wd-val" id="wd-wind">--</span></div>
+                                <div class="wd-row"><span>Nyomás</span><span class="wd-val" id="wd-press">-- hPa</span></div>
+                            </div>
+                            <!-- Footer Time -->
+                            <div class="weather-footer-time" id="weather-loc-time">Frissítve: --:--:--</div>
                         </div>
-                        <!-- Footer Time -->
-                        <div class="weather-footer-time" id="weather-loc-time">Frissítve: --:--:--</div>
                     </div>
                 </div>
                 <div class="panel-face back">
@@ -749,8 +817,6 @@
         const WUNDERGROUND_API_KEY = "e1f10a1e78da46f5b10a1e78da96f525"; 
         const NYIREGYHAZA_COORDS = { lat: 47.95, lon: 21.71 };
         
-        const AV_KEYS = ['4E5FW0E8H9BOEZS3', 'YP3VYIF03PGIM0ND', 'DHP4BBF68UVU0I3L'];
-        
         const ICONS = {
             CLEAR: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-warm)" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
             CLEAR_NIGHT: `<svg viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`,
@@ -778,12 +844,17 @@
         
         const HUNGARIAN_CITIES_OM = [ 
             { name: 'Debrecen', lat: 47.53, lon: 21.62 }, { name: 'Miskolc', lat: 48.10, lon: 20.78 }, { name: 'Szombathely', lat: 47.23, lon: 16.62 }, { name: 'Győr', lat: 47.68, lon: 17.63 }, { name: 'Pécs', lat: 46.07, lon: 18.23 }, { name: 'Szeged', lat: 46.25, lon: 20.15 }, { name: 'Eger', lat: 47.90, lon: 20.37 }, { name: 'Veszprém', lat: 47.09, lon: 17.91 }, { name: 'Zalaegerszeg', lat: 46.84, lon: 16.84 }, { name: 'Békéscsaba', lat: 46.68, lon: 21.09 }, { name: 'Kaposvár', lat: 46.36, lon: 17.79 }, { name: 'Tatabánya', lat: 47.57, lon: 18.40 }, { name: 'Salgótarján', lat: 48.10, lon: 19.80 }, { name: 'Szekszárd', lat: 46.35, lon: 18.70 }, { name: 'Sopron', lat: 47.68, lon: 16.58 }, { name: 'Hódmezővásárhely', lat: 46.43, lon: 20.32 }, { name: 'Nagykanizsa', lat: 46.45, lon: 16.99 }, { name: 'Dunaújváros', lat: 46.96, lon: 18.93 }, { name: 'Érd', lat: 47.38, lon: 18.91 }, { name: 'Szolnok', lat: 47.18, lon: 20.20 }, { name: 'Kecskemét', lat: 46.88, lon: 19.64 }, { name: 'Baja', lat: 46.18, lon: 18.95 }, { name: 'Cegléd', lat: 47.17, lon: 19.80 }, { name: 'Vác', lat: 47.78, lon: 19.13 }, { name: 'Gödöllő', lat: 47.60, lon: 19.35 }, { name: 'Ózd', lat: 48.22, lon: 20.29 }, { name: 'Pápa', lat: 47.33, lon: 17.47 }, { name: 'Gyula', lat: 46.65, lon: 21.28 }, { name: 'Hajdúböszörmény', lat: 47.67, lon: 21.51 }, { name: 'Nyíregyháza', lat: 47.95, lon: 21.71 }, { name: 'Balatonfüred', lat: 46.96, lon: 17.89 }, { name: 'Keszthely', lat: 46.76, lon: 17.24 }, { name: 'Siófok', lat: 46.90, lon: 18.05 }, { name: 'Komárom', lat: 47.74, lon: 18.11 }, { name: 'Esztergom', lat: 47.79, lon: 18.74 }, { name: 'Tata', lat: 47.65, lon: 18.31 }, { name: 'Mohács', lat: 45.99, lon: 18.68 }, { name: 'Paks', lat: 46.62, lon: 18.86 }, { name: 'Kalocsa', lat: 46.53, lon: 18.98 }, { name: 'Kiskunfélegyháza', lat: 46.71, lon: 19.85 }, { name: 'Jászberény', lat: 47.50, lon: 19.91 }, { name: 'Hatvan', lat: 47.66, lon: 19.67 }, { name: 'Gyöngyös', lat: 47.78, lon: 19.93 }, { name: 'Kazincbarcika', lat: 48.25, lon: 20.62 }, { name: 'Sátoraljaújhely', lat: 48.40, lon: 21.65 }, { name: 'Kisvárda', lat: 48.22, lon: 22.08 }, { name: 'Mátészalka', lat: 47.95, lon: 22.32 }, { name: 'Makó', lat: 46.22, lon: 20.47 }, { name: 'Szentes', lat: 46.65, lon: 20.26 }, { name: 'Orosháza', lat: 46.57, lon: 20.66 }, { name: 'Karcag', lat: 47.31, lon: 20.93 }, { name: 'Hajdúszoboszló', lat: 47.45, lon: 21.39 }, { name: 'Törökszentmiklós', lat: 47.17, lon: 20.41 }, { name: 'Gyál', lat: 47.38, lon: 19.22 }, { name: 'Dunakeszi', lat: 47.64, lon: 19.14 }, { name: 'Budaörs', lat: 47.46, lon: 18.96 }, { name: 'Szentendre', lat: 47.66, lon: 19.07 }, { name: 'Szigetszentmiklós', lat: 47.34, lon: 19.05 }, { name: 'Mosonmagyaróvár', lat: 47.87, lon: 17.27 }, { name: 'Bicske', lat: 47.49, lon: 18.63 }, { name: 'Monor', lat: 47.35, lon: 19.45 }, { name: 'Mezőkövesd', lat: 47.81, lon: 20.57 }, { name: 'Tiszaújváros', lat: 47.92, lon: 21.05 }, { name: 'Sárospatak', lat: 48.32, lon: 21.57 },
-            { name: 'Kőszeg', lat: 47.38, lon: 16.54 }, { name: 'Sárvár', lat: 47.25, lon: 16.93 }, { name: 'Tapolca', lat: 46.88, lon: 17.43 }, { name: 'Hévíz', lat: 46.79, lon: 17.18 }, { name: 'Balatonboglár', lat: 46.77, lon: 17.65 }, { name: 'Fonyód', lat: 46.74, lon: 17.55 }, { name: 'Pápoc', lat: 47.42, lon: 17.13 }, { name: 'Zirc', lat: 47.26, lon: 17.87 }, { name: 'Mór', lat: 47.37, lon: 18.20 }, { name: 'Gárdony', lat: 47.19, lon: 18.60 }, { name: 'Velence', lat: 47.24, lon: 18.65 }, { name: 'Abony', lat: 47.19, lon: 20.00 }, { name: 'Nagykáta', lat: 47.41, lon: 19.74 }, { name: 'Gyömrő', lat: 47.42, lon: 19.39 }, { name: 'Pécel', lat: 47.49, lon: 19.34 }, { name: 'Üllő', lat: 47.38, lon: 19.35 }, { name: 'Vecsés', lat: 47.40, lon: 19.26 }, { name: 'Törökbálint', lat: 47.43, lon: 18.91 }, { name: 'Biatorbágy', lat: 47.47, lon: 18.82 }, { name: 'Budakeszi', lat: 47.51, lon: 18.93 }
+            /* New additions */
+            { name: 'Kőszeg', lat: 47.38, lon: 16.54 }, { name: 'Sárvár', lat: 47.25, lon: 16.93 }, { name: 'Tapolca', lat: 46.88, lon: 17.43 }, { name: 'Hévíz', lat: 46.79, lon: 17.18 }, { name: 'Balatonboglár', lat: 46.77, lon: 17.65 }, { name: 'Fonyód', lat: 46.74, lon: 17.55 }, { name: 'Pápoc', lat: 47.42, lon: 17.13 }, { name: 'Zirc', lat: 47.26, lon: 17.87 }, { name: 'Mór', lat: 47.37, lon: 18.20 }, { name: 'Gárdony', lat: 47.19, lon: 18.60 }, { name: 'Velence', lat: 47.24, lon: 18.65 }, { name: 'Abony', lat: 47.19, lon: 20.00 }, { name: 'Nagykáta', lat: 47.41, lon: 19.74 }, { name: 'Gyömrő', lat: 47.42, lon: 19.39 }, { name: 'Pécel', lat: 47.49, lon: 19.34 }, { name: 'Üllő', lat: 47.38, lon: 19.35 }, { name: 'Vecsés', lat: 47.40, lon: 19.26 }, { name: 'Törökbálint', lat: 47.43, lon: 18.91 }, { name: 'Biatorbágy', lat: 47.47, lon: 18.82 }, { name: 'Budakeszi', lat: 47.51, lon: 18.93 },
+            /* V148 Additions */
+            { name: 'Harkány', lat: 45.85, lon: 18.23 }, { name: 'Zalakaros', lat: 46.56, lon: 17.12 }, { name: 'Bükfürdő', lat: 47.38, lon: 16.75 }, { name: 'Egerszalók', lat: 47.88, lon: 20.32 }, { name: 'Demjén', lat: 47.83, lon: 20.33 }, { name: 'Poroszló', lat: 47.65, lon: 20.65 }, { name: 'Tiszafüred', lat: 47.62, lon: 20.75 }, { name: 'Abádszalók', lat: 47.47, lon: 20.59 }, { name: 'Szarvas', lat: 46.86, lon: 20.55 }, { name: 'Gyopárosfürdő', lat: 46.57, lon: 20.63 }, { name: 'Siklós', lat: 45.85, lon: 18.30 }, { name: 'Szigetvár', lat: 46.05, lon: 17.80 }, { name: 'Soltvadkert', lat: 46.58, lon: 19.39 }, { name: 'Kiskőrös', lat: 46.62, lon: 19.28 }, { name: 'Lillafüred', lat: 48.10, lon: 20.62 }, { name: 'Szilvásvárad', lat: 48.10, lon: 20.39 }, { name: 'Hollókő', lat: 47.99, lon: 19.58 }, { name: 'Tokaj', lat: 48.12, lon: 21.41 }, { name: 'Villány', lat: 45.87, lon: 18.45 }, { name: 'Badacsony', lat: 46.79, lon: 17.50 }
         ];
 
+        // Expanded Foreign Cities List (+20 New)
         const FOREIGN_CITIES = [ 
             { name: 'London', lat: 51.50, lon: -0.12 }, { name: 'New York', lat: 40.71, lon: -74.00 }, { name: 'Tokió', lat: 35.68, lon: 139.69 }, { name: 'Peking', lat: 39.90, lon: 116.40 }, { name: 'Moszkva', lat: 55.75, lon: 37.61 }, { name: 'Sydney', lat: -33.86, lon: 151.20 }, { name: 'Párizs', lat: 48.85, lon: 2.35 }, { name: 'Berlin', lat: 52.52, lon: 13.40 }, { name: 'Róma', lat: 41.90, lon: 12.49 }, { name: 'Dubai', lat: 25.20, lon: 55.27 }, { name: 'Isztambul', lat: 41.00, lon: 28.97 }, { name: 'Bécs', lat: 48.20, lon: 16.37 }, { name: 'Los Angeles', lat: 34.05, lon: -118.24 }, { name: 'Madrid', lat: 40.41, lon: -3.70 }, { name: 'Toronto', lat: 43.65, lon: -79.38 }, { name: 'Mumbai', lat: 19.07, lon: 72.87 }, { name: 'Szingapúr', lat: 1.35, lon: 103.81 }, { name: 'Kairó', lat: 30.04, lon: 31.23 }, { name: 'Rio de Janeiro', lat: -22.90, lon: -43.17 }, { name: 'Prága', lat: 50.07, lon: 14.43 }, { name: 'Amszterdam', lat: 52.36, lon: 4.90 }, { name: 'Barcelona', lat: 41.38, lon: 2.17 }, { name: 'Zürich', lat: 47.37, lon: 8.54 }, { name: 'Varsó', lat: 52.22, lon: 21.01 }, { name: 'Bangkok', lat: 13.75, lon: 100.50 }, { name: 'Szöul', lat: 37.56, lon: 126.97 }, { name: 'Mexikóváros', lat: 19.43, lon: -99.13 }, { name: 'Buenos Aires', lat: -34.60, lon: -58.38 }, { name: 'Jakarta', lat: -6.20, lon: 106.84 }, { name: 'Lima', lat: -12.04, lon: -77.04 }, { name: 'Fokváros', lat: -33.92, lon: 18.42 }, { name: 'Helsinki', lat: 60.17, lon: 24.93 }, { name: 'Oslo', lat: 59.91, lon: 10.75 }, { name: 'Stockholm', lat: 59.32, lon: 18.06 }, { name: 'Koppenhága', lat: 55.67, lon: 12.56 }, { name: 'Reykjavik', lat: 64.14, lon: -21.94 }, { name: 'Dublin', lat: 53.34, lon: -6.26 }, { name: 'Lisszabon', lat: 38.72, lon: -9.13 }, { name: 'Athén', lat: 37.98, lon: 23.72 }, { name: 'Ankara', lat: 39.93, lon: 32.85 }, { name: 'Jeruzsálem', lat: 31.76, lon: 35.21 }, { name: 'Újdelhi', lat: 28.61, lon: 77.20 }, { name: 'Chicago', lat: 41.87, lon: -87.62 }, { name: 'San Francisco', lat: 37.77, lon: -122.41 }, { name: 'Vancouver', lat: 49.28, lon: -123.12 }, { name: 'Montreal', lat: 45.50, lon: -73.56 }, { name: 'Sao Paulo', lat: -23.55, lon: -46.63 }, { name: 'Santiago', lat: -33.44, lon: -70.66 }, { name: 'Bogota', lat: 4.71, lon: -74.07 }, { name: 'Casablanca', lat: 33.57, lon: -7.58 }, { name: 'Lagos', lat: 6.52, lon: 3.37 }, { name: 'Nairobi', lat: -1.29, lon: 36.82 }, { name: 'Rijád', lat: 24.71, lon: 46.67 }, { name: 'Teherán', lat: 35.68, lon: 51.38 }, { name: 'Karacsi', lat: 24.86, lon: 67.00 }, { name: 'Sanghaj', lat: 31.23, lon: 121.47 }, { name: 'Oszaka', lat: 34.69, lon: 135.50 }, { name: 'Manila', lat: 14.59, lon: 120.98 }, { name: 'Kuala Lumpur', lat: 3.13, lon: 101.68 }, { name: 'Hanoi', lat: 21.02, lon: 105.83 }, { name: 'Melbourne', lat: -37.81, lon: 144.96 }, { name: 'Auckland', lat: -36.84, lon: 174.76 }, { name: 'Brüsszel', lat: 50.85, lon: 4.35 }, { name: 'Genf', lat: 46.20, lon: 6.14 }, { name: 'München', lat: 48.13, lon: 11.58 }, { name: 'Milánó', lat: 45.46, lon: 9.19 }, { name: 'Nápoly', lat: 40.85, lon: 14.26 }, { name: 'Velence', lat: 45.44, lon: 12.31 }, { name: 'Lyon', lat: 45.76, lon: 4.83 }, { name: 'Marseille', lat: 43.29, lon: 5.36 }, { name: 'Las Vegas', lat: 36.16, lon: -115.13 }, { name: 'Miami', lat: 25.76, lon: -80.19 }, { name: 'Boston', lat: 42.36, lon: -71.05 }, { name: 'Seattle', lat: 47.60, lon: -122.33 }, { name: 'Denver', lat: 39.73, lon: -104.99 }, { name: 'Havanna', lat: 23.11, lon: -82.36 }, { name: 'Panamaváros', lat: 8.98, lon: -79.51 }, { name: 'Caracas', lat: 10.48, lon: -66.90 }, { name: 'La Paz', lat: -16.50, lon: -68.11 }, { name: 'Kijev', lat: 50.45, lon: 30.52 }, { name: 'Minszk', lat: 53.90, lon: 27.56 }, { name: 'Bukarest', lat: 44.42, lon: 26.10 }, { name: 'Belgrád', lat: 44.78, lon: 20.44 }, { name: 'Zágráb', lat: 45.81, lon: 15.98 }, { name: 'Szlovénia', lat: 46.05, lon: 14.50 }, { name: 'Pozsony', lat: 48.14, lon: 17.10 }, { name: 'Krakkó', lat: 50.06, lon: 19.94 }, { name: 'Gdansk', lat: 54.35, lon: 18.64 }, { name: 'Hamburg', lat: 53.55, lon: 9.99 }, { name: 'Frankfurt', lat: 50.11, lon: 8.68 }, { name: 'Köln', lat: 50.93, lon: 6.96 }, { name: 'Stuttgart', lat: 48.77, lon: 9.18 }, { name: 'Manchester', lat: 53.48, lon: -2.24 }, { name: 'Birmingham', lat: 52.48, lon: -1.89 }, { name: 'Glasgow', lat: 55.86, lon: -4.25 }, { name: 'Edinburgh', lat: 55.95, lon: -3.18 }, { name: 'Valencia', lat: 39.46, lon: -0.37 }, { name: 'Sevilla', lat: 37.38, lon: -5.98 }, { name: 'Porto', lat: 41.15, lon: -8.62 }, { name: 'Tel Aviv', lat: 32.08, lon: 34.78 }, { name: 'Doha', lat: 25.28, lon: 51.53 }, { name: 'Abu Dhabi', lat: 24.45, lon: 54.37 },
-            { name: 'Salzburg', lat: 47.80, lon: 13.05 }, { name: 'Innsbruck', lat: 47.26, lon: 11.40 }, { name: 'Graz', lat: 47.07, lon: 15.43 }, { name: 'Brno', lat: 49.19, lon: 16.60 }, { name: 'Ostrava', lat: 49.82, lon: 18.26 }, { name: 'Kassa', lat: 48.71, lon: 21.25 }, { name: 'Kolozsvár', lat: 46.77, lon: 23.62 }, { name: 'Temesvár', lat: 45.74, lon: 21.20 }, { name: 'Brassó', lat: 45.64, lon: 25.59 }, { name: 'Várna', lat: 43.21, lon: 27.91 }, { name: 'Burgasz', lat: 42.50, lon: 27.46 }, { name: 'Split', lat: 43.50, lon: 16.44 }, { name: 'Dubrovnik', lat: 42.65, lon: 18.09 }, { name: 'Johannesburg', lat: -26.20, lon: 28.04 }, { name: 'Valletta', lat: 35.89, lon: 14.51 }, { name: 'Nicosia', lat: 35.18, lon: 33.38 }, { name: 'Tbiliszi', lat: 41.71, lon: 44.82 }, { name: 'Jereván', lat: 40.18, lon: 44.50 }, { name: 'Baku', lat: 40.40, lon: 49.86 }, { name: 'Asztana', lat: 51.16, lon: 71.47 }
+            /* V148 Additions */
+            { name: 'Zakopane', lat: 49.29, lon: 19.94 }, { name: 'Poprad', lat: 49.05, lon: 20.30 }, { name: 'Donovaly', lat: 48.88, lon: 19.22 }, { name: 'Semmering', lat: 47.63, lon: 15.83 }, { name: 'Murau', lat: 47.11, lon: 14.17 }, { name: 'Cortina d\'Ampezzo', lat: 46.54, lon: 12.13 }, { name: 'Chamonix', lat: 45.92, lon: 6.86 }, { name: 'Zermatt', lat: 46.02, lon: 7.74 }, { name: 'St. Moritz', lat: 46.49, lon: 9.83 }, { name: 'Aspen', lat: 39.19, lon: -106.81 }, { name: 'Whistler', lat: 50.11, lon: -122.95 }, { name: 'Banff', lat: 51.17, lon: -115.57 }, { name: 'Queenstown', lat: -45.03, lon: 168.66 }, { name: 'Bariloche', lat: -41.13, lon: -71.30 }, { name: 'Niseko', lat: 42.80, lon: 140.68 }, { name: 'Nagano', lat: 36.64, lon: 138.18 }, { name: 'Sochi', lat: 43.60, lon: 39.73 }, { name: 'Almaty', lat: 43.22, lon: 76.85 }, { name: 'Gudauri', lat: 42.47, lon: 44.48 }, { name: 'Bansko', lat: 41.83, lon: 23.48 }
         ];
 
         const BACKUP_FEEDS = {
@@ -842,6 +913,8 @@
             wdWind: document.getElementById('wd-wind'),
             wdPress: document.getElementById('wd-press'),
             weatherView: document.getElementById('weather-view'),
+            weatherLoading: document.getElementById('weather-loading-state'),
+            weatherDataContainer: document.getElementById('weather-data-container'),
             scheduleView: document.getElementById('schedule-view'),
             scheduleList: document.getElementById('schedule-list-content'),
             promoView: document.getElementById('promo-view'),
@@ -878,7 +951,12 @@
             middlePanel: document.querySelector('.news-panel'),
 
             // Dev Menu
-            devMenu: document.getElementById('dev-menu')
+            devMenu: document.getElementById('dev-menu'),
+            
+            // Clock Hands
+            handHour: document.getElementById('clock-hand-hour'),
+            handMinute: document.getElementById('clock-hand-minute'),
+            handSecond: document.getElementById('clock-hand-second')
         };
 
         let state = {
@@ -910,7 +988,7 @@
             retryInterval: null,
             retryCount: 0, 
             economyVisible: false,
-            economyRates: { EUR: null, USD: null, CHF: null, GBP: null, AUD: null, CAD: null, PLN: null, CZK: null, RON: null, JPY: null, CNY: null, TRY: null },
+            economyRates: { EUR: null, USD: null, CHF: null, GBP: null, AUD: null, CAD: null, PLN: null, CZK: null, RON: null, JPY: null, CNY: null, TRY: null, SEK: null, NOK: null, DKK: null },
             economyKeyIndex: 0,
             economyCarouselInterval: null,
             economySlideIndex: 0,
@@ -982,16 +1060,21 @@
             el.economyContent.classList.add('active');
             state.economySlideIndex = 0;
             updateEconomySlide();
+            
+            if (state.economyCarouselInterval) clearInterval(state.economyCarouselInterval);
+            
             state.economyCarouselInterval = setInterval(() => {
-                state.economySlideIndex = (state.economySlideIndex + 1) % 4;
+                state.economySlideIndex = (state.economySlideIndex + 1) % 5;
                 updateEconomySlide();
             }, 8000); 
+            
             flipPanel('identity', true);
+            
             setTimeout(() => { 
                 flipPanel('identity', false); 
                 state.economyVisible = false;
                 clearInterval(state.economyCarouselInterval);
-            }, 32000); 
+            }, 40000); 
         }
 
         function updateEconomySlide() {
@@ -1002,30 +1085,30 @@
         }
 
         async function fetchExchangeRates() {
-            const currencies = ['EUR', 'USD', 'CHF', 'GBP', 'AUD', 'CAD', 'PLN', 'CZK', 'RON', 'JPY', 'CNY', 'TRY'];
-            for (let i = 0; i < currencies.length; i++) {
-                const curr = currencies[i];
-                let success = false;
-                let attempts = 0;
-                while(!success && attempts < AV_KEYS.length) {
-                    const apiKey = AV_KEYS[state.economyKeyIndex];
-                    try {
-                        const url = `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${curr}&to_currency=HUF&apikey=${apiKey}`;
-                        const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
-                        const data = await res.json();
-                        if(data["Realtime Currency Exchange Rate"]) {
-                            const rate = parseFloat(data["Realtime Currency Exchange Rate"]["5. Exchange Rate"]).toFixed(2);
-                            state.economyRates[curr] = rate;
+            try {
+                // Use Open Exchange Rate API (No Key Required, Fast)
+                const res = await fetch('https://open.er-api.com/v6/latest/HUF');
+                const data = await res.json();
+                
+                if (data && data.rates) {
+                    const currencies = ['EUR', 'USD', 'CHF', 'GBP', 'AUD', 'CAD', 'PLN', 'CZK', 'RON', 'JPY', 'CNY', 'TRY', 'SEK', 'NOK', 'DKK'];
+                    
+                    currencies.forEach(curr => {
+                        if (data.rates[curr]) {
+                            // HUF base, so 1 HUF = X Curr. We need 1 Curr = X HUF (inverse)
+                            const val = 1 / data.rates[curr];
                             const elId = `rate-${curr.toLowerCase()}`;
                             const element = document.getElementById(elId);
-                            if(element) element.textContent = `${rate} Ft`;
-                            success = true;
-                        } else if (data["Note"] || data["Error Message"]) {
-                            state.economyKeyIndex = (state.economyKeyIndex + 1) % AV_KEYS.length;
-                            attempts++;
+                            if (element) {
+                                element.textContent = `${val.toFixed(2)} Ft`;
+                                element.style.color = '#fff';
+                                setTimeout(() => element.style.color = null, 500);
+                            }
                         }
-                    } catch(e) { attempts++; }
+                    });
                 }
+            } catch (e) {
+                console.error("Exchange Rate Error:", e);
             }
         }
 
@@ -1141,6 +1224,13 @@
         function displayWeather() {
             if(state.weatherPlaylist.length === 0 || state.scheduleActive) return;
             if (state.weatherPlaylistIndex >= state.weatherPlaylist.length) { fetchWeatherData(); state.weatherPlaylistIndex = 0; if (state.weatherPlaylist.length === 0) return; }
+            
+            // First run: Hide loader, show data
+            if(el.weatherLoading.classList.contains('active')) {
+                el.weatherLoading.classList.remove('active');
+                el.weatherDataContainer.style.opacity = '1';
+            }
+
             const item = state.weatherPlaylist[state.weatherPlaylistIndex];
             state.weatherPlaylistIndex++;
             el.weatherLocName.textContent = item.name;
@@ -1343,6 +1433,38 @@
                 link: "#"
             });
         }
+
+        // --- TRAFFIC TEST ---
+        window.triggerTestTraffic = function() {
+            el.devMenu.style.display = 'none';
+            const trafficItem = {
+                title: "Baleset az M3-as autópályán - Torlódás várható a kivezetőn",
+                desc: "Két személygépkocsi ütközött össze az M3-as autópálya fővárosból kivezető szakaszán, a 12-es kilométerszelvénynél. A helyszínelés idejére a külső sávot lezárták, a forgalom a belső sávon halad, torlódásra kell számítani. Kérjük vezessenek óvatosan!",
+                source: "KÖZÚT", 
+                date: new Date(),
+                link: "#",
+                img: "https://images.unsplash.com/photo-1566752003788-b4b60451e045?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+            };
+            state.items.splice(state.currentIndex + 1, 0, trafficItem);
+            clearTimeout(state.flipTimer);
+            showNextItem(true);
+        };
+        
+        // --- ECONOMY TEST ---
+        window.triggerEconomyTest = function() {
+            el.devMenu.style.display = 'none';
+            fetchExchangeRates(); 
+            showEconomy();
+        };
+
+        // --- HOUR CHANGE TEST ---
+        window.triggerHourChangeTest = function() {
+             el.devMenu.style.display = 'none';
+             el.bigClockLayer.classList.add('active');
+             // Set timeout exactly 10s to match real life
+             setTimeout(() => { el.bigClockLayer.classList.remove('active'); }, 10000);
+        };
+
         window.closeDevMenu = function() { el.devMenu.style.display = 'none'; }
         
         // Open Dev Menu Handler - FIX: Stop Propagation
@@ -1363,6 +1485,21 @@
                 if (state.lastRefreshTimestamp < lastCheckpoint) { state.items = []; refreshNews(false); }
             }
         }
+        
+        function updateAnalogClock() {
+            const now = new Date();
+            const sec = now.getSeconds();
+            const min = now.getMinutes();
+            const hour = now.getHours();
+            
+            const secDeg = (sec / 60) * 360;
+            const minDeg = ((min + sec/60) / 60) * 360;
+            const hourDeg = ((hour % 12 + min/60) / 12) * 360;
+            
+            el.handSecond.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
+            el.handMinute.style.transform = `translateX(-50%) rotate(${minDeg}deg)`;
+            el.handHour.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
+        }
 
         function updateTimeAndState() {
             const now = new Date();
@@ -1373,6 +1510,10 @@
             const key = `${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
             if(CALENDAR_DATA.nameDays[key]) el.nameday.textContent = CALENDAR_DATA.nameDays[key].join(', ') + ' névnap';
             updateSkyGradient();
+            
+            // ANALOG CLOCK UPDATE
+            updateAnalogClock();
+            
             const h = now.getHours() + now.getMinutes()/60;
             let currentBlock = THEMATIC_BLOCKS.findLast(b => h >= b.start) || THEMATIC_BLOCKS[THEMATIC_BLOCKS.length-1];
             const min = now.getMinutes();
@@ -1380,7 +1521,12 @@
             const hour = now.getHours();
             if (hour === 23 && min === 59) {
                 if (sec >= 0 && sec < 50) { el.goodbyeCard.classList.add('active'); el.bigClockLayer.classList.remove('active'); } else if (sec >= 50) { el.goodbyeCard.classList.remove('active'); el.bigClockLayer.classList.add('active'); el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); if(sec === 50) showCredits(); }
-            } else if (min === 59 && sec >= 50) { el.bigClockLayer.classList.add('active'); el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); if(sec === 50) showCredits(); } else {
+            } else if (min === 59 && sec >= 50) { 
+                // HOUR CHANGE LOGIC
+                el.bigClockLayer.classList.add('active'); 
+                el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); 
+                if(sec === 50) showCredits(); 
+            } else {
                 if(el.bigClockLayer.classList.contains('active')) { el.bigClockLayer.classList.remove('active'); el.goodbyeCard.classList.remove('active'); if(state.block.type !== 'summary_yesterday') { state.currentIndex = 0; if(state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems = []; } showNextItem(false); } }
             }
             if (!state.block || state.block.name !== currentBlock.name) { state.block = currentBlock; el.badge.className = `program-badge visible ${state.block.styleClass}`; el.badge.textContent = state.block.name; refreshNews(); }
@@ -1559,25 +1705,15 @@
             const timeStr = item.date.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
             nextTrack.classList.remove('night-info');
             
-            // Traffic Check
-            const isTraffic = (displaySource === 'KÖZÚT' || displaySource === 'BKK');
-            
-            if (isTraffic) {
-                el.badge.className = 'program-badge visible badge-traffic';
-                el.badge.textContent = 'KÖZLEKEDÉS';
-                nextTrack.classList.add('traffic-alert');
-            } else {
-                el.badge.className = `program-badge visible ${state.block.styleClass}`;
-                el.badge.textContent = state.block.name;
-                nextTrack.classList.remove('traffic-alert');
-            }
+            el.badge.className = `program-badge visible ${state.block.styleClass}`;
+            el.badge.textContent = state.block.name;
 
-            // Updated Footer HTML structure
-            let iconHtml = isTraffic ? TRAFFIC_ICON : `<img src="${fav}" class="provider-icon">`;
-            let footerMetaHTML = `<div class="provider-identity">${iconHtml} ${displaySource}</div><span>${timeStr}</span>`;
+            // Updated Footer HTML structure - Puts items on opposite sides
+            let footerMetaHTML = `<div class="provider-identity"><img src="${fav}" class="provider-icon"> ${displaySource}</div><span>${timeStr}</span>`;
             
             el.badge.classList.remove('breaking-mode');
             
+            // Éjszakai jelző (Bal oldal)
             let extraLabel = '';
             if(state.block.type === 'summary_yesterday') {
                 extraLabel = `<span class="night-summary-label visible">AZ ELŐZŐ NAP HÍREI</span>`;
