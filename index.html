@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V152 (Time Fusion Edition)</title>
+    <title>Aurora News Ticker - V153 (No-Bleed 3D Fix)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,19 +126,29 @@
         }
         .ticker-container.open .news-panel { flex: 1; opacity: 1; }
 
-        /* --- FLIPPER --- */
+        /* --- FLIPPER FIX (Z-FIGHTING PREVENTION) --- */
         .panel-flipper {
             width: 100%; height: 100%;
             transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d; position: relative;
+            transform-style: preserve-3d; 
+            position: relative;
         }
         .panel-flipper.flipped { transform: rotateX(900deg); }
+        
         .panel-face {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             backface-visibility: hidden; -webkit-backface-visibility: hidden;
-            display: flex; flex-direction: column; background: var(--panel-gradient);
+            display: flex; flex-direction: column; 
+            background: var(--panel-gradient);
+            /* KEY FIX: TranslateZ pushes the face slightly forward to prevent bleed-through */
+            transform: rotateX(0deg) translateZ(1px); 
         }
-        .panel-face.back { transform: rotateX(180deg); display: flex; align-items: center; justify-content: center; }
+        
+        .panel-face.back { 
+            display: flex; align-items: center; justify-content: center;
+            /* KEY FIX: Rotate back face and also push it slightly forward in its local space */
+            transform: rotateX(180deg) translateZ(1px);
+        }
 
         /* --- LEFT PANEL CONTENT --- */
         .id-content { 
@@ -668,7 +678,7 @@
                 <!-- UPDATED BIG CLOCK LAYOUT -->
                 <div class="bc-digital-wrapper">
                     <div class="bc-time" id="bc-time-display">00:00:00</div>
-                    <div class="bc-label"></div>
+                    <div class="bc-label">KÖVETKEZŐ HÍRCSOMAG BETÖLTÉSE...</div>
                 </div>
                 <!-- ANALOG CLOCK - "TIME FUSION" -->
                 <div class="analog-clock">
@@ -711,7 +721,7 @@
 
             <div class="progress-line-container"><div id="progress-bar" class="progress-line"></div></div>
 
-            <!-- SIMPLIFIED CONTROLS BAR V151 -->
+            <!-- SIMPLIFIED CONTROLS BAR V153 (Solid & Sharp) -->
             <div class="controls-bar" id="controls-bar-main">
                 <!-- Normal Content -->
                 <div class="controls-normal-content" id="controls-normal">
@@ -1095,7 +1105,6 @@
                     
                     currencies.forEach(curr => {
                         if (data.rates[curr]) {
-                            // HUF base, so 1 HUF = X Curr. We need 1 Curr = X HUF (inverse)
                             const val = 1 / data.rates[curr];
                             const elId = `rate-${curr.toLowerCase()}`;
                             const element = document.getElementById(elId);
@@ -1705,15 +1714,25 @@
             const timeStr = item.date.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
             nextTrack.classList.remove('night-info');
             
-            el.badge.className = `program-badge visible ${state.block.styleClass}`;
-            el.badge.textContent = state.block.name;
+            // Traffic Check
+            const isTraffic = (displaySource === 'KÖZÚT' || displaySource === 'BKK');
+            
+            if (isTraffic) {
+                el.badge.className = 'program-badge visible badge-traffic';
+                el.badge.textContent = 'KÖZLEKEDÉS';
+                nextTrack.classList.add('traffic-alert');
+            } else {
+                el.badge.className = `program-badge visible ${state.block.styleClass}`;
+                el.badge.textContent = state.block.name;
+                nextTrack.classList.remove('traffic-alert');
+            }
 
-            // Updated Footer HTML structure - Puts items on opposite sides
-            let footerMetaHTML = `<div class="provider-identity"><img src="${fav}" class="provider-icon"> ${displaySource}</div><span>${timeStr}</span>`;
+            // Updated Footer HTML structure
+            let iconHtml = isTraffic ? TRAFFIC_ICON : `<img src="${fav}" class="provider-icon">`;
+            let footerMetaHTML = `<div class="provider-identity">${iconHtml} ${displaySource}</div><span>${timeStr}</span>`;
             
             el.badge.classList.remove('breaking-mode');
             
-            // Éjszakai jelző (Bal oldal)
             let extraLabel = '';
             if(state.block.type === 'summary_yesterday') {
                 extraLabel = `<span class="night-summary-label visible">AZ ELŐZŐ NAP HÍREI</span>`;
