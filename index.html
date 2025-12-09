@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V153 (No-Bleed 3D Fix)</title>
+    <title>Aurora News Ticker - V155 (Weather Fix & Smart Layout)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -140,13 +140,11 @@
             backface-visibility: hidden; -webkit-backface-visibility: hidden;
             display: flex; flex-direction: column; 
             background: var(--panel-gradient);
-            /* KEY FIX: TranslateZ pushes the face slightly forward to prevent bleed-through */
             transform: rotateX(0deg) translateZ(1px); 
         }
         
         .panel-face.back { 
             display: flex; align-items: center; justify-content: center;
-            /* KEY FIX: Rotate back face and also push it slightly forward in its local space */
             transform: rotateX(180deg) translateZ(1px);
         }
 
@@ -210,21 +208,77 @@
         }
         .news-card {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; justify-content: flex-start;
-            padding: 15px 20px 35px 20px; 
-            gap: 0; opacity: 0; visibility: hidden; transform: translateY(15px);
+            display: flex; flex-direction: row; /* Split View */
+            justify-content: flex-start;
+            padding: 35px 20px 35px 20px; /* INCREASED TOP PADDING FOR BADGE */
+            gap: 20px; 
+            opacity: 0; visibility: hidden; transform: translateY(15px);
             transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
         .news-card.visible { opacity: 1; visibility: visible; transform: translateY(0); }
         
         .news-content-wrapper { 
-            flex: 1 1 auto; display: flex; flex-direction: column; justify-content: flex-start; 
+            flex: 1 1 auto; 
+            display: flex; flex-direction: column; justify-content: flex-start; 
             min-height: 0; gap: 6px; 
             background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.8) 50%, rgba(15, 23, 42, 0.4) 100%);
-            padding: 10px 15px 5px 10px; border-radius: 8px; margin-left: -10px; margin-right: -5px;
+            padding: 10px 15px 5px 10px; border-radius: 8px; margin-left: -10px; 
             height: 100%; position: relative; transition: border 0.3s;
+            width: 100%;
+            max-width: 100%;
+            transition: max-width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* --- VISUAL COLUMN (Slide-in) --- */
+        .news-visual-column {
+            position: relative;
+            width: 280px; /* Fixed proportional width */
+            flex-shrink: 0;
+            height: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            transform: translateX(120%); /* Start off-screen */
+            transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: 15;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.15);
+            background: #0f172a;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Slide-in Action */
+        .news-card.visible .news-visual-column.slide-in { transform: translateX(0); }
+
+        /* Responsive Text Sizing when visual is present */
+        .news-card.has-visual .news-content-wrapper {
+            max-width: calc(100% - 300px); 
+        }
+
+        /* MOBILE/TABLET: HIDE IMAGE TO PRIORITIZE TEXT */
+        @media (max-width: 850px) {
+            .news-visual-column { display: none !important; }
+            .news-card.has-visual .news-content-wrapper { max-width: 100% !important; }
+            .news-card { padding-top: 40px !important; } /* Ensure space for badge */
         }
         
+        .news-visual-image {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        .visual-fallback {
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+            text-align: center; color: #fff; padding: 10px;
+        }
+        .visual-fallback svg, .visual-fallback img.vf-icon { 
+            width: 60px; height: 60px; 
+            filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.4));
+        }
+        .visual-fallback span { 
+            font-family: var(--font-head); font-weight: 800; 
+            font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--accent-color);
+        }
+
         /* TRAFFIC HIGHLIGHT */
         .news-card.traffic-alert .news-content-wrapper {
             background: linear-gradient(90deg, rgba(69, 26, 3, 0.95) 0%, rgba(124, 45, 18, 0.8) 50%, rgba(69, 26, 3, 0.4) 100%);
@@ -238,7 +292,7 @@
             width: 100%; 
             z-index: 5; 
             padding-bottom: 5px;
-            padding-right: 140px; 
+            padding-right: 5px; 
             margin-top: 0;
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
         }
@@ -272,30 +326,26 @@
         .provider-icon { width: 16px; height: 16px; border-radius: 50%; }
         .traffic-icon-svg { width: 16px; height: 16px; fill: var(--accent-warm); }
 
-        .news-image-overlay { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            mask-image: linear-gradient(to right, rgba(0,0,0,0.3) 0%, black 50%); 
-            opacity: 0; transition: opacity 1s ease; pointer-events: none; z-index: 1; 
-        }
-        .news-image-overlay img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0%) contrast(1.1); }
-        .news-panel.has-image .news-image-overlay { opacity: 0.75; } 
-        .default-news-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; opacity: 0; transition: opacity 1s ease; }
-        .news-panel:not(.has-image) .default-news-bg { opacity: 1; }
+        /* Legacy Background - Dimmed heavily */
+        .default-news-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; opacity: 1; transition: opacity 1s ease; }
         .dnb-gradient { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top right, #1e3a8a, #0f172a 70%, #020617); }
         .dnb-world-map { position: absolute; top: 5%; right: -5%; width: 70%; height: 80%; background-image: radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px); background-size: 20px 20px; mask-image: radial-gradient(circle, black 30%, transparent 80%); transform: rotate(-10deg); }
         .dnb-watermark { position: absolute; top: 50%; left: 70%; transform: translate(-50%, -50%); opacity: 0.04; pointer-events: none; }
         .dnb-watermark svg { width: 400px; height: 400px; fill: #fff; }
         .dnb-text-strip { position: absolute; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: space-around; transform: rotate(-3deg); opacity: 0.05; font-family: var(--font-head); font-weight: 900; font-size: 4.5rem; color: #fff; white-space: nowrap; letter-spacing: 5px; }
 
-        /* --- THEMATIC BADGES --- */
+        /* --- THEMATIC BADGES (MOVED TO TOP LEFT) --- */
         .program-badge { 
-            position: absolute; top: 12px; right: 12px; 
+            position: absolute; 
+            top: 0; left: 0; /* MOVED HERE */
             font-family: var(--font-head); font-size: 0.65rem; font-weight: 800; 
             letter-spacing: 0.5px; text-transform: uppercase; 
-            padding: 3px 8px; border-radius: 4px; 
-            border: 1px solid rgba(255,255,255,0.15); 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            transition: opacity 0.5s; z-index: 10; opacity: 0; 
+            padding: 4px 12px; 
+            border-radius: 8px 0 8px 0; /* Custom corner shape */
+            border-bottom: 1px solid rgba(255,255,255,0.15); 
+            border-right: 1px solid rgba(255,255,255,0.15); 
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+            transition: opacity 0.5s; z-index: 20; opacity: 0; 
         }
         .program-badge.visible { opacity: 1; }
         .badge-traffic { background: rgba(180, 83, 9, 0.98) !important; border-color: #fcd34d !important; color: #fef3c7 !important; }
@@ -316,7 +366,7 @@
             text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
         }
 
-        .news-card.night-info { background: radial-gradient(circle at top left, #312e81, #1e1b4b); border-left: 4px solid #a855f7; alignItems: center; justify-content: center; text-align: center; padding-bottom: 35px; }
+        .news-card.night-info { background: radial-gradient(circle at top left, #312e81, #1e1b4b); border-left: 4px solid #a855f7; alignItems: center; justify-content: center; text-align: center; padding-bottom: 35px; flex-direction: column; }
         .goodbye-card { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, #334155 0%, #020617 100%); opacity: 0; visibility: hidden; transition: opacity 1s; z-index: 100; }
         .goodbye-card.active { opacity: 1; visibility: visible; }
         .gb-moon { font-size: 3rem; margin-bottom: 8px; filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5)); animation: float 6s ease-in-out infinite; }
@@ -711,8 +761,6 @@
                 </div>
             </div>
 
-            <div id="news-bg-image" class="news-image-overlay"><img id="bg-img-element" src="" alt=""></div>
-
             <div class="news-viewport" id="news-viewport">
                 <div id="program-badge" class="program-badge">BETÖLTÉS...</div>
                 <div id="track-a" class="news-card"></div>
@@ -912,8 +960,6 @@
             progressBar: document.getElementById('progress-bar'),
             loading: document.getElementById('loading-overlay'),
             counter: document.getElementById('counter-display'),
-            newsBg: document.getElementById('news-bg-image'),
-            bgImg: document.getElementById('bg-img-element'),
             weatherLocName: document.getElementById('weather-loc-name'),
             weatherLocTime: document.getElementById('weather-loc-time'),
             weatherTemp: document.getElementById('weather-temp'),
@@ -1187,7 +1233,9 @@
         }
 
         async function fetchWeatherData() {
-            const stationKeys = Object.keys(PWS_MAP).sort(() => 0.5 - Math.random()).slice(0, 10);
+            // Priority: PWS
+            const stationKeys = Object.keys(PWS_MAP).sort(() => 0.5 - Math.random()).slice(0, 8);
+            
             const fetchPWS = async (id) => {
                 try {
                     const url = `https://api.weather.com/v2/pws/observations/current?stationId=${id}&format=json&units=m&apiKey=${WUNDERGROUND_API_KEY}&numericPrecision=decimal`;
@@ -1199,8 +1247,9 @@
                         if(obs.metric.temp !== null) {
                              let iconCode = 26;
                              try {
+                                 // Try get icon, but don't fail if it blocks
                                  const wxUrl = `https://api.weather.com/v3/wx/observations/current?geocode=${obs.lat},${obs.lon}&format=json&units=m&language=hu-HU&apiKey=${WUNDERGROUND_API_KEY}`;
-                                 const wxRes = await fetch(wxUrl, { signal: AbortSignal.timeout(2000) });
+                                 const wxRes = await fetch(wxUrl, { signal: AbortSignal.timeout(1500) });
                                  if(wxRes.ok) { const wxData = await wxRes.json(); if(wxData.iconCode !== undefined) iconCode = wxData.iconCode; }
                              } catch(e) {}
                              return { name: PWS_MAP[id] || id, lat: obs.lat, lon: obs.lon, temp: obs.metric.temp, hum: obs.humidity, wind: obs.metric.windSpeed, winddir: obs.metric.winddir, press: obs.metric.pressure, precip: obs.metric.precipRate, ibmIcon: iconCode, updatedAt: new Date(), type: 'PWS' };
@@ -1224,17 +1273,33 @@
                  return results.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
             };
 
-            const [pwsResults, huResults, foreignResults] = await Promise.all([ Promise.allSettled(stationKeys.map(id => fetchPWS(id))), fetchOM(HUNGARIAN_CITIES_OM, 5), fetchOM(FOREIGN_CITIES, 10) ]);
+            // Fetch in parallel
+            const [pwsResults, huResults, foreignResults] = await Promise.all([ 
+                Promise.allSettled(stationKeys.map(id => fetchPWS(id))), 
+                fetchOM(HUNGARIAN_CITIES_OM, 5), 
+                fetchOM(FOREIGN_CITIES, 10) 
+            ]);
+            
             const validPWS = pwsResults.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
             state.weatherPlaylist = [...validPWS, ...huResults, ...foreignResults];
             state.weatherPlaylistIndex = 0;
+
+            // IMMEDIATE DISPLAY FIX: If we have data, show it immediately, don't wait for timer
+            if (state.weatherPlaylist.length > 0 && el.weatherLoading.classList.contains('active')) {
+                displayWeather();
+            }
         }
 
         function displayWeather() {
             if(state.weatherPlaylist.length === 0 || state.scheduleActive) return;
-            if (state.weatherPlaylistIndex >= state.weatherPlaylist.length) { fetchWeatherData(); state.weatherPlaylistIndex = 0; if (state.weatherPlaylist.length === 0) return; }
+            if (state.weatherPlaylistIndex >= state.weatherPlaylist.length) { 
+                // Re-fetch but keep showing last item if needed
+                fetchWeatherData(); 
+                state.weatherPlaylistIndex = 0; 
+                if (state.weatherPlaylist.length === 0) return; 
+            }
             
-            // First run: Hide loader, show data
+            // Force Loading State Off
             if(el.weatherLoading.classList.contains('active')) {
                 el.weatherLoading.classList.remove('active');
                 el.weatherDataContainer.style.opacity = '1';
@@ -1699,7 +1764,6 @@
             const html = `<div class="ni-icon">🌙</div><div class="ni-text">Jelenleg az éjszakai műszak híreit olvasod. Ha friss hír érkezik, az azonnal megjelenik rövid időre.</div><div class="ni-sub">TKP NEWS Éjszakai Ügyelet</div>`;
             nextTrack.innerHTML = html;
             nextTrack.classList.add('night-info'); nextTrack.classList.remove('breaking');
-            el.newsBg.parentElement.classList.remove('has-image');
             currentTrack.classList.remove('visible'); nextTrack.classList.add('visible');
             state.activeTrack = state.activeTrack === 'a' ? 'b' : 'a';
             el.progressBar.classList.remove('animate-progress'); void el.progressBar.offsetWidth; el.progressBar.style.animationDuration = '10s'; el.progressBar.classList.add('animate-progress');
@@ -1738,7 +1802,35 @@
                 extraLabel = `<span class="night-summary-label visible">AZ ELŐZŐ NAP HÍREI</span>`;
             }
 
-            // New Layout: Title Top, Desc Middle, Meta Bottom
+            // --- VISUAL BLOCK CONSTRUCTION (Image or Logo) ---
+            let visualHtml = '';
+            let hasVisual = false;
+            
+            if (item.img) {
+                hasVisual = true;
+                visualHtml = `
+                    <div class="news-visual-column">
+                        <img src="${item.img}" class="news-visual-image" alt="Hír kép">
+                    </div>
+                `;
+            } else {
+                // FALLBACK: Provider Logo & Name
+                hasVisual = true; // Still have a visual block, just not an image
+                let fallbackIcon = isTraffic ? TRAFFIC_ICON : `<img src="${fav}" class="vf-icon">`;
+                visualHtml = `
+                    <div class="news-visual-column">
+                        <div class="visual-fallback">
+                            ${fallbackIcon}
+                            <span>${displaySource}</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Prepare card classes
+            if (hasVisual) { nextTrack.classList.add('has-visual'); } 
+            else { nextTrack.classList.remove('has-visual'); }
+
             const html = `
                 <div class="news-content-wrapper">
                     <div class="news-title">${item.title}</div>
@@ -1747,12 +1839,23 @@
                         ${extraLabel}
                         <div class="news-meta">${footerMetaHTML}</div>
                     </div>
-                </div>`;
+                </div>
+                ${visualHtml}
+            `;
             
             nextTrack.innerHTML = html;
             nextTrack.classList.remove('breaking');
-            if(item.img) { el.bgImg.src = item.img; el.newsBg.parentElement.classList.add('has-image'); } else { el.newsBg.parentElement.classList.remove('has-image'); }
-            currentTrack.classList.remove('visible'); nextTrack.classList.add('visible');
+            
+            // Transition Logic
+            currentTrack.classList.remove('visible'); 
+            nextTrack.classList.add('visible');
+            
+            // Trigger Visual Slide-in with Delay
+            setTimeout(() => {
+                const visualCol = nextTrack.querySelector('.news-visual-column');
+                if(visualCol) visualCol.classList.add('slide-in');
+            }, 600); // Delay for visual flair
+
             state.activeTrack = state.activeTrack === 'a' ? 'b' : 'a';
             el.counter.textContent = `${(state.currentIndex % state.items.length) + 1} / ${state.items.length}`;
             updateTimelineActive();
