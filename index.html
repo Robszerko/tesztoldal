@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V155 (Weather Fix & Smart Layout)</title>
+    <title>Aurora News Ticker - V158 (Weather Fix & Spinning Logo)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -157,11 +157,43 @@
         }
         .brand-wrapper { 
             display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center;
-            padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 5px;
+            padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 2px;
             cursor: pointer; z-index: 50; 
         }
         .brand-logo svg { width: 24px; height: 24px; fill: var(--accent-color); filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.4)); animation: pulseLogo 3s infinite ease-in-out; }
         .brand-name { font-family: var(--font-head); font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        
+        /* NEW LEFT SIDE PROGRAM BADGE */
+        .left-prog-badge {
+            width: 100%;
+            text-align: center;
+            font-family: var(--font-head);
+            font-weight: 800;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: -0.2px;
+            padding: 4px 2px;
+            margin-bottom: 5px;
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis; 
+            color: var(--accent-color);
+            transition: color 0.5s, text-shadow 0.5s;
+            opacity: 0;
+        }
+        .left-prog-badge.visible { opacity: 1; }
+        
+        /* Badge Colors Mapped to Left Panel */
+        .left-prog-badge.badge-night { color: #c7d2fe; text-shadow: 0 0 10px rgba(129, 140, 248, 0.4); }
+        .left-prog-badge.badge-dawn { color: #ffe4e6; text-shadow: 0 0 10px rgba(251, 113, 133, 0.4); }
+        .left-prog-badge.badge-morning { color: #fef3c7; text-shadow: 0 0 10px rgba(252, 211, 77, 0.4); }
+        .left-prog-badge.badge-day { color: #e0f2fe; text-shadow: 0 0 10px rgba(125, 211, 252, 0.4); }
+        .left-prog-badge.badge-noon { color: #fefce8; text-shadow: 0 0 10px rgba(253, 224, 71, 0.4); }
+        .left-prog-badge.badge-afternoon { color: #ccfbf1; text-shadow: 0 0 10px rgba(94, 234, 212, 0.4); }
+        .left-prog-badge.badge-sunset { color: #fae8ff; text-shadow: 0 0 10px rgba(232, 121, 249, 0.4); }
+        .left-prog-badge.badge-evening { color: #f3e8ff; text-shadow: 0 0 10px rgba(192, 132, 252, 0.4); }
+        .left-prog-badge.badge-traffic { color: #fcd34d; text-shadow: 0 0 10px rgba(245, 158, 11, 0.6); }
+
         .clock-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; }
         .clock-display-unified { display: flex; align-items: baseline; gap: 3px; margin-bottom: 4px; }
         .clock-hm { font-family: var(--font-mono); font-size: 1.9rem; font-weight: 700; color: #ffffff; line-height: 1; letter-spacing: -0.5px; text-shadow: 0 4px 8px rgba(0,0,0,0.3); }
@@ -210,8 +242,8 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: row; /* Split View */
             justify-content: flex-start;
-            padding: 35px 20px 35px 20px; /* INCREASED TOP PADDING FOR BADGE */
-            gap: 20px; 
+            padding: 12px 10px 30px 15px;
+            gap: 15px; 
             opacity: 0; visibility: hidden; transform: translateY(15px);
             transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
@@ -229,10 +261,11 @@
             transition: max-width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        /* --- VISUAL COLUMN (Slide-in) --- */
+        /* --- VISUAL COLUMN (Narrower in V157) --- */
         .news-visual-column {
             position: relative;
-            width: 280px; /* Fixed proportional width */
+            /* Reduced width from 340px to 250px */
+            width: 250px; 
             flex-shrink: 0;
             height: 100%;
             border-radius: 8px;
@@ -249,16 +282,15 @@
         /* Slide-in Action */
         .news-card.visible .news-visual-column.slide-in { transform: translateX(0); }
 
-        /* Responsive Text Sizing when visual is present */
+        /* Responsive Text Sizing: Calc(100% - (ImageWidth + Gap + Buffer)) */
         .news-card.has-visual .news-content-wrapper {
-            max-width: calc(100% - 300px); 
+            max-width: calc(100% - 270px); 
         }
 
         /* MOBILE/TABLET: HIDE IMAGE TO PRIORITIZE TEXT */
-        @media (max-width: 850px) {
+        @media (max-width: 950px) {
             .news-visual-column { display: none !important; }
             .news-card.has-visual .news-content-wrapper { max-width: 100% !important; }
-            .news-card { padding-top: 40px !important; } /* Ensure space for badge */
         }
         
         .news-visual-image {
@@ -269,10 +301,17 @@
             display: flex; flex-direction: column; align-items: center; gap: 10px;
             text-align: center; color: #fff; padding: 10px;
         }
-        .visual-fallback svg, .visual-fallback img.vf-icon { 
-            width: 60px; height: 60px; 
+        
+        /* FALLBACK ANIMATION AND LOGO */
+        @keyframes spinGlobe { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        .visual-fallback svg.tkp-globe { 
+            width: 80px; height: 80px; 
+            fill: var(--accent-color);
             filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.4));
+            animation: spinGlobe 20s linear infinite; /* SPIN EFFECT */
         }
+        
         .visual-fallback span { 
             font-family: var(--font-head); font-weight: 800; 
             font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;
@@ -287,7 +326,8 @@
 
         .news-title { 
             flex: 0 0 auto; 
-            font-family: var(--font-head); font-size: 1.15rem; font-weight: 700; line-height: 1.35; color: #fff; 
+            font-family: var(--font-head); font-size: 1.25rem; 
+            font-weight: 700; line-height: 1.3; color: #fff; 
             text-shadow: 0 1px 2px rgba(0,0,0,1); 
             width: 100%; 
             z-index: 5; 
@@ -299,7 +339,8 @@
 
         .news-desc { 
             flex: 1 1 auto; 
-            font-size: 0.88rem; color: #e2e8f0; font-weight: 400; line-height: 1.5; 
+            font-size: 0.95rem; 
+            color: #e2e8f0; font-weight: 400; line-height: 1.5; 
             display: -webkit-box; -webkit-line-clamp: 4; 
             -webkit-box-orient: vertical; overflow: hidden; max-width: 98%; 
             text-shadow: 0 1px 2px rgba(0,0,0,1); z-index: 5; 
@@ -334,32 +375,6 @@
         .dnb-watermark svg { width: 400px; height: 400px; fill: #fff; }
         .dnb-text-strip { position: absolute; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: space-around; transform: rotate(-3deg); opacity: 0.05; font-family: var(--font-head); font-weight: 900; font-size: 4.5rem; color: #fff; white-space: nowrap; letter-spacing: 5px; }
 
-        /* --- THEMATIC BADGES (MOVED TO TOP LEFT) --- */
-        .program-badge { 
-            position: absolute; 
-            top: 0; left: 0; /* MOVED HERE */
-            font-family: var(--font-head); font-size: 0.65rem; font-weight: 800; 
-            letter-spacing: 0.5px; text-transform: uppercase; 
-            padding: 4px 12px; 
-            border-radius: 8px 0 8px 0; /* Custom corner shape */
-            border-bottom: 1px solid rgba(255,255,255,0.15); 
-            border-right: 1px solid rgba(255,255,255,0.15); 
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
-            transition: opacity 0.5s; z-index: 20; opacity: 0; 
-        }
-        .program-badge.visible { opacity: 1; }
-        .badge-traffic { background: rgba(180, 83, 9, 0.98) !important; border-color: #fcd34d !important; color: #fef3c7 !important; }
-
-        /* Color Classes */
-        .badge-night { background: rgba(30, 27, 75, 0.98); border-color: #818cf8; color: #c7d2fe; }
-        .badge-dawn { background: rgba(159, 18, 57, 0.98); border-color: #fb7185; color: #ffe4e6; }
-        .badge-morning { background: rgba(180, 83, 9, 0.98); border-color: #fcd34d; color: #fef3c7; }
-        .badge-day { background: rgba(3, 105, 161, 0.98); border-color: #7dd3fc; color: #e0f2fe; }
-        .badge-noon { background: rgba(161, 98, 7, 0.98); border-color: #fde047; color: #fefce8; }
-        .badge-afternoon { background: rgba(15, 118, 110, 0.98); border-color: #5eead4; color: #ccfbf1; }
-        .badge-sunset { background: rgba(134, 25, 143, 0.98); border-color: #e879f9; color: #fae8ff; }
-        .badge-evening { background: rgba(88, 28, 135, 0.98); border-color: #c084fc; color: #f3e8ff; }
-        
         .night-summary-label { 
             color: var(--accent-warm); font-size: 0.65rem; font-weight: 800; 
             text-transform: uppercase; letter-spacing: 0.5px;
@@ -521,9 +536,19 @@
             background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%);
         }
         .weather-main { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 5px; }
-        .weather-main-left { display: flex; align-items: center; justify-content: center; width: 45%; }
-        .weather-main-right { display: flex; flex-direction: column; align-items: flex-end; width: 55%; }
-        .weather-temp-big { font-family: var(--font-head); font-size: 2.4rem; font-weight: 700; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.15); line-height: 1; }
+        /* Adjusted widths to prevent overlap */
+        .weather-main-left { display: flex; align-items: center; justify-content: center; width: 40%; }
+        .weather-main-right { display: flex; flex-direction: column; align-items: flex-end; width: 60%; }
+        
+        .weather-temp-big { 
+            font-family: var(--font-head); 
+            font-size: 2.0rem; /* Reduced to avoid overlap */
+            font-weight: 700; color: #fff; 
+            text-shadow: 0 0 15px rgba(255,255,255,0.15); 
+            line-height: 1; 
+            white-space: nowrap; /* Keep it on one line */
+        }
+        
         .weather-feels { font-size: 0.65rem; color: var(--accent-warm); text-transform: uppercase; margin-top: 2px; font-weight: 600; }
         .weather-icon-big svg { width: 56px; height: 56px; filter: drop-shadow(0 0 8px rgba(255,255,255,0.3)); }
         .weather-details-list { padding: 5px; background: rgba(0,0,0,0.2); border-radius: 8px; font-size: 0.7rem; display: flex; flex-direction: column; gap: 3px; margin-top: 5px; border: 1px solid rgba(255,255,255,0.05); }
@@ -642,6 +667,9 @@
                             <div class="brand-logo"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
                             <div class="brand-name">TKP NEWS</div>
                         </div>
+                        
+                        <!-- NEW LEFT BADGE LOCATION -->
+                        <div id="left-program-badge" class="left-prog-badge">BETÖLTÉS...</div>
                         
                         <div class="clock-container">
                             <div class="clock-display-unified">
@@ -762,7 +790,7 @@
             </div>
 
             <div class="news-viewport" id="news-viewport">
-                <div id="program-badge" class="program-badge">BETÖLTÉS...</div>
+                <!-- BADGE REMOVED FROM HERE -->
                 <div id="track-a" class="news-card"></div>
                 <div id="track-b" class="news-card"></div>
             </div>
@@ -977,7 +1005,7 @@
             timelineContainer: document.getElementById('timeline-container'),
             newsContainer: document.getElementById('news-container'),
             newsViewport: document.getElementById('news-viewport'),
-            badge: document.getElementById('program-badge'),
+            badge: document.getElementById('left-program-badge'), // UPDATED SELECTOR
             sky: document.getElementById('sky-bg'),
             weatherHeader: document.querySelector('.weather-location-header'),
             idFlipper: document.getElementById('id-flipper'),
@@ -1603,7 +1631,13 @@
             } else {
                 if(el.bigClockLayer.classList.contains('active')) { el.bigClockLayer.classList.remove('active'); el.goodbyeCard.classList.remove('active'); if(state.block.type !== 'summary_yesterday') { state.currentIndex = 0; if(state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems = []; } showNextItem(false); } }
             }
-            if (!state.block || state.block.name !== currentBlock.name) { state.block = currentBlock; el.badge.className = `program-badge visible ${state.block.styleClass}`; el.badge.textContent = state.block.name; refreshNews(); }
+            if (!state.block || state.block.name !== currentBlock.name) { 
+                state.block = currentBlock; 
+                el.badge.textContent = state.block.name;
+                // Add color class
+                el.badge.className = `left-prog-badge visible ${state.block.styleClass}`;
+                refreshNews(); 
+            }
             if(state.block.type === 'summary_yesterday') { el.badge.classList.add('visible'); } else { el.badge.classList.add('visible'); }
             if((min === 0 || min === 20 || min === 40) && sec === 0 && min !== state.lastScheduleMin) { state.lastScheduleMin = min; displaySchedule(); }
             if((min === 12 || min === 32 || min === 52) && sec === 30) { fetchExchangeRates(); }
@@ -1759,7 +1793,7 @@
             state.lastNightInfoTime = Date.now(); 
             const nextTrack = el[state.activeTrack === 'a' ? 'trackB' : 'trackA'];
             const currentTrack = el[state.activeTrack === 'a' ? 'trackA' : 'trackB'];
-            el.badge.className = `program-badge visible ${state.block.styleClass}`;
+            // Keep badge visible on left
             el.badge.textContent = state.block.name;
             const html = `<div class="ni-icon">🌙</div><div class="ni-text">Jelenleg az éjszakai műszak híreit olvasod. Ha friss hír érkezik, az azonnal megjelenik rövid időre.</div><div class="ni-sub">TKP NEWS Éjszakai Ügyelet</div>`;
             nextTrack.innerHTML = html;
@@ -1782,11 +1816,12 @@
             const isTraffic = (displaySource === 'KÖZÚT' || displaySource === 'BKK');
             
             if (isTraffic) {
-                el.badge.className = 'program-badge visible badge-traffic';
+                // Update Left Badge Class
+                el.badge.className = 'left-prog-badge visible badge-traffic';
                 el.badge.textContent = 'KÖZLEKEDÉS';
                 nextTrack.classList.add('traffic-alert');
             } else {
-                el.badge.className = `program-badge visible ${state.block.styleClass}`;
+                el.badge.className = `left-prog-badge visible ${state.block.styleClass}`;
                 el.badge.textContent = state.block.name;
                 nextTrack.classList.remove('traffic-alert');
             }
@@ -1794,8 +1829,6 @@
             // Updated Footer HTML structure
             let iconHtml = isTraffic ? TRAFFIC_ICON : `<img src="${fav}" class="provider-icon">`;
             let footerMetaHTML = `<div class="provider-identity">${iconHtml} ${displaySource}</div><span>${timeStr}</span>`;
-            
-            el.badge.classList.remove('breaking-mode');
             
             let extraLabel = '';
             if(state.block.type === 'summary_yesterday') {
@@ -1814,14 +1847,14 @@
                     </div>
                 `;
             } else {
-                // FALLBACK: Provider Logo & Name
-                hasVisual = true; // Still have a visual block, just not an image
-                let fallbackIcon = isTraffic ? TRAFFIC_ICON : `<img src="${fav}" class="vf-icon">`;
+                // FALLBACK: TKP NEWS Logo with Spinning Globe
+                hasVisual = true; 
                 visualHtml = `
                     <div class="news-visual-column">
                         <div class="visual-fallback">
-                            ${fallbackIcon}
-                            <span>${displaySource}</span>
+                            <!-- TKP Logo SVG -->
+                            <svg class="tkp-globe" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                            <span>TKP NEWS</span>
                         </div>
                     </div>
                 `;
