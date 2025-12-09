@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V158 (Weather Fix & Spinning Logo)</title>
+    <title>Aurora News Ticker - V159 (ATV Fix & Queue Logic)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -756,7 +756,7 @@
                 <!-- UPDATED BIG CLOCK LAYOUT -->
                 <div class="bc-digital-wrapper">
                     <div class="bc-time" id="bc-time-display">00:00:00</div>
-                    <div class="bc-label">KÖVETKEZŐ HÍRCSOMAG BETÖLTÉSE...</div>
+                    <div class="bc-label"></div>
                 </div>
                 <!-- ANALOG CLOCK - "TIME FUSION" -->
                 <div class="analog-clock">
@@ -1005,7 +1005,7 @@
             timelineContainer: document.getElementById('timeline-container'),
             newsContainer: document.getElementById('news-container'),
             newsViewport: document.getElementById('news-viewport'),
-            badge: document.getElementById('left-program-badge'), // UPDATED SELECTOR
+            badge: document.getElementById('left-program-badge'), 
             sky: document.getElementById('sky-bg'),
             weatherHeader: document.querySelector('.weather-location-header'),
             idFlipper: document.getElementById('id-flipper'),
@@ -1080,7 +1080,8 @@
             isTransitioning: false,
             lastRefreshTimestamp: Date.now(),
             breakingActive: false,
-            breakingLink: null
+            breakingLink: null,
+            breakingQueue: [] // NEW QUEUE
         };
 
         // --- UTILITIES ---
@@ -1096,12 +1097,22 @@
             throw new Error('All proxies failed for ' + url);
         }
 
+        // IMPROVED IMAGE EXTRACTION (Fixes ATV and others)
         function extractImageUrl(item, descHtml) {
-            const media = item.querySelector("content, media\\:content");
+            // 1. Check media:content (Standard + ATV often uses this)
+            const media = item.querySelector("media\\:content") || item.querySelector("content");
             if(media && media.getAttribute('url')) return media.getAttribute('url');
+
+            // 2. Check media:thumbnail (Very common in Hungarian feeds like ATV)
+            const thumb = item.querySelector("media\\:thumbnail");
+            if(thumb && thumb.getAttribute('url')) return thumb.getAttribute('url');
+
+            // 3. Check enclosure
             const enclosure = item.querySelector("enclosure");
             if(enclosure && enclosure.getAttribute('type')?.startsWith('image')) return enclosure.getAttribute('url');
-            const match = descHtml.match(/src="([^"]+)"/);
+
+            // 4. Robust Regex for description (Handles single/double quotes, case insensitive)
+            const match = descHtml.match(/<img[^>]+src=["']([^"']+)["']/i);
             return match ? match[1] : null;
         }
 
@@ -1439,9 +1450,10 @@
         }
 
         async function checkBreakingNews() {
-            if(state.breakingActive) return; 
+            // Populate the Queue, but don't run if already checking
             const now = Date.now();
             const threeMinutesAgo = now - (3 * 60 * 1000); 
+            
             for(const [src, url] of Object.entries(BACKUP_FEEDS)) {
                 try {
                     const uniqueUrl = url + (url.includes('?') ? '&' : '?') + 'cB=' + now;
@@ -1449,22 +1461,50 @@
                     const txt = await res.text();
                     const xml = new DOMParser().parseFromString(txt, "text/xml");
                     const items = xml.querySelectorAll("item");
+                    
+                    // Check first 2 items of every feed
                     for(let i=0; i<2; i++) { 
                         const item = items[i]; if(!item) continue;
                         const dateStr = item.querySelector("pubDate")?.textContent;
                         if(!dateStr) continue;
                         const date = new Date(dateStr);
                         const link = item.querySelector("link")?.textContent;
+                        
+                        // If fresh and NOT seen
                         if(date.getTime() > threeMinutesAgo && link && !state.seenBreakingLinks.has(link)) {
                             const title = item.querySelector("title")?.textContent || "";
-                            state.seenBreakingLinks.add(link); 
-                            const breakingItem = { title: title, desc: stripHtml(item.querySelector("description")?.textContent || ""), source: getSourceName(link), date: date, link: link, img: extractImageUrl(item, item.querySelector("description")?.textContent || "") };
-                            activateBreakingBar(breakingItem);
-                            return; 
+                            state.seenBreakingLinks.add(link); // Mark seen immediately
+                            
+                            const breakingItem = { 
+                                title: title, 
+                                desc: stripHtml(item.querySelector("description")?.textContent || ""), 
+                                source: getSourceName(link), 
+                                date: date, 
+                                link: link, 
+                                img: extractImageUrl(item, item.querySelector("description")?.textContent || "") 
+                            };
+                            
+                            // ADD TO QUEUE
+                            state.breakingQueue.push(breakingItem);
                         }
                     }
                 } catch(e) {}
             }
+            
+            // Process queue if we have items and aren't running
+            processBreakingQueue();
+        }
+
+        function processBreakingQueue() {
+            // If already showing breaking news, do nothing (it will call this when done)
+            if(state.breakingActive) return;
+            
+            // If queue is empty, we are done
+            if(state.breakingQueue.length === 0) return;
+            
+            // Get next item
+            const item = state.breakingQueue.shift();
+            activateBreakingBar(item);
         }
 
         function activateBreakingBar(item) {
@@ -1479,14 +1519,20 @@
             el.bpIntroLayer.style.opacity = '1';
             el.bpNewsLayer.style.opacity = '0';
 
+            // ANIMATION SEQUENCE
             setTimeout(() => {
+                // Fade out intro
                 el.bpIntroLayer.style.opacity = '0';
+                
                 setTimeout(() => {
+                    // Fade in news
                     el.bpNewsLayer.style.opacity = '1';
+                    
                     setTimeout(() => {
                         const containerWidth = document.querySelector('.bp-text-scroller').offsetWidth;
                         const textWidth = el.bpText.offsetWidth;
                         let totalDuration = 20000; 
+                        
                         if(textWidth > containerWidth) {
                             const dist = -(textWidth + 20) + "px"; 
                             el.bpText.style.setProperty('--scroll-dist', dist);
@@ -1498,11 +1544,16 @@
                         } else { totalDuration = 12000; }
                         
                         setTimeout(() => {
+                            // End of display
                             el.bpNewsLayer.style.opacity = '0';
                             setTimeout(() => {
                                 el.controlsBar.classList.remove('breaking-active');
-                                state.breakingActive = false;
                                 el.bpText.style.animation = 'none';
+                                
+                                // RESET AND CHECK QUEUE
+                                state.breakingActive = false;
+                                processBreakingQueue(); // <--- RECURSIVE CALL FOR QUEUE
+                                
                             }, 500);
                             
                         }, totalDuration);
@@ -1520,20 +1571,22 @@
         
         // --- DEV MENU FUNCTIONS ---
         window.triggerTestBreaking = function() {
-            activateBreakingBar({
+            state.breakingQueue.push({
                 title: "Ez egy rövid teszt hír.",
                 date: new Date(),
                 source: "TESZT",
                 link: "#"
             });
+            processBreakingQueue();
         }
         window.triggerTestBreakingLong = function() {
-            activateBreakingBar({
+            state.breakingQueue.push({
                 title: "Ez egy nagyon hosszú teszt hír, hogy lássuk, hogyan működik a szöveg görgetése, ha nem fér ki a képernyőre, és szépen eltűnik a forrás mögött.",
                 date: new Date(),
                 source: "TESZT",
                 link: "#"
             });
+            processBreakingQueue();
         }
 
         // --- TRAFFIC TEST ---
@@ -1610,7 +1663,7 @@
             const days = ['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat'];
             el.date.textContent = `${now.getFullYear()}. ${CALENDAR_DATA.honapok[now.getMonth()]} ${now.getDate()}., ${days[now.getDay()]}`;
             const key = `${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-            if(CALENDAR_DATA.nameDays[key]) el.nameday.textContent = CALENDAR_DATA.nameDays[key].join(', ') + ' névnap';
+            if(CALENDAR_DATA.nameDays[key]) el.nameday.textContent = CALENDAR_DATA.nameDays[key].join(', ') + ' névnapja';
             updateSkyGradient();
             
             // ANALOG CLOCK UPDATE
