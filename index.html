@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V184 (Optimized Goodbye Card)</title>
+    <title>Aurora News Ticker - V185 (Protopage Fix)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -202,7 +202,7 @@
         .left-prog-badge.badge-evening { color: #f3e8ff; box-shadow: 0 0 10px rgba(192, 132, 252, 0.1); border-color: rgba(192, 132, 252, 0.3); }
         .left-prog-badge.badge-traffic { color: #fcd34d; background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.5); }
 
-        /* 2. Clock Center Block - RESIZED */
+        /* 2. Clock Center Block - COMPACT */
         .clock-container { 
             flex-grow: 1; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; width: 100%; 
@@ -429,16 +429,15 @@
         }
         .goodbye-card.active { opacity: 1; visibility: visible; transform: scale(1); }
         
-        /* RESIZED FOR FIT */
         .gb-moon { 
-            font-size: 3.2rem; /* Reduced from 4.5rem */
-            margin-bottom: 8px; /* Tighter */
+            font-size: 3.2rem; 
+            margin-bottom: 8px; 
             filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.4)); 
             animation: float 6s ease-in-out infinite; 
         }
         .gb-title { 
             font-family: var(--font-serif); 
-            font-size: 1.4rem; /* Reduced from 1.8rem */
+            font-size: 1.4rem; 
             font-weight: 700; color: #fff; 
             margin-bottom: 8px; text-align: center; letter-spacing: 1px; 
             text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
@@ -449,7 +448,7 @@
             display: flex; align-items: center; gap: 12px; 
             margin-top: 5px; 
             opacity: 0.9; 
-            transform: scale(1.3); /* Reduced from 1.8 */
+            transform: scale(1.3); 
         }
         .gb-brand-lockup svg { width: 30px; height: 30px; fill: var(--accent-color); filter: drop-shadow(0 0 10px rgba(56,189,248,0.5)); }
         .gb-brand-text { font-family: var(--font-head); font-weight: 900; font-size: 1.2rem; color: #fff; }
@@ -1277,8 +1276,9 @@
             for (const id of PWS_IDS) {
                 if (!id || id === "INYREG_MASODIK") continue;
                 try {
+                    // INCREASED TIMEOUT FOR PROTOPAGE (6000ms)
                     const url = `https://api.weather.com/v2/pws/observations/current?stationId=${id}&format=json&units=m&apiKey=${WUNDERGROUND_API_KEY}&numericPrecision=decimal`;
-                    const res = await fetch(url, { signal: AbortSignal.timeout(2500) });
+                    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
                     if(res.ok) {
                         const data = await res.json();
                         if(data.observations && data.observations.length > 0) {
@@ -1307,12 +1307,13 @@
             }
         }
 
-        // --- FIXED WEATHER FETCH LOGIC ---
+        // --- FIXED WEATHER FETCH LOGIC (PROTOPAGE OPTIMIZED) ---
         async function fetchWeatherData() {
             const fetchPWS = async (id) => {
                 try {
+                    // INCREASED TIMEOUT (6000ms)
                     const url = `https://api.weather.com/v2/pws/observations/current?stationId=${id}&format=json&units=m&apiKey=${WUNDERGROUND_API_KEY}&numericPrecision=decimal`;
-                    const res = await fetch(url, { signal: AbortSignal.timeout(2000) });
+                    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
                     if(!res.ok) return null;
                     const data = await res.json();
                     if(data.observations && data.observations.length > 0) {
@@ -1321,7 +1322,7 @@
                              let iconCode = 26;
                              try {
                                  const wxUrl = `https://api.weather.com/v3/wx/observations/current?geocode=${obs.lat},${obs.lon}&format=json&units=m&language=hu-HU&apiKey=${WUNDERGROUND_API_KEY}`;
-                                 const wxRes = await fetch(wxUrl, { signal: AbortSignal.timeout(1500) });
+                                 const wxRes = await fetch(wxUrl, { signal: AbortSignal.timeout(2000) });
                                  if(wxRes.ok) { const wxData = await wxRes.json(); if(wxData.iconCode !== undefined) iconCode = wxData.iconCode; }
                              } catch(e) {}
                              return { name: PWS_MAP[id] || id, lat: obs.lat, lon: obs.lon, temp: obs.metric.temp, hum: obs.humidity, wind: obs.metric.windSpeed, winddir: obs.metric.winddir, press: obs.metric.pressure, precip: obs.metric.precipRate, ibmIcon: iconCode, updatedAt: new Date(), type: 'PWS' };
@@ -1333,8 +1334,9 @@
 
             const fetchSingleOM = async (city) => {
                 try {
+                    // INCREASED TIMEOUT (8000ms)
                     const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,weather_code,apparent_temperature`;
-                    const res = await fetch(url, { signal: AbortSignal.timeout(2500) });
+                    const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
                     if(!res.ok) return null;
                     const data = await res.json();
                     const weatherItem = { name: city.name, lat: city.lat, lon: city.lon, temp: data.current.temperature_2m, hum: data.current.relative_humidity_2m, wind: data.current.wind_speed_10m, winddir: data.current.wind_direction_10m, press: data.current.surface_pressure, precip: 0, wmo: data.current.weather_code, feelsLike: data.current.apparent_temperature, updatedAt: new Date(), type: 'OM' };
@@ -1363,6 +1365,7 @@
                 }
             });
             
+            // DELAYED FALLBACK (7000ms) - Increased to account for slow Protopage loading
             setTimeout(() => {
                 if(state.weatherPlaylist.length === 0) {
                      state.weatherPlaylist.push({ name: 'Budapest', temp: 15.0, hum: 50, wind: 10, wmo: 1, type:'OM', lat: 47.49, lon: 19.04 });
@@ -1373,7 +1376,7 @@
                      el.weatherLoading.classList.remove('active');
                      el.weatherDataContainer.style.opacity = '1';
                 }
-            }, 3000);
+            }, 7000);
         }
 
         function displayWeather() {
