@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V181 (Dev Tools Fixed)</title>
+    <title>Aurora News Ticker - V184 (Optimized Goodbye Card)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -110,7 +110,8 @@
 
         /* --- SHAPES --- */
         .identity-panel { 
-            width: 200px; flex-shrink: 0; z-index: 10; overflow: hidden;
+            width: 220px; 
+            flex-shrink: 0; z-index: 10; overflow: hidden;
             border-radius: var(--cap-radius-outer) var(--cap-radius-inner) var(--cap-radius-inner) var(--cap-radius-outer);
         }
         .weather-panel { 
@@ -126,7 +127,7 @@
         }
         .ticker-container.open .news-panel { flex: 1; opacity: 1; }
 
-        /* --- FLIPPER FIX --- */
+        /* --- FLIPPER --- */
         .panel-flipper {
             width: 100%; height: 100%;
             transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -151,87 +152,106 @@
         /* --- LEFT PANEL CONTENT --- */
         .id-content { 
             width: 100%; height: 100%; display: flex; flex-direction: column; 
-            align-items: center; justify-content: flex-start;
-            padding: 12px 15px; text-align: center;
-            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%);
-            gap: 2px;
+            justify-content: space-between; 
+            padding: 15px 10px; text-align: center;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.2) 100%);
         }
         
-        .brand-wrapper { 
-            display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center;
-            padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 2px;
-            cursor: pointer; z-index: 50; flex-shrink: 0;
+        /* 1. Header Block */
+        .id-header-block {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            width: 100%;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
         }
-        .brand-logo svg { width: 20px; height: 20px; fill: var(--accent-color); filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.4)); animation: pulseLogo 3s infinite ease-in-out; }
-        .brand-name { font-family: var(--font-head); font-weight: 800; font-size: 1.0rem; letter-spacing: -0.5px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-        
-        .left-prog-badge {
-            width: 100%; text-align: center; font-family: var(--font-head); font-weight: 800;
-            font-size: 0.6rem; text-transform: uppercase; letter-spacing: -0.2px;
-            padding: 2px 0; min-height: 20px; display: flex; align-items: center; justify-content: center;
-            color: var(--accent-color); transition: color 0.5s, text-shadow 0.5s; opacity: 0; line-height: 1.1; flex-shrink: 0;
-        }
-        .left-prog-badge.visible { opacity: 1; }
-        /* Badge Colors */
-        .left-prog-badge.badge-night { color: #c7d2fe; text-shadow: 0 0 10px rgba(129, 140, 248, 0.4); }
-        .left-prog-badge.badge-dawn { color: #ffe4e6; text-shadow: 0 0 10px rgba(251, 113, 133, 0.4); }
-        .left-prog-badge.badge-morning { color: #fef3c7; text-shadow: 0 0 10px rgba(252, 211, 77, 0.4); }
-        .left-prog-badge.badge-day { color: #e0f2fe; text-shadow: 0 0 10px rgba(125, 211, 252, 0.4); }
-        .left-prog-badge.badge-noon { color: #fefce8; text-shadow: 0 0 10px rgba(253, 224, 71, 0.4); }
-        .left-prog-badge.badge-afternoon { color: #ccfbf1; text-shadow: 0 0 10px rgba(94, 234, 212, 0.4); }
-        .left-prog-badge.badge-sunset { color: #fae8ff; text-shadow: 0 0 10px rgba(232, 121, 249, 0.4); }
-        .left-prog-badge.badge-evening { color: #f3e8ff; text-shadow: 0 0 10px rgba(192, 132, 252, 0.4); }
-        .left-prog-badge.badge-traffic { color: #fcd34d; text-shadow: 0 0 10px rgba(245, 158, 11, 0.6); }
 
-        /* --- CLOCK --- */
+        .brand-wrapper { 
+            display: flex; align-items: center; gap: 8px; justify-content: center;
+            cursor: pointer; z-index: 50;
+        }
+        .brand-logo svg { width: 22px; height: 22px; fill: var(--accent-color); filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.4)); animation: pulseLogo 3s infinite ease-in-out; }
+        .brand-name { font-family: var(--font-head); font-weight: 900; font-size: 1.1rem; letter-spacing: -0.5px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+
+        /* Badge (Program) */
+        .left-prog-badge {
+            font-family: var(--font-head); font-weight: 800;
+            font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;
+            padding: 3px 10px; 
+            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--accent-color); 
+            transition: all 0.5s ease; 
+            opacity: 0; 
+            transform: translateY(-5px);
+            white-space: nowrap;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .left-prog-badge.visible { opacity: 1; transform: translateY(0); }
+        
+        /* Badge Colors */
+        .left-prog-badge.badge-night { color: #c7d2fe; box-shadow: 0 0 10px rgba(129, 140, 248, 0.1); border-color: rgba(129, 140, 248, 0.3); }
+        .left-prog-badge.badge-dawn { color: #ffe4e6; box-shadow: 0 0 10px rgba(251, 113, 133, 0.1); border-color: rgba(251, 113, 133, 0.3); }
+        .left-prog-badge.badge-morning { color: #fef3c7; box-shadow: 0 0 10px rgba(252, 211, 77, 0.1); border-color: rgba(252, 211, 77, 0.3); }
+        .left-prog-badge.badge-day { color: #e0f2fe; box-shadow: 0 0 10px rgba(125, 211, 252, 0.1); border-color: rgba(125, 211, 252, 0.3); }
+        .left-prog-badge.badge-noon { color: #fefce8; box-shadow: 0 0 10px rgba(253, 224, 71, 0.1); border-color: rgba(253, 224, 71, 0.3); }
+        .left-prog-badge.badge-afternoon { color: #ccfbf1; box-shadow: 0 0 10px rgba(94, 234, 212, 0.1); border-color: rgba(94, 234, 212, 0.3); }
+        .left-prog-badge.badge-sunset { color: #fae8ff; box-shadow: 0 0 10px rgba(232, 121, 249, 0.1); border-color: rgba(232, 121, 249, 0.3); }
+        .left-prog-badge.badge-evening { color: #f3e8ff; box-shadow: 0 0 10px rgba(192, 132, 252, 0.1); border-color: rgba(192, 132, 252, 0.3); }
+        .left-prog-badge.badge-traffic { color: #fcd34d; background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.5); }
+
+        /* 2. Clock Center Block - RESIZED */
         .clock-container { 
             flex-grow: 1; display: flex; flex-direction: column; 
             justify-content: center; align-items: center; width: 100%; 
-            margin: 0; padding: 5px 0;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         
         .clock-main-row {
             display: flex; align-items: baseline; justify-content: center;
             line-height: 1;
+            margin-bottom: 4px; 
         }
         
         .clock-hm { 
             font-family: var(--font-head); 
-            font-size: 1.5rem; 
+            font-size: 2.0rem; 
             font-weight: 700; 
             color: #ffffff; 
             letter-spacing: -0.5px; 
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5); 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            background: linear-gradient(180deg, #fff 20%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; 
         }
         
         .clock-s { 
             font-family: var(--font-mono); 
-            font-size: 0.85rem; 
-            font-weight: 400; 
-            color: #94a3b8; 
-            margin-left: 3px;
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            color: var(--accent-color); 
+            margin-left: 2px;
+            opacity: 0.8;
         }
         
         .date-display { 
-            font-size: 0.65rem; color: #cbd5e1; 
+            font-size: 0.65rem; 
+            color: #94a3b8; 
             text-transform: uppercase; letter-spacing: 0.5px; 
-            font-weight: 600; margin-top: 4px;
+            font-weight: 600; 
         }
         
-        /* NAMEDAY - MOVED UP AS REQUESTED */
+        /* 3. Footer Block (Nameday) */
         .footer-info { 
             width: 100%; flex-shrink: 0; display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
-            padding-top: 2px; 
-            margin-top: -5px; /* Moved up */
-            min-height: 40px; 
-            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 10px; 
+            border-top: 1px solid rgba(255,255,255,0.08);
         }
         .nameday-container { width: 100%; text-align: center; }
-        .nd-label { font-size: 0.55rem; color: var(--accent-warm); font-weight: 800; letter-spacing: 1px; margin-bottom: 2px; text-transform: uppercase; display: block; }
-        .nd-names { font-size: 0.75rem; color: #fff; font-weight: 600; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; max-width: 100%; word-wrap: break-word; white-space: normal; }
+        .nd-label { font-size: 0.5rem; color: var(--accent-warm); font-weight: 800; letter-spacing: 1px; margin-bottom: 3px; text-transform: uppercase; display: block; opacity: 0.8; }
+        .nd-names { font-size: 0.8rem; color: #e2e8f0; font-weight: 600; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; max-width: 100%; word-wrap: break-word; white-space: normal; }
 
         /* --- CREDITS & ECONOMY --- */
         .credits-content { 
@@ -292,16 +312,15 @@
             transition: max-width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        /* --- VISUAL COLUMN (Narrower in V157) --- */
+        /* --- VISUAL COLUMN --- */
         .news-visual-column {
             position: relative;
-            /* Reduced width from 340px to 250px */
             width: 250px; 
             flex-shrink: 0;
             height: 100%;
             border-radius: 8px;
             overflow: hidden;
-            transform: translateX(120%); /* Start off-screen */
+            transform: translateX(120%); 
             transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
             z-index: 15;
             box-shadow: 0 5px 20px rgba(0,0,0,0.5);
@@ -310,50 +329,22 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* Slide-in Action */
         .news-card.visible .news-visual-column.slide-in { transform: translateX(0); }
+        .news-card.has-visual .news-content-wrapper { max-width: calc(100% - 270px); }
 
-        /* Responsive Text Sizing: Calc(100% - (ImageWidth + Gap + Buffer)) */
-        .news-card.has-visual .news-content-wrapper {
-            max-width: calc(100% - 270px); 
-        }
-
-        /* MOBILE/TABLET: HIDE IMAGE TO PRIORITIZE TEXT */
         @media (max-width: 950px) {
             .news-visual-column { display: none !important; }
             .news-card.has-visual .news-content-wrapper { max-width: 100% !important; }
         }
         
-        .news-visual-image {
-            width: 100%; height: 100%; object-fit: cover;
-        }
+        .news-visual-image { width: 100%; height: 100%; object-fit: cover; }
 
-        .visual-fallback {
-            display: flex; flex-direction: column; align-items: center; gap: 10px;
-            text-align: center; color: #fff; padding: 10px;
-        }
-        
-        /* FALLBACK ANIMATION AND LOGO */
+        .visual-fallback { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; color: #fff; padding: 10px; }
         @keyframes spinGlobe { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        
-        .visual-fallback svg.tkp-globe { 
-            width: 80px; height: 80px; 
-            fill: var(--accent-color);
-            filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.4));
-            animation: spinGlobe 20s linear infinite; /* SPIN EFFECT */
-        }
-        
-        .visual-fallback span { 
-            font-family: var(--font-head); font-weight: 800; 
-            font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;
-            color: var(--accent-color);
-        }
+        .visual-fallback svg.tkp-globe { width: 80px; height: 80px; fill: var(--accent-color); filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.4)); animation: spinGlobe 20s linear infinite; }
+        .visual-fallback span { font-family: var(--font-head); font-weight: 800; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-color); }
 
-        /* TRAFFIC HIGHLIGHT */
-        .news-card.traffic-alert .news-content-wrapper {
-            background: linear-gradient(90deg, rgba(69, 26, 3, 0.95) 0%, rgba(124, 45, 18, 0.8) 50%, rgba(69, 26, 3, 0.4) 100%);
-            border-left: 3px solid var(--accent-traffic);
-        }
+        .news-card.traffic-alert .news-content-wrapper { background: linear-gradient(90deg, rgba(69, 26, 3, 0.95) 0%, rgba(124, 45, 18, 0.8) 50%, rgba(69, 26, 3, 0.4) 100%); border-left: 3px solid var(--accent-traffic); }
 
         .news-title { 
             flex: 0 0 auto; 
@@ -398,25 +389,15 @@
         .provider-icon { width: 16px; height: 16px; border-radius: 50%; }
         .traffic-icon-svg { width: 16px; height: 16px; fill: var(--accent-warm); }
 
-        /* NYIREGYHAZA WEATHER IN FOOTER (RIGHT SIDE) */
+        /* NYIREGYHAZA WEATHER IN FOOTER */
         .ny-weather-in-footer {
-            margin-left: auto; /* Push to right */
-            display: flex; align-items: center; gap: 6px;
-            /* New Layer Style */
+            margin-left: auto; display: flex; align-items: center; gap: 6px;
             background: linear-gradient(90deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            border-radius: 4px;
-            padding: 4px 12px;
+            border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 4px; padding: 4px 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            /* Font Settings - Slightly Smaller */
-            font-size: 0.75rem; 
-            font-weight: 500;
-            color: #fff;
-            text-rendering: geometricPrecision;
-            -webkit-font-smoothing: antialiased;
+            font-size: 0.75rem; font-weight: 500; color: #fff;
         }
 
-        /* Legacy Background - Dimmed heavily */
         .default-news-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; opacity: 1; transition: opacity 1s ease; }
         .dnb-gradient { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top right, #1e3a8a, #0f172a 70%, #020617); }
         .dnb-world-map { position: absolute; top: 5%; right: -5%; width: 70%; height: 80%; background-image: radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px); background-size: 20px 20px; mask-image: radial-gradient(circle, black 30%, transparent 80%); transform: rotate(-10deg); }
@@ -428,17 +409,13 @@
             color: var(--accent-warm); font-size: 0.65rem; font-weight: 800; 
             text-transform: uppercase; letter-spacing: 0.5px;
             text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
-            /* New Night Summary Logic Styles */
-            display: none;
-            margin-left: auto; 
-            margin-right: 40px;
-            z-index: 200;
+            display: none; margin-left: auto; margin-right: 40px; z-index: 200;
         }
         .night-summary-label.active { display: block; }
 
         .news-card.night-info { background: radial-gradient(circle at top left, #312e81, #1e1b4b); border-left: 4px solid #a855f7; alignItems: center; justify-content: center; text-align: center; padding-bottom: 35px; flex-direction: column; }
         
-        /* GOODBYE CARD REDESIGN V177 - Bigger Logo/Text, No Subtitle */
+        /* GOODBYE CARD - OPTIMIZED SIZE (V184) */
         .goodbye-card { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
@@ -446,30 +423,33 @@
             opacity: 0; visibility: hidden; 
             transition: opacity 1.5s cubic-bezier(0.19, 1, 0.22, 1), transform 1.5s ease;
             transform: scale(0.95);
-            z-index: 1000; /* Ensure on top */
+            z-index: 1000;
             border: 1px solid rgba(255,255,255,0.05);
             box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
         }
         .goodbye-card.active { opacity: 1; visibility: visible; transform: scale(1); }
         
+        /* RESIZED FOR FIT */
         .gb-moon { 
-            font-size: 4.5rem; margin-bottom: 15px; 
+            font-size: 3.2rem; /* Reduced from 4.5rem */
+            margin-bottom: 8px; /* Tighter */
             filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.4)); 
             animation: float 6s ease-in-out infinite; 
         }
         .gb-title { 
-            font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: #fff; 
-            margin-bottom: 15px; text-align: center; letter-spacing: 1px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            background: linear-gradient(to bottom, #fff 40%, #94a3b8 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-family: var(--font-serif); 
+            font-size: 1.4rem; /* Reduced from 1.8rem */
+            font-weight: 700; color: #fff; 
+            margin-bottom: 8px; text-align: center; letter-spacing: 1px; 
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5); 
+            background: linear-gradient(to bottom, #fff 40%, #94a3b8 100%); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
         }
-        
-        /* SCALED UP BRAND */
-        .gb-brand-lockup {
-            display: flex; align-items: center; gap: 15px; margin-top: 10px;
-            opacity: 0.9;
-            transform: scale(1.8); /* Requested bigger size */
+        .gb-brand-lockup { 
+            display: flex; align-items: center; gap: 12px; 
+            margin-top: 5px; 
+            opacity: 0.9; 
+            transform: scale(1.3); /* Reduced from 1.8 */
         }
         .gb-brand-lockup svg { width: 30px; height: 30px; fill: var(--accent-color); filter: drop-shadow(0 0 10px rgba(56,189,248,0.5)); }
         .gb-brand-text { font-family: var(--font-head); font-weight: 900; font-size: 1.2rem; color: #fff; }
@@ -481,7 +461,7 @@
         .bc-time { font-family: var(--font-mono); font-size: 4.5rem; font-weight: 700; color: #fff; letter-spacing: -2px; animation: breathe 4s infinite ease-in-out; text-shadow: 0 0 20px rgba(56, 189, 248, 0.3); margin-bottom: 5px; font-variant-numeric: tabular-nums; }
         .bc-label { color: var(--accent-warm); font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; margin-top: 15px; font-weight: 600; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
         
-        /* ANALOG CLOCK - "TIME FUSION" STYLE */
+        /* ANALOG CLOCK */
         .analog-clock { width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.8); background: rgba(0,0,0,0.4); position: relative; box-shadow: 0 0 25px rgba(56, 189, 248, 0.2); backdrop-filter: blur(5px); }
         .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; background: #fff; border-radius: 4px; box-shadow: 0 0 5px rgba(255,255,255,0.5); }
         .hand.hour { width: 4px; height: 35px; margin-left: -2px; }
@@ -490,7 +470,7 @@
         .center-dot { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 5px rgba(255,255,255,0.8); }
         .hour-mark { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; justify-content: center; padding-top: 4px; font-family: var(--font-serif); font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.8); pointer-events: none; }
         
-        /* --- CONTROLS BAR (SHARP REBUILD) --- */
+        /* --- CONTROLS BAR --- */
         .controls-bar { 
             position: absolute; 
             top: calc(100% - 28px); 
@@ -510,7 +490,6 @@
         }
         .ticker-container.open .controls-bar { opacity: 1; }
 
-        /* ACTIVE STATE: Expands DOWN */
         .controls-bar.breaking-active {
             height: 60px; 
             background: #020617; 
@@ -520,7 +499,6 @@
             -webkit-backdrop-filter: none;
         }
         
-        /* Normal Controls container - FLEX LAYOUT */
         .controls-normal-content {
             display: flex; align-items: center; justify-content: space-between;
             width: 100%; height: 28px; padding: 0 15px;
@@ -533,35 +511,18 @@
         }
         .controls-bar.breaking-active .controls-normal-content { opacity: 0; pointer-events: none !important; }
 
-        /* ZONE 1: LEFT (WEATHER) - HIDDEN, MOVED TO FOOTER */
         .cb-left { display: none; }
-
-        /* ZONE 2: CENTER (TIMELINE or EMPTY) */
-        .cb-center {
-            flex-grow: 1; display: flex; align-items: center; justify-content: flex-start; position: relative; overflow: hidden; padding-left: 10px;
-        }
-        
-        /* TIMELINE FIX: Added z-index and pointer-events */
+        .cb-center { flex-grow: 1; display: flex; align-items: center; justify-content: flex-start; position: relative; overflow: hidden; padding-left: 10px; }
         #timeline-container { display: none; gap: 3px; overflow-x: auto; scrollbar-width: none; pointer-events: auto !important; z-index: 105; }
         #timeline-container.visible { display: flex; }
-        #timeline-container.shifted { margin-right: 15px; } /* Add spacing when shifted */
+        #timeline-container.shifted { margin-right: 15px; } 
         
         .timeline-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #ccc; font-family: var(--font-mono); font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; cursor: pointer; transition: all 0.2s; pointer-events: auto !important; }
         .timeline-btn:hover, .timeline-btn.active { background: var(--accent-warm); color: #000; font-weight:700; }
 
-        /* ZONE 3: RIGHT (CONTROLS) */
-        .cb-right {
-            display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: auto;
-            transform: translateZ(0); /* GPU Trigger */
-            backface-visibility: hidden;
-        }
+        .cb-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: auto; transform: translateZ(0); backface-visibility: hidden; }
         
-        /* LIVE INDICATOR */
-        .live-dot {
-            width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
-            box-shadow: 0 0 5px #22c55e; margin-right: 5px; opacity: 0.8;
-            transition: background 0.3s, box-shadow 0.3s;
-        }
+        .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 5px #22c55e; margin-right: 5px; opacity: 0.8; transition: background 0.3s, box-shadow 0.3s; }
         .live-dot.updating { background: #ef4444; box-shadow: 0 0 5px #ef4444; animation: blink 0.5s infinite; }
         @keyframes blink { 50% { opacity: 0.3; } }
 
@@ -569,83 +530,27 @@
         .control-btn:hover { background: var(--accent-color); color: #000; }
         .control-btn svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 3; fill: none; }
 
-        /* NEXT PROGRAM ALERT - Right Side */
-        .next-prog-alert { 
-            display: none; align-items: center; gap: 5px; 
-            color: var(--accent-next); font-weight: 700; font-size: 0.65rem; 
-            text-transform: uppercase; 
-            background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); 
-            padding: 2px 8px; border-radius: 4px; 
-            white-space: nowrap;
-        }
+        .next-prog-alert { display: none; align-items: center; gap: 5px; color: var(--accent-next); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
         .next-prog-alert.active { display: flex; }
 
-        /* INTRO LAYER */
-        .bp-intro-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.5s;
-        }
-        
-        .bp-intro-text {
-            font-family: var(--font-head); font-weight: 900; font-size: 1.2rem;
-            color: #fff; letter-spacing: 2px; text-transform: uppercase;
-            animation: flashIntro 0.4s ease-in-out infinite;
-        }
-        @keyframes flashIntro {
-            0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.8); }
-            50% { opacity: 0.2; text-shadow: none; color: #ef4444; }
-        }
+        /* INTRO & NEWS LAYERS */
+        .bp-intro-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+        .bp-intro-text { font-family: var(--font-head); font-weight: 900; font-size: 1.2rem; color: #fff; letter-spacing: 2px; text-transform: uppercase; animation: flashIntro 0.4s ease-in-out infinite; }
+        @keyframes flashIntro { 0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.8); } 50% { opacity: 0.2; text-shadow: none; color: #ef4444; } }
 
-        /* NEWS LAYER - SHARP FIX V3 */
-        .bp-news-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; align-items: center; padding: 0 20px;
-            opacity: 0; transition: opacity 0.5s;
-            /* CRITICAL FOR SHARPNESS ON TEXT */
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        
-        .bp-badge {
-            font-size: 0.6rem; font-weight: 800; color: #fff; background: #be123c;
-            padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
-            margin-right: 15px; flex-shrink: 0;
-            transform: translateZ(0); /* Fix badge jitter */
-        }
-        
-        .bp-meta {
-            font-size: 0.75rem; font-family: var(--font-mono); color: #94a3b8; font-weight: 700;
-            margin-right: 25px; flex-shrink: 0; white-space: nowrap;
-        }
-        
-        .bp-text-scroller {
-            flex-grow: 1; overflow: hidden; position: relative; height: 100%; display: flex; align-items: center;
-            /* Remove mask to improve performance and sharpness */
-            transform: translateZ(0); 
-            backface-visibility: hidden;
-        }
-        
-        #bp-text {
-            font-family: var(--font-head); font-weight: 700; color: #fff; font-size: 1.05rem;
-            white-space: nowrap; position: relative;
-            /* This forces GPU but keeps text vectors cleaner in Chrome */
-            transform: translate3d(0,0,0); 
-            padding-left: 25px;
-            will-change: transform; /* Hint to browser */
-        }
+        .bp-news-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; padding: 0 20px; opacity: 0; transition: opacity 0.5s; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .bp-badge { font-size: 0.6rem; font-weight: 800; color: #fff; background: #be123c; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-right: 15px; flex-shrink: 0; transform: translateZ(0); }
+        .bp-meta { font-size: 0.75rem; font-family: var(--font-mono); color: #94a3b8; font-weight: 700; margin-right: 25px; flex-shrink: 0; white-space: nowrap; }
+        .bp-text-scroller { flex-grow: 1; overflow: hidden; position: relative; height: 100%; display: flex; align-items: center; transform: translateZ(0); backface-visibility: hidden; }
+        #bp-text { font-family: var(--font-head); font-weight: 700; color: #fff; font-size: 1.05rem; white-space: nowrap; position: relative; transform: translate3d(0,0,0); padding-left: 25px; will-change: transform; }
+        @keyframes scrollTextLeft { 0% { transform: translateX(0); } 100% { transform: translateX(var(--scroll-dist)); } }
 
-        @keyframes scrollTextLeft {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(var(--scroll-dist)); } 
-        }
-
-        .progress-line-container { position: absolute; bottom: 28px; /* Lift above controls */ left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.1); z-index: 300; }
+        .progress-line-container { position: absolute; bottom: 28px; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.1); z-index: 300; }
         .progress-line { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-color), var(--accent-warm)); box-shadow: 0 0 8px var(--accent-color); }
         .animate-progress { animation: progressFill linear forwards; }
         @keyframes progressFill { from { width: 0%; } to { width: 100%; } }
         
-        .update-indicator { display: none; } /* Replaced by dot */
+        .update-indicator { display: none; }
         
         /* --- WEATHER & SCHEDULE FLIPPER --- */
         .weather-header-container { 
@@ -654,28 +559,24 @@
             padding: 0 55px 0 15px; 
             z-index: 10; width: 100%; position: absolute; top:0; left:0;
         }
-        /* FIXED HEADER LAYOUT (Only Location Name) */
         .weather-location-header { 
             display: flex; justify-content: center; align-items: center; width: 100%; 
             font-weight: 700; color: var(--accent-color); transition: opacity 0.5s; 
             font-size: 0.8rem; text-transform: uppercase;
         }
         
-        .weather-view { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 35px 55px 10px 20px; 
-            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%);
-        }
+        .weather-view { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 35px 55px 10px 20px; background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%); }
         .weather-main { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 5px; }
-        /* Adjusted widths to prevent overlap */
         .weather-main-left { display: flex; align-items: center; justify-content: center; width: 40%; }
         .weather-main-right { display: flex; flex-direction: column; align-items: flex-end; width: 60%; }
         
         .weather-temp-big { 
             font-family: var(--font-head); 
-            font-size: 2.0rem; /* Reduced to avoid overlap */
+            font-size: 2.0rem; 
             font-weight: 700; color: #fff; 
             text-shadow: 0 0 15px rgba(255,255,255,0.15); 
             line-height: 1; 
-            white-space: nowrap; /* Keep it on one line */
+            white-space: nowrap; 
         }
         
         .weather-feels { font-size: 0.65rem; color: var(--accent-warm); text-transform: uppercase; margin-top: 2px; font-weight: 600; }
@@ -683,30 +584,16 @@
         .weather-details-list { padding: 5px; background: rgba(0,0,0,0.2); border-radius: 8px; font-size: 0.7rem; display: flex; flex-direction: column; gap: 3px; margin-top: 5px; border: 1px solid rgba(255,255,255,0.05); }
         .wd-row { display: flex; justify-content: space-between; color: #ccc; }
         .wd-val { color: #fff; font-weight: 600; }
-        
-        /* WEATHER FOOTER */
-        .weather-footer-time {
-            font-family: var(--font-mono); font-size: 0.7rem; color: #94a3b8; 
-            text-align: center; margin-top: auto; padding-bottom: 5px; width: 100%; font-weight: 400;
-        }
+        .weather-footer-time { font-family: var(--font-mono); font-size: 0.7rem; color: #94a3b8; text-align: center; margin-top: auto; padding-bottom: 5px; width: 100%; font-weight: 400; }
 
-        /* --- WEATHER LOADER (RADAR STYLE) --- */
+        /* --- WEATHER LOADER (FIXED) --- */
         #weather-loading-state {
             display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%;
         }
         #weather-loading-state.active { display: flex; }
         
-        .radar-spinner {
-            width: 50px; height: 50px; border-radius: 50%;
-            border: 2px solid rgba(56, 189, 248, 0.3);
-            border-top-color: var(--accent-color);
-            animation: spin 1s linear infinite;
-            margin-bottom: 10px;
-        }
-        .loading-text {
-            font-size: 0.6rem; font-weight: 700; color: var(--accent-warm); 
-            animation: pulseText 1.5s infinite; letter-spacing: 1px;
-        }
+        .radar-spinner { width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(56, 189, 248, 0.3); border-top-color: var(--accent-color); animation: spin 1s linear infinite; margin-bottom: 10px; }
+        .loading-text { font-size: 0.6rem; font-weight: 700; color: var(--accent-warm); animation: pulseText 1.5s infinite; letter-spacing: 1px; }
 
         /* --- SCHEDULE --- */
         .schedule-view { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 35px 55px 5px 15px; justify-content: flex-start; }
@@ -767,16 +654,9 @@
         .identity-panel:hover .manual-refresh { opacity: 0.5; }
         
         #night-summary-label {
-            display: none;
-            align-items: center;
-            font-size: 0.7rem; font-weight: 700;
-            color: var(--accent-warm); text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            /* ALIGNMENT FIX */
-            margin-left: auto; /* Pushes to right */
-            margin-right: 40px; /* Buffer before the counter */
-            z-index: 200;
+            display: none; align-items: center; font-size: 0.7rem; font-weight: 700;
+            color: var(--accent-warm); text-transform: uppercase; letter-spacing: 0.5px;
+            white-space: nowrap; margin-left: auto; margin-right: 40px; z-index: 200;
         }
         #night-summary-label.active { display: flex; }
     </style>
@@ -785,7 +665,7 @@
 
     <div class="ambient-background" id="sky-bg"></div>
 
-    <!-- DEV MENU (EXPANDED V181) -->
+    <!-- DEV MENU -->
     <div id="dev-menu">
         <h3>Hírek & Panel Tesztek</h3>
         <button class="dev-btn" onclick="window.triggerTestBreaking()">Teszt: Breaking (Rövid)</button>
@@ -811,21 +691,23 @@
 
     <section class="ticker-container" id="ticker-container">
         
-        <!-- PANEL 1: IDENTITY & ECONOMY (Flippable) -->
+        <!-- PANEL 1: IDENTITY & ECONOMY (REDESIGNED) -->
         <div class="glass-panel identity-panel" id="panel-left">
             <div class="panel-flipper" id="id-flipper">
                 <!-- Front: ID -->
                 <div class="panel-face">
                     <div class="id-content">
-                        <div class="brand-wrapper" id="brand-click-area">
-                            <div class="brand-logo"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
-                            <div class="brand-name">TKP NEWS</div>
+                        <!-- Header: Logo & Name -->
+                        <div class="id-header-block">
+                            <div class="brand-wrapper" id="brand-click-area">
+                                <div class="brand-logo"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
+                                <div class="brand-name">TKP NEWS</div>
+                            </div>
+                            <!-- Program Badge moved here -->
+                            <div id="left-program-badge" class="left-prog-badge">BETÖLTÉS...</div>
                         </div>
                         
-                        <!-- NEW LEFT BADGE LOCATION -->
-                        <div id="left-program-badge" class="left-prog-badge">BETÖLTÉS...</div>
-                        
-                        <!-- NEW COMPACT & SOLID CLOCK -->
+                        <!-- Center: CLOCK -->
                         <div class="clock-container">
                             <div class="clock-main-row">
                                 <div id="clock-hm" class="clock-hm">--:--</div>
@@ -834,10 +716,10 @@
                             <div id="date-display" class="date-display">...</div>
                         </div>
                         
-                        <!-- NAMEDAY MOVED BACK HERE -->
+                        <!-- Footer: NAMEDAY -->
                         <div class="footer-info">
                             <div class="nameday-container">
-                                <span class="nd-label">A MAI NÉVNAP:</span>
+                                <span class="nd-label">MAI NÉVNAP:</span>
                                 <div id="nameday-text" class="nd-names"></div>
                             </div>
                         </div>
@@ -886,7 +768,6 @@
                                     <div class="eco-item"><div class="eco-curr"><img src="https://flagcdn.com/w20/cn.png" class="eco-flag"> CNY</div><div class="eco-val" id="rate-cny">---.-- Ft</div></div>
                                     <div class="eco-item"><div class="eco-curr"><img src="https://flagcdn.com/w20/tr.png" class="eco-flag"> TRY</div><div class="eco-val" id="rate-try">---.-- Ft</div></div>
                                 </div>
-                                <!-- NEW 5TH SLIDE -->
                                 <div class="eco-slide" id="eco-slide-4">
                                     <div class="eco-item"><div class="eco-curr"><img src="https://flagcdn.com/w20/se.png" class="eco-flag"> SEK</div><div class="eco-val" id="rate-sek">---.-- Ft</div></div>
                                     <div class="eco-item"><div class="eco-curr"><img src="https://flagcdn.com/w20/no.png" class="eco-flag"> NOK</div><div class="eco-val" id="rate-nok">---.-- Ft</div></div>
@@ -912,12 +793,10 @@
             <div class="loading-overlay" id="loading-overlay"></div>
             
             <div class="big-clock-layer" id="big-clock-layer">
-                <!-- UPDATED BIG CLOCK LAYOUT -->
                 <div class="bc-digital-wrapper">
                     <div class="bc-time" id="bc-time-display">00:00:00</div>
                     <div class="bc-label"></div>
                 </div>
-                <!-- ANALOG CLOCK - "TIME FUSION" -->
                 <div class="analog-clock">
                     <div class="hour-mark" style="transform: rotate(0deg)">XII</div>
                     <div class="hour-mark" style="transform: rotate(30deg); content: ''; width: 2px; background: rgba(255,255,255,0.3); height: 6px; top: 2px;"></div>
@@ -949,41 +828,29 @@
             </div>
 
             <div class="news-viewport" id="news-viewport">
-                <!-- BADGE REMOVED FROM HERE -->
                 <div id="track-a" class="news-card"></div>
                 <div id="track-b" class="news-card"></div>
             </div>
 
             <div class="progress-line-container"><div id="progress-bar" class="progress-line"></div></div>
 
-            <!-- SIMPLIFIED CONTROLS BAR V166 (REBUILT) -->
+            <!-- CONTROLS BAR -->
             <div class="controls-bar" id="controls-bar-main">
-                <!-- Normal Content -->
                 <div class="controls-normal-content" id="controls-normal">
-                    
-                    <!-- ZONE 1: LEFT - Special Weather (NOW HIDDEN - MOVED TO NEWS FOOTER) -->
-                    <div class="cb-left" style="display:none;"></div>
-
-                    <!-- ZONE 2: CENTER - Dynamic (Timeline / Next Alert / Night Label) -->
+                    <div class="cb-left"></div>
                     <div class="cb-center">
                          <div id="timeline-container"></div>
                          <div id="night-summary-label">AZ ELŐZŐ NAP HÍREI - ÖSSZEFOGLALÓ</div>
                     </div>
-                    
-                    <!-- ZONE 3: RIGHT - System Controls -->
                     <div class="cb-right">
                         <div id="next-prog-alert" class="next-prog-alert"></div>
-                        
-                        <!-- Update Indicator (LIVE DOT) -->
                         <div id="live-indicator" class="live-dot"></div>
-                        
                         <span id="counter-display" style="font-family:var(--font-mono); color:var(--text-muted); margin-right:5px; font-weight:700;">0/0</span>
                         <button class="control-btn" id="prev-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                         <button class="control-btn" id="next-btn"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                     </div>
                 </div>
 
-                <!-- Breaking Content Layers -->
                 <div class="bp-intro-layer" id="bp-intro-layer">
                     <span class="bp-intro-text">MOST ÉRKEZETT</span>
                 </div>
@@ -1001,7 +868,7 @@
             </div>
         </div>
 
-        <!-- PANEL 3: WEATHER / SCHEDULE / PROMO (Flippable) -->
+        <!-- PANEL 3: WEATHER / SCHEDULE / PROMO -->
         <div class="glass-panel weather-panel" id="panel-right">
             <div class="panel-flipper" id="weather-flipper">
                 <div class="panel-face">
@@ -1031,7 +898,6 @@
                                 <div class="wd-row"><span>Szél</span><span class="wd-val" id="wd-wind">--</span></div>
                                 <div class="wd-row"><span>Nyomás</span><span class="wd-val" id="wd-press">-- hPa</span></div>
                             </div>
-                            <!-- Footer Time -->
                             <div class="weather-footer-time" id="weather-loc-time">Frissítve: --:--:--</div>
                         </div>
                     </div>
@@ -1113,7 +979,6 @@
             "Hirado.hu": "https://hirado.hu/feed/", "ATV": "https://www.atv.hu/feed", "RTL": "https://rtl.hu/rss", "Economx": "https://economx.hu/rss", "Napi.hu": "https://www.napi.hu/rss",
             "Magyar Hírlap": "https://www.magyarhirlap.hu/rss", "Pesti Srácok": "https://pestisracok.hu/feed/", "Nemzeti Sport": "https://www.nemzetisport.hu/feed", "M4 Sport": "https://m4sport.hu/feed",
             "Hír TV": "https://hirtv.hu/rss", "Privátbankár": "https://www.privatbankar.hu/rss/all.xml",
-            // --- NEW TRAFFIC FEEDS ---
             "Police.hu": "http://www.police.hu/hu/rss/balesetek-torlodasok",
             "BKK Info": "https://bkk.hu/apps/bkk-info/rss.php"
         };
@@ -1145,7 +1010,6 @@
             clockHm: document.getElementById('clock-hm'),
             clockS: document.getElementById('clock-s'),
             date: document.getElementById('date-display'),
-            // Nameday moved to left panel
             namedayText: document.getElementById('nameday-text'),
             
             trackA: document.getElementById('track-a'),
@@ -1194,18 +1058,12 @@
             bpText: document.getElementById('bp-text'),
             bpTextScroller: document.querySelector('.bp-text-scroller'),
             
-            // NEW Bottom Info Ticker (Weather Only)
-            bitWeatherText: document.getElementById('bottom-weather-text'),
-            
             mainContainer: document.querySelector('.ticker-container'),
             leftPanel: document.querySelector('.identity-panel'),
             rightPanel: document.querySelector('.weather-panel'),
             middlePanel: document.querySelector('.news-panel'),
-
-            // Dev Menu
             devMenu: document.getElementById('dev-menu'),
             
-            // Clock Hands
             handHour: document.getElementById('clock-hand-hour'),
             handMinute: document.getElementById('clock-hand-minute'),
             handSecond: document.getElementById('clock-hand-second')
@@ -1217,7 +1075,6 @@
             currentIndex: 0,
             block: null,
             rssFeeds: {},
-            pwsData: [],
             weatherIndex: 0,
             flipTimer: null,
             loading: false,
@@ -1250,12 +1107,10 @@
             breakingActive: false,
             breakingLink: null,
             breakingQueue: [],
-            currentNyData: null // Start as null to hide by default
+            currentNyData: null
         };
 
-        // --- UTILITIES ---
         const stripHtml = (html) => { let doc = new DOMParser().parseFromString(html, 'text/html'); return doc.body.textContent || ""; };
-        
         async function fetchWithProxyFallback(url) {
             for (const proxy of CORS_PROXIES) {
                 try {
@@ -1285,23 +1140,18 @@
             try {
                 const url = new URL(link);
                 const host = url.hostname.replace('www.', '').toLowerCase();
-                const map = { 
-                    'telex.hu': 'TELEX', 'index.hu': 'INDEX', '24.hu': '24.HU', 'origo.hu': 'ORIGO', 
-                    'hirado.hu':'HIRADO', 'rtl.hu':'RTL', 'atv.hu':'ATV', 'police.hu': 'KÖZÚT', 'bkk.hu': 'BKK' 
-                };
+                const map = { 'telex.hu': 'TELEX', 'index.hu': 'INDEX', '24.hu': '24.HU', 'origo.hu': 'ORIGO', 'hirado.hu':'HIRADO', 'rtl.hu':'RTL', 'atv.hu':'ATV', 'police.hu': 'KÖZÚT', 'bkk.hu': 'BKK' };
                 if(map[host]) return map[host];
                 return host.split('.')[0].toUpperCase();
             } catch(e) { return "HÍR"; }
         }
 
-        // --- FLIP CONTROLLER ---
         function flipPanel(panelType, showBack) {
             const flipper = panelType === 'identity' ? el.idFlipper : el.weatherFlipper;
             if(showBack) flipper.classList.add('flipped');
             else flipper.classList.remove('flipped');
         }
 
-        // --- CREDITS & ECONOMY LOGIC ---
         function showCredits() {
             if(state.economyVisible) return; 
             el.creditsContent.classList.add('active');
@@ -1358,7 +1208,6 @@
             } catch (e) { console.error("Exchange Rate Error:", e); }
         }
 
-        // --- SOLAR ENGINE ---
         function updateSkyGradient() {
             const now = new Date();
             const sunPos = SunCalc.getPosition(now, NYIREGYHAZA_COORDS.lat, NYIREGYHAZA_COORDS.lon);
@@ -1374,7 +1223,6 @@
             el.sky.style.background = `linear-gradient(135deg, ${stops[0]}, ${stops[1]}, ${stops[2]})`;
         }
 
-        // --- WEATHER ---
         function calculateFeelsLike(temp, hum, wind) {
             if (temp <= 10 && wind > 4.8) { return 13.12 + 0.6215 * temp - 11.37 * Math.pow(wind, 0.16) + 0.3965 * temp * Math.pow(wind, 0.16); }
             else if (temp >= 27 && hum >= 40) { return temp - 0.55 * (1 - (hum / 100)) * (temp - 14); }
@@ -1423,13 +1271,9 @@
             return ICONS.CLOUDY;
         }
 
-        // --- SPECIFIC NYÍREGYHÁZA WEATHER FETCH (STRICT PWS + NEW TEXT FORMAT) ---
         async function fetchNyiregyhazaSpecific() {
             const PWS_IDS = ["INYREG37", "INYREG_MASODIK"]; 
-            
             let finalData = null;
-
-            // Try PWS Only (Strict)
             for (const id of PWS_IDS) {
                 if (!id || id === "INYREG_MASODIK") continue;
                 try {
@@ -1440,49 +1284,35 @@
                         if(data.observations && data.observations.length > 0) {
                             const obs = data.observations[0];
                             finalData = {
-                                metric: {
-                                    temp: obs.metric.temp,
-                                    windSpeed: obs.metric.windSpeed,
-                                    winddir: obs.metric.winddir,
-                                    pressure: obs.metric.pressure
-                                },
-                                humidity: obs.humidity
+                                metric: { temp: obs.metric.temp },
                             };
                             break; 
                         }
                     }
                 } catch(e) {}
             }
-
-            // Logic: Only show if PWS data exists. No fallback.
             if (finalData && finalData.metric) {
                 const temp = typeof finalData.metric.temp === 'number' ? finalData.metric.temp.toFixed(1) : "--";
-                
-                // Construct HTML String for Footer (MINIMAL TEXT BASED)
                 const text = `
                     <span style="font-weight:700; color:#fff;">NYÍREGYHÁZA MOST:</span>
                     <span style="color:var(--accent-warm); font-weight:700; margin-left:4px;">${temp}°C</span>
                 `;
-                
                 state.currentNyData = text;
-                
-                // Update active if visible immediately
                 const activeFooter = document.querySelector('.news-card.visible .ny-weather-in-footer');
                 if (activeFooter) activeFooter.innerHTML = text;
             } else {
-                // If NO data, hide it
                 state.currentNyData = null;
                 const activeFooter = document.querySelector('.news-card.visible .ny-weather-in-footer');
                 if (activeFooter) activeFooter.innerHTML = "";
             }
         }
 
-        // --- GENERAL WEATHER FETCH (Panel 3) ---
+        // --- FIXED WEATHER FETCH LOGIC ---
         async function fetchWeatherData() {
             const fetchPWS = async (id) => {
                 try {
                     const url = `https://api.weather.com/v2/pws/observations/current?stationId=${id}&format=json&units=m&apiKey=${WUNDERGROUND_API_KEY}&numericPrecision=decimal`;
-                    const res = await fetch(url, { signal: AbortSignal.timeout(2000) }); // Short timeout
+                    const res = await fetch(url, { signal: AbortSignal.timeout(2000) });
                     if(!res.ok) return null;
                     const data = await res.json();
                     if(data.observations && data.observations.length > 0) {
@@ -1509,7 +1339,7 @@
                     const data = await res.json();
                     const weatherItem = { name: city.name, lat: city.lat, lon: city.lon, temp: data.current.temperature_2m, hum: data.current.relative_humidity_2m, wind: data.current.wind_speed_10m, winddir: data.current.wind_direction_10m, press: data.current.surface_pressure, precip: 0, wmo: data.current.weather_code, feelsLike: data.current.apparent_temperature, updatedAt: new Date(), type: 'OM' };
                     state.weatherPlaylist.push(weatherItem);
-                    // Force update UI on first item
+                    
                     if (state.weatherPlaylist.length === 1) { 
                         state.weatherPlaylistIndex = 0; 
                         displayWeather(); 
@@ -1524,17 +1354,24 @@
             const stationKeys = Object.keys(PWS_MAP).sort(() => 0.5 - Math.random()).slice(0, 5);
             stationKeys.forEach(async (id) => {
                 const data = await fetchPWS(id);
-                if(data) { state.weatherPlaylist.push(data); }
+                if(data) { 
+                    state.weatherPlaylist.push(data); 
+                    if (state.weatherPlaylist.length === 1) { 
+                        state.weatherPlaylistIndex = 0; 
+                        displayWeather(); 
+                    }
+                }
             });
             
             setTimeout(() => {
+                if(state.weatherPlaylist.length === 0) {
+                     state.weatherPlaylist.push({ name: 'Budapest', temp: 15.0, hum: 50, wind: 10, wmo: 1, type:'OM', lat: 47.49, lon: 19.04 });
+                     state.weatherPlaylistIndex = 0;
+                     displayWeather();
+                }
                 if(el.weatherLoading.classList.contains('active')) {
                      el.weatherLoading.classList.remove('active');
                      el.weatherDataContainer.style.opacity = '1';
-                     if(state.weatherPlaylist.length === 0) {
-                         state.weatherPlaylist.push({ name: 'Budapest', temp: 15.0, hum: 50, wind: 10, wmo: 1, type:'OM' });
-                         displayWeather();
-                     }
                 }
             }, 3000);
         }
@@ -1647,14 +1484,11 @@
                 cutoffTime = new Date();
                 const hoursBack = state.block.timeWindowHours || 2;
                 cutoffTime.setHours(now.getHours() - hoursBack);
-                const originalCount = state.items.length;
                 state.items = state.items.filter(item => item.date >= cutoffTime);
-                if (state.items.length < originalCount) { console.log(`Cleaned up ${originalCount - state.items.length} old news items.`); }
             } 
         }
 
         async function checkBreakingNews() {
-            // Populate the Queue, but don't run if already checking
             const now = Date.now();
             const threeMinutesAgo = now - (3 * 60 * 1000); 
             
@@ -1666,7 +1500,6 @@
                     const xml = new DOMParser().parseFromString(txt, "text/xml");
                     const items = xml.querySelectorAll("item");
                     
-                    // Check first 2 items of every feed
                     for(let i=0; i<2; i++) { 
                         const item = items[i]; if(!item) continue;
                         const dateStr = item.querySelector("pubDate")?.textContent;
@@ -1674,11 +1507,9 @@
                         const date = new Date(dateStr);
                         const link = item.querySelector("link")?.textContent;
                         
-                        // If fresh and NOT seen
                         if(date.getTime() > threeMinutesAgo && link && !state.seenBreakingLinks.has(link)) {
                             const title = item.querySelector("title")?.textContent || "";
-                            state.seenBreakingLinks.add(link); // Mark seen immediately
-                            
+                            state.seenBreakingLinks.add(link);
                             const breakingItem = { 
                                 title: title, 
                                 desc: stripHtml(item.querySelector("description")?.textContent || ""), 
@@ -1687,32 +1518,22 @@
                                 link: link, 
                                 img: extractImageUrl(item, item.querySelector("description")?.textContent || "") 
                             };
-                            
-                            // ADD TO QUEUE
                             state.breakingQueue.push(breakingItem);
                         }
                     }
                 } catch(e) {}
             }
-            
-            // Process queue if we have items and aren't running
             processBreakingQueue();
         }
 
         function processBreakingQueue() {
-            // If already showing breaking news, do nothing (it will call this when done)
             if(state.breakingActive) return;
-            
-            // If queue is empty, we are done
             if(state.breakingQueue.length === 0) return;
-            
-            // Get next item
             const item = state.breakingQueue.shift();
             activateBreakingBar(item);
         }
 
         function activateBreakingBar(item) {
-            console.log("BREAKING ACTIVE:", item.title);
             state.breakingActive = true;
             state.breakingLink = item.link; 
             el.bpText.textContent = item.title;
@@ -1723,15 +1544,10 @@
             el.bpIntroLayer.style.opacity = '1';
             el.bpNewsLayer.style.opacity = '0';
 
-            // ANIMATION SEQUENCE
             setTimeout(() => {
-                // Fade out intro
                 el.bpIntroLayer.style.opacity = '0';
-                
                 setTimeout(() => {
-                    // Fade in news
                     el.bpNewsLayer.style.opacity = '1';
-                    
                     setTimeout(() => {
                         const containerWidth = document.querySelector('.bp-text-scroller').offsetWidth;
                         const textWidth = el.bpText.offsetWidth;
@@ -1740,26 +1556,19 @@
                         if(textWidth > containerWidth) {
                             const dist = -(textWidth + 20) + "px"; 
                             el.bpText.style.setProperty('--scroll-dist', dist);
-                            const speed = 80; 
-                            const scrollDuration = (textWidth + containerWidth) / speed;
-                            const animDuration = Math.max(scrollDuration, 10); 
+                            const animDuration = Math.max((textWidth + containerWidth) / 80, 10); 
                             el.bpText.style.animation = `scrollTextLeft ${animDuration}s linear 1s forwards`;
                             totalDuration = (1 + animDuration + 2) * 1000;
                         } else { totalDuration = 12000; }
                         
                         setTimeout(() => {
-                            // End of display
                             el.bpNewsLayer.style.opacity = '0';
                             setTimeout(() => {
                                 el.controlsBar.classList.remove('breaking-active');
                                 el.bpText.style.animation = 'none';
-                                
-                                // RESET AND CHECK QUEUE
                                 state.breakingActive = false;
-                                processBreakingQueue(); // <--- RECURSIVE CALL FOR QUEUE
-                                
+                                processBreakingQueue(); 
                             }, 500);
-                            
                         }, totalDuration);
                     }, 100);
                 }, 500);
@@ -1774,119 +1583,22 @@
         });
         
         // --- DEV MENU FUNCTIONS ---
-        // NEW TEST FUNCTIONS
-        window.triggerTestBreaking = function() {
-            state.breakingQueue.push({
-                title: "Ez egy rövid teszt hír a Breaking News rendszer tesztelésére.",
-                date: new Date(),
-                source: "TESZT",
-                link: "#"
-            });
-            processBreakingQueue();
-            el.devMenu.style.display = 'none';
-        }
-        window.triggerTestBreakingLong = function() {
-            state.breakingQueue.push({
-                title: "Ez egy rendkívül hosszú teszt hír, amely arra szolgál, hogy ellenőrizzük a görgető mechanizmust, amikor a szöveg túl hosszú a rendelkezésre álló helyhez képest, és megfelelően kell megjelennie.",
-                date: new Date(),
-                source: "TESZT",
-                link: "#"
-            });
-            processBreakingQueue();
-            el.devMenu.style.display = 'none';
-        }
-        window.triggerTestTraffic = function() {
-            el.devMenu.style.display = 'none';
-            const trafficItem = {
-                title: "Baleset az M3-as autópályán - Torlódás várható",
-                desc: "Két személygépkocsi ütközött össze. A helyszínelés idejére sávlezárás van érvényben.",
-                source: "KÖZÚT", 
-                date: new Date(),
-                link: "#"
-            };
-            state.items.splice(state.currentIndex + 1, 0, trafficItem);
-            clearTimeout(state.flipTimer);
-            showNextItem(true);
-        };
-        window.triggerVisualNews = function() {
-             el.devMenu.style.display = 'none';
-             state.items.splice(state.currentIndex + 1, 0, {
-                 title: "Képes Hír Teszt - Látványos Megjelenés",
-                 desc: "Ez a hír tartalmaz egy képet a jobb oldalon, hogy ellenőrizzük a layoutot.",
-                 source: "INDEX",
-                 date: new Date(),
-                 link: "#",
-                 img: "https://images.unsplash.com/photo-1504711434969-e33886168f5c"
-             });
-             clearTimeout(state.flipTimer);
-             showNextItem(true);
-        };
-        window.triggerTextNews = function() {
-             el.devMenu.style.display = 'none';
-             state.items.splice(state.currentIndex + 1, 0, {
-                 title: "Szöveges Hír Teszt - Csak Szöveg",
-                 desc: "Ez a hír nem tartalmaz képet, így a szövegnek ki kell töltenie a teljes szélességet.",
-                 source: "TELEX",
-                 date: new Date(),
-                 link: "#",
-                 img: null
-             });
-             clearTimeout(state.flipTimer);
-             showNextItem(true);
-        };
-        window.triggerEconomyTest = function() {
-            el.devMenu.style.display = 'none';
-            fetchExchangeRates(); 
-            showEconomy();
-        };
-        window.triggerSchedule = function() {
-             el.devMenu.style.display = 'none';
-             displaySchedule();
-        };
-        window.triggerWeatherLoading = function() {
-             el.devMenu.style.display = 'none';
-             el.weatherLoading.classList.add('active');
-             setTimeout(() => el.weatherLoading.classList.remove('active'), 5000);
-        };
-        // V181: Night Mode Test - Forces label active
-        window.triggerNightMode = function() {
-             el.devMenu.style.display = 'none';
-             state.block = THEMATIC_BLOCKS[0]; 
-             updateTimeAndState(); 
-             // FORCE LABEL VISIBILITY FOR TESTING
-             document.getElementById('night-summary-label').classList.add('active');
-        };
-        // V181: Day Mode Test - Resets label
-        window.triggerDayMode = function() {
-             el.devMenu.style.display = 'none';
-             state.block = null;
-             // FORCE LABEL OFF
-             document.getElementById('night-summary-label').classList.remove('active');
-             updateTimeAndState();
-        };
-        window.triggerHourChangeTest = function() {
-             el.devMenu.style.display = 'none';
-             el.bigClockLayer.classList.add('active');
-             setTimeout(() => { el.bigClockLayer.classList.remove('active'); }, 10000);
-        };
-        window.triggerGoodbyeTest = function() {
-             el.devMenu.style.display = 'none';
-             el.goodbyeCard.classList.add('active');
-             setTimeout(() => { el.goodbyeCard.classList.remove('active'); }, 15000);
-        };
-        window.triggerCredits = function() {
-             el.devMenu.style.display = 'none';
-             showCredits();
-        };
-
+        window.triggerTestBreaking = function() { state.breakingQueue.push({ title: "Ez egy rövid teszt hír.", date: new Date(), source: "TESZT", link: "#" }); processBreakingQueue(); el.devMenu.style.display = 'none'; }
+        window.triggerTestBreakingLong = function() { state.breakingQueue.push({ title: "Ez egy rendkívül hosszú teszt hír, amely arra szolgál, hogy ellenőrizzük a görgető mechanizmust.", date: new Date(), source: "TESZT", link: "#" }); processBreakingQueue(); el.devMenu.style.display = 'none'; }
+        window.triggerTestTraffic = function() { el.devMenu.style.display = 'none'; state.items.splice(state.currentIndex + 1, 0, { title: "Baleset az M3-as autópályán", desc: "Torlódás várható.", source: "KÖZÚT", date: new Date(), link: "#" }); clearTimeout(state.flipTimer); showNextItem(true); };
+        window.triggerVisualNews = function() { el.devMenu.style.display = 'none'; state.items.splice(state.currentIndex + 1, 0, { title: "Képes Hír Teszt", desc: "Leírás...", source: "INDEX", date: new Date(), link: "#", img: "https://images.unsplash.com/photo-1504711434969-e33886168f5c" }); clearTimeout(state.flipTimer); showNextItem(true); };
+        window.triggerTextNews = function() { el.devMenu.style.display = 'none'; state.items.splice(state.currentIndex + 1, 0, { title: "Szöveges Hír", desc: "Leírás...", source: "TELEX", date: new Date(), link: "#", img: null }); clearTimeout(state.flipTimer); showNextItem(true); };
+        window.triggerEconomyTest = function() { el.devMenu.style.display = 'none'; fetchExchangeRates(); showEconomy(); };
+        window.triggerSchedule = function() { el.devMenu.style.display = 'none'; displaySchedule(); };
+        window.triggerWeatherLoading = function() { el.devMenu.style.display = 'none'; el.weatherLoading.classList.add('active'); setTimeout(() => el.weatherLoading.classList.remove('active'), 5000); };
+        window.triggerNightMode = function() { el.devMenu.style.display = 'none'; state.block = THEMATIC_BLOCKS[0]; updateTimeAndState(); document.getElementById('night-summary-label').classList.add('active'); };
+        window.triggerDayMode = function() { el.devMenu.style.display = 'none'; state.block = null; document.getElementById('night-summary-label').classList.remove('active'); updateTimeAndState(); };
+        window.triggerHourChangeTest = function() { el.devMenu.style.display = 'none'; el.bigClockLayer.classList.add('active'); setTimeout(() => { el.bigClockLayer.classList.remove('active'); }, 10000); };
+        window.triggerGoodbyeTest = function() { el.devMenu.style.display = 'none'; el.goodbyeCard.classList.add('active'); setTimeout(() => { el.goodbyeCard.classList.remove('active'); }, 15000); };
+        window.triggerCredits = function() { el.devMenu.style.display = 'none'; showCredits(); };
         window.closeDevMenu = function() { el.devMenu.style.display = 'none'; }
         
-        // Open Dev Menu Handler
-        document.querySelector('.brand-wrapper').addEventListener('click', (e) => {
-             e.stopPropagation(); 
-             const code = prompt("Fejlesztői kód:");
-             if(code === "0000") el.devMenu.style.display = 'flex';
-        });
+        document.querySelector('.brand-wrapper').addEventListener('click', (e) => { e.stopPropagation(); const code = prompt("Fejlesztői kód:"); if(code === "0000") el.devMenu.style.display = 'flex'; });
 
         function handleVisibilityChange() {
             if (document.visibilityState === 'visible') {
@@ -1902,14 +1614,10 @@
         
         function updateAnalogClock() {
             const now = new Date();
-            const sec = now.getSeconds();
-            const min = now.getMinutes();
-            const hour = now.getHours();
-            
+            const sec = now.getSeconds(); const min = now.getMinutes(); const hour = now.getHours();
             const secDeg = (sec / 60) * 360;
             const minDeg = ((min + sec/60) / 60) * 360;
             const hourDeg = ((hour % 12 + min/60) / 12) * 360;
-            
             el.handSecond.style.transform = `translateX(-50%) rotate(${secDeg}deg)`;
             el.handMinute.style.transform = `translateX(-50%) rotate(${minDeg}deg)`;
             el.handHour.style.transform = `translateX(-50%) rotate(${hourDeg}deg)`;
@@ -1922,27 +1630,19 @@
             const days = ['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat'];
             el.date.textContent = `${now.getFullYear()}. ${CALENDAR_DATA.honapok[now.getMonth()]} ${now.getDate()}., ${days[now.getDay()]}`;
             const key = `${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-            if(CALENDAR_DATA.nameDays[key]) {
-                const names = CALENDAR_DATA.nameDays[key].join(', ');
-                if(el.namedayText) el.namedayText.textContent = names;
-            }
+            if(CALENDAR_DATA.nameDays[key]) { const names = CALENDAR_DATA.nameDays[key].join(', '); if(el.namedayText) el.namedayText.textContent = names; }
             updateSkyGradient();
             updateAnalogClock();
             
             const h = now.getHours() + now.getMinutes()/60;
             let currentBlock = THEMATIC_BLOCKS.findLast(b => h >= b.start) || THEMATIC_BLOCKS[THEMATIC_BLOCKS.length-1];
-            const min = now.getMinutes();
-            const sec = now.getSeconds();
-            const hour = now.getHours();
+            const min = now.getMinutes(); const sec = now.getSeconds(); const hour = now.getHours();
 
-            // Goodbye Logic
             if (hour === 23 && min === 59) {
                 if (sec >= 0 && sec < 50) { el.goodbyeCard.classList.add('active'); el.bigClockLayer.classList.remove('active'); } 
                 else if (sec >= 50) { el.goodbyeCard.classList.remove('active'); el.bigClockLayer.classList.add('active'); el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); if(sec === 50) showCredits(); }
             } else if (min === 59 && sec >= 50) { 
-                el.bigClockLayer.classList.add('active'); 
-                el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); 
-                if(sec === 50) showCredits(); 
+                el.bigClockLayer.classList.add('active'); el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); if(sec === 50) showCredits(); 
             } else {
                 if(el.bigClockLayer.classList.contains('active')) { el.bigClockLayer.classList.remove('active'); el.goodbyeCard.classList.remove('active'); if(state.block.type !== 'summary_yesterday') { state.currentIndex = 0; if(state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems = []; } showNextItem(false); } }
             }
@@ -1963,69 +1663,46 @@
             const nextBlock = THEMATIC_BLOCKS[(currentIndex + 1) % THEMATIC_BLOCKS.length];
             const nextStartMin = (nextBlock.start * 60);
             const currentMin = (now.getHours() * 60) + now.getMinutes();
-            let diff = nextStartMin - currentMin;
-            if (diff < 0) diff += 1440; 
+            let diff = nextStartMin - currentMin; if (diff < 0) diff += 1440; 
             if(diff <= 15 && diff > 0) {
                 const nH = Math.floor(nextBlock.start); const nM = Math.round((nextBlock.start % 1) * 60);
                 const nTime = `${String(nH).padStart(2,'0')}:${String(nM).padStart(2,'0')}`;
                 el.nextProgAlert.textContent = `KÖVETKEZIK: ${nTime} ${nextBlock.name}`; el.nextProgAlert.classList.add('active');
             } else { el.nextProgAlert.classList.remove('active'); }
             
-            if (hour >= 6 && sec === 50 && (min === 14 || min === 29 || min === 44 || min === 59)) { 
-                document.getElementById('live-indicator').classList.add('updating'); 
-                refreshNews(true); 
-            } else {
-                document.getElementById('live-indicator').classList.remove('updating');
-            }
-            
+            if (hour >= 6 && sec === 50 && (min === 14 || min === 29 || min === 44 || min === 59)) { document.getElementById('live-indicator').classList.add('updating'); refreshNews(true); } 
+            else { document.getElementById('live-indicator').classList.remove('updating'); }
             if (sec === 0 && (min === 0 || min === 15 || min === 30 || min === 45)) { state.pendingListReset = true; }
             if (sec === 0) cleanUpOldItems();
 
-            // NIGHT SUMMARY LABEL LOGIC (UNTIL 05:44:45)
             const nightLabel = document.getElementById('night-summary-label');
             if (state.block.type === 'summary_yesterday') {
                 el.timelineContainer.style.display = 'flex';
-                // Show label only until 05:44:45 - unless forced by dev menu
-                if (hour < 5 || (hour === 5 && min < 44) || (hour === 5 && min === 44 && sec <= 45)) {
-                    nightLabel.classList.add('active');
-                } else if (!document.getElementById('dev-menu').style.display.includes('flex')) { 
-                    // Only remove if not being forced by dev test
-                    nightLabel.classList.remove('active');
-                }
-            } else {
-                el.timelineContainer.style.display = 'none';
-                nightLabel.classList.remove('active');
-            }
+                if (hour < 5 || (hour === 5 && min < 44) || (hour === 5 && min === 44 && sec <= 45)) { nightLabel.classList.add('active'); } 
+                else if (!document.getElementById('dev-menu').style.display.includes('flex')) { nightLabel.classList.remove('active'); }
+            } else { el.timelineContainer.style.display = 'none'; nightLabel.classList.remove('active'); }
         }
 
         function filterItemsByBlock(items) {
             const now = new Date();
             let filtered = [];
             if(state.block.type === 'summary_yesterday') {
-                const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1);
-                yesterday.setHours(0,0,0,0);
+                const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1); yesterday.setHours(0,0,0,0);
                 const end = new Date(yesterday); end.setHours(23,59,59,999);
-                filtered = items.filter(item => item.date >= yesterday && item.date <= end);
-                filtered.sort((a,b) => a.date - b.date); 
+                filtered = items.filter(item => item.date >= yesterday && item.date <= end); filtered.sort((a,b) => a.date - b.date); 
             } else if(state.block.type === 'morning_catchup') {
-                let start = new Date(now); start.setHours(0,0,0,0);
-                filtered = items.filter(item => item.date >= start);
+                let start = new Date(now); start.setHours(0,0,0,0); filtered = items.filter(item => item.date >= start);
             } else if(state.block.type === 'fresh') {
-                let timeLimit = new Date();
-                timeLimit.setHours(now.getHours() - (state.block.timeWindowHours || 2));
-                filtered = items.filter(item => item.date >= timeLimit);
+                let timeLimit = new Date(); timeLimit.setHours(now.getHours() - (state.block.timeWindowHours || 2)); filtered = items.filter(item => item.date >= timeLimit);
             } else {
-                let timeLimit = new Date(); timeLimit.setHours(0,0,0,0);
-                filtered = items.filter(item => item.date >= timeLimit);
+                let timeLimit = new Date(); timeLimit.setHours(0,0,0,0); filtered = items.filter(item => item.date >= timeLimit);
             }
             return filtered;
         }
 
         async function attemptFetchFeed(key, url) {
             const res = await fetchWithProxyFallback(url);
-            let txt;
-            if(url.includes('ma.hu')) txt = new TextDecoder('iso-8859-2').decode(await res.arrayBuffer());
-            else txt = await res.text();
+            let txt; if(url.includes('ma.hu')) txt = new TextDecoder('iso-8859-2').decode(await res.arrayBuffer()); else txt = await res.text();
             const xml = new DOMParser().parseFromString(txt, "text/xml");
             const parsedItems = [];
             xml.querySelectorAll("item").forEach(item => {
@@ -2033,9 +1710,7 @@
                 const descHtml = item.querySelector("description")?.textContent || "";
                 const link = item.querySelector("link")?.textContent;
                 const dateStr = item.querySelector("pubDate")?.textContent;
-                if(title && dateStr) {
-                    parsedItems.push({ title: title, link: link, desc: stripHtml(descHtml).substring(0, 300), source: key, date: new Date(dateStr), img: extractImageUrl(item, descHtml) });
-                }
+                if(title && dateStr) { parsedItems.push({ title: title, link: link, desc: stripHtml(descHtml).substring(0, 300), source: key, date: new Date(dateStr), img: extractImageUrl(item, descHtml) }); }
             });
             return parsedItems;
         }
@@ -2043,78 +1718,48 @@
         async function processRetries() {
             state.retryCount = (state.retryCount || 0) + 1;
             if(state.retryQueue.length === 0 || state.retryCount > 15) { clearInterval(state.retryInterval); state.retryQueue = []; return; }
-            const currentQueue = [...state.retryQueue];
-            state.retryQueue = []; 
-            const fetched = [];
-            for(const task of currentQueue) {
-                try {
-                    const items = await attemptFetchFeed(task.key, task.url);
-                    fetched.push(...items);
-                } catch(e) { state.retryQueue.push(task); }
-            }
+            const currentQueue = [...state.retryQueue]; state.retryQueue = []; const fetched = [];
+            for(const task of currentQueue) { try { const items = await attemptFetchFeed(task.key, task.url); fetched.push(...items); } catch(e) { state.retryQueue.push(task); } }
             if(fetched.length > 0) mergeNewItems(fetched);
         }
 
         function mergeNewItems(newItems) {
             const currentLink = state.currentItem ? state.currentItem.link : null;
             const combined = [...state.items, ...newItems];
-            const uniqueMap = new Map();
-            combined.forEach(item => uniqueMap.set(item.link, item));
-            let uniqueItems = Array.from(uniqueMap.values());
-            uniqueItems = filterItemsByBlock(uniqueItems);
+            const uniqueMap = new Map(); combined.forEach(item => uniqueMap.set(item.link, item));
+            let uniqueItems = Array.from(uniqueMap.values()); uniqueItems = filterItemsByBlock(uniqueItems);
             if(state.block.type !== 'summary_yesterday') { uniqueItems.sort((a,b) => b.date - a.date); }
             state.items = uniqueItems;
-            if(currentLink) {
-                const newIdx = state.items.findIndex(i => i.link === currentLink);
-                if(newIdx !== -1) { state.currentIndex = newIdx; } else { state.currentIndex = state.currentIndex % state.items.length; }
-            }
+            if(currentLink) { const newIdx = state.items.findIndex(i => i.link === currentLink); if(newIdx !== -1) { state.currentIndex = newIdx; } else { state.currentIndex = state.currentIndex % state.items.length; } }
             if(state.items.length > 0) { el.counter.textContent = `${(state.currentIndex % state.items.length) + 1} / ${state.items.length}`; }
         }
 
         async function refreshNews(silent = false) {
-            state.lastRefreshTimestamp = Date.now();
-            state.retryCount = 0; 
+            state.lastRefreshTimestamp = Date.now(); state.retryCount = 0; 
             if(!silent) el.loading.classList.add('active');
-            state.retryQueue = [];
-            if(state.retryInterval) clearInterval(state.retryInterval);
-            let feeds = BACKUP_FEEDS;
-            if(Object.keys(state.rssFeeds).length > 0) feeds = { ...feeds, ...state.rssFeeds };
+            state.retryQueue = []; if(state.retryInterval) clearInterval(state.retryInterval);
+            let feeds = BACKUP_FEEDS; if(Object.keys(state.rssFeeds).length > 0) feeds = { ...feeds, ...state.rssFeeds };
             let fetchedItems = [];
-            const fetchPromises = Object.entries(feeds).map(async ([key, url]) => {
-                try {
-                    const items = await attemptFetchFeed(key, url);
-                    fetchedItems.push(...items);
-                } catch(e) { state.retryQueue.push({ key, url }); }
-            });
+            const fetchPromises = Object.entries(feeds).map(async ([key, url]) => { try { const items = await attemptFetchFeed(key, url); fetchedItems.push(...items); } catch(e) { state.retryQueue.push({ key, url }); } });
             await Promise.allSettled(fetchPromises);
             const now = new Date();
             let cutoffTime = new Date(0); 
-            if (state.block.type === 'fresh') {
-                const hoursBack = state.block.timeWindowHours || 2;
-                cutoffTime = new Date(now.getTime() - (hoursBack * 60 * 60 * 1000));
-            } else if (state.block.type === 'morning_catchup') { cutoffTime = new Date(now); cutoffTime.setHours(0,0,0,0); }
-            fetchedItems = fetchedItems.filter(item => item.date >= cutoffTime);
-            fetchedItems.sort((a,b) => b.date - a.date);
+            if (state.block.type === 'fresh') { const hoursBack = state.block.timeWindowHours || 2; cutoffTime = new Date(now.getTime() - (hoursBack * 60 * 60 * 1000)); } 
+            else if (state.block.type === 'morning_catchup') { cutoffTime = new Date(now); cutoffTime.setHours(0,0,0,0); }
+            fetchedItems = fetchedItems.filter(item => item.date >= cutoffTime); fetchedItems.sort((a,b) => b.date - a.date);
             const filtered = filterItemsByBlock(fetchedItems); 
-            const uniqueItems = [];
-            const seenLinks = new Set();
+            const uniqueItems = []; const seenLinks = new Set();
             for(const item of filtered) { if(!seenLinks.has(item.link)) { uniqueItems.push(item); seenLinks.add(item.link); } }
-            if(silent) { 
-                state.nextItems = uniqueItems; 
-                document.getElementById('live-indicator').classList.remove('updating');
-            } else { state.items = uniqueItems; el.loading.classList.remove('active'); state.currentIndex = 0; showNextItem(false); }
+            if(silent) { state.nextItems = uniqueItems; document.getElementById('live-indicator').classList.remove('updating'); } 
+            else { state.items = uniqueItems; el.loading.classList.remove('active'); state.currentIndex = 0; showNextItem(false); }
             if(state.block.type === 'summary_yesterday') generateTimeline(); else el.timelineContainer.classList.remove('visible');
             if(state.retryQueue.length > 0) { state.retryInterval = setInterval(processRetries, 20000); }
             cleanUpOldItems();
         }
 
         function showNextItem(advance = true) {
-            clearTimeout(state.flipTimer);
-            state.isTransitioning = true;
-            if(state.block.type === 'summary_yesterday') {
-                const now = Date.now();
-                if (now - state.lastNightInfoTime > 300000) { renderNightInfoCard(); return; }
-            }
+            clearTimeout(state.flipTimer); state.isTransitioning = true;
+            if(state.block.type === 'summary_yesterday') { const now = Date.now(); if (now - state.lastNightInfoTime > 300000) { renderNightInfoCard(); return; } }
             if(state.pendingListReset && state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems = []; state.currentIndex = -1; advance = true; state.pendingListReset = false; }
             if(state.items.length === 0) { el[state.activeTrack === 'a' ? 'trackA' : 'trackB'].innerHTML = `<div class="news-title">Nincs hír...</div>`; return; }
             if(advance) state.currentIndex++;
@@ -2128,13 +1773,10 @@
 
         function renderNightInfoCard() {
             state.lastNightInfoTime = Date.now(); 
-            const nextTrack = el[state.activeTrack === 'a' ? 'trackB' : 'trackA'];
-            const currentTrack = el[state.activeTrack === 'a' ? 'trackA' : 'trackB'];
-            // Keep badge visible on left
+            const nextTrack = el[state.activeTrack === 'a' ? 'trackB' : 'trackA']; const currentTrack = el[state.activeTrack === 'a' ? 'trackA' : 'trackB'];
             el.badge.textContent = state.block.name;
             const html = `<div class="ni-icon">🌙</div><div class="ni-text">Jelenleg az éjszakai műszak híreit olvasod. Ha friss hír érkezik, az azonnal megjelenik rövid időre.</div><div class="ni-sub">TKP NEWS Éjszakai Ügyelet</div>`;
-            nextTrack.innerHTML = html;
-            nextTrack.classList.add('night-info'); nextTrack.classList.remove('breaking');
+            nextTrack.innerHTML = html; nextTrack.classList.add('night-info'); nextTrack.classList.remove('breaking');
             currentTrack.classList.remove('visible'); nextTrack.classList.add('visible');
             state.activeTrack = state.activeTrack === 'a' ? 'b' : 'a';
             el.progressBar.classList.remove('animate-progress'); void el.progressBar.offsetWidth; el.progressBar.style.animationDuration = '10s'; el.progressBar.classList.add('animate-progress');
@@ -2149,63 +1791,27 @@
             const timeStr = item.date.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
             nextTrack.classList.remove('night-info');
             
-            // Traffic Check
             const isTraffic = (displaySource === 'KÖZÚT' || displaySource === 'BKK');
-            
             if (isTraffic) {
-                // Update Left Badge Class
-                el.badge.className = 'left-prog-badge visible badge-traffic';
-                el.badge.textContent = 'KÖZLEKEDÉS';
-                nextTrack.classList.add('traffic-alert');
+                el.badge.className = 'left-prog-badge visible badge-traffic'; el.badge.textContent = 'KÖZLEKEDÉS'; nextTrack.classList.add('traffic-alert');
             } else {
-                el.badge.className = `left-prog-badge visible ${state.block.styleClass}`;
-                el.badge.textContent = state.block.name;
-                nextTrack.classList.remove('traffic-alert');
+                el.badge.className = `left-prog-badge visible ${state.block.styleClass}`; el.badge.textContent = state.block.name; nextTrack.classList.remove('traffic-alert');
             }
 
-            // Updated Footer HTML structure
             let iconHtml = isTraffic ? TRAFFIC_ICON : `<img src="${fav}" class="provider-icon">`;
             let footerMetaHTML = `<div class="provider-identity">${iconHtml} ${displaySource}</div><span>${timeStr}</span>`;
             
-            let extraLabel = '';
-            if(state.block.type === 'summary_yesterday') {
-                extraLabel = `<span class="night-summary-label visible">AZ ELŐZŐ NAP HÍREI</span>`;
-            }
-
-            // --- VISUAL BLOCK CONSTRUCTION (Image or Logo) ---
-            let visualHtml = '';
-            let hasVisual = false;
-            
+            let visualHtml = ''; let hasVisual = false;
             if (item.img) {
-                hasVisual = true;
-                visualHtml = `
-                    <div class="news-visual-column">
-                        <img src="${item.img}" class="news-visual-image" alt="Hír kép">
-                    </div>
-                `;
+                hasVisual = true; visualHtml = `<div class="news-visual-column"><img src="${item.img}" class="news-visual-image" alt="Hír kép"></div>`;
             } else {
-                // FALLBACK: TKP NEWS Logo with Spinning Globe
-                hasVisual = true; 
-                visualHtml = `
-                    <div class="news-visual-column">
-                        <div class="visual-fallback">
-                            <!-- TKP Logo SVG -->
-                            <svg class="tkp-globe" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                            <span>TKP NEWS</span>
-                        </div>
-                    </div>
-                `;
+                hasVisual = true; visualHtml = `<div class="news-visual-column"><div class="visual-fallback"><svg class="tkp-globe" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg><span>TKP NEWS</span></div></div>`;
             }
 
-            // Prepare card classes
-            if (hasVisual) { nextTrack.classList.add('has-visual'); } 
-            else { nextTrack.classList.remove('has-visual'); }
+            if (hasVisual) { nextTrack.classList.add('has-visual'); } else { nextTrack.classList.remove('has-visual'); }
             
-            // INJECT NYIREGYHAZA WEATHER INTO FOOTER (IF EXISTS)
             let weatherHTML = "";
-            if (state.currentNyData) {
-                weatherHTML = `<div class="ny-weather-in-footer">${state.currentNyData}</div>`;
-            }
+            if (state.currentNyData) { weatherHTML = `<div class="ny-weather-in-footer">${state.currentNyData}</div>`; }
 
             const html = `
                 <div class="news-content-wrapper">
@@ -2219,18 +1825,10 @@
                 ${visualHtml}
             `;
             
-            nextTrack.innerHTML = html;
-            nextTrack.classList.remove('breaking');
+            nextTrack.innerHTML = html; nextTrack.classList.remove('breaking');
+            currentTrack.classList.remove('visible'); nextTrack.classList.add('visible');
             
-            // Transition Logic
-            currentTrack.classList.remove('visible'); 
-            nextTrack.classList.add('visible');
-            
-            // Trigger Visual Slide-in with Delay
-            setTimeout(() => {
-                const visualCol = nextTrack.querySelector('.news-visual-column');
-                if(visualCol) visualCol.classList.add('slide-in');
-            }, 600); // Delay for visual flair
+            setTimeout(() => { const visualCol = nextTrack.querySelector('.news-visual-column'); if(visualCol) visualCol.classList.add('slide-in'); }, 600); 
 
             state.activeTrack = state.activeTrack === 'a' ? 'b' : 'a';
             el.counter.textContent = `${(state.currentIndex % state.items.length) + 1} / ${state.items.length}`;
@@ -2249,11 +1847,7 @@
             setInterval(updateTimeAndState, 1000); updateTimeAndState();
             onValue(feedsRef, (snap) => { state.rssFeeds = snap.val() || {}; refreshNews(); });
             fetchWeatherData(); setInterval(fetchWeatherData, 150000); setInterval(displayWeather, 6000);
-            
-            // Init Special Nyíregyháza Weather
-            fetchNyiregyhazaSpecific();
-            setInterval(fetchNyiregyhazaSpecific, 30000);
-
+            fetchNyiregyhazaSpecific(); setInterval(fetchNyiregyhazaSpecific, 30000);
             setInterval(checkBreakingNews, 20000); setTimeout(checkBreakingNews, 5000);
             setInterval(showCredits, 300000); 
             document.getElementById('manual-refresh-trigger').addEventListener('click', () => refreshNews());
