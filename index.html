@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V159 (ATV Fix & Queue Logic)</title>
+    <title>Aurora News Ticker - V181 (Dev Tools Fixed)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;700;800;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js" type="module"></script>
@@ -126,7 +126,7 @@
         }
         .ticker-container.open .news-panel { flex: 1; opacity: 1; }
 
-        /* --- FLIPPER FIX (Z-FIGHTING PREVENTION) --- */
+        /* --- FLIPPER FIX --- */
         .panel-flipper {
             width: 100%; height: 100%;
             transition: transform 2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -151,39 +151,28 @@
         /* --- LEFT PANEL CONTENT --- */
         .id-content { 
             width: 100%; height: 100%; display: flex; flex-direction: column; 
-            align-items: center; justify-content: space-between; 
-            padding: 15px 10px 15px 30px; text-align: center;
+            align-items: center; justify-content: flex-start;
+            padding: 12px 15px; text-align: center;
             background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%);
+            gap: 2px;
         }
-        .brand-wrapper { 
-            display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center;
-            padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 2px;
-            cursor: pointer; z-index: 50; 
-        }
-        .brand-logo svg { width: 24px; height: 24px; fill: var(--accent-color); filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.4)); animation: pulseLogo 3s infinite ease-in-out; }
-        .brand-name { font-family: var(--font-head); font-weight: 800; font-size: 1.1rem; letter-spacing: -0.5px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
         
-        /* NEW LEFT SIDE PROGRAM BADGE */
+        .brand-wrapper { 
+            display: flex; align-items: center; gap: 6px; width: 100%; justify-content: center;
+            padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 2px;
+            cursor: pointer; z-index: 50; flex-shrink: 0;
+        }
+        .brand-logo svg { width: 20px; height: 20px; fill: var(--accent-color); filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.4)); animation: pulseLogo 3s infinite ease-in-out; }
+        .brand-name { font-family: var(--font-head); font-weight: 800; font-size: 1.0rem; letter-spacing: -0.5px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        
         .left-prog-badge {
-            width: 100%;
-            text-align: center;
-            font-family: var(--font-head);
-            font-weight: 800;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: -0.2px;
-            padding: 4px 2px;
-            margin-bottom: 5px;
-            white-space: nowrap; 
-            overflow: hidden;
-            text-overflow: ellipsis; 
-            color: var(--accent-color);
-            transition: color 0.5s, text-shadow 0.5s;
-            opacity: 0;
+            width: 100%; text-align: center; font-family: var(--font-head); font-weight: 800;
+            font-size: 0.6rem; text-transform: uppercase; letter-spacing: -0.2px;
+            padding: 2px 0; min-height: 20px; display: flex; align-items: center; justify-content: center;
+            color: var(--accent-color); transition: color 0.5s, text-shadow 0.5s; opacity: 0; line-height: 1.1; flex-shrink: 0;
         }
         .left-prog-badge.visible { opacity: 1; }
-        
-        /* Badge Colors Mapped to Left Panel */
+        /* Badge Colors */
         .left-prog-badge.badge-night { color: #c7d2fe; text-shadow: 0 0 10px rgba(129, 140, 248, 0.4); }
         .left-prog-badge.badge-dawn { color: #ffe4e6; text-shadow: 0 0 10px rgba(251, 113, 133, 0.4); }
         .left-prog-badge.badge-morning { color: #fef3c7; text-shadow: 0 0 10px rgba(252, 211, 77, 0.4); }
@@ -194,13 +183,55 @@
         .left-prog-badge.badge-evening { color: #f3e8ff; text-shadow: 0 0 10px rgba(192, 132, 252, 0.4); }
         .left-prog-badge.badge-traffic { color: #fcd34d; text-shadow: 0 0 10px rgba(245, 158, 11, 0.6); }
 
-        .clock-container { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; }
-        .clock-display-unified { display: flex; align-items: baseline; gap: 3px; margin-bottom: 4px; }
-        .clock-hm { font-family: var(--font-mono); font-size: 1.9rem; font-weight: 700; color: #ffffff; line-height: 1; letter-spacing: -0.5px; text-shadow: 0 4px 8px rgba(0,0,0,0.3); }
-        .clock-s { font-family: var(--font-mono); font-size: 1.0rem; font-weight: 600; color: var(--accent-color); line-height: 1; opacity: 0.9; }
-        .date-display { font-size: 0.7rem; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; line-height: 1.4; margin-top: 5px; }
-        .footer-info { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 5px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .nameday-badge { background: rgba(var(--accent-warm), 0.15); color: var(--accent-warm); padding: 2px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: 700; max-width: 100%; border: 1px solid rgba(251, 191, 36, 0.25); letter-spacing: 0.5px; }
+        /* --- CLOCK --- */
+        .clock-container { 
+            flex-grow: 1; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; width: 100%; 
+            margin: 0; padding: 5px 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .clock-main-row {
+            display: flex; align-items: baseline; justify-content: center;
+            line-height: 1;
+        }
+        
+        .clock-hm { 
+            font-family: var(--font-head); 
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            color: #ffffff; 
+            letter-spacing: -0.5px; 
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5); 
+        }
+        
+        .clock-s { 
+            font-family: var(--font-mono); 
+            font-size: 0.85rem; 
+            font-weight: 400; 
+            color: #94a3b8; 
+            margin-left: 3px;
+        }
+        
+        .date-display { 
+            font-size: 0.65rem; color: #cbd5e1; 
+            text-transform: uppercase; letter-spacing: 0.5px; 
+            font-weight: 600; margin-top: 4px;
+        }
+        
+        /* NAMEDAY - MOVED UP AS REQUESTED */
+        .footer-info { 
+            width: 100%; flex-shrink: 0; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            padding-top: 2px; 
+            margin-top: -5px; /* Moved up */
+            min-height: 40px; 
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .nameday-container { width: 100%; text-align: center; }
+        .nd-label { font-size: 0.55rem; color: var(--accent-warm); font-weight: 800; letter-spacing: 1px; margin-bottom: 2px; text-transform: uppercase; display: block; }
+        .nd-names { font-size: 0.75rem; color: #fff; font-weight: 600; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; max-width: 100%; word-wrap: break-word; white-space: normal; }
 
         /* --- CREDITS & ECONOMY --- */
         .credits-content { 
@@ -367,6 +398,24 @@
         .provider-icon { width: 16px; height: 16px; border-radius: 50%; }
         .traffic-icon-svg { width: 16px; height: 16px; fill: var(--accent-warm); }
 
+        /* NYIREGYHAZA WEATHER IN FOOTER (RIGHT SIDE) */
+        .ny-weather-in-footer {
+            margin-left: auto; /* Push to right */
+            display: flex; align-items: center; gap: 6px;
+            /* New Layer Style */
+            background: linear-gradient(90deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 4px;
+            padding: 4px 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            /* Font Settings - Slightly Smaller */
+            font-size: 0.75rem; 
+            font-weight: 500;
+            color: #fff;
+            text-rendering: geometricPrecision;
+            -webkit-font-smoothing: antialiased;
+        }
+
         /* Legacy Background - Dimmed heavily */
         .default-news-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; opacity: 1; transition: opacity 1s ease; }
         .dnb-gradient { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top right, #1e3a8a, #0f172a 70%, #020617); }
@@ -379,14 +428,52 @@
             color: var(--accent-warm); font-size: 0.65rem; font-weight: 800; 
             text-transform: uppercase; letter-spacing: 0.5px;
             text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+            /* New Night Summary Logic Styles */
+            display: none;
+            margin-left: auto; 
+            margin-right: 40px;
+            z-index: 200;
         }
+        .night-summary-label.active { display: block; }
 
         .news-card.night-info { background: radial-gradient(circle at top left, #312e81, #1e1b4b); border-left: 4px solid #a855f7; alignItems: center; justify-content: center; text-align: center; padding-bottom: 35px; flex-direction: column; }
-        .goodbye-card { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, #334155 0%, #020617 100%); opacity: 0; visibility: hidden; transition: opacity 1s; z-index: 100; }
-        .goodbye-card.active { opacity: 1; visibility: visible; }
-        .gb-moon { font-size: 3rem; margin-bottom: 8px; filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.5)); animation: float 6s ease-in-out infinite; }
-        .gb-title { font-family: var(--font-head); font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: 4px; text-align: center; }
         
+        /* GOODBYE CARD REDESIGN V177 - Bigger Logo/Text, No Subtitle */
+        .goodbye-card { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: radial-gradient(circle at 50% 120%, #1e1b4b 0%, #020617 60%, #000000 100%);
+            opacity: 0; visibility: hidden; 
+            transition: opacity 1.5s cubic-bezier(0.19, 1, 0.22, 1), transform 1.5s ease;
+            transform: scale(0.95);
+            z-index: 1000; /* Ensure on top */
+            border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+        }
+        .goodbye-card.active { opacity: 1; visibility: visible; transform: scale(1); }
+        
+        .gb-moon { 
+            font-size: 4.5rem; margin-bottom: 15px; 
+            filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.4)); 
+            animation: float 6s ease-in-out infinite; 
+        }
+        .gb-title { 
+            font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; color: #fff; 
+            margin-bottom: 15px; text-align: center; letter-spacing: 1px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            background: linear-gradient(to bottom, #fff 40%, #94a3b8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        
+        /* SCALED UP BRAND */
+        .gb-brand-lockup {
+            display: flex; align-items: center; gap: 15px; margin-top: 10px;
+            opacity: 0.9;
+            transform: scale(1.8); /* Requested bigger size */
+        }
+        .gb-brand-lockup svg { width: 30px; height: 30px; fill: var(--accent-color); filter: drop-shadow(0 0 10px rgba(56,189,248,0.5)); }
+        .gb-brand-text { font-family: var(--font-head); font-weight: 900; font-size: 1.2rem; color: #fff; }
+
         /* BIG CLOCK */
         .big-clock-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #020617 100%); z-index: 60; display: flex; flex-direction: row; gap: 30px; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
         .big-clock-layer.active { opacity: 1; pointer-events: all; }
@@ -403,7 +490,7 @@
         .center-dot { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 5px rgba(255,255,255,0.8); }
         .hour-mark { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; justify-content: center; padding-top: 4px; font-family: var(--font-serif); font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.8); pointer-events: none; }
         
-        /* --- CONTROLS BAR (SHARP) --- */
+        /* --- CONTROLS BAR (SHARP REBUILD) --- */
         .controls-bar { 
             position: absolute; 
             top: calc(100% - 28px); 
@@ -411,13 +498,15 @@
             height: 28px; 
             border-top: 1px solid var(--panel-border); 
             background: #020617; 
-            font-size: 0.7rem; 
+            font-size: 0.75rem;
             z-index: 200; 
             overflow: hidden; 
             opacity: 0; 
             transition: height 0.6s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s ease;
             pointer-events: auto;
             cursor: pointer;
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale;
         }
         .ticker-container.open .controls-bar { opacity: 1; }
 
@@ -431,16 +520,65 @@
             -webkit-backdrop-filter: none;
         }
         
-        /* Normal Controls container */
+        /* Normal Controls container - FLEX LAYOUT */
         .controls-normal-content {
             display: flex; align-items: center; justify-content: space-between;
-            width: 100%; height: 28px; padding: 0 10px;
+            width: 100%; height: 28px; padding: 0 15px;
             transition: opacity 0.3s;
             position: absolute; top: 0; left: 0;
             pointer-events: auto !important; 
             z-index: 101;
+            padding: 0 10px;
+            gap: 15px;
         }
         .controls-bar.breaking-active .controls-normal-content { opacity: 0; pointer-events: none !important; }
+
+        /* ZONE 1: LEFT (WEATHER) - HIDDEN, MOVED TO FOOTER */
+        .cb-left { display: none; }
+
+        /* ZONE 2: CENTER (TIMELINE or EMPTY) */
+        .cb-center {
+            flex-grow: 1; display: flex; align-items: center; justify-content: flex-start; position: relative; overflow: hidden; padding-left: 10px;
+        }
+        
+        /* TIMELINE FIX: Added z-index and pointer-events */
+        #timeline-container { display: none; gap: 3px; overflow-x: auto; scrollbar-width: none; pointer-events: auto !important; z-index: 105; }
+        #timeline-container.visible { display: flex; }
+        #timeline-container.shifted { margin-right: 15px; } /* Add spacing when shifted */
+        
+        .timeline-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #ccc; font-family: var(--font-mono); font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; cursor: pointer; transition: all 0.2s; pointer-events: auto !important; }
+        .timeline-btn:hover, .timeline-btn.active { background: var(--accent-warm); color: #000; font-weight:700; }
+
+        /* ZONE 3: RIGHT (CONTROLS) */
+        .cb-right {
+            display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: auto;
+            transform: translateZ(0); /* GPU Trigger */
+            backface-visibility: hidden;
+        }
+        
+        /* LIVE INDICATOR */
+        .live-dot {
+            width: 6px; height: 6px; border-radius: 50%; background: #22c55e;
+            box-shadow: 0 0 5px #22c55e; margin-right: 5px; opacity: 0.8;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+        .live-dot.updating { background: #ef4444; box-shadow: 0 0 5px #ef4444; animation: blink 0.5s infinite; }
+        @keyframes blink { 50% { opacity: 0.3; } }
+
+        .control-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer; padding: 3px 6px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; pointer-events: auto !important; }
+        .control-btn:hover { background: var(--accent-color); color: #000; }
+        .control-btn svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 3; fill: none; }
+
+        /* NEXT PROGRAM ALERT - Right Side */
+        .next-prog-alert { 
+            display: none; align-items: center; gap: 5px; 
+            color: var(--accent-next); font-weight: 700; font-size: 0.65rem; 
+            text-transform: uppercase; 
+            background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); 
+            padding: 2px 8px; border-radius: 4px; 
+            white-space: nowrap;
+        }
+        .next-prog-alert.active { display: flex; }
 
         /* INTRO LAYER */
         .bp-intro-layer {
@@ -459,18 +597,21 @@
             50% { opacity: 0.2; text-shadow: none; color: #ef4444; }
         }
 
-        /* NEWS LAYER */
+        /* NEWS LAYER - SHARP FIX V3 */
         .bp-news-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; align-items: center; padding: 0 20px;
             opacity: 0; transition: opacity 0.5s;
+            /* CRITICAL FOR SHARPNESS ON TEXT */
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         .bp-badge {
             font-size: 0.6rem; font-weight: 800; color: #fff; background: #be123c;
             padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
             margin-right: 15px; flex-shrink: 0;
+            transform: translateZ(0); /* Fix badge jitter */
         }
         
         .bp-meta {
@@ -480,15 +621,18 @@
         
         .bp-text-scroller {
             flex-grow: 1; overflow: hidden; position: relative; height: 100%; display: flex; align-items: center;
-            mask-image: linear-gradient(to right, transparent, black 10px, black 95%, transparent);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black 95%, transparent);
+            /* Remove mask to improve performance and sharpness */
+            transform: translateZ(0); 
+            backface-visibility: hidden;
         }
         
         #bp-text {
             font-family: var(--font-head); font-weight: 700; color: #fff; font-size: 1.05rem;
             white-space: nowrap; position: relative;
-            will-change: transform; 
+            /* This forces GPU but keeps text vectors cleaner in Chrome */
+            transform: translate3d(0,0,0); 
             padding-left: 25px;
+            will-change: transform; /* Hint to browser */
         }
 
         @keyframes scrollTextLeft {
@@ -496,28 +640,13 @@
             100% { transform: translateX(var(--scroll-dist)); } 
         }
 
-        .update-indicator { display: none; font-size: 0.65rem; font-weight: 700; color: var(--accent-warm); margin-right: 10px; animation: pulseText 1s infinite; }
-        .update-indicator.active { display: block; }
-        .next-prog-alert { display: none; align-items: center; gap: 5px; color: var(--accent-next); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 2px 8px; border-radius: 4px; }
-        .next-prog-alert.active { display: flex; }
-        
-        .progress-line-container { position: absolute; bottom: 28px; /* Lift above controls */ left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.1); z-index: 6; }
+        .progress-line-container { position: absolute; bottom: 28px; /* Lift above controls */ left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.1); z-index: 300; }
         .progress-line { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-color), var(--accent-warm)); box-shadow: 0 0 8px var(--accent-color); }
         .animate-progress { animation: progressFill linear forwards; }
         @keyframes progressFill { from { width: 0%; } to { width: 100%; } }
         
-        /* TIMELINE FIX: Added z-index and pointer-events */
-        #timeline-container { display: none; flex-grow: 1; gap: 3px; overflow-x: auto; scrollbar-width: none; mask-image: linear-gradient(to right, transparent, black 10px, black 90%, transparent); pointer-events: auto !important; z-index: 105; }
-        #timeline-container.visible { display: flex; }
+        .update-indicator { display: none; } /* Replaced by dot */
         
-        .timeline-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #ccc; font-family: var(--font-mono); font-size: 0.65rem; padding: 1px 5px; border-radius: 3px; cursor: pointer; transition: all 0.2s; pointer-events: auto !important; }
-        .timeline-btn:hover, .timeline-btn.active { background: var(--accent-warm); color: #000; font-weight:700; }
-        
-        .control-group { display: flex; gap: 8px; align-items: center; pointer-events: auto; z-index: 105; }
-        .control-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; cursor: pointer; padding: 3px 6px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; pointer-events: auto !important; }
-        .control-btn:hover { background: var(--accent-color); color: #000; }
-        .control-btn svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 3; fill: none; }
-
         /* --- WEATHER & SCHEDULE FLIPPER --- */
         .weather-header-container { 
             height: 28px; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--glass-border); 
@@ -614,12 +743,13 @@
             display: none; flex-direction: column; gap: 10px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             color: #fff; font-family: var(--font-mono);
+            max-height: 80vh; overflow-y: auto;
         }
         #dev-menu h3 { margin: 0 0 10px 0; color: var(--accent-warm); text-transform: uppercase; font-size: 0.9rem; }
         .dev-btn {
             background: rgba(56, 189, 248, 0.2); border: 1px solid var(--accent-color);
             color: #fff; padding: 8px; cursor: pointer; font-family: var(--font-body); font-weight: 600;
-            transition: background 0.2s;
+            transition: background 0.2s; font-size: 0.8rem;
         }
         .dev-btn:hover { background: var(--accent-color); color: #000; }
         .dev-close { background: #dc2626; border-color: #ef4444; margin-top: 10px; }
@@ -635,23 +765,47 @@
 
         .manual-refresh { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; background: var(--accent-color); border-radius: 50%; cursor: pointer; opacity: 0; transition: opacity 0.3s; }
         .identity-panel:hover .manual-refresh { opacity: 0.5; }
+        
+        #night-summary-label {
+            display: none;
+            align-items: center;
+            font-size: 0.7rem; font-weight: 700;
+            color: var(--accent-warm); text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            /* ALIGNMENT FIX */
+            margin-left: auto; /* Pushes to right */
+            margin-right: 40px; /* Buffer before the counter */
+            z-index: 200;
+        }
+        #night-summary-label.active { display: flex; }
     </style>
 </head>
 <body data-theme="night">
 
     <div class="ambient-background" id="sky-bg"></div>
 
-    <!-- DEV MENU -->
+    <!-- DEV MENU (EXPANDED V181) -->
     <div id="dev-menu">
-        <h3>Fejlesztői Menü</h3>
-        <button class="dev-btn" onclick="window.triggerTestBreaking()">Teszt: Rövid Hír (Breaking)</button>
-        <button class="dev-btn" onclick="window.triggerTestBreakingLong()">Teszt: Hosszú Hír (Breaking)</button>
-        <button class="dev-btn" style="border-color: #f59e0b; color: #f59e0b;" onclick="window.triggerTestTraffic()">Teszt: Közlekedési Hír</button>
-        <button class="dev-btn" style="border-color: #fbbf24; color: #fbbf24;" onclick="window.triggerEconomyTest()">Teszt: Árfolyam Panel</button>
-        <!-- NEW BUTTON -->
-        <button class="dev-btn" style="border-color: #a855f7; color: #a855f7;" onclick="window.triggerHourChangeTest()">Teszt: Óraváltás (Analóg)</button>
+        <h3>Hírek & Panel Tesztek</h3>
+        <button class="dev-btn" onclick="window.triggerTestBreaking()">Teszt: Breaking (Rövid)</button>
+        <button class="dev-btn" onclick="window.triggerTestBreakingLong()">Teszt: Breaking (Hosszú)</button>
+        <button class="dev-btn" style="border-color: #f59e0b; color: #f59e0b;" onclick="window.triggerTestTraffic()">Teszt: Közlekedés</button>
+        <button class="dev-btn" onclick="window.triggerVisualNews()">Teszt: Képes Hír (Normál)</button>
+        <button class="dev-btn" onclick="window.triggerTextNews()">Teszt: Szöveges Hír (Normál)</button>
         
-        <button class="dev-btn" onclick="window.location.reload()">Újratöltés</button>
+        <h3 style="margin-top:10px;">Jobb Panel & Egyéb</h3>
+        <button class="dev-btn" style="border-color: #fbbf24; color: #fbbf24;" onclick="window.triggerEconomyTest()">Teszt: Árfolyam</button>
+        <button class="dev-btn" onclick="window.triggerSchedule()">Teszt: Műsorajánló</button>
+        <button class="dev-btn" onclick="window.triggerWeatherLoading()">Teszt: Időjárás Loader</button>
+        
+        <h3 style="margin-top:10px;">Módok & Események</h3>
+        <button class="dev-btn" onclick="window.triggerNightMode()">Teszt: Éjszakai Mód (Timeline + Felirat)</button>
+        <button class="dev-btn" onclick="window.triggerDayMode()">Teszt: Nappali Mód (Vissza)</button>
+        <button class="dev-btn" style="border-color: #a855f7; color: #a855f7;" onclick="window.triggerHourChangeTest()">Teszt: Óraváltás (10mp)</button>
+        <button class="dev-btn" style="border-color: #c026d3; color: #c026d3;" onclick="window.triggerGoodbyeTest()">Teszt: Elköszönés (15mp)</button>
+        <button class="dev-btn" onclick="window.triggerCredits()">Teszt: Stáblista</button>
+        
         <button class="dev-btn dev-close" onclick="window.closeDevMenu()">Bezárás</button>
     </div>
 
@@ -671,16 +825,21 @@
                         <!-- NEW LEFT BADGE LOCATION -->
                         <div id="left-program-badge" class="left-prog-badge">BETÖLTÉS...</div>
                         
+                        <!-- NEW COMPACT & SOLID CLOCK -->
                         <div class="clock-container">
-                            <div class="clock-display-unified">
-                                <span id="clock-hm" class="clock-hm">--:--</span>
-                                <span id="clock-s" class="clock-s">:--</span>
+                            <div class="clock-main-row">
+                                <div id="clock-hm" class="clock-hm">--:--</div>
+                                <div id="clock-s" class="clock-s">--</div>
                             </div>
                             <div id="date-display" class="date-display">...</div>
                         </div>
                         
+                        <!-- NAMEDAY MOVED BACK HERE -->
                         <div class="footer-info">
-                            <div id="nameday" class="nameday-badge"></div>
+                            <div class="nameday-container">
+                                <span class="nd-label">A MAI NÉVNAP:</span>
+                                <div id="nameday-text" class="nd-names"></div>
+                            </div>
                         </div>
                         
                         <div class="manual-refresh" id="manual-refresh-trigger"></div>
@@ -797,14 +956,27 @@
 
             <div class="progress-line-container"><div id="progress-bar" class="progress-line"></div></div>
 
-            <!-- SIMPLIFIED CONTROLS BAR V153 (Solid & Sharp) -->
+            <!-- SIMPLIFIED CONTROLS BAR V166 (REBUILT) -->
             <div class="controls-bar" id="controls-bar-main">
                 <!-- Normal Content -->
                 <div class="controls-normal-content" id="controls-normal">
-                    <div id="timeline-container"></div>
-                    <div id="update-indicator" class="update-indicator">FRISSÍTÉS...</div>
-                    <div id="next-prog-alert" class="next-prog-alert"></div>
-                    <div class="control-group">
+                    
+                    <!-- ZONE 1: LEFT - Special Weather (NOW HIDDEN - MOVED TO NEWS FOOTER) -->
+                    <div class="cb-left" style="display:none;"></div>
+
+                    <!-- ZONE 2: CENTER - Dynamic (Timeline / Next Alert / Night Label) -->
+                    <div class="cb-center">
+                         <div id="timeline-container"></div>
+                         <div id="night-summary-label">AZ ELŐZŐ NAP HÍREI - ÖSSZEFOGLALÓ</div>
+                    </div>
+                    
+                    <!-- ZONE 3: RIGHT - System Controls -->
+                    <div class="cb-right">
+                        <div id="next-prog-alert" class="next-prog-alert"></div>
+                        
+                        <!-- Update Indicator (LIVE DOT) -->
+                        <div id="live-indicator" class="live-dot"></div>
+                        
                         <span id="counter-display" style="font-family:var(--font-mono); color:var(--text-muted); margin-right:5px; font-weight:700;">0/0</span>
                         <button class="control-btn" id="prev-btn"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                         <button class="control-btn" id="next-btn"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -930,15 +1102,6 @@
         
         const HUNGARIAN_CITIES_OM = [ 
             { name: 'Debrecen', lat: 47.53, lon: 21.62 }, { name: 'Miskolc', lat: 48.10, lon: 20.78 }, { name: 'Szombathely', lat: 47.23, lon: 16.62 }, { name: 'Győr', lat: 47.68, lon: 17.63 }, { name: 'Pécs', lat: 46.07, lon: 18.23 }, { name: 'Szeged', lat: 46.25, lon: 20.15 }, { name: 'Eger', lat: 47.90, lon: 20.37 }, { name: 'Veszprém', lat: 47.09, lon: 17.91 }, { name: 'Zalaegerszeg', lat: 46.84, lon: 16.84 }, { name: 'Békéscsaba', lat: 46.68, lon: 21.09 }, { name: 'Kaposvár', lat: 46.36, lon: 17.79 }, { name: 'Tatabánya', lat: 47.57, lon: 18.40 }, { name: 'Salgótarján', lat: 48.10, lon: 19.80 }, { name: 'Szekszárd', lat: 46.35, lon: 18.70 }, { name: 'Sopron', lat: 47.68, lon: 16.58 }, { name: 'Hódmezővásárhely', lat: 46.43, lon: 20.32 }, { name: 'Nagykanizsa', lat: 46.45, lon: 16.99 }, { name: 'Dunaújváros', lat: 46.96, lon: 18.93 }, { name: 'Érd', lat: 47.38, lon: 18.91 }, { name: 'Szolnok', lat: 47.18, lon: 20.20 }, { name: 'Kecskemét', lat: 46.88, lon: 19.64 }, { name: 'Baja', lat: 46.18, lon: 18.95 }, { name: 'Cegléd', lat: 47.17, lon: 19.80 }, { name: 'Vác', lat: 47.78, lon: 19.13 }, { name: 'Gödöllő', lat: 47.60, lon: 19.35 }, { name: 'Ózd', lat: 48.22, lon: 20.29 }, { name: 'Pápa', lat: 47.33, lon: 17.47 }, { name: 'Gyula', lat: 46.65, lon: 21.28 }, { name: 'Hajdúböszörmény', lat: 47.67, lon: 21.51 }, { name: 'Nyíregyháza', lat: 47.95, lon: 21.71 }, { name: 'Balatonfüred', lat: 46.96, lon: 17.89 }, { name: 'Keszthely', lat: 46.76, lon: 17.24 }, { name: 'Siófok', lat: 46.90, lon: 18.05 }, { name: 'Komárom', lat: 47.74, lon: 18.11 }, { name: 'Esztergom', lat: 47.79, lon: 18.74 }, { name: 'Tata', lat: 47.65, lon: 18.31 }, { name: 'Mohács', lat: 45.99, lon: 18.68 }, { name: 'Paks', lat: 46.62, lon: 18.86 }, { name: 'Kalocsa', lat: 46.53, lon: 18.98 }, { name: 'Kiskunfélegyháza', lat: 46.71, lon: 19.85 }, { name: 'Jászberény', lat: 47.50, lon: 19.91 }, { name: 'Hatvan', lat: 47.66, lon: 19.67 }, { name: 'Gyöngyös', lat: 47.78, lon: 19.93 }, { name: 'Kazincbarcika', lat: 48.25, lon: 20.62 }, { name: 'Sátoraljaújhely', lat: 48.40, lon: 21.65 }, { name: 'Kisvárda', lat: 48.22, lon: 22.08 }, { name: 'Mátészalka', lat: 47.95, lon: 22.32 }, { name: 'Makó', lat: 46.22, lon: 20.47 }, { name: 'Szentes', lat: 46.65, lon: 20.26 }, { name: 'Orosháza', lat: 46.57, lon: 20.66 }, { name: 'Karcag', lat: 47.31, lon: 20.93 }, { name: 'Hajdúszoboszló', lat: 47.45, lon: 21.39 }, { name: 'Törökszentmiklós', lat: 47.17, lon: 20.41 }, { name: 'Gyál', lat: 47.38, lon: 19.22 }, { name: 'Dunakeszi', lat: 47.64, lon: 19.14 }, { name: 'Budaörs', lat: 47.46, lon: 18.96 }, { name: 'Szentendre', lat: 47.66, lon: 19.07 }, { name: 'Szigetszentmiklós', lat: 47.34, lon: 19.05 }, { name: 'Mosonmagyaróvár', lat: 47.87, lon: 17.27 }, { name: 'Bicske', lat: 47.49, lon: 18.63 }, { name: 'Monor', lat: 47.35, lon: 19.45 }, { name: 'Mezőkövesd', lat: 47.81, lon: 20.57 }, { name: 'Tiszaújváros', lat: 47.92, lon: 21.05 }, { name: 'Sárospatak', lat: 48.32, lon: 21.57 },
-            /* New additions */
-            { name: 'Kőszeg', lat: 47.38, lon: 16.54 }, { name: 'Sárvár', lat: 47.25, lon: 16.93 }, { name: 'Tapolca', lat: 46.88, lon: 17.43 }, { name: 'Hévíz', lat: 46.79, lon: 17.18 }, { name: 'Balatonboglár', lat: 46.77, lon: 17.65 }, { name: 'Fonyód', lat: 46.74, lon: 17.55 }, { name: 'Pápoc', lat: 47.42, lon: 17.13 }, { name: 'Zirc', lat: 47.26, lon: 17.87 }, { name: 'Mór', lat: 47.37, lon: 18.20 }, { name: 'Gárdony', lat: 47.19, lon: 18.60 }, { name: 'Velence', lat: 47.24, lon: 18.65 }, { name: 'Abony', lat: 47.19, lon: 20.00 }, { name: 'Nagykáta', lat: 47.41, lon: 19.74 }, { name: 'Gyömrő', lat: 47.42, lon: 19.39 }, { name: 'Pécel', lat: 47.49, lon: 19.34 }, { name: 'Üllő', lat: 47.38, lon: 19.35 }, { name: 'Vecsés', lat: 47.40, lon: 19.26 }, { name: 'Törökbálint', lat: 47.43, lon: 18.91 }, { name: 'Biatorbágy', lat: 47.47, lon: 18.82 }, { name: 'Budakeszi', lat: 47.51, lon: 18.93 },
-            /* V148 Additions */
-            { name: 'Harkány', lat: 45.85, lon: 18.23 }, { name: 'Zalakaros', lat: 46.56, lon: 17.12 }, { name: 'Bükfürdő', lat: 47.38, lon: 16.75 }, { name: 'Egerszalók', lat: 47.88, lon: 20.32 }, { name: 'Demjén', lat: 47.83, lon: 20.33 }, { name: 'Poroszló', lat: 47.65, lon: 20.65 }, { name: 'Tiszafüred', lat: 47.62, lon: 20.75 }, { name: 'Abádszalók', lat: 47.47, lon: 20.59 }, { name: 'Szarvas', lat: 46.86, lon: 20.55 }, { name: 'Gyopárosfürdő', lat: 46.57, lon: 20.63 }, { name: 'Siklós', lat: 45.85, lon: 18.30 }, { name: 'Szigetvár', lat: 46.05, lon: 17.80 }, { name: 'Soltvadkert', lat: 46.58, lon: 19.39 }, { name: 'Kiskőrös', lat: 46.62, lon: 19.28 }, { name: 'Lillafüred', lat: 48.10, lon: 20.62 }, { name: 'Szilvásvárad', lat: 48.10, lon: 20.39 }, { name: 'Hollókő', lat: 47.99, lon: 19.58 }, { name: 'Tokaj', lat: 48.12, lon: 21.41 }, { name: 'Villány', lat: 45.87, lon: 18.45 }, { name: 'Badacsony', lat: 46.79, lon: 17.50 }
-        ];
-
-        // Expanded Foreign Cities List (+20 New)
-        const FOREIGN_CITIES = [ 
-            { name: 'London', lat: 51.50, lon: -0.12 }, { name: 'New York', lat: 40.71, lon: -74.00 }, { name: 'Tokió', lat: 35.68, lon: 139.69 }, { name: 'Peking', lat: 39.90, lon: 116.40 }, { name: 'Moszkva', lat: 55.75, lon: 37.61 }, { name: 'Sydney', lat: -33.86, lon: 151.20 }, { name: 'Párizs', lat: 48.85, lon: 2.35 }, { name: 'Berlin', lat: 52.52, lon: 13.40 }, { name: 'Róma', lat: 41.90, lon: 12.49 }, { name: 'Dubai', lat: 25.20, lon: 55.27 }, { name: 'Isztambul', lat: 41.00, lon: 28.97 }, { name: 'Bécs', lat: 48.20, lon: 16.37 }, { name: 'Los Angeles', lat: 34.05, lon: -118.24 }, { name: 'Madrid', lat: 40.41, lon: -3.70 }, { name: 'Toronto', lat: 43.65, lon: -79.38 }, { name: 'Mumbai', lat: 19.07, lon: 72.87 }, { name: 'Szingapúr', lat: 1.35, lon: 103.81 }, { name: 'Kairó', lat: 30.04, lon: 31.23 }, { name: 'Rio de Janeiro', lat: -22.90, lon: -43.17 }, { name: 'Prága', lat: 50.07, lon: 14.43 }, { name: 'Amszterdam', lat: 52.36, lon: 4.90 }, { name: 'Barcelona', lat: 41.38, lon: 2.17 }, { name: 'Zürich', lat: 47.37, lon: 8.54 }, { name: 'Varsó', lat: 52.22, lon: 21.01 }, { name: 'Bangkok', lat: 13.75, lon: 100.50 }, { name: 'Szöul', lat: 37.56, lon: 126.97 }, { name: 'Mexikóváros', lat: 19.43, lon: -99.13 }, { name: 'Buenos Aires', lat: -34.60, lon: -58.38 }, { name: 'Jakarta', lat: -6.20, lon: 106.84 }, { name: 'Lima', lat: -12.04, lon: -77.04 }, { name: 'Fokváros', lat: -33.92, lon: 18.42 }, { name: 'Helsinki', lat: 60.17, lon: 24.93 }, { name: 'Oslo', lat: 59.91, lon: 10.75 }, { name: 'Stockholm', lat: 59.32, lon: 18.06 }, { name: 'Koppenhága', lat: 55.67, lon: 12.56 }, { name: 'Reykjavik', lat: 64.14, lon: -21.94 }, { name: 'Dublin', lat: 53.34, lon: -6.26 }, { name: 'Lisszabon', lat: 38.72, lon: -9.13 }, { name: 'Athén', lat: 37.98, lon: 23.72 }, { name: 'Ankara', lat: 39.93, lon: 32.85 }, { name: 'Jeruzsálem', lat: 31.76, lon: 35.21 }, { name: 'Újdelhi', lat: 28.61, lon: 77.20 }, { name: 'Chicago', lat: 41.87, lon: -87.62 }, { name: 'San Francisco', lat: 37.77, lon: -122.41 }, { name: 'Vancouver', lat: 49.28, lon: -123.12 }, { name: 'Montreal', lat: 45.50, lon: -73.56 }, { name: 'Sao Paulo', lat: -23.55, lon: -46.63 }, { name: 'Santiago', lat: -33.44, lon: -70.66 }, { name: 'Bogota', lat: 4.71, lon: -74.07 }, { name: 'Casablanca', lat: 33.57, lon: -7.58 }, { name: 'Lagos', lat: 6.52, lon: 3.37 }, { name: 'Nairobi', lat: -1.29, lon: 36.82 }, { name: 'Rijád', lat: 24.71, lon: 46.67 }, { name: 'Teherán', lat: 35.68, lon: 51.38 }, { name: 'Karacsi', lat: 24.86, lon: 67.00 }, { name: 'Sanghaj', lat: 31.23, lon: 121.47 }, { name: 'Oszaka', lat: 34.69, lon: 135.50 }, { name: 'Manila', lat: 14.59, lon: 120.98 }, { name: 'Kuala Lumpur', lat: 3.13, lon: 101.68 }, { name: 'Hanoi', lat: 21.02, lon: 105.83 }, { name: 'Melbourne', lat: -37.81, lon: 144.96 }, { name: 'Auckland', lat: -36.84, lon: 174.76 }, { name: 'Brüsszel', lat: 50.85, lon: 4.35 }, { name: 'Genf', lat: 46.20, lon: 6.14 }, { name: 'München', lat: 48.13, lon: 11.58 }, { name: 'Milánó', lat: 45.46, lon: 9.19 }, { name: 'Nápoly', lat: 40.85, lon: 14.26 }, { name: 'Velence', lat: 45.44, lon: 12.31 }, { name: 'Lyon', lat: 45.76, lon: 4.83 }, { name: 'Marseille', lat: 43.29, lon: 5.36 }, { name: 'Las Vegas', lat: 36.16, lon: -115.13 }, { name: 'Miami', lat: 25.76, lon: -80.19 }, { name: 'Boston', lat: 42.36, lon: -71.05 }, { name: 'Seattle', lat: 47.60, lon: -122.33 }, { name: 'Denver', lat: 39.73, lon: -104.99 }, { name: 'Havanna', lat: 23.11, lon: -82.36 }, { name: 'Panamaváros', lat: 8.98, lon: -79.51 }, { name: 'Caracas', lat: 10.48, lon: -66.90 }, { name: 'La Paz', lat: -16.50, lon: -68.11 }, { name: 'Kijev', lat: 50.45, lon: 30.52 }, { name: 'Minszk', lat: 53.90, lon: 27.56 }, { name: 'Bukarest', lat: 44.42, lon: 26.10 }, { name: 'Belgrád', lat: 44.78, lon: 20.44 }, { name: 'Zágráb', lat: 45.81, lon: 15.98 }, { name: 'Szlovénia', lat: 46.05, lon: 14.50 }, { name: 'Pozsony', lat: 48.14, lon: 17.10 }, { name: 'Krakkó', lat: 50.06, lon: 19.94 }, { name: 'Gdansk', lat: 54.35, lon: 18.64 }, { name: 'Hamburg', lat: 53.55, lon: 9.99 }, { name: 'Frankfurt', lat: 50.11, lon: 8.68 }, { name: 'Köln', lat: 50.93, lon: 6.96 }, { name: 'Stuttgart', lat: 48.77, lon: 9.18 }, { name: 'Manchester', lat: 53.48, lon: -2.24 }, { name: 'Birmingham', lat: 52.48, lon: -1.89 }, { name: 'Glasgow', lat: 55.86, lon: -4.25 }, { name: 'Edinburgh', lat: 55.95, lon: -3.18 }, { name: 'Valencia', lat: 39.46, lon: -0.37 }, { name: 'Sevilla', lat: 37.38, lon: -5.98 }, { name: 'Porto', lat: 41.15, lon: -8.62 }, { name: 'Tel Aviv', lat: 32.08, lon: 34.78 }, { name: 'Doha', lat: 25.28, lon: 51.53 }, { name: 'Abu Dhabi', lat: 24.45, lon: 54.37 },
             /* V148 Additions */
             { name: 'Zakopane', lat: 49.29, lon: 19.94 }, { name: 'Poprad', lat: 49.05, lon: 20.30 }, { name: 'Donovaly', lat: 48.88, lon: 19.22 }, { name: 'Semmering', lat: 47.63, lon: 15.83 }, { name: 'Murau', lat: 47.11, lon: 14.17 }, { name: 'Cortina d\'Ampezzo', lat: 46.54, lon: 12.13 }, { name: 'Chamonix', lat: 45.92, lon: 6.86 }, { name: 'Zermatt', lat: 46.02, lon: 7.74 }, { name: 'St. Moritz', lat: 46.49, lon: 9.83 }, { name: 'Aspen', lat: 39.19, lon: -106.81 }, { name: 'Whistler', lat: 50.11, lon: -122.95 }, { name: 'Banff', lat: 51.17, lon: -115.57 }, { name: 'Queenstown', lat: -45.03, lon: 168.66 }, { name: 'Bariloche', lat: -41.13, lon: -71.30 }, { name: 'Niseko', lat: 42.80, lon: 140.68 }, { name: 'Nagano', lat: 36.64, lon: 138.18 }, { name: 'Sochi', lat: 43.60, lon: 39.73 }, { name: 'Almaty', lat: 43.22, lon: 76.85 }, { name: 'Gudauri', lat: 42.47, lon: 44.48 }, { name: 'Bansko', lat: 41.83, lon: 23.48 }
         ];
@@ -982,7 +1145,9 @@
             clockHm: document.getElementById('clock-hm'),
             clockS: document.getElementById('clock-s'),
             date: document.getElementById('date-display'),
-            nameday: document.getElementById('nameday'),
+            // Nameday moved to left panel
+            namedayText: document.getElementById('nameday-text'),
+            
             trackA: document.getElementById('track-a'),
             trackB: document.getElementById('track-b'),
             progressBar: document.getElementById('progress-bar'),
@@ -1015,7 +1180,7 @@
             bcTime: document.getElementById('bc-time-display'),
             nextProgAlert: document.getElementById('next-prog-alert'),
             crYear: document.getElementById('cr-year'),
-            updateIndicator: document.getElementById('update-indicator'),
+            
             creditsContent: document.getElementById('credits-content'),
             economyContent: document.getElementById('economy-content'),
             controlsBar: document.getElementById('controls-bar-main'),
@@ -1028,6 +1193,9 @@
             bpSource: document.getElementById('bp-source'),
             bpText: document.getElementById('bp-text'),
             bpTextScroller: document.querySelector('.bp-text-scroller'),
+            
+            // NEW Bottom Info Ticker (Weather Only)
+            bitWeatherText: document.getElementById('bottom-weather-text'),
             
             mainContainer: document.querySelector('.ticker-container'),
             leftPanel: document.querySelector('.identity-panel'),
@@ -1081,7 +1249,8 @@
             lastRefreshTimestamp: Date.now(),
             breakingActive: false,
             breakingLink: null,
-            breakingQueue: [] // NEW QUEUE
+            breakingQueue: [],
+            currentNyData: null // Start as null to hide by default
         };
 
         // --- UTILITIES ---
@@ -1097,21 +1266,13 @@
             throw new Error('All proxies failed for ' + url);
         }
 
-        // IMPROVED IMAGE EXTRACTION (Fixes ATV and others)
         function extractImageUrl(item, descHtml) {
-            // 1. Check media:content (Standard + ATV often uses this)
             const media = item.querySelector("media\\:content") || item.querySelector("content");
             if(media && media.getAttribute('url')) return media.getAttribute('url');
-
-            // 2. Check media:thumbnail (Very common in Hungarian feeds like ATV)
             const thumb = item.querySelector("media\\:thumbnail");
             if(thumb && thumb.getAttribute('url')) return thumb.getAttribute('url');
-
-            // 3. Check enclosure
             const enclosure = item.querySelector("enclosure");
             if(enclosure && enclosure.getAttribute('type')?.startsWith('image')) return enclosure.getAttribute('url');
-
-            // 4. Robust Regex for description (Handles single/double quotes, case insensitive)
             const match = descHtml.match(/<img[^>]+src=["']([^"']+)["']/i);
             return match ? match[1] : null;
         }
@@ -1155,16 +1316,12 @@
             el.economyContent.classList.add('active');
             state.economySlideIndex = 0;
             updateEconomySlide();
-            
             if (state.economyCarouselInterval) clearInterval(state.economyCarouselInterval);
-            
             state.economyCarouselInterval = setInterval(() => {
                 state.economySlideIndex = (state.economySlideIndex + 1) % 5;
                 updateEconomySlide();
             }, 8000); 
-            
             flipPanel('identity', true);
-            
             setTimeout(() => { 
                 flipPanel('identity', false); 
                 state.economyVisible = false;
@@ -1181,13 +1338,10 @@
 
         async function fetchExchangeRates() {
             try {
-                // Use Open Exchange Rate API (No Key Required, Fast)
                 const res = await fetch('https://open.er-api.com/v6/latest/HUF');
                 const data = await res.json();
-                
                 if (data && data.rates) {
                     const currencies = ['EUR', 'USD', 'CHF', 'GBP', 'AUD', 'CAD', 'PLN', 'CZK', 'RON', 'JPY', 'CNY', 'TRY', 'SEK', 'NOK', 'DKK'];
-                    
                     currencies.forEach(curr => {
                         if (data.rates[curr]) {
                             const val = 1 / data.rates[curr];
@@ -1201,9 +1355,7 @@
                         }
                     });
                 }
-            } catch (e) {
-                console.error("Exchange Rate Error:", e);
-            }
+            } catch (e) { console.error("Exchange Rate Error:", e); }
         }
 
         // --- SOLAR ENGINE ---
@@ -1271,14 +1423,66 @@
             return ICONS.CLOUDY;
         }
 
-        async function fetchWeatherData() {
-            // Priority: PWS
-            const stationKeys = Object.keys(PWS_MAP).sort(() => 0.5 - Math.random()).slice(0, 8);
+        // --- SPECIFIC NYÍREGYHÁZA WEATHER FETCH (STRICT PWS + NEW TEXT FORMAT) ---
+        async function fetchNyiregyhazaSpecific() {
+            const PWS_IDS = ["INYREG37", "INYREG_MASODIK"]; 
             
+            let finalData = null;
+
+            // Try PWS Only (Strict)
+            for (const id of PWS_IDS) {
+                if (!id || id === "INYREG_MASODIK") continue;
+                try {
+                    const url = `https://api.weather.com/v2/pws/observations/current?stationId=${id}&format=json&units=m&apiKey=${WUNDERGROUND_API_KEY}&numericPrecision=decimal`;
+                    const res = await fetch(url, { signal: AbortSignal.timeout(2500) });
+                    if(res.ok) {
+                        const data = await res.json();
+                        if(data.observations && data.observations.length > 0) {
+                            const obs = data.observations[0];
+                            finalData = {
+                                metric: {
+                                    temp: obs.metric.temp,
+                                    windSpeed: obs.metric.windSpeed,
+                                    winddir: obs.metric.winddir,
+                                    pressure: obs.metric.pressure
+                                },
+                                humidity: obs.humidity
+                            };
+                            break; 
+                        }
+                    }
+                } catch(e) {}
+            }
+
+            // Logic: Only show if PWS data exists. No fallback.
+            if (finalData && finalData.metric) {
+                const temp = typeof finalData.metric.temp === 'number' ? finalData.metric.temp.toFixed(1) : "--";
+                
+                // Construct HTML String for Footer (MINIMAL TEXT BASED)
+                const text = `
+                    <span style="font-weight:700; color:#fff;">NYÍREGYHÁZA MOST:</span>
+                    <span style="color:var(--accent-warm); font-weight:700; margin-left:4px;">${temp}°C</span>
+                `;
+                
+                state.currentNyData = text;
+                
+                // Update active if visible immediately
+                const activeFooter = document.querySelector('.news-card.visible .ny-weather-in-footer');
+                if (activeFooter) activeFooter.innerHTML = text;
+            } else {
+                // If NO data, hide it
+                state.currentNyData = null;
+                const activeFooter = document.querySelector('.news-card.visible .ny-weather-in-footer');
+                if (activeFooter) activeFooter.innerHTML = "";
+            }
+        }
+
+        // --- GENERAL WEATHER FETCH (Panel 3) ---
+        async function fetchWeatherData() {
             const fetchPWS = async (id) => {
                 try {
                     const url = `https://api.weather.com/v2/pws/observations/current?stationId=${id}&format=json&units=m&apiKey=${WUNDERGROUND_API_KEY}&numericPrecision=decimal`;
-                    const res = await fetch(url, { signal: AbortSignal.timeout(3000) }); 
+                    const res = await fetch(url, { signal: AbortSignal.timeout(2000) }); // Short timeout
                     if(!res.ok) return null;
                     const data = await res.json();
                     if(data.observations && data.observations.length > 0) {
@@ -1286,7 +1490,6 @@
                         if(obs.metric.temp !== null) {
                              let iconCode = 26;
                              try {
-                                 // Try get icon, but don't fail if it blocks
                                  const wxUrl = `https://api.weather.com/v3/wx/observations/current?geocode=${obs.lat},${obs.lon}&format=json&units=m&language=hu-HU&apiKey=${WUNDERGROUND_API_KEY}`;
                                  const wxRes = await fetch(wxUrl, { signal: AbortSignal.timeout(1500) });
                                  if(wxRes.ok) { const wxData = await wxRes.json(); if(wxData.iconCode !== undefined) iconCode = wxData.iconCode; }
@@ -1298,52 +1501,53 @@
                 return null;
             };
 
-            const fetchOM = async (cityList, count) => {
-                 const keys = cityList.sort(() => 0.5 - Math.random()).slice(0, count);
-                 const promises = keys.map(async city => {
-                    try {
-                        const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,weather_code,apparent_temperature`;
-                        const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
-                        const data = await res.json();
-                        return { name: city.name, lat: city.lat, lon: city.lon, temp: data.current.temperature_2m, hum: data.current.relative_humidity_2m, wind: data.current.wind_speed_10m, winddir: data.current.wind_direction_10m, press: data.current.surface_pressure, precip: 0, wmo: data.current.weather_code, feelsLike: data.current.apparent_temperature, updatedAt: new Date(), type: 'OM' };
-                    } catch(e) { return null; }
-                 });
-                 const results = await Promise.allSettled(promises);
-                 return results.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
+            const fetchSingleOM = async (city) => {
+                try {
+                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,weather_code,apparent_temperature`;
+                    const res = await fetch(url, { signal: AbortSignal.timeout(2500) });
+                    if(!res.ok) return null;
+                    const data = await res.json();
+                    const weatherItem = { name: city.name, lat: city.lat, lon: city.lon, temp: data.current.temperature_2m, hum: data.current.relative_humidity_2m, wind: data.current.wind_speed_10m, winddir: data.current.wind_direction_10m, press: data.current.surface_pressure, precip: 0, wmo: data.current.weather_code, feelsLike: data.current.apparent_temperature, updatedAt: new Date(), type: 'OM' };
+                    state.weatherPlaylist.push(weatherItem);
+                    // Force update UI on first item
+                    if (state.weatherPlaylist.length === 1) { 
+                        state.weatherPlaylistIndex = 0; 
+                        displayWeather(); 
+                    }
+                    return weatherItem;
+                } catch(e) { return null; }
             };
 
-            // Fetch in parallel
-            const [pwsResults, huResults, foreignResults] = await Promise.all([ 
-                Promise.allSettled(stationKeys.map(id => fetchPWS(id))), 
-                fetchOM(HUNGARIAN_CITIES_OM, 5), 
-                fetchOM(FOREIGN_CITIES, 10) 
-            ]);
-            
-            const validPWS = pwsResults.filter(r => r.status === 'fulfilled' && r.value).map(r => r.value);
-            state.weatherPlaylist = [...validPWS, ...huResults, ...foreignResults];
-            state.weatherPlaylistIndex = 0;
+            const huKeys = HUNGARIAN_CITIES_OM.sort(() => 0.5 - Math.random()).slice(0, 6);
+            huKeys.forEach(city => fetchSingleOM(city));
 
-            // IMMEDIATE DISPLAY FIX: If we have data, show it immediately, don't wait for timer
-            if (state.weatherPlaylist.length > 0 && el.weatherLoading.classList.contains('active')) {
-                displayWeather();
-            }
+            const stationKeys = Object.keys(PWS_MAP).sort(() => 0.5 - Math.random()).slice(0, 5);
+            stationKeys.forEach(async (id) => {
+                const data = await fetchPWS(id);
+                if(data) { state.weatherPlaylist.push(data); }
+            });
+            
+            setTimeout(() => {
+                if(el.weatherLoading.classList.contains('active')) {
+                     el.weatherLoading.classList.remove('active');
+                     el.weatherDataContainer.style.opacity = '1';
+                     if(state.weatherPlaylist.length === 0) {
+                         state.weatherPlaylist.push({ name: 'Budapest', temp: 15.0, hum: 50, wind: 10, wmo: 1, type:'OM' });
+                         displayWeather();
+                     }
+                }
+            }, 3000);
         }
 
         function displayWeather() {
             if(state.weatherPlaylist.length === 0 || state.scheduleActive) return;
-            if (state.weatherPlaylistIndex >= state.weatherPlaylist.length) { 
-                // Re-fetch but keep showing last item if needed
-                fetchWeatherData(); 
-                state.weatherPlaylistIndex = 0; 
-                if (state.weatherPlaylist.length === 0) return; 
+            if (state.weatherPlaylistIndex >= state.weatherPlaylist.length) { state.weatherPlaylistIndex = 0; }
+            
+            if(el.weatherLoading.classList.contains('active')) { 
+                el.weatherLoading.classList.remove('active'); 
+                el.weatherDataContainer.style.opacity = '1'; 
             }
             
-            // Force Loading State Off
-            if(el.weatherLoading.classList.contains('active')) {
-                el.weatherLoading.classList.remove('active');
-                el.weatherDataContainer.style.opacity = '1';
-            }
-
             const item = state.weatherPlaylist[state.weatherPlaylistIndex];
             state.weatherPlaylistIndex++;
             el.weatherLocName.textContent = item.name;
@@ -1570,61 +1774,116 @@
         });
         
         // --- DEV MENU FUNCTIONS ---
+        // NEW TEST FUNCTIONS
         window.triggerTestBreaking = function() {
             state.breakingQueue.push({
-                title: "Ez egy rövid teszt hír.",
+                title: "Ez egy rövid teszt hír a Breaking News rendszer tesztelésére.",
                 date: new Date(),
                 source: "TESZT",
                 link: "#"
             });
             processBreakingQueue();
+            el.devMenu.style.display = 'none';
         }
         window.triggerTestBreakingLong = function() {
             state.breakingQueue.push({
-                title: "Ez egy nagyon hosszú teszt hír, hogy lássuk, hogyan működik a szöveg görgetése, ha nem fér ki a képernyőre, és szépen eltűnik a forrás mögött.",
+                title: "Ez egy rendkívül hosszú teszt hír, amely arra szolgál, hogy ellenőrizzük a görgető mechanizmust, amikor a szöveg túl hosszú a rendelkezésre álló helyhez képest, és megfelelően kell megjelennie.",
                 date: new Date(),
                 source: "TESZT",
                 link: "#"
             });
             processBreakingQueue();
+            el.devMenu.style.display = 'none';
         }
-
-        // --- TRAFFIC TEST ---
         window.triggerTestTraffic = function() {
             el.devMenu.style.display = 'none';
             const trafficItem = {
-                title: "Baleset az M3-as autópályán - Torlódás várható a kivezetőn",
-                desc: "Két személygépkocsi ütközött össze az M3-as autópálya fővárosból kivezető szakaszán, a 12-es kilométerszelvénynél. A helyszínelés idejére a külső sávot lezárták, a forgalom a belső sávon halad, torlódásra kell számítani. Kérjük vezessenek óvatosan!",
+                title: "Baleset az M3-as autópályán - Torlódás várható",
+                desc: "Két személygépkocsi ütközött össze. A helyszínelés idejére sávlezárás van érvényben.",
                 source: "KÖZÚT", 
                 date: new Date(),
-                link: "#",
-                img: "https://images.unsplash.com/photo-1566752003788-b4b60451e045?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                link: "#"
             };
             state.items.splice(state.currentIndex + 1, 0, trafficItem);
             clearTimeout(state.flipTimer);
             showNextItem(true);
         };
-        
-        // --- ECONOMY TEST ---
+        window.triggerVisualNews = function() {
+             el.devMenu.style.display = 'none';
+             state.items.splice(state.currentIndex + 1, 0, {
+                 title: "Képes Hír Teszt - Látványos Megjelenés",
+                 desc: "Ez a hír tartalmaz egy képet a jobb oldalon, hogy ellenőrizzük a layoutot.",
+                 source: "INDEX",
+                 date: new Date(),
+                 link: "#",
+                 img: "https://images.unsplash.com/photo-1504711434969-e33886168f5c"
+             });
+             clearTimeout(state.flipTimer);
+             showNextItem(true);
+        };
+        window.triggerTextNews = function() {
+             el.devMenu.style.display = 'none';
+             state.items.splice(state.currentIndex + 1, 0, {
+                 title: "Szöveges Hír Teszt - Csak Szöveg",
+                 desc: "Ez a hír nem tartalmaz képet, így a szövegnek ki kell töltenie a teljes szélességet.",
+                 source: "TELEX",
+                 date: new Date(),
+                 link: "#",
+                 img: null
+             });
+             clearTimeout(state.flipTimer);
+             showNextItem(true);
+        };
         window.triggerEconomyTest = function() {
             el.devMenu.style.display = 'none';
             fetchExchangeRates(); 
             showEconomy();
         };
-
-        // --- HOUR CHANGE TEST ---
+        window.triggerSchedule = function() {
+             el.devMenu.style.display = 'none';
+             displaySchedule();
+        };
+        window.triggerWeatherLoading = function() {
+             el.devMenu.style.display = 'none';
+             el.weatherLoading.classList.add('active');
+             setTimeout(() => el.weatherLoading.classList.remove('active'), 5000);
+        };
+        // V181: Night Mode Test - Forces label active
+        window.triggerNightMode = function() {
+             el.devMenu.style.display = 'none';
+             state.block = THEMATIC_BLOCKS[0]; 
+             updateTimeAndState(); 
+             // FORCE LABEL VISIBILITY FOR TESTING
+             document.getElementById('night-summary-label').classList.add('active');
+        };
+        // V181: Day Mode Test - Resets label
+        window.triggerDayMode = function() {
+             el.devMenu.style.display = 'none';
+             state.block = null;
+             // FORCE LABEL OFF
+             document.getElementById('night-summary-label').classList.remove('active');
+             updateTimeAndState();
+        };
         window.triggerHourChangeTest = function() {
              el.devMenu.style.display = 'none';
              el.bigClockLayer.classList.add('active');
-             // Set timeout exactly 10s to match real life
              setTimeout(() => { el.bigClockLayer.classList.remove('active'); }, 10000);
+        };
+        window.triggerGoodbyeTest = function() {
+             el.devMenu.style.display = 'none';
+             el.goodbyeCard.classList.add('active');
+             setTimeout(() => { el.goodbyeCard.classList.remove('active'); }, 15000);
+        };
+        window.triggerCredits = function() {
+             el.devMenu.style.display = 'none';
+             showCredits();
         };
 
         window.closeDevMenu = function() { el.devMenu.style.display = 'none'; }
         
-        // Open Dev Menu Handler - FIX: Stop Propagation
+        // Open Dev Menu Handler
         document.querySelector('.brand-wrapper').addEventListener('click', (e) => {
-             e.stopPropagation(); // Prevents bubbling to other elements
+             e.stopPropagation(); 
              const code = prompt("Fejlesztői kód:");
              if(code === "0000") el.devMenu.style.display = 'flex';
         });
@@ -1663,10 +1922,11 @@
             const days = ['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat'];
             el.date.textContent = `${now.getFullYear()}. ${CALENDAR_DATA.honapok[now.getMonth()]} ${now.getDate()}., ${days[now.getDay()]}`;
             const key = `${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-            if(CALENDAR_DATA.nameDays[key]) el.nameday.textContent = CALENDAR_DATA.nameDays[key].join(', ') + ' névnapja';
+            if(CALENDAR_DATA.nameDays[key]) {
+                const names = CALENDAR_DATA.nameDays[key].join(', ');
+                if(el.namedayText) el.namedayText.textContent = names;
+            }
             updateSkyGradient();
-            
-            // ANALOG CLOCK UPDATE
             updateAnalogClock();
             
             const h = now.getHours() + now.getMinutes()/60;
@@ -1674,27 +1934,31 @@
             const min = now.getMinutes();
             const sec = now.getSeconds();
             const hour = now.getHours();
+
+            // Goodbye Logic
             if (hour === 23 && min === 59) {
-                if (sec >= 0 && sec < 50) { el.goodbyeCard.classList.add('active'); el.bigClockLayer.classList.remove('active'); } else if (sec >= 50) { el.goodbyeCard.classList.remove('active'); el.bigClockLayer.classList.add('active'); el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); if(sec === 50) showCredits(); }
+                if (sec >= 0 && sec < 50) { el.goodbyeCard.classList.add('active'); el.bigClockLayer.classList.remove('active'); } 
+                else if (sec >= 50) { el.goodbyeCard.classList.remove('active'); el.bigClockLayer.classList.add('active'); el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); if(sec === 50) showCredits(); }
             } else if (min === 59 && sec >= 50) { 
-                // HOUR CHANGE LOGIC
                 el.bigClockLayer.classList.add('active'); 
                 el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); 
                 if(sec === 50) showCredits(); 
             } else {
                 if(el.bigClockLayer.classList.contains('active')) { el.bigClockLayer.classList.remove('active'); el.goodbyeCard.classList.remove('active'); if(state.block.type !== 'summary_yesterday') { state.currentIndex = 0; if(state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems = []; } showNextItem(false); } }
             }
+
             if (!state.block || state.block.name !== currentBlock.name) { 
                 state.block = currentBlock; 
                 el.badge.textContent = state.block.name;
-                // Add color class
                 el.badge.className = `left-prog-badge visible ${state.block.styleClass}`;
                 refreshNews(); 
             }
             if(state.block.type === 'summary_yesterday') { el.badge.classList.add('visible'); } else { el.badge.classList.add('visible'); }
+            
             if((min === 0 || min === 20 || min === 40) && sec === 0 && min !== state.lastScheduleMin) { state.lastScheduleMin = min; displaySchedule(); }
             if((min === 12 || min === 32 || min === 52) && sec === 30) { fetchExchangeRates(); }
             if((min === 13 || min === 33 || min === 53) && sec === 0) { showEconomy(); }
+            
             const currentIndex = THEMATIC_BLOCKS.findIndex(b => b.name === state.block.name);
             const nextBlock = THEMATIC_BLOCKS[(currentIndex + 1) % THEMATIC_BLOCKS.length];
             const nextStartMin = (nextBlock.start * 60);
@@ -1707,14 +1971,31 @@
                 el.nextProgAlert.textContent = `KÖVETKEZIK: ${nTime} ${nextBlock.name}`; el.nextProgAlert.classList.add('active');
             } else { el.nextProgAlert.classList.remove('active'); }
             
-            // ÉJSZAKAI CSENDESÍTÉS: Csak 06:00 után frissítünk
             if (hour >= 6 && sec === 50 && (min === 14 || min === 29 || min === 44 || min === 59)) { 
-                el.updateIndicator.classList.add('active'); 
+                document.getElementById('live-indicator').classList.add('updating'); 
                 refreshNews(true); 
+            } else {
+                document.getElementById('live-indicator').classList.remove('updating');
             }
             
             if (sec === 0 && (min === 0 || min === 15 || min === 30 || min === 45)) { state.pendingListReset = true; }
             if (sec === 0) cleanUpOldItems();
+
+            // NIGHT SUMMARY LABEL LOGIC (UNTIL 05:44:45)
+            const nightLabel = document.getElementById('night-summary-label');
+            if (state.block.type === 'summary_yesterday') {
+                el.timelineContainer.style.display = 'flex';
+                // Show label only until 05:44:45 - unless forced by dev menu
+                if (hour < 5 || (hour === 5 && min < 44) || (hour === 5 && min === 44 && sec <= 45)) {
+                    nightLabel.classList.add('active');
+                } else if (!document.getElementById('dev-menu').style.display.includes('flex')) { 
+                    // Only remove if not being forced by dev test
+                    nightLabel.classList.remove('active');
+                }
+            } else {
+                el.timelineContainer.style.display = 'none';
+                nightLabel.classList.remove('active');
+            }
         }
 
         function filterItemsByBlock(items) {
@@ -1818,7 +2099,10 @@
             const uniqueItems = [];
             const seenLinks = new Set();
             for(const item of filtered) { if(!seenLinks.has(item.link)) { uniqueItems.push(item); seenLinks.add(item.link); } }
-            if(silent) { state.nextItems = uniqueItems; el.updateIndicator.classList.remove('active'); } else { state.items = uniqueItems; el.loading.classList.remove('active'); state.currentIndex = 0; showNextItem(false); }
+            if(silent) { 
+                state.nextItems = uniqueItems; 
+                document.getElementById('live-indicator').classList.remove('updating');
+            } else { state.items = uniqueItems; el.loading.classList.remove('active'); state.currentIndex = 0; showNextItem(false); }
             if(state.block.type === 'summary_yesterday') generateTimeline(); else el.timelineContainer.classList.remove('visible');
             if(state.retryQueue.length > 0) { state.retryInterval = setInterval(processRetries, 20000); }
             cleanUpOldItems();
@@ -1916,14 +2200,20 @@
             // Prepare card classes
             if (hasVisual) { nextTrack.classList.add('has-visual'); } 
             else { nextTrack.classList.remove('has-visual'); }
+            
+            // INJECT NYIREGYHAZA WEATHER INTO FOOTER (IF EXISTS)
+            let weatherHTML = "";
+            if (state.currentNyData) {
+                weatherHTML = `<div class="ny-weather-in-footer">${state.currentNyData}</div>`;
+            }
 
             const html = `
                 <div class="news-content-wrapper">
                     <div class="news-title">${item.title}</div>
                     <div class="news-desc">${item.desc}</div>
                     <div class="news-footer-row">
-                        ${extraLabel}
                         <div class="news-meta">${footerMetaHTML}</div>
+                        ${weatherHTML}
                     </div>
                 </div>
                 ${visualHtml}
@@ -1959,6 +2249,11 @@
             setInterval(updateTimeAndState, 1000); updateTimeAndState();
             onValue(feedsRef, (snap) => { state.rssFeeds = snap.val() || {}; refreshNews(); });
             fetchWeatherData(); setInterval(fetchWeatherData, 150000); setInterval(displayWeather, 6000);
+            
+            // Init Special Nyíregyháza Weather
+            fetchNyiregyhazaSpecific();
+            setInterval(fetchNyiregyhazaSpecific, 30000);
+
             setInterval(checkBreakingNews, 20000); setTimeout(checkBreakingNews, 5000);
             setInterval(showCredits, 300000); 
             document.getElementById('manual-refresh-trigger').addEventListener('click', () => refreshNews());
