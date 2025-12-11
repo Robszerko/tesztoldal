@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V189 (Horizontal Scroll)</title>
+    <title>Aurora News Ticker - V190 (Smart Paging)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -355,24 +355,24 @@
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
         }
 
-        /* --- HORIZONTAL SCROLL DESCRIPTION --- */
+        /* --- PAGED DESCRIPTION STYLING --- */
         .news-desc { 
             flex: 1 1 auto; 
             font-size: 0.95rem; 
             color: #e2e8f0; font-weight: 400; line-height: 1.6; 
-            overflow: hidden; 
+            overflow: hidden; /* Mask content */
             position: relative;
             max-width: 99%; 
-            white-space: nowrap; /* Forces horizontal */
             text-shadow: 0 1px 2px rgba(0,0,0,1); z-index: 5; 
-            mask-image: linear-gradient(to right, black 90%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to right, black 90%, transparent 100%);
-            display: flex; align-items: center;
+            /* Gradient Mask to fade out bottom */
+            mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
         }
         
         .news-desc-inner {
-            display: inline-block;
-            white-space: nowrap;
+            display: block;
+            width: 100%;
+            will-change: transform;
         }
 
         .news-footer-row {
@@ -1769,7 +1769,7 @@
             if(state.items.length > 1 && state.currentItem && (item.link === state.currentItem.link || item.title === state.currentItem.title)) { state.currentIndex++; item = state.items[state.currentIndex % state.items.length]; }
             state.currentItem = item;
             renderCard(item, false);
-            // The duration is now handled inside renderCard based on content length
+            // Duration is set inside renderCard
         }
 
         function renderNightInfoCard() {
@@ -1837,34 +1837,50 @@
             el.counter.textContent = `${(state.currentIndex % state.items.length) + 1} / ${state.items.length}`;
             updateTimelineActive();
 
-            // --- SMART HORIZONTAL SCROLL LOGIC ---
+            // --- SMART "PAGING" (LAPOZÓS) LOGIC ---
             requestAnimationFrame(() => {
                 const descOuter = nextTrack.querySelector('.news-desc');
                 const descInner = nextTrack.querySelector('.news-desc-inner');
-                let duration = 18000; // Default base duration
+                let duration = 15000; // Base duration for simple text
 
                 if (descOuter && descInner) {
-                    const outerWidth = descOuter.clientWidth;
-                    const innerWidth = descInner.scrollWidth;
+                    const outerHeight = descOuter.clientHeight;
+                    const innerHeight = descInner.scrollHeight;
                     
-                    if (innerWidth > outerWidth) {
-                        const scrollDist = innerWidth - outerWidth;
-                        // Calculate extra time based on length (30px per second - Slow and readable)
-                        const speed = 30; // pixels per second
-                        const scrollTime = (scrollDist / speed) * 1000; 
-                        // Wait 3s before start, then scroll slowly, then wait 3s at end
-                        duration = 3000 + scrollTime + 3000;
+                    if (innerHeight > outerHeight) {
+                        const pageHeight = outerHeight; // Amount to scroll per "page"
+                        const pages = Math.ceil(innerHeight / pageHeight);
+                        const pauseDuration = 6000; // Pause 6 seconds on each page
+                        const animDuration = 1000; // 1 second to slide
+                        
+                        duration = (pages * pauseDuration) + ((pages - 1) * animDuration);
+                        
+                        // Construct keyframes for vertical "paging"
+                        let keyframes = [];
+                        let timeAccumulator = 0;
+                        
+                        for (let i = 0; i < pages; i++) {
+                            // Hold position (Start of step)
+                            let offset = i * pageHeight;
+                            // Ensure we don't scroll past the very bottom too much
+                            if (offset > (innerHeight - outerHeight)) offset = innerHeight - outerHeight; 
+                            
+                            keyframes.push({ transform: `translateY(-${offset}px)`, offset: timeAccumulator / duration });
+                            
+                            timeAccumulator += pauseDuration;
+                            
+                            // Hold position (End of hold)
+                            keyframes.push({ transform: `translateY(-${offset}px)`, offset: timeAccumulator / duration });
+                            
+                            if (i < pages - 1) {
+                                timeAccumulator += animDuration; // Add slide time
+                            }
+                        }
 
-                        // Apply animation via Web Animations API
-                        descInner.animate([
-                            { transform: 'translateX(0)' },
-                            { transform: 'translateX(0)', offset: 3000 / duration }, // Wait
-                            { transform: `translateX(-${scrollDist}px)`, offset: (3000 + scrollTime) / duration }, // Scroll
-                            { transform: `translateX(-${scrollDist}px)` } // Wait at end
-                        ], {
+                        descInner.animate(keyframes, {
                             duration: duration,
                             fill: 'forwards',
-                            easing: 'linear'
+                            easing: 'ease-in-out'
                         });
                     }
                 }
@@ -1872,13 +1888,11 @@
                 state.currentDuration = duration;
                 state.cardStartTime = Date.now();
                 
-                // Reset and start progress bar
                 el.progressBar.classList.remove('animate-progress'); 
                 void el.progressBar.offsetWidth; 
                 el.progressBar.style.animationDuration = `${duration}ms`;
                 el.progressBar.classList.add('animate-progress');
 
-                // Set timer for next slide
                 state.flipTimer = setTimeout(() => { state.isTransitioning = false; showNextItem(true); }, duration);
             });
         }
