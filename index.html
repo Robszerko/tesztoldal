@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V190 (Smart Paging)</title>
+    <title>Aurora News Ticker - V191 (Smart Summary & Tip)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,6 +36,7 @@
             --accent-danger: #ef4444;
             --accent-traffic: #f59e0b;
             --accent-next: #a855f7; 
+            --accent-info: #10b981;
             
             --font-head: 'Montserrat', sans-serif;
             --font-body: 'Inter', sans-serif;
@@ -204,6 +205,7 @@
         .left-prog-badge.badge-sunset { color: #fae8ff; box-shadow: 0 0 10px rgba(232, 121, 249, 0.1); border-color: rgba(232, 121, 249, 0.3); }
         .left-prog-badge.badge-evening { color: #f3e8ff; box-shadow: 0 0 10px rgba(192, 132, 252, 0.1); border-color: rgba(192, 132, 252, 0.3); }
         .left-prog-badge.badge-traffic { color: #fcd34d; background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.5); }
+        .left-prog-badge.badge-tip { color: #6ee7b7; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.5); box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
 
         /* 2. Clock Center Block */
         .clock-container { 
@@ -355,25 +357,29 @@
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
         }
 
-        /* --- PAGED DESCRIPTION STYLING --- */
+        /* --- SWITCHABLE DESCRIPTION --- */
         .news-desc { 
             flex: 1 1 auto; 
             font-size: 0.95rem; 
-            color: #e2e8f0; font-weight: 400; line-height: 1.6; 
-            overflow: hidden; /* Mask content */
+            color: #e2e8f0; font-weight: 400; line-height: 1.5; 
+            overflow: hidden; 
             position: relative;
             max-width: 99%; 
             text-shadow: 0 1px 2px rgba(0,0,0,1); z-index: 5; 
-            /* Gradient Mask to fade out bottom */
-            mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 85%, transparent 100%);
         }
         
-        .news-desc-inner {
-            display: block;
-            width: 100%;
-            will-change: transform;
-        }
+        .news-desc .short-view { display: block; opacity: 1; transition: opacity 0.3s; }
+        .news-desc .full-view { display: none; opacity: 0; height: 100%; overflow-y: auto; padding-right: 5px; }
+        
+        /* HOVER EFFECT: SWAP CONTENT */
+        .news-card:hover .news-desc .short-view { display: none; opacity: 0; }
+        .news-card:hover .news-desc .full-view { display: block; opacity: 1; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Custom scrollbar for full view */
+        .full-view::-webkit-scrollbar { width: 4px; }
+        .full-view::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .full-view::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
 
         .news-footer-row {
             flex: 0 0 auto;
@@ -383,7 +389,7 @@
             padding-top: 8px;
             border-top: 1px solid rgba(255,255,255,0.1);
             width: 100%;
-            z-index: 10; background: transparent; /* Ensure footer stays visible */
+            z-index: 10; background: transparent; 
         }
         
         .news-meta { 
@@ -405,6 +411,22 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             font-size: 0.75rem; font-weight: 500; color: #fff;
         }
+
+        /* TIP CARD STYLES */
+        .news-card.tip-card {
+            background: radial-gradient(circle at top left, #064e3b, #022c22);
+            border-left: 4px solid var(--accent-info);
+            align-items: center; justify-content: center;
+            text-align: center;
+            flex-direction: column;
+            padding-right: 15px;
+        }
+        .tip-content { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .tip-icon-row { display: flex; align-items: center; gap: 20px; }
+        .tip-icon { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #fff; }
+        .tip-icon svg { width: 32px; height: 32px; fill: var(--accent-info); filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.4)); }
+        .tip-label { font-size: 0.7rem; text-transform: uppercase; font-weight: 700; color: #a7f3d0; }
+        .tip-text { font-size: 1.1rem; font-weight: 600; color: #fff; max-width: 80%; line-height: 1.4; }
 
         .default-news-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; opacity: 1; transition: opacity 1s ease; }
         .dnb-gradient { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top right, #1e3a8a, #0f172a 70%, #020617); }
@@ -1106,10 +1128,20 @@
             breakingActive: false,
             breakingLink: null,
             breakingQueue: [],
-            currentNyData: null
+            currentNyData: null,
+            lastTipTime: Date.now() // For the Tip Card
         };
 
         const stripHtml = (html) => { let doc = new DOMParser().parseFromString(html, 'text/html'); return doc.body.textContent || ""; };
+        
+        // --- HELPER: GET FIRST SENTENCE ---
+        function getFirstSentence(str) {
+            if (!str) return "";
+            // Find first occurrence of . ! or ? followed by space or end of string
+            const match = str.match(/^.*?[.!?](?:\s|$)/);
+            return match ? match[0] : str;
+        }
+
         async function fetchWithProxyFallback(url) {
             for (const proxy of CORS_PROXIES) {
                 try {
@@ -1761,7 +1793,17 @@
 
         function showNextItem(advance = true) {
             clearTimeout(state.flipTimer); state.isTransitioning = true;
-            if(state.block.type === 'summary_yesterday') { const now = Date.now(); if (now - state.lastNightInfoTime > 300000) { renderNightInfoCard(); return; } }
+            
+            // --- TIP CARD LOGIC ---
+            // Check if 10 minutes have passed since last tip
+            const now = Date.now();
+            if (now - state.lastTipTime > 600000 && state.items.length > 0) { // 10 mins = 600000 ms
+                renderTipCard();
+                state.lastTipTime = now;
+                return;
+            }
+
+            if(state.block.type === 'summary_yesterday') { if (now - state.lastNightInfoTime > 300000) { renderNightInfoCard(); return; } }
             if(state.pendingListReset && state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems = []; state.currentIndex = -1; advance = true; state.pendingListReset = false; }
             if(state.items.length === 0) { el[state.activeTrack === 'a' ? 'trackA' : 'trackB'].innerHTML = `<div class="news-title">Nincs hír...</div>`; return; }
             if(advance) state.currentIndex++;
@@ -1769,7 +1811,44 @@
             if(state.items.length > 1 && state.currentItem && (item.link === state.currentItem.link || item.title === state.currentItem.title)) { state.currentIndex++; item = state.items[state.currentIndex % state.items.length]; }
             state.currentItem = item;
             renderCard(item, false);
-            // Duration is set inside renderCard
+            // Duration is now fixed or slight variation
+            let duration = 15000;
+            state.currentDuration = duration;
+            state.cardStartTime = Date.now();
+            el.progressBar.classList.remove('animate-progress'); void el.progressBar.offsetWidth; el.progressBar.style.animationDuration = '15s'; el.progressBar.classList.add('animate-progress');
+            state.flipTimer = setTimeout(() => { state.isTransitioning = false; showNextItem(true); }, duration);
+        }
+
+        function renderTipCard() {
+            const nextTrack = el[state.activeTrack === 'a' ? 'trackB' : 'trackA']; const currentTrack = el[state.activeTrack === 'a' ? 'trackA' : 'trackB'];
+            el.badge.className = 'left-prog-badge visible badge-tip';
+            el.badge.textContent = 'HASZNOS TIPP';
+            
+            const html = `
+                <div class="tip-content">
+                    <div class="tip-icon-row">
+                        <div class="tip-icon">
+                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                            <span class="tip-label">INFO</span>
+                        </div>
+                        <div class="tip-icon">
+                            <svg viewBox="0 0 24 24"><path d="M13 1.07V9h7c0-4.08-3.05-7.44-7-7.93zM4 15c0 4.42 3.58 8 8 8s8-3.58 8-8v-4H4v4zm7-13.93C7.05 1.56 4 4.92 4 9h7V1.07z"/></svg>
+                            <span class="tip-label">EGÉR</span>
+                        </div>
+                    </div>
+                    <div class="tip-text">
+                        A részletekért húzza az egeret a hírre,<br>a teljes cikkért pedig kattintson rá!
+                    </div>
+                </div>
+            `;
+            
+            nextTrack.innerHTML = html; 
+            nextTrack.className = 'news-card tip-card visible';
+            currentTrack.classList.remove('visible'); 
+            
+            state.activeTrack = state.activeTrack === 'a' ? 'b' : 'a';
+            el.progressBar.classList.remove('animate-progress'); void el.progressBar.offsetWidth; el.progressBar.style.animationDuration = '10s'; el.progressBar.classList.add('animate-progress');
+            state.flipTimer = setTimeout(() => { state.isTransitioning = false; showNextItem(false); }, 10000); 
         }
 
         function renderNightInfoCard() {
@@ -1790,13 +1869,13 @@
             const fav = getFavicon(item.link);
             const displaySource = getSourceName(item.link);
             const timeStr = item.date.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
-            nextTrack.classList.remove('night-info');
+            nextTrack.className = 'news-card'; // Reset classes
             
             const isTraffic = (displaySource === 'KÖZÚT' || displaySource === 'BKK');
             if (isTraffic) {
                 el.badge.className = 'left-prog-badge visible badge-traffic'; el.badge.textContent = 'KÖZLEKEDÉS'; nextTrack.classList.add('traffic-alert');
             } else {
-                el.badge.className = `left-prog-badge visible ${state.block.styleClass}`; el.badge.textContent = state.block.name; nextTrack.classList.remove('traffic-alert');
+                el.badge.className = `left-prog-badge visible ${state.block.styleClass}`; el.badge.textContent = state.block.name;
             }
 
             let iconHtml = isTraffic ? TRAFFIC_ICON : `<img src="${fav}" class="provider-icon">`;
@@ -1809,16 +1888,20 @@
                 hasVisual = true; visualHtml = `<div class="news-visual-column"><div class="visual-fallback"><svg class="tkp-globe" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg><span>TKP NEWS</span></div></div>`;
             }
 
-            if (hasVisual) { nextTrack.classList.add('has-visual'); } else { nextTrack.classList.remove('has-visual'); }
+            if (hasVisual) { nextTrack.classList.add('has-visual'); }
             
             let weatherHTML = "";
             if (state.currentNyData) { weatherHTML = `<div class="ny-weather-in-footer">${state.currentNyData}</div>`; }
+
+            // Extract single sentence for short view
+            const shortDesc = getFirstSentence(item.desc);
 
             const html = `
                 <div class="news-content-wrapper">
                     <div class="news-title">${item.title}</div>
                     <div class="news-desc">
-                        <div class="news-desc-inner">${item.desc}</div>
+                        <span class="short-view">${shortDesc}</span>
+                        <div class="full-view">${item.desc}</div>
                     </div>
                     <div class="news-footer-row">
                         <div class="news-meta">${footerMetaHTML}</div>
@@ -1828,7 +1911,7 @@
                 ${visualHtml}
             `;
             
-            nextTrack.innerHTML = html; nextTrack.classList.remove('breaking');
+            nextTrack.innerHTML = html; 
             currentTrack.classList.remove('visible'); nextTrack.classList.add('visible');
             
             setTimeout(() => { const visualCol = nextTrack.querySelector('.news-visual-column'); if(visualCol) visualCol.classList.add('slide-in'); }, 600); 
@@ -1836,65 +1919,6 @@
             state.activeTrack = state.activeTrack === 'a' ? 'b' : 'a';
             el.counter.textContent = `${(state.currentIndex % state.items.length) + 1} / ${state.items.length}`;
             updateTimelineActive();
-
-            // --- SMART "PAGING" (LAPOZÓS) LOGIC ---
-            requestAnimationFrame(() => {
-                const descOuter = nextTrack.querySelector('.news-desc');
-                const descInner = nextTrack.querySelector('.news-desc-inner');
-                let duration = 15000; // Base duration for simple text
-
-                if (descOuter && descInner) {
-                    const outerHeight = descOuter.clientHeight;
-                    const innerHeight = descInner.scrollHeight;
-                    
-                    if (innerHeight > outerHeight) {
-                        const pageHeight = outerHeight; // Amount to scroll per "page"
-                        const pages = Math.ceil(innerHeight / pageHeight);
-                        const pauseDuration = 6000; // Pause 6 seconds on each page
-                        const animDuration = 1000; // 1 second to slide
-                        
-                        duration = (pages * pauseDuration) + ((pages - 1) * animDuration);
-                        
-                        // Construct keyframes for vertical "paging"
-                        let keyframes = [];
-                        let timeAccumulator = 0;
-                        
-                        for (let i = 0; i < pages; i++) {
-                            // Hold position (Start of step)
-                            let offset = i * pageHeight;
-                            // Ensure we don't scroll past the very bottom too much
-                            if (offset > (innerHeight - outerHeight)) offset = innerHeight - outerHeight; 
-                            
-                            keyframes.push({ transform: `translateY(-${offset}px)`, offset: timeAccumulator / duration });
-                            
-                            timeAccumulator += pauseDuration;
-                            
-                            // Hold position (End of hold)
-                            keyframes.push({ transform: `translateY(-${offset}px)`, offset: timeAccumulator / duration });
-                            
-                            if (i < pages - 1) {
-                                timeAccumulator += animDuration; // Add slide time
-                            }
-                        }
-
-                        descInner.animate(keyframes, {
-                            duration: duration,
-                            fill: 'forwards',
-                            easing: 'ease-in-out'
-                        });
-                    }
-                }
-                
-                state.currentDuration = duration;
-                state.cardStartTime = Date.now();
-                
-                el.progressBar.classList.remove('animate-progress'); 
-                void el.progressBar.offsetWidth; 
-                el.progressBar.style.animationDuration = `${duration}ms`;
-                el.progressBar.classList.add('animate-progress');
-
-                state.flipTimer = setTimeout(() => { state.isTransitioning = false; showNextItem(true); }, duration);
-            });
         }
 
         el.newsViewport.addEventListener('mouseenter', () => { if(!state.isPaused) { clearTimeout(state.flipTimer); el.progressBar.style.animationPlayState = 'paused'; state.isPaused = true; const elapsed = Date.now() - state.cardStartTime; state.remainingTime = Math.max(0, state.currentDuration - elapsed); } });
