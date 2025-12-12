@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V191 (Smart Summary & Tip)</title>
+    <title>Aurora News Ticker - V200 (Stable PWS & Night Logic)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -403,13 +403,35 @@
         .provider-icon { width: 16px; height: 16px; border-radius: 50%; }
         .traffic-icon-svg { width: 16px; height: 16px; fill: var(--accent-warm); }
 
-        /* NYIREGYHAZA WEATHER IN FOOTER */
+        /* NYIREGYHAZA WEATHER IN FOOTER - REVISED V200 */
         .ny-weather-in-footer {
-            margin-left: auto; display: flex; align-items: center; gap: 6px;
-            background: linear-gradient(90deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
-            border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 4px; padding: 4px 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            font-size: 0.75rem; font-weight: 500; color: #fff;
+            position: absolute; 
+            bottom: 30px; 
+            right: 300px; /* Offset 300px as requested */
+            display: none; align-items: center; gap: 8px;
+            
+            /* Revised Gradient: Dark Left -> Transparent Right */
+            background: linear-gradient(90deg, rgba(6, 10, 25, 1) 0%, rgba(6, 10, 25, 0.8) 60%, rgba(6, 10, 25, 0) 100%);
+            
+            padding: 5px 20px 5px 15px; 
+            border-radius: 4px 0 0 4px;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2); 
+            border-right: none;
+            
+            pointer-events: none; 
+            
+            font-family: var(--font-mono); font-size: 0.8rem;
+            font-weight: 700; color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            z-index: 200; 
+            white-space: nowrap;
+            
+            opacity: 0; /* Hidden by default for fade-in */
+            transition: opacity 1s ease;
+        }
+        
+        .ny-weather-in-footer.visible {
+            opacity: 1; /* Fade in when data is ready */
         }
 
         /* TIP CARD STYLES */
@@ -435,13 +457,15 @@
         .dnb-watermark svg { width: 400px; height: 400px; fill: #fff; }
         .dnb-text-strip { position: absolute; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: space-around; transform: rotate(-3deg); opacity: 0.05; font-family: var(--font-head); font-weight: 900; font-size: 4.5rem; color: #fff; white-space: nowrap; letter-spacing: 5px; }
 
-        .night-summary-label { 
-            color: var(--accent-warm); font-size: 0.65rem; font-weight: 800; 
-            text-transform: uppercase; letter-spacing: 0.5px;
+        /* NIGHT LABEL - STRICTLY HIDDEN BY DEFAULT */
+        #night-summary-label {
+            display: none; 
+            align-items: center; font-size: 0.7rem; font-weight: 700;
+            color: var(--accent-warm); text-transform: uppercase; letter-spacing: 0.5px;
+            white-space: nowrap; margin-right: 0; z-index: 200; flex-shrink: 0;
             text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
-            display: none; margin-left: auto; margin-right: 40px; z-index: 200;
         }
-        .night-summary-label.active { display: block; }
+        #night-summary-label.active { display: flex; }
 
         .news-card.night-info { background: radial-gradient(circle at top left, #312e81, #1e1b4b); border-left: 4px solid #a855f7; alignItems: center; justify-content: center; text-align: center; padding-bottom: 35px; flex-direction: column; }
         
@@ -541,8 +565,14 @@
         .controls-bar.breaking-active .controls-normal-content { opacity: 0; pointer-events: none !important; }
 
         .cb-left { display: none; }
-        .cb-center { flex-grow: 1; display: flex; align-items: center; justify-content: flex-start; position: relative; overflow: hidden; padding-left: 10px; }
-        #timeline-container { display: none; gap: 3px; overflow-x: auto; scrollbar-width: none; pointer-events: auto !important; z-index: 105; }
+        .cb-center { 
+            flex-grow: 1; 
+            display: flex; align-items: center; 
+            justify-content: flex-start; 
+            position: relative; overflow: hidden; padding-left: 10px;
+            gap: 15px; /* Spacing between timeline and label */
+        }
+        #timeline-container { display: none; gap: 3px; overflow-x: auto; scrollbar-width: none; pointer-events: auto !important; z-index: 105; flex-grow: 1; }
         #timeline-container.visible { display: flex; }
         #timeline-container.shifted { margin-right: 15px; } 
         
@@ -562,16 +592,66 @@
         .next-prog-alert { display: none; align-items: center; gap: 5px; color: var(--accent-next); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
         .next-prog-alert.active { display: flex; }
 
-        /* INTRO & NEWS LAYERS */
-        .bp-intro-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s; }
-        .bp-intro-text { font-family: var(--font-head); font-weight: 900; font-size: 1.2rem; color: #fff; letter-spacing: 2px; text-transform: uppercase; animation: flashIntro 0.4s ease-in-out infinite; }
-        @keyframes flashIntro { 0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.8); } 50% { opacity: 0.2; text-shadow: none; color: #ef4444; } }
+        /* --- BREAKING PANEL (FLIP & NO STROBE) --- */
+        .breaking-panel {
+            position: absolute;
+            bottom: 0px; /* Aligned to bottom, covering controls */
+            left: 0; 
+            width: 100%;
+            height: 28px; /* Same height as controls */
+            background: linear-gradient(90deg, #7f1d1d, #450a0a);
+            border-top: 1px solid #ef4444;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
+            display: none; align-items: center; padding: 0 15px;
+            z-index: 500;
+            transform-origin: bottom center;
+            overflow: hidden;
+            opacity: 0;
+            transform: perspective(600px) rotateX(90deg); /* Start flipped down */
+            cursor: pointer;
+        }
+        
+        .breaking-panel.active { 
+            display: flex; 
+            animation: flipInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+        }
+        
+        @keyframes flipInUp {
+            from { transform: perspective(600px) rotateX(90deg); opacity: 0; }
+            to { transform: perspective(600px) rotateX(0deg); opacity: 1; }
+        }
 
-        .bp-news-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; padding: 0 20px; opacity: 0; transition: opacity 0.5s; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-        .bp-badge { font-size: 0.6rem; font-weight: 800; color: #fff; background: #be123c; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; margin-right: 15px; flex-shrink: 0; transform: translateZ(0); }
-        .bp-meta { font-size: 0.75rem; font-family: var(--font-mono); color: #94a3b8; font-weight: 700; margin-right: 25px; flex-shrink: 0; white-space: nowrap; }
-        .bp-text-scroller { flex-grow: 1; overflow: hidden; position: relative; height: 100%; display: flex; align-items: center; transform: translateZ(0); backface-visibility: hidden; }
-        #bp-text { font-family: var(--font-head); font-weight: 700; color: #fff; font-size: 1.05rem; white-space: nowrap; position: relative; transform: translate3d(0,0,0); padding-left: 25px; will-change: transform; }
+        @keyframes flipOutDown {
+            from { transform: perspective(600px) rotateX(0deg); opacity: 1; }
+            to { transform: perspective(600px) rotateX(90deg); opacity: 0; }
+        }
+        .breaking-panel.closing { animation: flipOutDown 0.4s ease-in forwards; }
+
+        .clean-badge {
+            font-family: var(--font-head); font-weight: 900; font-size: 0.65rem;
+            color: #fff; background: #b91c1c;
+            padding: 2px 8px; border-radius: 4px;
+            margin-right: 10px; text-transform: uppercase;
+            box-shadow: 0 0 5px #ef4444;
+            flex-shrink: 0;
+        }
+
+        .bp-meta-info {
+            font-family: var(--font-mono); font-size: 0.7rem; color: #fca5a5;
+            font-weight: 700; margin-right: 15px; white-space: nowrap; flex-shrink: 0;
+        }
+        
+        .bp-text-mask {
+            flex-grow: 1; overflow: hidden; position: relative; height: 100%; display: flex; align-items: center;
+        }
+        
+        .bp-text-content {
+            font-family: var(--font-head); font-weight: 700; color: #fff; font-size: 0.9rem;
+            white-space: nowrap; will-change: transform;
+            transform: translateX(20px); opacity: 0; transition: all 0.3s ease 0.3s;
+        }
+        .breaking-panel.active .bp-text-content { transform: translateX(0); opacity: 1; }
+
         @keyframes scrollTextLeft { 0% { transform: translateX(0); } 100% { transform: translateX(var(--scroll-dist)); } }
 
         .progress-line-container { position: absolute; bottom: 28px; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.1); z-index: 300; }
@@ -681,13 +761,6 @@
 
         .manual-refresh { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; background: var(--accent-color); border-radius: 50%; cursor: pointer; opacity: 0; transition: opacity 0.3s; }
         .identity-panel:hover .manual-refresh { opacity: 0.5; }
-        
-        #night-summary-label {
-            display: none; align-items: center; font-size: 0.7rem; font-weight: 700;
-            color: var(--accent-warm); text-transform: uppercase; letter-spacing: 0.5px;
-            white-space: nowrap; margin-left: auto; margin-right: 40px; z-index: 200;
-        }
-        #night-summary-label.active { display: flex; }
     </style>
 </head>
 <body data-theme="night">
@@ -855,6 +928,20 @@
 
             <div class="progress-line-container"><div id="progress-bar" class="progress-line"></div></div>
 
+            <!-- PWS BADGE HERE (Fixed Offset) -->
+            <div id="pws-badge" class="ny-weather-in-footer"></div>
+
+            <!-- SEPARATED BREAKING PANEL (FLIP DOWN STYLE) -->
+            <div class="breaking-panel" id="breaking-panel">
+                <div class="clean-badge">Most érkezett</div>
+                <div class="bp-meta-info">
+                    <span id="bp-time">00:00</span> <span style="opacity:0.5; margin:0 5px;">|</span> <span id="bp-source" style="color:#fff;">FORRÁS</span>
+                </div>
+                <div class="bp-text-mask">
+                    <div class="bp-text-content" id="bp-text">Ez egy rendkívüli hír szövege...</div>
+                </div>
+            </div>
+
             <!-- CONTROLS BAR -->
             <div class="controls-bar" id="controls-bar-main">
                 <div class="controls-normal-content" id="controls-normal">
@@ -871,21 +958,6 @@
                         <button class="control-btn" id="next-btn"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
                     </div>
                 </div>
-
-                <div class="bp-intro-layer" id="bp-intro-layer">
-                    <span class="bp-intro-text">MOST ÉRKEZETT</span>
-                </div>
-
-                <div class="bp-news-layer" id="bp-news-layer">
-                    <div class="bp-badge">Most Érkezett</div>
-                    <div class="bp-meta">
-                        <span id="bp-time">00:00</span> | <span id="bp-source">Forrás</span>
-                    </div>
-                    <div class="bp-text-scroller">
-                        <span id="bp-text">Hír szövege...</span>
-                    </div>
-                </div>
-
             </div>
         </div>
 
@@ -1071,13 +1143,11 @@
             controlsBar: document.getElementById('controls-bar-main'),
             
             // Breaking System
-            controlsContent: document.getElementById('controls-normal'),
-            bpIntroLayer: document.getElementById('bp-intro-layer'),
-            bpNewsLayer: document.getElementById('bp-news-layer'),
+            breakingPanel: document.getElementById('breaking-panel'),
+            bpText: document.getElementById('bp-text'),
             bpTime: document.getElementById('bp-time'),
             bpSource: document.getElementById('bp-source'),
-            bpText: document.getElementById('bp-text'),
-            bpTextScroller: document.querySelector('.bp-text-scroller'),
+            bpTextMask: document.querySelector('.bp-text-mask'),
             
             mainContainer: document.querySelector('.ticker-container'),
             leftPanel: document.querySelector('.identity-panel'),
@@ -1137,7 +1207,6 @@
         // --- HELPER: GET FIRST SENTENCE ---
         function getFirstSentence(str) {
             if (!str) return "";
-            // Find first occurrence of . ! or ? followed by space or end of string
             const match = str.match(/^.*?[.!?](?:\s|$)/);
             return match ? match[0] : str;
         }
@@ -1303,12 +1372,12 @@
         }
 
         async function fetchNyiregyhazaSpecific() {
-            const PWS_IDS = ["INYREG37", "INYREG_MASODIK"]; 
+            // Priority list: INYREG42, INYREG26
+            const PWS_IDS = ["INYREG42", "INYREG26"]; 
             let finalData = null;
+            
             for (const id of PWS_IDS) {
-                if (!id || id === "INYREG_MASODIK") continue;
                 try {
-                    // INCREASED TIMEOUT FOR PROTOPAGE (6000ms)
                     const url = `https://api.weather.com/v2/pws/observations/current?stationId=${id}&format=json&units=m&apiKey=${WUNDERGROUND_API_KEY}&numericPrecision=decimal`;
                     const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
                     if(res.ok) {
@@ -1323,19 +1392,26 @@
                     }
                 } catch(e) {}
             }
-            if (finalData && finalData.metric) {
-                const temp = typeof finalData.metric.temp === 'number' ? finalData.metric.temp.toFixed(1) : "--";
-                const text = `
-                    <span style="font-weight:700; color:#fff;">NYÍREGYHÁZA MOST:</span>
+
+            const pwsEl = document.getElementById('pws-badge');
+            if (finalData && finalData.metric && typeof finalData.metric.temp === 'number') {
+                const temp = finalData.metric.temp.toFixed(1);
+                // HTML for the badge
+                pwsEl.innerHTML = `
+                    <span style="font-weight:700; color:#fff;">NYÍREGYHÁZA:</span>
                     <span style="color:var(--accent-warm); font-weight:700; margin-left:4px;">${temp}°C</span>
                 `;
-                state.currentNyData = text;
-                const activeFooter = document.querySelector('.news-card.visible .ny-weather-in-footer');
-                if (activeFooter) activeFooter.innerHTML = text;
+                pwsEl.style.display = 'flex';
+                
+                // Fade in delay
+                if (!pwsEl.classList.contains('visible')) {
+                    setTimeout(() => {
+                        pwsEl.classList.add('visible');
+                    }, 5000); 
+                }
             } else {
-                state.currentNyData = null;
-                const activeFooter = document.querySelector('.news-card.visible .ny-weather-in-footer');
-                if (activeFooter) activeFooter.innerHTML = "";
+                pwsEl.style.display = 'none'; 
+                pwsEl.classList.remove('visible');
             }
         }
 
@@ -1525,7 +1601,7 @@
 
         async function checkBreakingNews() {
             const now = Date.now();
-            const threeMinutesAgo = now - (3 * 60 * 1000); 
+            const twoMinutesAgo = now - (2 * 60 * 1000); 
             
             for(const [src, url] of Object.entries(BACKUP_FEEDS)) {
                 try {
@@ -1542,7 +1618,7 @@
                         const date = new Date(dateStr);
                         const link = item.querySelector("link")?.textContent;
                         
-                        if(date.getTime() > threeMinutesAgo && link && !state.seenBreakingLinks.has(link)) {
+                        if(date.getTime() > twoMinutesAgo && link && !state.seenBreakingLinks.has(link)) {
                             const title = item.querySelector("title")?.textContent || "";
                             state.seenBreakingLinks.add(link);
                             const breakingItem = { 
@@ -1550,8 +1626,7 @@
                                 desc: stripHtml(item.querySelector("description")?.textContent || ""), 
                                 source: getSourceName(link), 
                                 date: date, 
-                                link: link, 
-                                img: extractImageUrl(item, item.querySelector("description")?.textContent || "") 
+                                link: link
                             };
                             state.breakingQueue.push(breakingItem);
                         }
@@ -1571,55 +1646,65 @@
         function activateBreakingBar(item) {
             state.breakingActive = true;
             state.breakingLink = item.link; 
-            el.bpText.textContent = item.title;
-            el.bpTime.textContent = item.date.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
-            el.bpSource.textContent = item.source;
-            el.bpText.style.animation = 'none';
-            el.controlsBar.classList.add('breaking-active');
-            el.bpIntroLayer.style.opacity = '1';
-            el.bpNewsLayer.style.opacity = '0';
+            
+            // Set Content
+            el.bpText.innerText = item.title;
+            el.bpSource.innerText = item.source;
+            el.bpTime.innerText = item.date.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
 
+            // Flip In (Down to Up from absolute bottom)
+            el.breakingPanel.classList.remove('closing');
+            el.breakingPanel.classList.add('active');
+            
+            // Wait for flip to finish (500ms), then check text length
             setTimeout(() => {
-                el.bpIntroLayer.style.opacity = '0';
+                const containerWidth = el.bpTextMask.offsetWidth;
+                const textWidth = el.bpText.offsetWidth;
+                let totalDuration = 0;
+                
+                if (textWidth > containerWidth) {
+                    const dist = -(textWidth + 30) + "px"; 
+                    el.bpText.style.setProperty('--scroll-dist', dist);
+                    const animDuration = Math.max((textWidth + containerWidth) / 100, 5); // Faster speed
+                    el.bpText.style.animation = `scrollTextLeft ${animDuration}s linear 2s forwards`;
+                    totalDuration = (2 + animDuration + 2) * 1000;
+                } else {
+                    totalDuration = 8000; // Fixed show time if fits
+                }
+
                 setTimeout(() => {
-                    el.bpNewsLayer.style.opacity = '1';
-                    setTimeout(() => {
-                        const containerWidth = document.querySelector('.bp-text-scroller').offsetWidth;
-                        const textWidth = el.bpText.offsetWidth;
-                        let totalDuration = 20000; 
-                        
-                        if(textWidth > containerWidth) {
-                            const dist = -(textWidth + 20) + "px"; 
-                            el.bpText.style.setProperty('--scroll-dist', dist);
-                            const animDuration = Math.max((textWidth + containerWidth) / 80, 10); 
-                            el.bpText.style.animation = `scrollTextLeft ${animDuration}s linear 1s forwards`;
-                            totalDuration = (1 + animDuration + 2) * 1000;
-                        } else { totalDuration = 12000; }
-                        
-                        setTimeout(() => {
-                            el.bpNewsLayer.style.opacity = '0';
-                            setTimeout(() => {
-                                el.controlsBar.classList.remove('breaking-active');
-                                el.bpText.style.animation = 'none';
-                                state.breakingActive = false;
-                                processBreakingQueue(); 
-                            }, 500);
-                        }, totalDuration);
-                    }, 100);
-                }, 500);
-            }, 3000); 
+                    // Close animation
+                    el.breakingPanel.classList.add('closing');
+                    el.breakingPanel.addEventListener('animationend', () => {
+                        el.breakingPanel.classList.remove('active');
+                        el.breakingPanel.classList.remove('closing');
+                        el.bpText.style.animation = 'none';
+                        state.breakingActive = false;
+                        processBreakingQueue();
+                    }, { once: true });
+                }, totalDuration);
+
+            }, 500);
         }
         
-        el.controlsBar.addEventListener('click', (e) => {
-             if(state.breakingActive && state.breakingLink) {
-                 e.preventDefault(); e.stopPropagation();
-                 window.open(state.breakingLink, '_blank');
+        // News Container click for main news (delegation)
+        el.newsContainer.addEventListener('click', (e) => {
+             // Breaking News Panel click
+             if(e.target.closest('#breaking-panel')) {
+                  if(state.breakingActive && state.breakingLink) {
+                     e.preventDefault(); e.stopPropagation();
+                     window.open(state.breakingLink, '_blank');
+                  }
+                  return;
              }
+             // Main News Card click
+             if(e.target.closest('.controls-bar') || e.target.closest('.breaking-pod')) return; 
+             if(state.currentItem && state.currentItem.link) window.open(state.currentItem.link, '_blank'); 
         });
         
         // --- DEV MENU FUNCTIONS ---
         window.triggerTestBreaking = function() { state.breakingQueue.push({ title: "Ez egy rövid teszt hír.", date: new Date(), source: "TESZT", link: "#" }); processBreakingQueue(); el.devMenu.style.display = 'none'; }
-        window.triggerTestBreakingLong = function() { state.breakingQueue.push({ title: "Ez egy rendkívül hosszú teszt hír, amely arra szolgál, hogy ellenőrizzük a görgető mechanizmust.", date: new Date(), source: "TESZT", link: "#" }); processBreakingQueue(); el.devMenu.style.display = 'none'; }
+        window.triggerTestBreakingLong = function() { state.breakingQueue.push({ title: "Ez egy rendkívül hosszú teszt hír, amely arra szolgál, hogy ellenőrizzük a görgető mechanizmust és a megjelenést.", date: new Date(), source: "TESZT", link: "#" }); processBreakingQueue(); el.devMenu.style.display = 'none'; }
         window.triggerTestTraffic = function() { el.devMenu.style.display = 'none'; state.items.splice(state.currentIndex + 1, 0, { title: "Baleset az M3-as autópályán", desc: "Torlódás várható.", source: "KÖZÚT", date: new Date(), link: "#" }); clearTimeout(state.flipTimer); showNextItem(true); };
         window.triggerVisualNews = function() { el.devMenu.style.display = 'none'; state.items.splice(state.currentIndex + 1, 0, { title: "Képes Hír Teszt", desc: "Leírás...", source: "INDEX", date: new Date(), link: "#", img: "https://images.unsplash.com/photo-1504711434969-e33886168f5c" }); clearTimeout(state.flipTimer); showNextItem(true); };
         window.triggerTextNews = function() { el.devMenu.style.display = 'none'; state.items.splice(state.currentIndex + 1, 0, { title: "Szöveges Hír", desc: "Leírás...", source: "TELEX", date: new Date(), link: "#", img: null }); clearTimeout(state.flipTimer); showNextItem(true); };
@@ -1710,11 +1795,14 @@
             if (sec === 0) cleanUpOldItems();
 
             const nightLabel = document.getElementById('night-summary-label');
-            if (state.block.type === 'summary_yesterday') {
+            // Strict logic: ONLY show if block type is exactly 'summary_yesterday'
+            if (state.block && state.block.type === 'summary_yesterday') {
                 el.timelineContainer.style.display = 'flex';
-                if (hour < 5 || (hour === 5 && min < 44) || (hour === 5 && min === 44 && sec <= 45)) { nightLabel.classList.add('active'); } 
-                else if (!document.getElementById('dev-menu').style.display.includes('flex')) { nightLabel.classList.remove('active'); }
-            } else { el.timelineContainer.style.display = 'none'; nightLabel.classList.remove('active'); }
+                nightLabel.classList.add('active');
+            } else { 
+                el.timelineContainer.style.display = 'none'; 
+                nightLabel.classList.remove('active'); 
+            }
         }
 
         function filterItemsByBlock(items) {
@@ -1890,8 +1978,13 @@
 
             if (hasVisual) { nextTrack.classList.add('has-visual'); }
             
+            // --- NYIREGYHAZA PWS LOGIC (FIXED) ---
             let weatherHTML = "";
-            if (state.currentNyData) { weatherHTML = `<div class="ny-weather-in-footer">${state.currentNyData}</div>`; }
+            if (state.currentNyData) {
+                weatherHTML = `<div class="ny-weather-in-footer">${state.currentNyData}</div>`;
+            } else {
+                 weatherHTML = ""; // Hide completely if no data
+            }
 
             // Extract single sentence for short view
             const shortDesc = getFirstSentence(item.desc);
@@ -1905,7 +1998,6 @@
                     </div>
                     <div class="news-footer-row">
                         <div class="news-meta">${footerMetaHTML}</div>
-                        ${weatherHTML}
                     </div>
                 </div>
                 ${visualHtml}
@@ -1932,8 +2024,11 @@
             setInterval(updateTimeAndState, 1000); updateTimeAndState();
             onValue(feedsRef, (snap) => { state.rssFeeds = snap.val() || {}; refreshNews(); });
             fetchWeatherData(); setInterval(fetchWeatherData, 150000); setInterval(displayWeather, 6000);
+            
+            // Fixed PWS:
             fetchNyiregyhazaSpecific(); setInterval(fetchNyiregyhazaSpecific, 30000);
-            setInterval(checkBreakingNews, 20000); setTimeout(checkBreakingNews, 5000);
+            
+            setInterval(checkBreakingNews, 45000); setTimeout(checkBreakingNews, 5000);
             setInterval(showCredits, 300000); 
             document.getElementById('manual-refresh-trigger').addEventListener('click', () => refreshNews());
             document.getElementById('next-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); showNextItem(true); });
