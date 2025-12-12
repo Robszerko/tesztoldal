@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V200 (Stable PWS & Night Logic)</title>
+    <title>Aurora News Ticker - V201 (New PWS Design & Logic)</title>
     
-    <!-- Fonts -->
+    <!-- Fonts: Added 'Rajdhani' for the PWS widget -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js" type="module"></script>
@@ -42,6 +42,7 @@
             --font-body: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             --font-serif: 'Playfair Display', serif;
+            --font-tech: 'Rajdhani', sans-serif; /* New font variable */
             
             --cap-radius-outer: 90px; 
             --cap-radius-inner: 8px; 
@@ -403,36 +404,39 @@
         .provider-icon { width: 16px; height: 16px; border-radius: 50%; }
         .traffic-icon-svg { width: 16px; height: 16px; fill: var(--accent-warm); }
 
-        /* NYIREGYHAZA WEATHER IN FOOTER - REVISED V200 */
+        /* NYIREGYHAZA WEATHER IN FOOTER - REVISED V201 (NEW DESIGN) */
         .ny-weather-in-footer {
             position: absolute; 
             bottom: 30px; 
-            right: 300px; /* Offset 300px as requested */
+            right: 300px;
             display: none; align-items: center; gap: 8px;
             
-            /* Revised Gradient: Dark Left -> Transparent Right */
-            background: linear-gradient(90deg, rgba(6, 10, 25, 1) 0%, rgba(6, 10, 25, 0.8) 60%, rgba(6, 10, 25, 0) 100%);
+            /* NEW MODERN DESIGN */
+            font-family: var(--font-tech); /* Rajdhani */
+            font-size: 1.1rem; /* Slightly bigger */
+            font-weight: 600; 
+            color: #fff;
             
-            padding: 5px 20px 5px 15px; 
-            border-radius: 4px 0 0 4px;
-            border-bottom: 1px solid rgba(56, 189, 248, 0.2); 
-            border-right: none;
+            background: linear-gradient(90deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+            backdrop-filter: blur(4px);
             
+            padding: 4px 15px; 
+            border-radius: 0 4px 4px 0; /* Asymmetric */
+            border-left: 3px solid var(--accent-warm); /* Golden Accent */
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+
             pointer-events: none; 
             
-            font-family: var(--font-mono); font-size: 0.8rem;
-            font-weight: 700; color: #fff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+            letter-spacing: 0.5px;
             z-index: 200; 
             white-space: nowrap;
             
-            opacity: 0; /* Hidden by default for fade-in */
+            opacity: 0; 
             transition: opacity 1s ease;
         }
         
-        .ny-weather-in-footer.visible {
-            opacity: 1; /* Fade in when data is ready */
-        }
+        .ny-weather-in-footer.visible { opacity: 1; }
 
         /* TIP CARD STYLES */
         .news-card.tip-card {
@@ -462,8 +466,8 @@
             display: none; 
             align-items: center; font-size: 0.7rem; font-weight: 700;
             color: var(--accent-warm); text-transform: uppercase; letter-spacing: 0.5px;
-            white-space: nowrap; margin-right: 0; z-index: 200; flex-shrink: 0;
             text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+            white-space: nowrap; margin-right: 0; z-index: 200; flex-shrink: 0;
         }
         #night-summary-label.active { display: flex; }
 
@@ -928,7 +932,7 @@
 
             <div class="progress-line-container"><div id="progress-bar" class="progress-line"></div></div>
 
-            <!-- PWS BADGE HERE (Fixed Offset) -->
+            <!-- PWS BADGE HERE (Fixed Offset V201) -->
             <div id="pws-badge" class="ny-weather-in-footer"></div>
 
             <!-- SEPARATED BREAKING PANEL (FLIP DOWN STYLE) -->
@@ -1756,6 +1760,14 @@
             const h = now.getHours() + now.getMinutes()/60;
             let currentBlock = THEMATIC_BLOCKS.findLast(b => h >= b.start) || THEMATIC_BLOCKS[THEMATIC_BLOCKS.length-1];
             const min = now.getMinutes(); const sec = now.getSeconds(); const hour = now.getHours();
+
+            // PWS HIDING LOGIC for BIG CLOCK
+            const pwsEl = document.getElementById('pws-badge');
+            if (el.bigClockLayer.classList.contains('active')) {
+                 if (pwsEl) pwsEl.style.opacity = '0';
+            } else if (pwsEl && pwsEl.classList.contains('visible')) {
+                 pwsEl.style.opacity = '1';
+            }
 
             if (hour === 23 && min === 59) {
                 if (sec >= 0 && sec < 50) { el.goodbyeCard.classList.add('active'); el.bigClockLayer.classList.remove('active'); } 
