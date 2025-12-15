@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V214 (Clock Layout & Decimals)</title>
+    <title>Aurora News Ticker - V217 (Inline PWS Fix)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -198,6 +198,22 @@
         }
         .left-prog-badge.visible { opacity: 1; transform: translateY(0); }
         
+        /* NIGHT SUMMARY LABEL - MOVED HERE */
+        #night-summary-label {
+            display: none; 
+            font-size: 0.5rem; 
+            font-weight: 700;
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            margin-top: 5px;
+            text-align: center;
+            opacity: 0.8;
+            animation: fadeIn 0.5s ease;
+        }
+        #night-summary-label.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 0.8; } }
+        
         /* Badge Colors */
         .left-prog-badge.badge-night { color: #c7d2fe; box-shadow: 0 0 10px rgba(129, 140, 248, 0.1); border-color: rgba(129, 140, 248, 0.3); }
         .left-prog-badge.badge-dawn { color: #ffe4e6; box-shadow: 0 0 10px rgba(251, 113, 133, 0.1); border-color: rgba(251, 113, 133, 0.3); }
@@ -308,7 +324,7 @@
             background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.8) 50%, rgba(15, 23, 42, 0.4) 100%);
             padding: 10px 15px 5px 10px; border-radius: 8px; margin-left: -10px; 
             height: 100%; position: relative; transition: border 0.3s;
-            width: 100%;
+            width: 100%; /* Default to full width */
             max-width: 100%;
             transition: max-width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
@@ -361,40 +377,6 @@
         }
         
         .news-visual-image { width: 100%; height: 100%; object-fit: cover; }
-
-        /* VISUAL FALLBACK - NEWSROOM STYLE */
-        .visual-fallback { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; color: #fff; padding: 10px; width:100%; height:100%; justify-content:center; }
-        
-        .visual-fallback.newsroom-style {
-            background: radial-gradient(circle at center, #1e293b, #0f172a 80%),
-                        repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 10px);
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
-            position: relative;
-        }
-        
-        .no-img-icon { font-size: 2rem; margin-bottom: 5px; opacity: 0.5; filter: grayscale(100%); }
-        
-        .no-img-text {
-            font-family: var(--font-head);
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: #94a3b8;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-            line-height: 1.4;
-            letter-spacing: 0.5px;
-        }
-
-        .fallback-brand {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            opacity: 0.6;
-            margin-top: auto;
-            padding-bottom: 5px;
-        }
-        .fallback-brand svg { width: 14px; height: 14px; fill: var(--accent-color); }
-        .fallback-brand span { font-family: var(--font-head); font-weight: 900; font-size: 0.75rem; color: #fff; }
 
         .news-card.traffic-alert .news-content-wrapper { background: linear-gradient(90deg, rgba(69, 26, 3, 0.95) 0%, rgba(124, 45, 18, 0.8) 50%, rgba(69, 26, 3, 0.4) 100%); border-left: 3px solid var(--accent-traffic); }
 
@@ -488,7 +470,7 @@
         .news-footer-row {
             flex: 0 0 auto;
             display: flex; align-items: center; 
-            justify-content: space-between; 
+            justify-content: flex-start; /* Changed from space-between */
             margin-top: auto; 
             padding-top: 8px;
             border-top: 1px solid rgba(255,255,255,0.1);
@@ -503,43 +485,22 @@
         }
         .news-card.traffic-alert .news-meta { color: var(--accent-warm); }
         
+        /* INLINE PWS BADGE STYLE V217 */
+        .pws-inline-badge {
+            display: flex; align-items: center; gap: 6px;
+            margin-left: 20px; /* The "3 spaces" visual gap */
+            font-family: var(--font-body); /* Inter */
+            font-weight: 600;
+            color: #fff;
+            opacity: 0.9;
+        }
+        .pws-temp-val { color: var(--accent-warm); font-weight: 700; }
+        .pws-live-dot-inline { width: 6px; height: 6px; background: var(--accent-color); border-radius: 50%; box-shadow: 0 0 5px var(--accent-color); animation: pulse 2s infinite; }
+
+        
         .provider-identity { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 15px; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
         .provider-icon { width: 16px; height: 16px; border-radius: 50%; }
         .traffic-icon-svg { width: 16px; height: 16px; fill: var(--accent-warm); }
-
-        /* NYIREGYHAZA WEATHER IN FOOTER - REVISED V204 (FIXED POS) */
-        .ny-weather-in-footer {
-            position: absolute; 
-            bottom: 32px; /* Lifted up to clear controls bar */
-            right: 300px;
-            display: none; align-items: center; gap: 6px;
-            
-            /* REMOVED LAYER STYLES FOR SHARPNESS */
-            background: transparent;
-            backdrop-filter: none;
-            border: none;
-            box-shadow: none;
-
-            /* SHARP TYPOGRAPHY */
-            font-family: var(--font-head); /* Montserrat for readability */
-            font-weight: 800; /* Extra Bold */
-            font-size: 0.85rem; 
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            
-            /* Strong Shadow for contrast without box */
-            text-shadow: 0 2px 4px rgba(0,0,0,0.9);
-            
-            pointer-events: none; 
-            z-index: 400; /* Increased Z-Index to stay on top */
-            white-space: nowrap;
-            
-            opacity: 0; 
-            transition: opacity 1s ease;
-        }
-        
-        .ny-weather-in-footer.visible { opacity: 1; }
 
         /* TIP CARD STYLES - REVISED FOR FIT */
         .news-card.tip-card {
@@ -648,24 +609,8 @@
         .dnb-watermark svg { width: 400px; height: 400px; fill: #fff; }
         .dnb-text-strip { position: absolute; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: space-around; transform: rotate(-3deg); opacity: 0.05; font-family: var(--font-head); font-weight: 900; font-size: 4.5rem; color: #fff; white-space: nowrap; letter-spacing: 5px; }
 
-        /* NIGHT LABEL - SMALLER & FIXED */
-        #night-summary-label {
-            display: none; 
-            align-items: center; 
-            font-size: 0.55rem; /* Reduced Size */
-            font-weight: 800;
-            color: var(--accent-warm); 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
-            white-space: nowrap; 
-            margin-right: 10px; 
-            margin-left: 15px; /* Added spacing from timeline */
-            z-index: 200; 
-            flex-shrink: 0;
-        }
-        #night-summary-label.active { display: flex; }
-
+        /* NIGHT LABEL - REMOVED FROM CONTROLS */
+        
         .news-card.night-info { background: radial-gradient(circle at top left, #312e81, #1e1b4b); border-left: 4px solid #a855f7; alignItems: center; justify-content: center; text-align: center; padding-bottom: 35px; flex-direction: column; }
         
         /* GOODBYE CARD - OPTIMIZED SIZE (V184) */
@@ -814,7 +759,7 @@
             position: relative; overflow: hidden; padding-left: 10px;
             gap: 15px; /* Spacing between timeline and label */
         }
-        #timeline-container { display: none; gap: 3px; overflow-x: auto; scrollbar-width: none; pointer-events: auto !important; z-index: 105; flex-grow: 1; }
+        #timeline-container { display: none; gap: 3px; overflow-x: auto; scrollbar-width: none; pointer-events: auto !important; z-index: 105; flex-grow: 1; margin-left: 10px; }
         #timeline-container.visible { display: flex; }
         #timeline-container.shifted { margin-right: 15px; } 
         
@@ -1077,6 +1022,8 @@
                             </div>
                             <!-- Program Badge moved here -->
                             <div id="left-program-badge" class="left-prog-badge">BETÖLTÉS...</div>
+                            <!-- NIGHT LABEL MOVED HERE -->
+                            <div id="night-summary-label">AZ ELŐZŐ NAP HÍREI - ÖSSZEFOGLALÓ</div>
                         </div>
                         
                         <!-- Center: CLOCK & DATE (SWAPPED & CENTERED) -->
@@ -1203,9 +1150,6 @@
 
             <div class="progress-line-container"><div id="progress-bar" class="progress-line"></div></div>
 
-            <!-- PWS BADGE HERE (Fixed Offset V201) -->
-            <div id="pws-badge" class="ny-weather-in-footer"></div>
-
             <!-- SEPARATED BREAKING PANEL (FLIP DOWN STYLE) -->
             <div class="breaking-panel" id="breaking-panel">
                 <div class="clean-badge">Most érkezett</div>
@@ -1227,7 +1171,6 @@
                     </div>
                     <div class="cb-center">
                          <div id="timeline-container"></div>
-                         <div id="night-summary-label">AZ ELŐZŐ NAP HÍREI - ÖSSZEFOGLALÓ</div>
                     </div>
                     <div class="cb-right">
                         <div id="next-prog-alert" class="next-prog-alert"></div>
@@ -1495,7 +1438,8 @@
             lastTipTime: Date.now(), // For the Tip Card
             testModeActive: false, 
             forcedBlock: null,
-            isHourChangeTestActive: false // NEW for clock test
+            isHourChangeTestActive: false, // NEW for clock test
+            currentNyTemp: null // Store temperature globally
         };
 
         const stripHtml = (html) => { let doc = new DOMParser().parseFromString(html, 'text/html'); return doc.body.textContent || ""; };
@@ -1760,29 +1704,8 @@
 
         // --- NEW PWS MANAGER ---
         function managePwsVisibility(shouldShow) {
-            const pwsEl = document.getElementById('pws-badge');
-            if(!pwsEl) return;
-
-            if (!shouldShow) {
-                // HIDE IMMEDIATELY
-                if (state.pwsTimer) clearTimeout(state.pwsTimer);
-                state.pwsTimer = null;
-                pwsEl.style.opacity = '0';
-            } else {
-                // SHOW WITH DELAY (if not already showing or pending)
-                // Check safety: Don't start timer if Big Clock is active
-                if (el.bigClockLayer.classList.contains('active')) return;
-
-                if (pwsEl.style.opacity !== '1' && !state.pwsTimer) {
-                    state.pwsTimer = setTimeout(() => {
-                        // Double check safety before showing
-                        if (!el.bigClockLayer.classList.contains('active')) {
-                            pwsEl.style.opacity = '1';
-                        }
-                        state.pwsTimer = null;
-                    }, 5000); // 5 seconds delay
-                }
-            }
+            // No longer managing an absolute div. Function kept for compatibility structure
+            // but now logic happens inside renderCard
         }
 
         async function fetchNyiregyhazaSpecific() {
@@ -1807,19 +1730,10 @@
                 } catch(e) {}
             }
 
-            const pwsEl = document.getElementById('pws-badge');
             if (finalData && finalData.metric && typeof finalData.metric.temp === 'number') {
                 const temp = finalData.metric.temp.toFixed(1);
-                // HTML for the badge
-                pwsEl.innerHTML = `
-                    <span>NYÍREGYHÁZA</span>
-                    <span style="color:var(--accent-warm);">|</span>
-                    <span style="color:var(--accent-warm);">${temp}°C</span>
-                `;
-                pwsEl.style.display = 'flex';
-                // NOTE: We do NOT set opacity here anymore. The Manager handles it.
-            } else {
-                pwsEl.style.display = 'none'; 
+                state.currentNyTemp = temp; // Store globally
+                // Don't update DOM directly, renderCard will pick it up
             }
         }
 
@@ -2098,21 +2012,6 @@
 
             }, 600); // Wait for open transition + buffer
         }
-        
-        // News Container click for main news (delegation)
-        el.newsContainer.addEventListener('click', (e) => {
-             // Breaking News Panel click
-             if(e.target.closest('#breaking-panel')) {
-                  if(state.breakingActive && state.breakingLink) {
-                     e.preventDefault(); e.stopPropagation();
-                     window.open(state.breakingLink, '_blank');
-                  }
-                  return;
-             }
-             // Main News Card click
-             if(e.target.closest('.controls-bar') || e.target.closest('.breaking-pod')) return; 
-             if(state.currentItem && state.currentItem.link) window.open(state.currentItem.link, '_blank'); 
-        });
         
         // --- DEV MENU FUNCTIONS ---
         window.triggerTestBreaking = function() { state.breakingQueue.push({ title: "Ez egy rövid teszt hír.", date: new Date(), source: "TESZT", link: "#" }); processBreakingQueue(); el.devMenu.style.display = 'none'; }
@@ -2456,7 +2355,26 @@
             }
 
             let iconHtml = isTraffic ? TRAFFIC_ICON : `<img src="${fav}" class="provider-icon">`;
-            let footerMetaHTML = `<div class="provider-identity">${iconHtml} ${displaySource}</div><span>${timeStr}</span>`;
+            
+            // --- INLINE PWS DATA GENERATION ---
+            let weatherHTML = '';
+            if (state.currentNyTemp) {
+                weatherHTML = `
+                    <div class="pws-inline-badge">
+                        <div class="pws-live-dot-inline"></div>
+                        <span>NYÍREGYHÁZA</span>
+                        <span style="color:var(--accent-warm);">|</span>
+                        <span class="pws-temp-val">${state.currentNyTemp}°C</span>
+                    </div>
+                `;
+            }
+
+            // Combine into footer meta
+            let footerMetaHTML = `
+                <div class="provider-identity">${iconHtml} ${displaySource}</div>
+                <span>${timeStr}</span>
+                ${weatherHTML}
+            `;
             
             let visualHtml = ''; let hasVisual = false;
             let overlayStyle = 'style="background: rgba(2, 6, 23, 0.98);"'; // Default dark
@@ -2467,19 +2385,9 @@
                 // Add linear gradient over image for readability
                 overlayStyle = `style="background-image: linear-gradient(to bottom, rgba(2,6,23,0.92), rgba(2,6,23,0.96)), url('${item.img}'); background-size: cover; background-position: center;"`;
             } else {
-                hasVisual = true; 
-                // UPDATED FALLBACK: Newsroom style
-                visualHtml = `
-                    <div class="news-visual-column">
-                        <div class="visual-fallback newsroom-style">
-                            <div class="no-img-icon">📷</div>
-                            <div class="no-img-text">Ehhez a hírhez<br>nincs megjeleníthető kép</div>
-                            <div class="fallback-brand">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                                <span>TKP NEWS</span>
-                            </div>
-                        </div>
-                    </div>`;
+                // NO VISUAL - Text will expand due to CSS max-width: 100% on wrapper
+                hasVisual = false; 
+                visualHtml = ''; // No fallback graphic
             }
 
             if (hasVisual) { nextTrack.classList.add('has-visual'); }
