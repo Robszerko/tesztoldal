@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V206 (Currency API Update)</title>
+    <title>Aurora News Ticker - V214 (Clock Layout & Decimals)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -706,15 +706,29 @@
         .gb-brand-lockup svg { width: 30px; height: 30px; fill: var(--accent-color); filter: drop-shadow(0 0 10px rgba(56,189,248,0.5)); }
         .gb-brand-text { font-family: var(--font-head); font-weight: 900; font-size: 1.2rem; color: #fff; }
 
-        /* BIG CLOCK */
-        .big-clock-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #020617 100%); z-index: 60; display: flex; flex-direction: row; gap: 30px; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        /* BIG CLOCK REDESIGNED V212 (FIXED SIZE V213 + LAYOUT V214) */
+        .big-clock-layer { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%); 
+            z-index: 60; 
+            display: flex; 
+            flex-direction: row; 
+            align-items: center; 
+            justify-content: space-evenly; /* Spread items evenly */
+            padding: 0 40px; /* Add padding to prevent edge sticking */
+            opacity: 0; pointer-events: none; transition: opacity 0.5s ease; 
+        }
         .big-clock-layer.active { opacity: 1; pointer-events: all; }
-        .bc-digital-wrapper { display: flex; flex-direction: column; align-items: center; }
-        .bc-time { font-family: var(--font-mono); font-size: 4.5rem; font-weight: 700; color: #fff; letter-spacing: -2px; animation: breathe 4s infinite ease-in-out; text-shadow: 0 0 20px rgba(56, 189, 248, 0.3); margin-bottom: 5px; font-variant-numeric: tabular-nums; }
-        .bc-label { color: var(--accent-warm); font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; margin-top: 15px; font-weight: 600; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
         
+        .bc-digital-wrapper { flex: 0 1 auto; display: flex; flex-direction: column; align-items: center; }
+        .bc-time { font-family: var(--font-mono); font-size: 4.5rem; font-weight: 700; color: #fff; letter-spacing: -2px; animation: breathe 4s infinite ease-in-out; text-shadow: 0 0 20px rgba(56, 189, 248, 0.3); margin-bottom: 5px; font-variant-numeric: tabular-nums; }
+        
+        .bc-center-brand { flex: 0 1 auto; display: flex; flex-direction: column; align-items: center; animation: pulseLogo 3s infinite ease-in-out; }
+        .bc-logo-large svg { width: 50px; height: 50px; fill: var(--accent-color); filter: drop-shadow(0 0 15px rgba(56,189,248,0.6)); }
+        .bc-brand-text { font-family: var(--font-head); font-size: 1.5rem; font-weight: 900; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.5); letter-spacing: -1px; margin-top: 10px; }
+
         /* ANALOG CLOCK */
-        .analog-clock { width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.8); background: rgba(0,0,0,0.4); position: relative; box-shadow: 0 0 25px rgba(56, 189, 248, 0.2); backdrop-filter: blur(5px); }
+        .analog-clock { flex: 0 0 auto; width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.8); background: rgba(0,0,0,0.4); position: relative; box-shadow: 0 0 25px rgba(56, 189, 248, 0.2); backdrop-filter: blur(5px); transform: translateY(-10px); }
         .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; background: #fff; border-radius: 4px; box-shadow: 0 0 5px rgba(255,255,255,0.5); }
         .hand.hour { width: 4px; height: 35px; margin-left: -2px; }
         .hand.minute { width: 3px; height: 48px; margin-left: -1.5px; opacity: 0.9; }
@@ -1145,8 +1159,13 @@
             <div class="big-clock-layer" id="big-clock-layer">
                 <div class="bc-digital-wrapper">
                     <div class="bc-time" id="bc-time-display">00:00:00</div>
-                    <div class="bc-label"></div>
                 </div>
+                
+                <div class="bc-center-brand">
+                    <div class="bc-logo-large"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
+                    <div class="bc-brand-text">TKP NEWS</div>
+                </div>
+
                 <div class="analog-clock">
                     <div class="hour-mark" style="transform: rotate(0deg)">XII</div>
                     <div class="hour-mark" style="transform: rotate(30deg); content: ''; width: 2px; background: rgba(255,255,255,0.3); height: 6px; top: 2px;"></div>
@@ -1339,7 +1358,15 @@
             "Magyar Hírlap": "https://www.magyarhirlap.hu/rss", "Pesti Srácok": "https://pestisracok.hu/feed/", "Nemzeti Sport": "https://www.nemzetisport.hu/feed", "M4 Sport": "https://m4sport.hu/feed",
             "Hír TV": "https://hirtv.hu/rss", "Privátbankár": "https://www.privatbankar.hu/rss/all.xml",
             "Police.hu": "http://www.police.hu/hu/rss/balesetek-torlodasok",
-            "BKK Info": "https://bkk.hu/apps/bkk-info/rss.php"
+            "BKK Info": "https://bkk.hu/apps/bkk-info/rss.php",
+            "Pécsi Újság": "https://feeds.feedburner.com/pecsiujsag",
+            "Dehir": "https://dehir.hu/rss.php",
+            "Roadster": "https://roadster.hu/feed/",
+            "NatGeo": "https://ng.24.hu/feed/",
+            "Player.hu": "https://player.hu/feed",
+            "Qubit": "https://qubit.hu/feed",
+            "PC World": "https://www.pcwplus.hu/site/rss/rss.xml",
+            "GameStar": "https://www.gsplus.hu/site/rss/rss.xml"
         };
 
         const firebaseConfig = { apiKey: "AIzaSyDgBgiNSxjgWP_jmaoHpf0Qejo8_OO4sPg", authDomain: "robi-oldala.firebaseapp.com", databaseURL: "https://robi-oldala-default-rtdb.europe-west1.firebasedatabase.app", projectId: "robi-oldala", storageBucket: "robi-oldala.appspot.com", messagingSenderId: "300815778397", appId: "1:300815778397:web:ec609be55cc8afd193c3b4" };
@@ -1467,7 +1494,8 @@
             currentNyData: null,
             lastTipTime: Date.now(), // For the Tip Card
             testModeActive: false, 
-            forcedBlock: null
+            forcedBlock: null,
+            isHourChangeTestActive: false // NEW for clock test
         };
 
         const stripHtml = (html) => { let doc = new DOMParser().parseFromString(html, 'text/html'); return doc.body.textContent || ""; };
@@ -1661,10 +1689,10 @@
                 }
             });
 
-            // Update Footer (Whole Numbers)
-            if(rates.EUR) document.getElementById('fr-eur').textContent = Math.round(rates.EUR) + ' Ft';
-            if(rates.USD) document.getElementById('fr-usd').textContent = Math.round(rates.USD) + ' Ft';
-            if(rates.CHF) document.getElementById('fr-chf').textContent = Math.round(rates.CHF) + ' Ft';
+            // Update Footer (Decimals for Footer as well - V214)
+            if(rates.EUR) document.getElementById('fr-eur').textContent = rates.EUR.toFixed(2) + ' Ft';
+            if(rates.USD) document.getElementById('fr-usd').textContent = rates.USD.toFixed(2) + ' Ft';
+            if(rates.CHF) document.getElementById('fr-chf').textContent = rates.CHF.toFixed(2) + ' Ft';
         }
 
         function updateSkyGradient() {
@@ -2128,7 +2156,17 @@
             }, 25000); 
         };
 
-        window.triggerHourChangeTest = function() { el.devMenu.style.display = 'none'; el.bigClockLayer.classList.add('active'); setTimeout(() => { el.bigClockLayer.classList.remove('active'); }, 10000); };
+        window.triggerHourChangeTest = function() { 
+            el.devMenu.style.display = 'none'; 
+            state.isHourChangeTestActive = true; 
+            el.bigClockLayer.classList.add('active');
+            const now = new Date();
+            el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+            setTimeout(() => { 
+                state.isHourChangeTestActive = false; 
+                el.bigClockLayer.classList.remove('active'); 
+            }, 10000); 
+        };
         window.triggerGoodbyeTest = function() { el.devMenu.style.display = 'none'; el.goodbyeCard.classList.add('active'); setTimeout(() => { el.goodbyeCard.classList.remove('active'); }, 15000); };
         window.triggerCredits = function() { el.devMenu.style.display = 'none'; showCredits(); };
         window.closeDevMenu = function() { el.devMenu.style.display = 'none'; }
@@ -2184,8 +2222,11 @@
             if (el.bigClockLayer.classList.contains('active')) {
                  managePwsVisibility(false);
             } 
-            // Note: We don't force 'true' here else it overrides card-specific logic. 
-            // The restoration is handled by renderCard.
+
+            // Always update big clock time text if active (for test or real)
+            if(el.bigClockLayer.classList.contains('active')) {
+                 el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+            }
 
             if (hour === 23 && min === 59) {
                 if (sec >= 0 && sec < 50) { el.goodbyeCard.classList.add('active'); el.bigClockLayer.classList.remove('active'); } 
@@ -2193,7 +2234,10 @@
             } else if (min === 59 && sec >= 50) { 
                 el.bigClockLayer.classList.add('active'); el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); if(sec === 50) showCredits(); 
             } else {
-                if(el.bigClockLayer.classList.contains('active')) { el.bigClockLayer.classList.remove('active'); el.goodbyeCard.classList.remove('active'); if(state.block.type !== 'summary_yesterday') { state.currentIndex = 0; if(state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems = []; } showNextItem(false); } }
+                if(!state.isHourChangeTestActive && el.bigClockLayer.classList.contains('active')) { 
+                    el.bigClockLayer.classList.remove('active'); el.goodbyeCard.classList.remove('active'); 
+                    if(state.block.type !== 'summary_yesterday') { state.currentIndex = 0; if(state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems = []; } showNextItem(false); } 
+                }
             }
 
             if (!state.block || state.block.name !== currentBlock.name) { 
@@ -2497,7 +2541,22 @@
             document.getElementById('manual-refresh-trigger').addEventListener('click', () => refreshNews());
             document.getElementById('next-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); showNextItem(true); });
             document.getElementById('prev-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); state.currentIndex -= 2; showNextItem(true); });
-            el.newsContainer.addEventListener('click', (e) => { if(e.target.closest('.controls-bar') || e.target.closest('.breaking-pod')) return; if(state.currentItem && state.currentItem.link) window.open(state.currentItem.link, '_blank'); });
+
+            // --- SINGLE CLICK LISTENER ---
+            el.newsContainer.addEventListener('click', (e) => {
+                // Prevent opening link when using controls
+                if(e.target.closest('.controls-bar') || e.target.closest('.breaking-pod')) return; 
+
+                // Prevent opening link when clicking Tip Card (it shows previous item data)
+                if(e.target.closest('.tip-card')) return;
+                
+                e.stopPropagation(); // Stop bubbling
+                
+                if(state.currentItem && state.currentItem.link) {
+                    window.open(state.currentItem.link, '_blank'); 
+                }
+            });
+
             setTimeout(fetchExchangeRates, 5000);
             initIntroSequence();
         });
