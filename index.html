@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V205 (Breaking Duration 15s)</title>
+    <title>Aurora News Ticker - V206 (Currency API Update)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -763,7 +763,36 @@
         }
         .controls-bar.breaking-active .controls-normal-content { opacity: 0; pointer-events: none !important; }
 
-        .cb-left { display: none; }
+        /* CB-LEFT (FOOTER RATES) */
+        .cb-left { 
+            display: flex; /* Visible by default */
+            align-items: center; 
+            gap: 15px; 
+            padding-right: 15px; 
+            border-right: 1px solid rgba(255,255,255,0.1); 
+            margin-right: 10px; 
+            height: 100%;
+        }
+        
+        .footer-rate-item { 
+            font-family: var(--font-mono); 
+            font-size: 0.75rem; 
+            color: #94a3b8; 
+            font-weight: 600; 
+            white-space: nowrap; 
+            display: flex; align-items: center; /* Align flag and text */
+        }
+        .footer-rate-val { color: var(--accent-color); font-weight: 700; margin-left: 4px; }
+        
+        .footer-flag {
+            width: 14px;
+            height: auto;
+            vertical-align: middle;
+            margin-right: 4px;
+            opacity: 0.8;
+            border-radius: 2px;
+        }
+
         .cb-center { 
             flex-grow: 1; 
             display: flex; align-items: center; 
@@ -975,6 +1004,12 @@
 
         .manual-refresh { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; background: var(--accent-color); border-radius: 50%; cursor: pointer; opacity: 0; transition: opacity 0.3s; }
         .identity-panel:hover .manual-refresh { opacity: 0.5; }
+        
+        /* DEV INFO BOX */
+        .dev-info-box { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin-top: 5px; font-size: 0.75rem; }
+        .dib-row { display: flex; justify-content: space-between; margin-bottom: 2px; }
+        .dib-val { font-weight: 700; color: var(--accent-color); }
+        .dib-val.backup { color: var(--accent-danger); }
     </style>
 </head>
 <body data-theme="night">
@@ -992,13 +1027,19 @@
         
         <h3 style="margin-top:10px;">Jobb Panel & Egyéb</h3>
         <button class="dev-btn" style="border-color: #fbbf24; color: #fbbf24;" onclick="window.triggerEconomyTest()">Teszt: Árfolyam</button>
+        <div class="dev-info-box" id="rate-api-stats">
+            <div class="dib-row"><span>Szolgáltató:</span> <span class="dib-val" id="ras-provider">--</span></div>
+            <div class="dib-row"><span>Aktív Kulcs:</span> <span class="dib-val" id="ras-key">--</span></div>
+            <div class="dib-row"><span>Sikeres (K1):</span> <span class="dib-val" id="ras-c1">0</span></div>
+            <div class="dib-row"><span>Sikeres (K2):</span> <span class="dib-val" id="ras-c2">0</span></div>
+        </div>
         <button class="dev-btn" onclick="window.triggerSchedule()">Teszt: Műsorajánló</button>
         <button class="dev-btn" onclick="window.triggerWeatherLoading()">Teszt: Időjárás Loader</button>
         <button class="dev-btn" onclick="window.triggerTipTest()">Teszt: Tipp Kártya</button>
         
         <h3 style="margin-top:10px;">Módok & Események</h3>
-        <button class="dev-btn" onclick="window.triggerNightMode()">Teszt: Éjszakai Mód (Timeline + Felirat)</button>
-        <button class="dev-btn" onclick="window.triggerDayMode()">Teszt: Nappali Mód (Vissza)</button>
+        <button class="dev-btn" onclick="window.triggerNightMode()">Teszt: Éjszakai Mód (25mp)</button>
+        <button class="dev-btn" onclick="window.triggerDayMode()">Teszt: Nappali Mód (25mp)</button>
         <button class="dev-btn" style="border-color: #a855f7; color: #a855f7;" onclick="window.triggerHourChangeTest()">Teszt: Óraváltás (10mp)</button>
         <button class="dev-btn" style="border-color: #c026d3; color: #c026d3;" onclick="window.triggerGoodbyeTest()">Teszt: Elköszönés (15mp)</button>
         <button class="dev-btn" onclick="window.triggerCredits()">Teszt: Stáblista</button>
@@ -1160,7 +1201,11 @@
             <!-- CONTROLS BAR -->
             <div class="controls-bar" id="controls-bar-main">
                 <div class="controls-normal-content" id="controls-normal">
-                    <div class="cb-left"></div>
+                    <div class="cb-left" id="cb-left-rates">
+                        <span class="footer-rate-item"><img src="https://flagcdn.com/w20/eu.png" class="footer-flag">EUR: <span class="footer-rate-val" id="fr-eur">--</span></span>
+                        <span class="footer-rate-item"><img src="https://flagcdn.com/w20/us.png" class="footer-flag">USD: <span class="footer-rate-val" id="fr-usd">--</span></span>
+                        <span class="footer-rate-item"><img src="https://flagcdn.com/w20/ch.png" class="footer-flag">CHF: <span class="footer-rate-val" id="fr-chf">--</span></span>
+                    </div>
                     <div class="cb-center">
                          <div id="timeline-container"></div>
                          <div id="night-summary-label">AZ ELŐZŐ NAP HÍREI - ÖSSZEFOGLALÓ</div>
@@ -1248,6 +1293,12 @@
         
         const WUNDERGROUND_API_KEY = "e1f10a1e78da46f5b10a1e78da96f525"; 
         const NYIREGYHAZA_COORDS = { lat: 47.95, lon: 21.71 };
+
+        // NEW CURRENCY API CONFIG
+        const CURRENCY_API_KEYS = ['8258c9489622103635e16227fd9dadd7b8d1', '883da7c029a9ffaede3d17ae88d4b574a081'];
+        let curApiKeyIndex = 0;
+        let apiCallCounts = { key1: 0, key2: 0 };
+        let useBackupApi = false;
         
         const ICONS = {
             CLEAR: `<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-warm)" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
@@ -1414,7 +1465,9 @@
             breakingLink: null,
             breakingQueue: [],
             currentNyData: null,
-            lastTipTime: Date.now() // For the Tip Card
+            lastTipTime: Date.now(), // For the Tip Card
+            testModeActive: false, 
+            forcedBlock: null
         };
 
         const stripHtml = (html) => { let doc = new DOMParser().parseFromString(html, 'text/html'); return doc.body.textContent || ""; };
@@ -1501,26 +1554,117 @@
             });
         }
 
+        // --- DEV STATS UPDATE ---
+        function updateDevStats() {
+            document.getElementById('ras-provider').textContent = useBackupApi ? "Open ER (Backup)" : "CurrencyAPI.net";
+            document.getElementById('ras-provider').className = useBackupApi ? "dib-val backup" : "dib-val";
+            
+            document.getElementById('ras-key').textContent = useBackupApi ? "-" : (curApiKeyIndex + 1);
+            document.getElementById('ras-c1').textContent = apiCallCounts.key1;
+            document.getElementById('ras-c2').textContent = apiCallCounts.key2;
+        }
+
+        // --- CURRENCY API LOGIC (NEW) ---
         async function fetchExchangeRates() {
+            // 1. Try CurrencyAPI.net if not in backup mode
+            if (!useBackupApi) {
+                const currentKey = CURRENCY_API_KEYS[curApiKeyIndex];
+                try {
+                    // Note: Free plan on currencyapi.net usually forces Base: USD. 
+                    // So we fetch USD based rates and calculate cross rates.
+                    const res = await fetch(`https://currencyapi.net/api/v1/rates?key=${currentKey}&base=USD&output=JSON`);
+                    
+                    if (!res.ok) throw new Error("API Limit or Error");
+                    
+                    const data = await res.json();
+                    
+                    if (data.rates) {
+                        // Success! Update stats
+                        if(curApiKeyIndex === 0) apiCallCounts.key1++;
+                        else apiCallCounts.key2++;
+                        
+                        const r = data.rates; // 1 USD = X Currency
+                        // We need: 1 Currency = X HUF
+                        // 1 USD = r.HUF HUF
+                        // 1 EUR = (r.HUF / r.EUR) HUF
+                        // 1 CHF = (r.HUF / r.CHF) HUF
+
+                        const hufRate = r.HUF;
+                        const eurRate = r.EUR;
+                        const chfRate = r.CHF;
+                        // Add more if needed (GBP, etc)
+
+                        updateRatesUI({
+                            EUR: hufRate / eurRate,
+                            USD: hufRate,
+                            CHF: hufRate / chfRate,
+                            GBP: hufRate / r.GBP,
+                            AUD: hufRate / r.AUD,
+                            CAD: hufRate / r.CAD,
+                            PLN: hufRate / r.PLN,
+                            CZK: hufRate / r.CZK,
+                            RON: hufRate / r.RON,
+                            JPY: hufRate / r.JPY,
+                            CNY: hufRate / r.CNY,
+                            TRY: hufRate / r.TRY,
+                            SEK: hufRate / r.SEK,
+                            NOK: hufRate / r.NOK,
+                            DKK: hufRate / r.DKK
+                        });
+                        
+                        updateDevStats();
+                        return; // Success, exit function
+                    }
+                } catch (e) {
+                    console.warn(`Key ${curApiKeyIndex + 1} failed, switching...`);
+                    // Switch Logic
+                    if (curApiKeyIndex < CURRENCY_API_KEYS.length - 1) {
+                        curApiKeyIndex++;
+                        fetchExchangeRates(); // Retry immediately with next key
+                    } else {
+                        useBackupApi = true; // All keys failed, switch to backup
+                        fetchExchangeRates(); // Retry immediately with backup
+                    }
+                    updateDevStats();
+                    return;
+                }
+            }
+
+            // 2. Backup API (Open ER)
             try {
                 const res = await fetch('https://open.er-api.com/v6/latest/HUF');
                 const data = await res.json();
                 if (data && data.rates) {
-                    const currencies = ['EUR', 'USD', 'CHF', 'GBP', 'AUD', 'CAD', 'PLN', 'CZK', 'RON', 'JPY', 'CNY', 'TRY', 'SEK', 'NOK', 'DKK'];
-                    currencies.forEach(curr => {
-                        if (data.rates[curr]) {
-                            const val = 1 / data.rates[curr];
-                            const elId = `rate-${curr.toLowerCase()}`;
-                            const element = document.getElementById(elId);
-                            if (element) {
-                                element.textContent = `${val.toFixed(2)} Ft`;
-                                element.style.color = '#fff';
-                                setTimeout(() => element.style.color = null, 500);
-                            }
-                        }
-                    });
+                     // Invert rates (1 / rate) because this API gives 1 HUF = X Currency
+                     const processed = {};
+                     Object.keys(data.rates).forEach(key => {
+                         processed[key] = 1 / data.rates[key];
+                     });
+                     updateRatesUI(processed);
                 }
-            } catch (e) { console.error("Exchange Rate Error:", e); }
+                updateDevStats();
+            } catch (e) { console.error("All currency APIs failed"); }
+        }
+
+        function updateRatesUI(rates) {
+            // Update Card (Decimals for Panel)
+            const currencies = ['EUR', 'USD', 'CHF', 'GBP', 'AUD', 'CAD', 'PLN', 'CZK', 'RON', 'JPY', 'CNY', 'TRY', 'SEK', 'NOK', 'DKK'];
+            currencies.forEach(curr => {
+                if (rates[curr]) {
+                    const elId = `rate-${curr.toLowerCase()}`;
+                    const element = document.getElementById(elId);
+                    if (element) {
+                        element.textContent = `${rates[curr].toFixed(2)} Ft`;
+                        element.style.color = '#fff';
+                        setTimeout(() => element.style.color = null, 500);
+                    }
+                }
+            });
+
+            // Update Footer (Whole Numbers)
+            if(rates.EUR) document.getElementById('fr-eur').textContent = Math.round(rates.EUR) + ' Ft';
+            if(rates.USD) document.getElementById('fr-usd').textContent = Math.round(rates.USD) + ' Ft';
+            if(rates.CHF) document.getElementById('fr-chf').textContent = Math.round(rates.CHF) + ' Ft';
         }
 
         function updateSkyGradient() {
@@ -1953,8 +2097,37 @@
         window.triggerWeatherLoading = function() { el.devMenu.style.display = 'none'; el.weatherLoading.classList.add('active'); setTimeout(() => el.weatherLoading.classList.remove('active'), 5000); };
         window.triggerTipTest = function() { el.devMenu.style.display = 'none'; renderTipCard(); };
         
-        window.triggerNightMode = function() { el.devMenu.style.display = 'none'; state.block = THEMATIC_BLOCKS[0]; updateTimeAndState(); document.getElementById('night-summary-label').classList.add('active'); };
-        window.triggerDayMode = function() { el.devMenu.style.display = 'none'; state.block = null; document.getElementById('night-summary-label').classList.remove('active'); updateTimeAndState(); };
+        // --- FIXED DEV MODES (25 SECONDS) ---
+        window.triggerNightMode = function() { 
+            el.devMenu.style.display = 'none'; 
+            state.testModeActive = true;
+            state.forcedBlock = THEMATIC_BLOCKS[0]; // Éjszakai műszak
+            updateTimeAndState(); // Apply immediately
+            refreshNews(); 
+            setTimeout(() => { 
+                state.testModeActive = false; 
+                state.forcedBlock = null; 
+                updateTimeAndState(); 
+                refreshNews(); 
+                alert("Éjszakai teszt vége."); 
+            }, 25000); 
+        };
+
+        window.triggerDayMode = function() { 
+            el.devMenu.style.display = 'none'; 
+            state.testModeActive = true;
+            state.forcedBlock = THEMATIC_BLOCKS[4]; // Délidőben (Day example)
+            updateTimeAndState(); 
+            refreshNews(); 
+            setTimeout(() => { 
+                state.testModeActive = false; 
+                state.forcedBlock = null; 
+                updateTimeAndState(); 
+                refreshNews(); 
+                alert("Nappali teszt vége."); 
+            }, 25000); 
+        };
+
         window.triggerHourChangeTest = function() { el.devMenu.style.display = 'none'; el.bigClockLayer.classList.add('active'); setTimeout(() => { el.bigClockLayer.classList.remove('active'); }, 10000); };
         window.triggerGoodbyeTest = function() { el.devMenu.style.display = 'none'; el.goodbyeCard.classList.add('active'); setTimeout(() => { el.goodbyeCard.classList.remove('active'); }, 15000); };
         window.triggerCredits = function() { el.devMenu.style.display = 'none'; showCredits(); };
@@ -1996,7 +2169,15 @@
             updateAnalogClock();
             
             const h = now.getHours() + now.getMinutes()/60;
-            let currentBlock = THEMATIC_BLOCKS.findLast(b => h >= b.start) || THEMATIC_BLOCKS[THEMATIC_BLOCKS.length-1];
+            
+            // --- MODIFIED BLOCK SELECTION LOGIC ---
+            let currentBlock;
+            if(state.testModeActive && state.forcedBlock) {
+                currentBlock = state.forcedBlock;
+            } else {
+                currentBlock = THEMATIC_BLOCKS.findLast(b => h >= b.start) || THEMATIC_BLOCKS[THEMATIC_BLOCKS.length-1];
+            }
+
             const min = now.getMinutes(); const sec = now.getSeconds(); const hour = now.getHours();
 
             // PWS HIDING LOGIC for BIG CLOCK (via Manager)
@@ -2027,6 +2208,9 @@
             if((min === 12 || min === 32 || min === 52) && sec === 30) { fetchExchangeRates(); }
             if((min === 13 || min === 33 || min === 53) && sec === 0) { showEconomy(); }
             
+            // --- UPDATED REFRESH RATE LOGIC (10 Minutes) ---
+            if (min % 10 === 0 && sec === 0) { fetchExchangeRates(); }
+
             const currentIndex = THEMATIC_BLOCKS.findIndex(b => b.name === state.block.name);
             const nextBlock = THEMATIC_BLOCKS[(currentIndex + 1) % THEMATIC_BLOCKS.length];
             const nextStartMin = (nextBlock.start * 60);
@@ -2048,9 +2232,13 @@
             if (state.block && state.block.type === 'summary_yesterday') {
                 el.timelineContainer.style.display = 'flex';
                 nightLabel.classList.add('active');
+                // HIDE RATES
+                document.getElementById('cb-left-rates').style.display = 'none';
             } else { 
                 el.timelineContainer.style.display = 'none'; 
                 nightLabel.classList.remove('active'); 
+                // SHOW RATES
+                document.getElementById('cb-left-rates').style.display = 'flex';
             }
         }
 
