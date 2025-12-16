@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V217 (Inline PWS Fix)</title>
+    <title>Aurora News Ticker - V220 (Professional PWS Layout)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     
     <!-- Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js" type="module"></script>
@@ -198,7 +198,7 @@
         }
         .left-prog-badge.visible { opacity: 1; transform: translateY(0); }
         
-        /* NIGHT SUMMARY LABEL - MOVED HERE */
+        /* NIGHT SUMMARY LABEL */
         #night-summary-label {
             display: none; 
             font-size: 0.5rem; 
@@ -470,7 +470,7 @@
         .news-footer-row {
             flex: 0 0 auto;
             display: flex; align-items: center; 
-            justify-content: flex-start; /* Changed from space-between */
+            /* Push PWS to the right using auto margin in JS logic or Flex spacer */
             margin-top: auto; 
             padding-top: 8px;
             border-top: 1px solid rgba(255,255,255,0.1);
@@ -485,18 +485,73 @@
         }
         .news-card.traffic-alert .news-meta { color: var(--accent-warm); }
         
-        /* INLINE PWS BADGE STYLE V217 */
-        .pws-inline-badge {
-            display: flex; align-items: center; gap: 6px;
-            margin-left: 20px; /* The "3 spaces" visual gap */
-            font-family: var(--font-body); /* Inter */
-            font-weight: 600;
-            color: #fff;
-            opacity: 0.9;
+        /* INLINE PWS CAPSULE BADGE V220 (PROFESSIONAL SPLIT) */
+        .pws-smart-badge {
+            display: inline-flex; align-items: stretch;
+            background: rgba(15, 23, 42, 0.95); 
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-left: auto; /* PUSHES TO THE RIGHT */
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+            height: 24px;
         }
-        .pws-temp-val { color: var(--accent-warm); font-weight: 700; }
-        .pws-live-dot-inline { width: 6px; height: 6px; background: var(--accent-color); border-radius: 50%; box-shadow: 0 0 5px var(--accent-color); animation: pulse 2s infinite; }
 
+        .pws-sb-header {
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.05);
+            padding: 0 8px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .pws-sb-live {
+            display: flex; align-items: center; gap: 4px;
+            background: #ef4444;
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 0 6px;
+            text-transform: uppercase;
+        }
+
+        .pws-sb-data {
+            display: flex; align-items: center; gap: 6px;
+            padding: 0 10px;
+            font-size: 0.8rem;
+            color: #fff;
+        }
+
+        .pws-main-temp { font-weight: 700; color: #fff; }
+        
+        .pws-feels-wrapper {
+            display: flex; align-items: center; gap: 4px;
+            border-left: 1px solid rgba(255,255,255,0.2);
+            padding-left: 8px;
+            margin-left: 2px;
+        }
+
+        .pws-feels-label { 
+            font-size: 0.6rem; color: #94a3b8; text-transform: uppercase; font-weight: 600; 
+        }
+
+        /* Hide long text on small screens */
+        @media (max-width: 600px) {
+            .pws-feels-label { display: none; }
+            .pws-sb-header { display: none; } /* Hide city name on very small */
+        }
+        
+        .pws-val-anim { animation: digitPulse 0.8s ease-out forwards; }
+        @keyframes digitPulse {
+            0% { opacity: 0.5; color: var(--accent-color); }
+            50% { opacity: 1; transform: scale(1.1); color: #fff; }
+            100% { opacity: 1; transform: scale(1); color: #fff; }
+        }
         
         .provider-identity { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.6); padding: 3px 8px; border-radius: 15px; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
         .provider-icon { width: 16px; height: 16px; border-radius: 50%; }
@@ -1439,7 +1494,9 @@
             testModeActive: false, 
             forcedBlock: null,
             isHourChangeTestActive: false, // NEW for clock test
-            currentNyTemp: null // Store temperature globally
+            currentNyTemp: null, // Store temperature globally
+            currentNyFeelsLike: null, // Feels like temp
+            pwsLastUpdate: 0 // Timestamp of last value change
         };
 
         const stripHtml = (html) => { let doc = new DOMParser().parseFromString(html, 'text/html'); return doc.body.textContent || ""; };
@@ -1721,8 +1778,13 @@
                         const data = await res.json();
                         if(data.observations && data.observations.length > 0) {
                             const obs = data.observations[0];
+                            // EXTRACT MORE DATA FOR FEELS LIKE CALCULATION
                             finalData = {
-                                metric: { temp: obs.metric.temp },
+                                metric: { 
+                                    temp: obs.metric.temp,
+                                    windSpeed: obs.metric.windSpeed
+                                },
+                                humidity: obs.humidity
                             };
                             break; 
                         }
@@ -1731,9 +1793,15 @@
             }
 
             if (finalData && finalData.metric && typeof finalData.metric.temp === 'number') {
-                const temp = finalData.metric.temp.toFixed(1);
-                state.currentNyTemp = temp; // Store globally
-                // Don't update DOM directly, renderCard will pick it up
+                const newTemp = finalData.metric.temp.toFixed(1);
+                const newFl = calculateFeelsLike(finalData.metric.temp, finalData.humidity, finalData.metric.windSpeed).toFixed(1);
+
+                // Smart Animation Check
+                if (newTemp !== state.currentNyTemp || newFl !== state.currentNyFeelsLike) {
+                    state.pwsLastUpdate = Date.now(); // Mark time of change
+                    state.currentNyTemp = newTemp;
+                    state.currentNyFeelsLike = newFl;
+                }
             }
         }
 
@@ -2356,23 +2424,37 @@
 
             let iconHtml = isTraffic ? TRAFFIC_ICON : `<img src="${fav}" class="provider-icon">`;
             
-            // --- INLINE PWS DATA GENERATION ---
+            // --- INLINE PWS CAPSULE GENERATION (V220) ---
             let weatherHTML = '';
             if (state.currentNyTemp) {
+                const shouldAnimate = (Date.now() - state.pwsLastUpdate) < 15000;
+                const animClass = shouldAnimate ? 'pws-value-change' : '';
+                
                 weatherHTML = `
-                    <div class="pws-inline-badge">
-                        <div class="pws-live-dot-inline"></div>
-                        <span>NYÍREGYHÁZA</span>
-                        <span style="color:var(--accent-warm);">|</span>
-                        <span class="pws-temp-val">${state.currentNyTemp}°C</span>
-                    </div>
+                    <div class="pws-smart-badge">
+                        <div class="pws-sb-header">Nyíregyháza</div>
+                        <div class="pws-sb-live">ÉLŐ</div>
+                        <div class="pws-sb-data">
+                            <span class="pws-main-temp ${animClass}">${state.currentNyTemp}°C</span>
+                        </div>
                 `;
+                
+                if (state.currentNyFeelsLike) {
+                    weatherHTML += `
+                        <div class="pws-feels-wrapper">
+                            <span class="pws-feels-label">HŐÉRZET:</span>
+                            <span class="pws-main-temp ${animClass}" style="color:var(--accent-warm);">${state.currentNyFeelsLike}°C</span>
+                        </div>
+                    `;
+                }
+                
+                weatherHTML += `</div>`; 
             }
 
-            // Combine into footer meta
+            // Combine into footer meta (Weather pushed to right by margin-left:auto in CSS)
             let footerMetaHTML = `
                 <div class="provider-identity">${iconHtml} ${displaySource}</div>
-                <span>${timeStr}</span>
+                <span style="margin-left:8px;">${timeStr}</span>
                 ${weatherHTML}
             `;
             
@@ -2408,7 +2490,7 @@
                         ${shortDesc}
                     </div>
                     <div class="news-footer-row">
-                        <div class="news-meta">${footerMetaHTML}</div>
+                        <div class="news-meta" style="width:100%;">${footerMetaHTML}</div>
                     </div>
                 </div>
                 ${visualHtml}
@@ -2452,12 +2534,22 @@
 
             // --- SINGLE CLICK LISTENER ---
             el.newsContainer.addEventListener('click', (e) => {
-                // Prevent opening link when using controls
+                // 1. Breaking News Priority Check
+                if(e.target.closest('#breaking-panel')) {
+                    e.preventDefault(); e.stopPropagation();
+                    if(state.breakingLink) {
+                         window.open(state.breakingLink, '_blank');
+                    }
+                    return;
+                }
+
+                // 2. Prevent controls from triggering news link
                 if(e.target.closest('.controls-bar') || e.target.closest('.breaking-pod')) return; 
 
-                // Prevent opening link when clicking Tip Card (it shows previous item data)
+                // 3. Prevent tip card clicks
                 if(e.target.closest('.tip-card')) return;
                 
+                // 4. Main News Link
                 e.stopPropagation(); // Stop bubbling
                 
                 if(state.currentItem && state.currentItem.link) {
