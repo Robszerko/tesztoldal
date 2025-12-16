@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V220 (Professional PWS Layout)</title>
+    <title>Aurora News Ticker - V221 (Accurate Feels Like)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -470,7 +470,7 @@
         .news-footer-row {
             flex: 0 0 auto;
             display: flex; align-items: center; 
-            /* Push PWS to the right using auto margin in JS logic or Flex spacer */
+            justify-content: flex-start; /* Changed from space-between */
             margin-top: auto; 
             padding-top: 8px;
             border-top: 1px solid rgba(255,255,255,0.1);
@@ -1711,10 +1711,19 @@
             el.sky.style.background = `linear-gradient(135deg, ${stops[0]}, ${stops[1]}, ${stops[2]})`;
         }
 
-        function calculateFeelsLike(temp, hum, wind) {
-            if (temp <= 10 && wind > 4.8) { return 13.12 + 0.6215 * temp - 11.37 * Math.pow(wind, 0.16) + 0.3965 * temp * Math.pow(wind, 0.16); }
-            else if (temp >= 27 && hum >= 40) { return temp - 0.55 * (1 - (hum / 100)) * (temp - 14); }
-            return temp; 
+        function calculateFeelsLike(temp, hum, windKmh) {
+            // 1. Wind Chill (Cold & Windy) - NOAA
+            if (temp <= 10 && windKmh > 4.8) {
+                return 13.12 + 0.6215 * temp - 11.37 * Math.pow(windKmh, 0.16) + 0.3965 * temp * Math.pow(windKmh, 0.16);
+            }
+            
+            // 2. Australian Apparent Temperature (Universal Feel)
+            // e = Water Vapor Pressure (hPa)
+            const e = (hum / 100) * 6.105 * Math.exp((17.27 * temp) / (237.7 + temp));
+            const windMs = windKmh / 3.6;
+            let AT = temp + (0.33 * e) - (0.70 * windMs) - 4.00;
+            
+            return AT;
         }
 
         function getWindDirStr(deg) {
@@ -1794,6 +1803,7 @@
 
             if (finalData && finalData.metric && typeof finalData.metric.temp === 'number') {
                 const newTemp = finalData.metric.temp.toFixed(1);
+                // Calculate Heat Index using new Australian formula
                 const newFl = calculateFeelsLike(finalData.metric.temp, finalData.humidity, finalData.metric.windSpeed).toFixed(1);
 
                 // Smart Animation Check
