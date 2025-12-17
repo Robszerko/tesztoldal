@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V221 (Optimized)</title>
+    <title>Aurora News Ticker - V221 (Accurate Feels Like)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2314,168 +2314,27 @@
             if(state.items.length > 0) { el.counter.textContent = `${(state.currentIndex % state.items.length) + 1} / ${state.items.length}`; }
         }
 
-         // --- ÚJ HELPER: Csoportos letöltés ---
-        async function fetchFeedBatch(entries) {
-            let batchItems = [];
-            const promises = entries.map(async ([key, url]) => {
-                try {
-                    const items = await attemptFetchFeed(key, url);
-                    batchItems.push(...items);
-                } catch(e) {
-                    // Ha a háttérben hiba van, azt csendben elnyeljük vagy sorba állítjuk
-                    if(!state.retryQueue.find(x => x.key === key)) {
-                        state.retryQueue.push({ key, url });
-                    }
-                }
-            });
-            await Promise.allSettled(promises);
-            return batchItems;
-        }
-
-        // --- ÚJ HELPER: Háttérbetöltés ütemezése ---
-        async function loadBackgroundFeeds(entries) {
-            // 5-ösével töltjük le a maradékot, hogy ne akasszuk meg a böngészőt
-            const CHUNK_SIZE = 5;
-            for (let i = 0; i < entries.length; i += CHUNK_SIZE) {
-                // Ha a felhasználó időközben bezárta/ellépett, ne folytassuk feleslegesen
-                if(document.hidden && i > CHUNK_SIZE) { 
-                    await new Promise(r => setTimeout(r, 2000)); // Lassabb ütem, ha inaktív a tab
-                }
-
-                const chunk = entries.slice(i, i + CHUNK_SIZE);
-                const newItems = await fetchFeedBatch(chunk);
-                
-                if (newItems.length > 0) {
-                    // Időszűrés az új elemekre is
-                    const now = new Date();
-                    let cutoffTime = new Date(0);
-                    if (state.block.type === 'fresh') { 
-                        const hoursBack = state.block.timeWindowHours || 2; 
-                        cutoffTime = new Date(now.getTime() - (hoursBack * 60 * 60 * 1000)); 
-                    } else if (state.block.type === 'morning_catchup') { 
-                        cutoffTime = new Date(now); cutoffTime.setHours(0,0,0,0); 
-                    }
-
-                    const filteredNew = newItems.filter(item => item.date >= cutoffTime);
-                    
-                    if(filteredNew.length > 0) {
-                        mergeNewItems(filteredNew);
-                        // Frissítjük a számlálót vizuálisan is, ha épp fut a sáv
-                        if(state.items.length > 0) { 
-                            el.counter.textContent = `${(state.currentIndex % state.items.length) + 1} / ${state.items.length}`; 
-                        }
-                    }
-                }
-                
-                // Kis szünet a csoportok között, hogy a UI szál fellélegezzen (gyenge gép védelem)
-                await new Promise(r => setTimeout(r, 800));
-            }
-        }
-
-        // --- OPTIMALIZÁLT REFRESH NEWS (SZAKASZOS BETÖLTÉS) ---
         async function refreshNews(silent = false) {
-            state.lastRefreshTimestamp = Date.now(); 
-            state.retryCount = 0; 
-            
-            // Csak akkor rakjuk ki a töltőt, ha ez az első indítás vagy manuális frissítés
+            state.lastRefreshTimestamp = Date.now(); state.retryCount = 0; 
             if(!silent) el.loading.classList.add('active');
-            
-            state.retryQueue = []; 
-            if(state.retryInterval) clearInterval(state.retryInterval);
-
-            // 1. Források előkészítése
-            let allFeeds = BACKUP_FEEDS; 
-            if(Object.keys(state.rssFeeds).length > 0) {
-                allFeeds = { ...allFeeds, ...state.rssFeeds };
-            }
-            
-            const allEntries = Object.entries(allFeeds);
-
-            // 2. Prioritás meghatározása (Top 6 "nagy" oldal)
-            // Ezek jelennek meg azonnal, a többi a háttérben jön
-            const PRIORITY_KEYS = ['Telex', 'Index', '24hu', 'Origo', 'HVG', 'Hirado.hu'];
-            
-            const priorityEntries = [];
-            const backgroundEntries = [];
-
-            allEntries.forEach(entry => {
-                if (PRIORITY_KEYS.includes(entry[0])) {
-                    priorityEntries.push(entry);
-                } else {
-                    backgroundEntries.push(entry);
-                }
-            });
-
-            // Ha valamiért nincs prioritásos (pl. egyedi feed lista), vegyük az első 5-öt
-            if (priorityEntries.length === 0) {
-                priorityEntries.push(...backgroundEntries.splice(0, 5));
-            }
-
-            // 3. CSAK a prioritásosok letöltése (Ez gyors lesz!)
-            let fetchedItems = await fetchFeedBatch(priorityEntries);
-
-            // 4. Szűrés és megjelenítés (Azonnali)
+            state.retryQueue = []; if(state.retryInterval) clearInterval(state.retryInterval);
+            let feeds = BACKUP_FEEDS; if(Object.keys(state.rssFeeds).length > 0) feeds = { ...feeds, ...state.rssFeeds };
+            let fetchedItems = [];
+            const fetchPromises = Object.entries(feeds).map(async ([key, url]) => { try { const items = await attemptFetchFeed(key, url); fetchedItems.push(...items); } catch(e) { state.retryQueue.push({ key, url }); } });
+            await Promise.allSettled(fetchPromises);
             const now = new Date();
             let cutoffTime = new Date(0); 
-            if (state.block.type === 'fresh') { 
-                const hoursBack = state.block.timeWindowHours || 2; 
-                cutoffTime = new Date(now.getTime() - (hoursBack * 60 * 60 * 1000)); 
-            } else if (state.block.type === 'morning_catchup') { 
-                cutoffTime = new Date(now); cutoffTime.setHours(0,0,0,0); 
-            }
-            
-            fetchedItems = fetchedItems.filter(item => item.date >= cutoffTime); 
-            fetchedItems.sort((a,b) => b.date - a.date);
+            if (state.block.type === 'fresh') { const hoursBack = state.block.timeWindowHours || 2; cutoffTime = new Date(now.getTime() - (hoursBack * 60 * 60 * 1000)); } 
+            else if (state.block.type === 'morning_catchup') { cutoffTime = new Date(now); cutoffTime.setHours(0,0,0,0); }
+            fetchedItems = fetchedItems.filter(item => item.date >= cutoffTime); fetchedItems.sort((a,b) => b.date - a.date);
             const filtered = filterItemsByBlock(fetchedItems); 
-            
-            // Duplikáció szűrés (Link alapján)
-            const uniqueItems = []; 
-            const seenLinks = new Set();
-            for(const item of filtered) { 
-                if(!seenLinks.has(item.link)) { 
-                    uniqueItems.push(item); 
-                    seenLinks.add(item.link); 
-                } 
-            }
-
-            if(silent) { 
-                // Ha csendes frissítés volt, csak eltároljuk a következő körre
-                // De mivel ez most "partial", inkább egyesítjük azonnal, ha van új
-                if(uniqueItems.length > 0) mergeNewItems(uniqueItems);
-                document.getElementById('live-indicator').classList.remove('updating'); 
-            } else { 
-                // Első indítás: beállítjuk az alap listát és indítjuk a lejátszást
-                state.items = uniqueItems; 
-                el.loading.classList.remove('active'); 
-                
-                // Ha véletlenül 0 hír jött be a prioritásból, akkor várjuk meg a hátteret
-                // De ha van hír, azonnal mutatjuk
-                if (state.items.length > 0) {
-                    state.currentIndex = 0; 
-                    showNextItem(false); 
-                } else {
-                    // Ha a prioritásos üres, tartsuk kint a töltőt még egy kicsit
-                    // és indítsuk a hátteret azonnal
-                }
-            }
-
-            // Timeline kezelés
-            if(state.block.type === 'summary_yesterday') generateTimeline(); 
-            else el.timelineContainer.classList.remove('visible');
-            
+            const uniqueItems = []; const seenLinks = new Set();
+            for(const item of filtered) { if(!seenLinks.has(item.link)) { uniqueItems.push(item); seenLinks.add(item.link); } }
+            if(silent) { state.nextItems = uniqueItems; document.getElementById('live-indicator').classList.remove('updating'); } 
+            else { state.items = uniqueItems; el.loading.classList.remove('active'); state.currentIndex = 0; showNextItem(false); }
+            if(state.block.type === 'summary_yesterday') generateTimeline(); else el.timelineContainer.classList.remove('visible');
+            if(state.retryQueue.length > 0) { state.retryInterval = setInterval(processRetries, 20000); }
             cleanUpOldItems();
-
-            // 5. HÁTTÉRBETÖLTÉS INDÍTÁSA (Phase 2)
-            // Ez már nem blokkolja a megjelenést
-            if (backgroundEntries.length > 0) {
-                // Nem várjuk meg (nincs await), hadd fusson aszinkron
-                loadBackgroundFeeds(backgroundEntries);
-            }
-
-            // Retry logika a hibásaknak
-            if(state.retryQueue.length > 0) { 
-                state.retryInterval = setInterval(processRetries, 20000); 
-            }
         }
 
         function showNextItem(advance = true) {
