@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V221 (Accurate Feels Like)</title>
+    <title>Aurora News Ticker - V221 (Crisp Pro Edition)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -65,8 +65,73 @@
             -webkit-font-smoothing: antialiased !important;
             -moz-osx-font-smoothing: grayscale !important;
             text-rendering: optimizeLegibility !important;
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.004);
         }
+
+        /* --- NEW TKP ANIMATED LOGO CSS --- */
+        .tkp-animated-logo {
+            position: relative;
+            display: flex; flex-direction: column; align-items: center;
+            cursor: pointer; z-index: 50;
+            transform: scale(0.9);
+            margin-bottom: 5px;
+            transform-origin: center center;
+            transition: transform 1.5s ease, opacity 1.5s ease;
+        }
+        .new-logo-container { display: flex; flex-direction: column; align-items: center; }
+        .logo-letters { display: flex; gap: 2px; z-index: 2; }
+        .logo-block {
+            width: 26px; height: 26px; 
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-family: 'Inter', sans-serif; font-weight: 900; 
+            font-size: 1.1rem; 
+            border-radius: 2px;
+            border: 1px solid rgba(255,255,255,0.25);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            animation: logoColorJump 0.6s infinite alternate;
+            transition: all 1.5s ease;
+        }
+        .lb-t { background: linear-gradient(135deg, #d00000 0%, #900000 100%); animation-delay: 0s; }
+        .lb-k { background: linear-gradient(135deg, #702082 0%, #4a1555 100%); animation-delay: 0.1s; }
+        .lb-p { background: linear-gradient(135deg, #009ee3 0%, #006c9b 100%); animation-delay: 0.2s; }
+
+        @keyframes logoColorJump {
+            0% { filter: brightness(1); transform: translateY(0) scale(1); }
+            50% { filter: brightness(1.3) saturate(1.2); transform: translateY(-2px) scale(1); }
+            100% { filter: brightness(1); transform: translateY(0) scale(1); }
+        }
+
+        .logo-news-bar {
+            background: transparent; color: #fff; width: 100%; text-align: center;
+            font-family: var(--font-head);
+            font-weight: 900; font-size: 0.75rem; letter-spacing: 3px;
+            padding: 1px 0; border-bottom: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.6);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 5px rgba(0,0,0,0.5);
+            margin-top: 2px;
+            transition: all 1.5s ease;
+        }
+
+        /* WATERMARK MODE FOR LOGO (AFTER ANIMATION) */
+        .tkp-animated-logo.watermark-mode {
+            transform: scale(0.85); 
+            opacity: 0.85;
+        }
+        .tkp-animated-logo.watermark-mode .logo-block {
+            animation: none !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.15) !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            box-shadow: none !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8) !important;
+        }
+        .tkp-animated-logo.watermark-mode .logo-news-bar {
+            color: rgba(255, 255, 255, 0.4) !important;
+            border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+        }
+        /* --- /NEW LOGO CSS END --- */
 
         /* STABLE BACKGROUND */
         .ambient-background {
@@ -99,18 +164,16 @@
         /* PREMIUM PANEL DESIGN */
         .glass-panel {
             background: var(--panel-gradient);
-            backdrop-filter: none; 
-            -webkit-backdrop-filter: none;
             border: 1px solid var(--panel-border); 
             border-top: 1px solid rgba(255,255,255,0.25);
             border-bottom: 1px solid rgba(0,0,0,0.4);
             box-shadow: var(--panel-shadow);
             position: relative;
-            perspective: 1000px;
-            opacity: 0; transform: scale(0.95) translateZ(0); /* translateZ for sharpness */
+            /* Elmosódás (blur) mentesítő módosítások - eltávolított 3D filterek a szülőről */
+            opacity: 0; transform: translateY(10px);
             transition: opacity 0.5s ease, transform 0.5s ease;
         }
-        .glass-panel.loaded { opacity: 1; transform: scale(1) translateZ(0); }
+        .glass-panel.loaded { opacity: 1; transform: none; }
 
         /* --- SHAPES --- */
         .identity-panel { 
@@ -145,12 +208,12 @@
             backface-visibility: hidden; -webkit-backface-visibility: hidden;
             display: flex; flex-direction: column; 
             background: var(--panel-gradient);
-            transform: rotateX(0deg) translateZ(1px); 
+            /* Fontos! A front panelt nem tesszük 3D térbe (nincs rotate), így a szövegek borotvaélesek maradnak! */
         }
         
         .panel-face.back { 
             display: flex; align-items: center; justify-content: center;
-            transform: rotateX(180deg) translateZ(1px);
+            transform: rotateX(180deg);
         }
 
         /* --- LEFT PANEL CONTENT --- */
@@ -164,20 +227,13 @@
         
         /* 1. Header Block */
         .id-header-block {
-            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            display: flex; flex-direction: column; align-items: center; gap: 6px; /* Kompaktabb gapek */
             width: 100%;
-            padding-bottom: 15px;
+            padding-bottom: 10px; /* Kevesebb helyigény alul */
             border-bottom: 1px solid rgba(255,255,255,0.08);
             margin-bottom: auto; 
             flex-shrink: 0;
         }
-
-        .brand-wrapper { 
-            display: flex; align-items: center; gap: 8px; justify-content: center;
-            cursor: pointer; z-index: 50;
-        }
-        .brand-logo svg { width: 22px; height: 22px; fill: var(--accent-color); filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.4)); animation: pulseLogo 3s infinite ease-in-out; }
-        .brand-name { font-family: var(--font-head); font-weight: 900; font-size: 1.1rem; letter-spacing: -0.5px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
         /* Badge (Program) */
         .left-prog-badge {
@@ -226,48 +282,73 @@
         .left-prog-badge.badge-traffic { color: #fcd34d; background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.5); }
         .left-prog-badge.badge-tip { color: #6ee7b7; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.5); box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
 
-        /* 2. Clock Center Block */
-        .clock-container { 
-            flex-grow: 1; 
-            display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; width: 100%; 
-            margin-bottom: auto; 
+        /* 2. Clock Center Block (Kisebb, elegánsabb, biztonságosan elférő Box) */
+        .clock-container {
+            width: 100%;
+            margin: auto 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
         }
         
+        .clock-wrapper {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.4) 0%, rgba(2, 6, 23, 0.6) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(0,0,0,0.8);
+            border-radius: 6px;
+            padding: 5px 8px; /* Nagyon feszes térközök */
+            width: 85%; /* Biztosan belül marad a kereten */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+            position: relative;
+            display: flex; flex-direction: column; align-items: center;
+            margin: 0 auto;
+        }
+
+        .clock-wrapper::before {
+            content: ''; position: absolute; top: -1px; left: 20%; right: 20%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.8), transparent);
+        }
+
+        .date-display {
+            font-family: var(--font-body);
+            font-size: 0.55rem; /* Kisebb, nagyon éles */
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            margin-bottom: 2px; 
+            text-align: center;
+            white-space: nowrap; /* Soha nem törik új sorba! */
+        }
+
         .clock-main-row {
-            display: flex; align-items: baseline; justify-content: center;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 2px;
             line-height: 1;
-            margin-top: 5px; 
+            margin-top: 1px; 
         }
-        
-        .clock-hm { 
-            font-family: var(--font-head); 
-            font-size: 2.2rem; 
-            font-weight: 700; 
-            color: #ffffff; 
-            letter-spacing: -0.5px; 
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            background: linear-gradient(180deg, #fff 20%, #cbd5e1 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent; 
+
+        .clock-hm {
+            font-family: var(--font-tech);
+            font-size: 1.8rem; /* Kisebb és biztonságos méret */
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+            font-variant-numeric: tabular-nums;
         }
-        
-        .clock-s { 
-            font-family: var(--font-mono); 
-            font-size: 1.0rem; 
-            font-weight: 600; 
-            color: var(--accent-color); 
-            margin-left: 3px;
-            opacity: 0.8;
-        }
-        
-        .date-display { 
-            font-size: 0.75rem; 
-            color: var(--accent-color); 
-            text-transform: uppercase; letter-spacing: 0.5px; 
-            font-weight: 700; 
-            margin-bottom: 5px;
-            opacity: 0.9;
+
+        .clock-s {
+            font-family: var(--font-tech);
+            font-size: 0.9rem; /* Szintén arányosítva csökkentett */
+            font-weight: 600;
+            color: var(--accent-color);
+            margin-bottom: 2px;
+            font-variant-numeric: tabular-nums;
         }
         
         /* --- CREDITS & ECONOMY --- */
@@ -308,14 +389,14 @@
         }
         .news-card {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: row; /* Split View */
+            display: flex; flex-direction: row; 
             justify-content: flex-start;
             padding: 12px 10px 30px 15px;
             gap: 15px; 
-            opacity: 0; visibility: hidden; transform: translateY(15px);
+            opacity: 0; visibility: hidden; transform: translateY(15px); /* Simpelt 2D transform */
             transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
-        .news-card.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+        .news-card.visible { opacity: 1; visibility: visible; transform: none; }
         
         .news-content-wrapper { 
             flex: 1 1 auto; 
@@ -324,7 +405,7 @@
             background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.8) 50%, rgba(15, 23, 42, 0.4) 100%);
             padding: 10px 15px 5px 10px; border-radius: 8px; margin-left: -10px; 
             height: 100%; position: relative; transition: border 0.3s;
-            width: 100%; /* Default to full width */
+            width: 100%; 
             max-width: 100%;
             transition: max-width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
         }
@@ -336,19 +417,10 @@
             right: 15px;
             display: flex;
             align-items: center;
-            gap: 6px;
             opacity: 0.15;
-            z-index: 0; /* Behind text, above bg */
+            z-index: 0; 
             pointer-events: none;
             filter: grayscale(100%);
-        }
-        .card-watermark svg { width: 18px; height: 18px; fill: #fff; }
-        .card-watermark span {
-            font-family: var(--font-head);
-            font-weight: 900;
-            font-size: 0.8rem;
-            color: #fff;
-            letter-spacing: 1px;
         }
 
         /* --- VISUAL COLUMN --- */
@@ -368,7 +440,7 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        .news-card.visible .news-visual-column.slide-in { transform: translateX(0); }
+        .news-card.visible .news-visual-column.slide-in { transform: none; }
         .news-card.has-visual .news-content-wrapper { max-width: calc(100% - 270px); }
 
         @media (max-width: 950px) {
@@ -376,7 +448,12 @@
             .news-card.has-visual .news-content-wrapper { max-width: 100% !important; }
         }
         
-        .news-visual-image { width: 100%; height: 100%; object-fit: cover; }
+        /* SHARPNESS FIX: image-rendering properties force crisp scaling in Chrome */
+        .news-visual-image { 
+            width: 100%; height: 100%; object-fit: cover; 
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
 
         .news-card.traffic-alert .news-content-wrapper { background: linear-gradient(90deg, rgba(69, 26, 3, 0.95) 0%, rgba(124, 45, 18, 0.8) 50%, rgba(69, 26, 3, 0.4) 100%); border-left: 3px solid var(--accent-traffic); }
 
@@ -391,10 +468,8 @@
             padding-right: 5px; 
             margin-top: 0;
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-            -webkit-font-smoothing: antialiased; /* Sharp text */
         }
 
-        /* --- MODIFIED NEWS DESCRIPTION (Overlay Logic) --- */
         .news-desc { 
             flex: 1 1 auto; 
             font-size: 0.95rem; 
@@ -403,18 +478,6 @@
             position: relative;
             max-width: 99%; 
             text-shadow: 0 1px 2px rgba(0,0,0,1); z-index: 5; 
-            -webkit-font-smoothing: antialiased; /* Sharp text */
-        }
-
-        .news-hint {
-            font-size: 0.75rem; 
-            color: var(--accent-color);
-            font-weight: 700; 
-            margin-top: 8px; 
-            text-transform: uppercase;
-            display: flex; align-items: center; gap: 5px;
-            opacity: 0.8;
-            animation: pulseText 2s infinite ease-in-out;
         }
 
         /* FULL OVERLAY TOOLTIP */
@@ -422,7 +485,7 @@
             position: absolute; 
             top: 0; left: 0; 
             width: 100%; height: 100%;
-            background: rgba(2, 6, 23, 0.98); /* Fallback */
+            background: rgba(2, 6, 23, 0.98); 
             padding: 20px;
             display: flex; 
             flex-direction: column;
@@ -430,7 +493,7 @@
             opacity: 0; 
             visibility: hidden;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 100; /* Above visual and text */
+            z-index: 100; 
             overflow-y: auto;
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
@@ -462,7 +525,6 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
         
-        /* Custom scrollbar for full view */
         .news-full-overlay::-webkit-scrollbar { width: 4px; }
         .news-full-overlay::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
         .news-full-overlay::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 4px; }
@@ -470,7 +532,7 @@
         .news-footer-row {
             flex: 0 0 auto;
             display: flex; align-items: center; 
-            justify-content: flex-start; /* Changed from space-between */
+            justify-content: flex-start; 
             margin-top: auto; 
             padding-top: 8px;
             border-top: 1px solid rgba(255,255,255,0.1);
@@ -485,14 +547,14 @@
         }
         .news-card.traffic-alert .news-meta { color: var(--accent-warm); }
         
-        /* INLINE PWS CAPSULE BADGE V220 (PROFESSIONAL SPLIT) */
+        /* INLINE PWS CAPSULE BADGE */
         .pws-smart-badge {
             display: inline-flex; align-items: stretch;
             background: rgba(15, 23, 42, 0.95); 
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 4px;
             overflow: hidden;
-            margin-left: auto; /* PUSHES TO THE RIGHT */
+            margin-left: auto; 
             font-family: 'Inter', sans-serif;
             box-shadow: 0 2px 10px rgba(0,0,0,0.4);
             height: 24px;
@@ -540,10 +602,9 @@
             font-size: 0.6rem; color: #94a3b8; text-transform: uppercase; font-weight: 600; 
         }
 
-        /* Hide long text on small screens */
         @media (max-width: 600px) {
             .pws-feels-label { display: none; }
-            .pws-sb-header { display: none; } /* Hide city name on very small */
+            .pws-sb-header { display: none; }
         }
         
         .pws-val-anim { animation: digitPulse 0.8s ease-out forwards; }
@@ -557,18 +618,17 @@
         .provider-icon { width: 16px; height: 16px; border-radius: 50%; }
         .traffic-icon-svg { width: 16px; height: 16px; fill: var(--accent-warm); }
 
-        /* TIP CARD STYLES - REVISED FOR FIT */
+        /* TIP CARD STYLES */
         .news-card.tip-card {
             background: radial-gradient(circle at top left, #064e3b, #022c22);
             border-left: 4px solid var(--accent-info);
-            /* HORIZONTAL LAYOUT */
             display: flex;
             flex-direction: row; 
             align-items: center;
             justify-content: center;
-            gap: 20px; /* Reduced gap */
-            padding: 0 20px; /* Reduced padding */
-            overflow: hidden; /* Ensure nothing sticks out */
+            gap: 20px; 
+            padding: 0 20px; 
+            overflow: hidden; 
         }
         
         .tip-container-horizontal {
@@ -585,7 +645,7 @@
         
         .tip-visual {
             position: relative;
-            width: 80px; /* Slightly smaller fixed width */
+            width: 80px; 
             height: 80px;
             flex-shrink: 0;
             display: flex; align-items: center; justify-content: center;
@@ -629,15 +689,15 @@
             justify-content: center;
             align-items: flex-start;
             text-align: left;
-            flex: 1; /* Allow taking available space */
-            min-width: 0; /* Important for flex child truncation */
+            flex: 1; 
+            min-width: 0; 
             max-width: 100%;
         }
         
         .tip-main-line {
             font-family: var(--font-head);
             font-weight: 900;
-            font-size: 2.0rem; /* Adjusted */
+            font-size: 2.0rem; 
             color: var(--accent-info);
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -650,9 +710,9 @@
         .tip-sub-line {
             font-family: var(--font-body);
             font-weight: 600;
-            font-size: 1.05rem; /* Adjusted */
+            font-size: 1.05rem; 
             color: #ffffff;
-            white-space: normal; /* Allow wrapping */
+            white-space: normal; 
             line-height: 1.4;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
         }
@@ -661,14 +721,11 @@
         .dnb-gradient { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top right, #1e3a8a, #0f172a 70%, #020617); }
         .dnb-world-map { position: absolute; top: 5%; right: -5%; width: 70%; height: 80%; background-image: radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px); background-size: 20px 20px; mask-image: radial-gradient(circle, black 30%, transparent 80%); transform: rotate(-10deg); }
         .dnb-watermark { position: absolute; top: 50%; left: 70%; transform: translate(-50%, -50%); opacity: 0.04; pointer-events: none; }
-        .dnb-watermark svg { width: 400px; height: 400px; fill: #fff; }
         .dnb-text-strip { position: absolute; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: space-around; transform: rotate(-3deg); opacity: 0.05; font-family: var(--font-head); font-weight: 900; font-size: 4.5rem; color: #fff; white-space: nowrap; letter-spacing: 5px; }
 
-        /* NIGHT LABEL - REMOVED FROM CONTROLS */
-        
         .news-card.night-info { background: radial-gradient(circle at top left, #312e81, #1e1b4b); border-left: 4px solid #a855f7; alignItems: center; justify-content: center; text-align: center; padding-bottom: 35px; flex-direction: column; }
         
-        /* GOODBYE CARD - OPTIMIZED SIZE (V184) */
+        /* GOODBYE CARD */
         .goodbye-card { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
@@ -703,10 +760,8 @@
             opacity: 0.9; 
             transform: scale(1.3); 
         }
-        .gb-brand-lockup svg { width: 30px; height: 30px; fill: var(--accent-color); filter: drop-shadow(0 0 10px rgba(56,189,248,0.5)); }
-        .gb-brand-text { font-family: var(--font-head); font-weight: 900; font-size: 1.2rem; color: #fff; }
 
-        /* BIG CLOCK REDESIGNED V212 (FIXED SIZE V213 + LAYOUT V214) */
+        /* BIG CLOCK */
         .big-clock-layer { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             background: radial-gradient(circle at center, #1e293b 0%, #020617 100%); 
@@ -714,8 +769,8 @@
             display: flex; 
             flex-direction: row; 
             align-items: center; 
-            justify-content: space-evenly; /* Spread items evenly */
-            padding: 0 40px; /* Add padding to prevent edge sticking */
+            justify-content: space-evenly; 
+            padding: 0 40px; 
             opacity: 0; pointer-events: none; transition: opacity 0.5s ease; 
         }
         .big-clock-layer.active { opacity: 1; pointer-events: all; }
@@ -723,9 +778,7 @@
         .bc-digital-wrapper { flex: 0 1 auto; display: flex; flex-direction: column; align-items: center; }
         .bc-time { font-family: var(--font-mono); font-size: 4.5rem; font-weight: 700; color: #fff; letter-spacing: -2px; animation: breathe 4s infinite ease-in-out; text-shadow: 0 0 20px rgba(56, 189, 248, 0.3); margin-bottom: 5px; font-variant-numeric: tabular-nums; }
         
-        .bc-center-brand { flex: 0 1 auto; display: flex; flex-direction: column; align-items: center; animation: pulseLogo 3s infinite ease-in-out; }
-        .bc-logo-large svg { width: 50px; height: 50px; fill: var(--accent-color); filter: drop-shadow(0 0 15px rgba(56,189,248,0.6)); }
-        .bc-brand-text { font-family: var(--font-head); font-size: 1.5rem; font-weight: 900; color: #fff; text-shadow: 0 4px 10px rgba(0,0,0,0.5); letter-spacing: -1px; margin-top: 10px; }
+        .bc-center-brand { flex: 0 1 auto; display: flex; flex-direction: column; align-items: center; }
 
         /* ANALOG CLOCK */
         .analog-clock { flex: 0 0 auto; width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.8); background: rgba(0,0,0,0.4); position: relative; box-shadow: 0 0 25px rgba(56, 189, 248, 0.2); backdrop-filter: blur(5px); transform: translateY(-10px); }
@@ -777,9 +830,9 @@
         }
         .controls-bar.breaking-active .controls-normal-content { opacity: 0; pointer-events: none !important; }
 
-        /* CB-LEFT (FOOTER RATES) */
+        /* CB-LEFT */
         .cb-left { 
-            display: flex; /* Visible by default */
+            display: flex; 
             align-items: center; 
             gap: 15px; 
             padding-right: 15px; 
@@ -794,7 +847,7 @@
             color: #94a3b8; 
             font-weight: 600; 
             white-space: nowrap; 
-            display: flex; align-items: center; /* Align flag and text */
+            display: flex; align-items: center;
         }
         .footer-rate-val { color: var(--accent-color); font-weight: 700; margin-left: 4px; }
         
@@ -812,20 +865,19 @@
             display: flex; align-items: center; 
             justify-content: flex-start; 
             position: relative; overflow: hidden; padding-left: 10px;
-            gap: 15px; /* Spacing between timeline and label */
+            gap: 15px; 
         }
         #timeline-container { display: none; gap: 3px; overflow-x: auto; scrollbar-width: none; pointer-events: auto !important; z-index: 105; flex-grow: 1; margin-left: 10px; }
         #timeline-container.visible { display: flex; }
         #timeline-container.shifted { margin-right: 15px; } 
         
-        /* Timeline Buttons - Smaller */
         .timeline-btn { 
             background: rgba(255,255,255,0.1); 
             border: 1px solid rgba(255,255,255,0.1); 
             color: #ccc; 
             font-family: var(--font-mono); 
-            font-size: 0.75rem; /* INCREASED */
-            padding: 2px 8px; /* INCREASED */
+            font-size: 0.75rem; 
+            padding: 2px 8px; 
             font-weight: 600;
             border-radius: 3px; 
             cursor: pointer; 
@@ -834,7 +886,7 @@
         }
         .timeline-btn:hover, .timeline-btn.active { background: var(--accent-warm); color: #000; font-weight:700; }
 
-        .cb-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: auto; transform: translateZ(0); backface-visibility: hidden; }
+        .cb-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: auto; }
         
         .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 5px #22c55e; margin-right: 5px; opacity: 0.8; transition: background 0.3s, box-shadow 0.3s; }
         .live-dot.updating { background: #ef4444; box-shadow: 0 0 5px #ef4444; animation: blink 0.5s infinite; }
@@ -847,38 +899,32 @@
         .next-prog-alert { display: none; align-items: center; gap: 5px; color: var(--accent-next); font-weight: 700; font-size: 0.65rem; text-transform: uppercase; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
         .next-prog-alert.active { display: flex; }
 
-        /* --- BREAKING PANEL (SLIDE UP - NO 3D) --- */
+        /* --- BREAKING PANEL --- */
         .breaking-panel {
             position: absolute;
             left: 0; width: 100%; height: 28px;
-            bottom: 0; /* Default positioning */
+            bottom: 0; 
             background: linear-gradient(90deg, #b91c1c, #991b1b);
             border-top: 1px solid #ef4444;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
             display: flex; align-items: center; padding: 0 15px;
-            z-index: 600; /* Higher than controls-bar (200) to sit ON TOP */
+            z-index: 600; 
             overflow: hidden;
-            
-            /* Hidden State Logic */
-            transform: translateY(100%); /* Pushed down out of view */
+            transform: translateY(100%); 
             opacity: 0; 
-            visibility: hidden; /* Truly hidden from screen readers/view */
-            
-            /* Transition */
+            visibility: hidden; 
             transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.3s;
-            
             cursor: pointer;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
         
         .breaking-panel.active { 
-            transform: translateY(0); /* Slide Up */
+            transform: translateY(0);
             opacity: 1;
             visibility: visible;
         }
 
-        /* SHARPNESS FIXES FOR CONTENT */
         .clean-badge {
             font-family: 'Inter', sans-serif;
             font-weight: 700; 
@@ -888,13 +934,11 @@
             margin-right: 10px; text-transform: uppercase;
             box-shadow: 0 0 5px rgba(0,0,0,0.5);
             flex-shrink: 0;
-            transform: translateZ(0); /* Layer Hack */
         }
 
         .bp-meta-info {
             font-family: var(--font-mono); font-size: 0.7rem; color: #fca5a5;
             font-weight: 700; margin-right: 15px; white-space: nowrap; flex-shrink: 0;
-            transform: translateZ(0); /* Layer Hack */
         }
         
         .bp-text-mask {
@@ -904,10 +948,10 @@
         .bp-text-content {
             font-family: var(--font-head); font-weight: 700; color: #fff; font-size: 0.9rem;
             white-space: nowrap; will-change: auto;
-            transform: translateX(20px) translateZ(0); /* Layer Hack */
+            transform: translateX(20px);
             opacity: 0; transition: all 0.3s ease 0.3s;
         }
-        .breaking-panel.active .bp-text-content { transform: translateX(0) translateZ(0); opacity: 1; }
+        .breaking-panel.active .bp-text-content { transform: translateX(0); opacity: 1; }
 
         @keyframes scrollTextLeft { 0% { transform: translateX(0); } 100% { transform: translateX(var(--scroll-dist)); } }
 
@@ -920,7 +964,7 @@
         
         /* --- WEATHER & SCHEDULE FLIPPER --- */
         .weather-header-container { 
-            height: 28px; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--glass-border); 
+            height: 28px; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--panel-border); 
             display: flex; align-items: center; justify-content: center;
             padding: 0 55px 0 15px; 
             z-index: 10; width: 100%; position: absolute; top:0; left:0;
@@ -952,7 +996,6 @@
         .wd-val { color: #fff; font-weight: 600; }
         .weather-footer-time { font-family: var(--font-mono); font-size: 0.7rem; color: #94a3b8; text-align: center; margin-top: auto; padding-bottom: 5px; width: 100%; font-weight: 400; }
 
-        /* --- WEATHER LOADER (FIXED) --- */
         #weather-loading-state {
             display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%;
         }
@@ -976,7 +1019,6 @@
         .promo-content { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px; background: linear-gradient(135deg, #1e1b4b, #312e81); text-align: center; padding-right: 60px; }
         .promo-main-block { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #e2e8f0; font-size: 0.9rem; font-weight: 600; }
         .promo-logo-inline { display: inline-flex; align-items: center; gap: 6px; margin: 4px 0; }
-        .promo-logo-inline svg { width: 24px; height: 24px; fill: var(--accent-color); filter: drop-shadow(0 0 5px rgba(56,189,248,0.5)); }
         .promo-tkp { font-family: var(--font-head); font-weight: 900; color: #fff; font-size: 1.1rem; }
         .promo-24-wrapper { position: relative; display: flex; align-items: center; justify-content: center; margin: 5px 0; }
         .promo-24-block { font-family: var(--font-head); font-size: 4rem; font-weight: 900; line-height: 1; color: #fff; background: linear-gradient(to bottom, #fff 40%, var(--accent-color) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 2px 10px rgba(56,189,248,0.3)); }
@@ -1008,7 +1050,6 @@
         .dev-close { background: #dc2626; border-color: #ef4444; margin-top: 10px; }
         
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulseLogo { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.95); opacity: 0.8; } }
         @keyframes pulseRed { 0%, 100% { background-color: var(--accent-danger); box-shadow: 0 0 5px var(--accent-danger); } 50% { background-color: #dc2626; box-shadow: 0 0 20px var(--accent-danger); } }
         .strobe-effect { animation: strobeAnim 1.5s ease-out forwards; }
         @keyframes strobeAnim { 0% { opacity: 0; transform: scale(1.1); filter: brightness(2); } 10% { opacity: 1; } 20% { opacity: 0; } 30% { opacity: 1; } 40% { opacity: 0; } 50% { opacity: 1; filter: brightness(1); transform: scale(1); } 100% { opacity: 1; } }
@@ -1063,30 +1104,36 @@
 
     <section class="ticker-container" id="ticker-container">
         
-        <!-- PANEL 1: IDENTITY & ECONOMY (REDESIGNED) -->
+        <!-- PANEL 1: IDENTITY & ECONOMY -->
         <div class="glass-panel identity-panel" id="panel-left">
             <div class="panel-flipper" id="id-flipper">
                 <!-- Front: ID -->
                 <div class="panel-face">
                     <div class="id-content">
-                        <!-- Header: Logo & Name -->
+                        <!-- Header: Animated TKP Logo -->
                         <div class="id-header-block">
-                            <div class="brand-wrapper" id="brand-click-area">
-                                <div class="brand-logo"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
-                                <div class="brand-name">TKP NEWS</div>
+                            <div class="tkp-animated-logo" id="brand-click-area">
+                                <div class="new-logo-container">
+                                    <div class="logo-letters">
+                                        <div class="logo-block lb-t">T</div>
+                                        <div class="logo-block lb-k">K</div>
+                                        <div class="logo-block lb-p">P</div>
+                                    </div>
+                                    <div class="logo-news-bar">NEWS</div>
+                                </div>
                             </div>
-                            <!-- Program Badge moved here -->
                             <div id="left-program-badge" class="left-prog-badge">BETÖLTÉS...</div>
-                            <!-- NIGHT LABEL MOVED HERE -->
                             <div id="night-summary-label">AZ ELŐZŐ NAP HÍREI - ÖSSZEFOGLALÓ</div>
                         </div>
                         
-                        <!-- Center: CLOCK & DATE (SWAPPED & CENTERED) -->
+                        <!-- Center: CLOCK & DATE (Tűéles és Kisebb Box verzió) -->
                         <div class="clock-container">
-                             <div id="date-display" class="date-display">...</div>
-                            <div class="clock-main-row">
-                                <div id="clock-hm" class="clock-hm">--:--</div>
-                                <div id="clock-s" class="clock-s">--</div>
+                            <div class="clock-wrapper">
+                                <div id="date-display" class="date-display">...</div>
+                                <div class="clock-main-row">
+                                    <div id="clock-hm" class="clock-hm">--:--</div>
+                                    <div id="clock-s" class="clock-s">--</div>
+                                </div>
                             </div>
                         </div>
                         
@@ -1110,7 +1157,16 @@
                         </div>
                         <div class="economy-content" id="economy-content">
                             <div class="eco-header">
-                                <div class="brand-logo" style="transform: scale(0.6);"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
+                                <div class="tkp-animated-logo watermark-mode" style="transform: scale(0.6); margin-bottom: 0;">
+                                    <div class="new-logo-container">
+                                        <div class="logo-letters">
+                                            <div class="logo-block lb-t">T</div>
+                                            <div class="logo-block lb-k">K</div>
+                                            <div class="logo-block lb-p">P</div>
+                                        </div>
+                                        <div class="logo-news-bar" style="border:none; box-shadow:none;">NEWS</div>
+                                    </div>
+                                </div>
                                 <div class="eco-title">ÁRFOLYAM</div>
                             </div>
                             <div class="eco-carousel">
@@ -1152,7 +1208,17 @@
             <div class="default-news-bg">
                 <div class="dnb-gradient"></div>
                 <div class="dnb-world-map"></div>
-                <div class="dnb-watermark"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
+                <div class="dnb-watermark">
+                    <div class="tkp-animated-logo watermark-mode" style="transform: scale(8); opacity: 0.1; margin-bottom:0;">
+                        <div class="new-logo-container">
+                            <div class="logo-letters">
+                                <div class="logo-block lb-t">T</div>
+                                <div class="logo-block lb-k">K</div>
+                                <div class="logo-block lb-p">P</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="dnb-text-strip"><span>NEWS</span><span>HÍREK</span><span>NACHRICHTEN</span><span>NOUVELLES</span></div>
             </div>
 
@@ -1164,8 +1230,16 @@
                 </div>
                 
                 <div class="bc-center-brand">
-                    <div class="bc-logo-large"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
-                    <div class="bc-brand-text">TKP NEWS</div>
+                    <div class="tkp-animated-logo watermark-mode" style="transform: scale(1.5);">
+                        <div class="new-logo-container">
+                            <div class="logo-letters">
+                                <div class="logo-block lb-t">T</div>
+                                <div class="logo-block lb-k">K</div>
+                                <div class="logo-block lb-p">P</div>
+                            </div>
+                            <div class="logo-news-bar">NEWS</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="analog-clock">
@@ -1193,8 +1267,16 @@
                 <div class="gb-moon">🌙</div>
                 <div class="gb-title">Nyugodalmas éjszakát kíván a</div>
                 <div class="gb-brand-lockup">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                    <div class="gb-brand-text">TKP NEWS</div>
+                    <div class="tkp-animated-logo watermark-mode" style="transform: scale(1.2);">
+                        <div class="new-logo-container">
+                            <div class="logo-letters">
+                                <div class="logo-block lb-t">T</div>
+                                <div class="logo-block lb-k">K</div>
+                                <div class="logo-block lb-p">P</div>
+                            </div>
+                            <div class="logo-news-bar">NEWS</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1205,7 +1287,7 @@
 
             <div class="progress-line-container"><div id="progress-bar" class="progress-line"></div></div>
 
-            <!-- SEPARATED BREAKING PANEL (FLIP DOWN STYLE) -->
+            <!-- SEPARATED BREAKING PANEL -->
             <div class="breaking-panel" id="breaking-panel">
                 <div class="clean-badge">Most érkezett</div>
                 <div class="bp-meta-info">
@@ -1283,7 +1365,15 @@
                         <div class="promo-main-block">
                             <span>Kövesd a</span>
                             <div class="promo-logo-inline">
-                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                                <div class="tkp-animated-logo watermark-mode" style="transform: scale(0.7); margin-bottom: 0;">
+                                    <div class="new-logo-container">
+                                        <div class="logo-letters">
+                                            <div class="logo-block lb-t">T</div>
+                                            <div class="logo-block lb-k">K</div>
+                                            <div class="logo-block lb-p">P</div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <span class="promo-tkp">TKP NEWS</span>
                             </div>
                             <span>oldalát a nap</span>
@@ -1312,7 +1402,7 @@
         const NYIREGYHAZA_COORDS = { lat: 47.95, lon: 21.71 };
 
         // NEW CURRENCY API CONFIG
-        const CURRENCY_API_KEYS = ['8258c9489622103635e16227fd9dadd7b8d1', '883da7c029a9ffaede3d17ae88d4b574a081'];
+        const CURRENCY_API_KEYS =['8258c9489622103635e16227fd9dadd7b8d1', '883da7c029a9ffaede3d17ae88d4b574a081'];
         let curApiKeyIndex = 0;
         let apiCallCounts = { key1: 0, key2: 0 };
         let useBackupApi = false;
@@ -1331,21 +1421,23 @@
         const TRAFFIC_ICON = `<svg class="traffic-icon-svg" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>`;
 
         const SKY_PHASES = {
-            DEEP_NIGHT: { stops: ["#020617", "#0f172a", "#000000"] },
-            ASTRO_DAWN: { stops: ["#0f172a", "#1e1b4b", "#172554"] },
-            NAUTICAL_DAWN: { stops: ["#1e1b4b", "#312e81", "#4338ca"] },
-            CIVIL_DAWN: { stops: ["#312e81", "#4f46e5", "#c026d3"] },
-            SUNRISE:    { stops: ["#4f46e5", "#db2777", "#f59e0b"] },
-            MORNING:    { stops: ["#0ea5e9", "#7dd3fc", "#bae6fd"] },
-            NOON:       { stops: ["#0284c7", "#38bdf8", "#e0f2fe"] }
+            DEEP_NIGHT: { stops:["#020617", "#0f172a", "#000000"] },
+            ASTRO_DAWN: { stops:["#0f172a", "#1e1b4b", "#172554"] },
+            NAUTICAL_DAWN: { stops:["#1e1b4b", "#312e81", "#4338ca"] },
+            CIVIL_DAWN: { stops:["#312e81", "#4f46e5", "#c026d3"] },
+            SUNRISE:    { stops:["#4f46e5", "#db2777", "#f59e0b"] },
+            MORNING:    { stops:["#0ea5e9", "#7dd3fc", "#bae6fd"] },
+            NOON:       { stops:["#0284c7", "#38bdf8", "#e0f2fe"] }
         };
 
         const PWS_MAP = { "ISRVR13": "Sárvár", "IOSZK4": "Oszkó", "ISZNTD6": "Szántód", "IBALAT149": "Balatonszemes", "IBUZSK1": "Csisztapuszta", "ISZEKS12": "Szekszárd", "IJNOSH2": "Jánoshalma", "IPCS52": "Pécs", "IPPRD1": "Páprád", "IKISKU42": "Kiskunhalas", "INEMES10": "Nemesnádudvar", "ISZEGE67": "Szeged", "IBKSCS12": "Békéscsaba", "IFZESG2": "Füzesgyarmat", "IMIKEP2": "Mikepércs", "ITGLS2": "Téglás", "IGACSL1": "Gacsály", "IFLESD1": "Fülesd", "IKISSZ3": "Kisszekeres", "ILEVEL2": "Levelek", "IKEMEC2": "Kemecse", "INAGYC6": "Nagycserkesz", "ITISZA15": "Tiszavasvári", "INEMES19": "Nemesbikk", "IEGERS22": "Egerszólát", "IBKKSZ5": "Bükkszenterzsébet", "IPSZT1": "Pásztó", "IPALOT13": "Palotás", "IGDLL37": "Gödöllő", "IZSMBK6": "Zsámbék", "ICSORN6": "Csorna", "IGAGYV1": "Gagyvendégi", "IMARTO122": "Martonyi", "IKAZIN14": "Kazincbarcika", "IPUTNO1": "Putnok", "IZABAR1": "Zabar", "ISALGT1": "Salgótarján", "IKARAN11": "Karancslapujtő", "IBEKLC3": "Bekölce", "IMTRAB1": "Mátraballa", "IVC267": "Vác", "IPILIS37": "Pilisvörösvár", "IFELCS4": "Felcsút", "IBUDAK6": "Budakeszi", "IBIATO9": "Biatorbágy", "ICSKVR4": "Csákvár", "IOROSZ2": "Oroszlány", "IBALINKA2": "Bakony", "ISR67": "Súr", "IPANNO3": "Pannonhalma", "IKAJRP2": "Kajárpéc", "IPPA11": "Pápa", "ICELLD14": "Celldömölk", "IHEVES2": "Heves", "IGYNGY22": "Gyöngyös", "ISZCSN9": "Szécsény", "ITAHIT11": "Tahitótfalu", "IESZTE5": "Esztergom", "ITATA16": "Tata", "IKARTAL4": "Kartal", "IMARTO67": "Martonvásár", "ISZOLNOK10": "Szolnok", "ISZOLN13": "Szolnok", "INAGYK59": "Nagykőrös", "IKECSK31": "Kecskemét", "IKALOCSA2": "Kalocsa", "IBONYH1": "Bonyhád", "ISZENT114": "Szentlőrinc", "ILJUBL47": "Ljubljana", "IBAKTA4": "Baktalórántháza", "IJFEHR1": "Újfehértó", "IPAPOS6": "Papos", "ISONKD1": "Sonkád", "INAPKO1": "Napkor", "IHARSN4": "Harsány", "IBKKSZ2": "Bükkszentkereszt", "INYREG37": "Nyíregyháza", "IPUSZT3": "Pusztadobos", "ITISZA93": "Tiszaújváros", "IEGER76": "Eger", "IHAJDD7": "Hajdúdorog", "IGYULA12": "Gyula", "IMAGYA4": "Magyarcsanád", "IHDMEZ21": "Hódmezővásárhely", "ISZEGE23": "Szeged-Rókus", "ICSENG9": "Csengele", "INAGYN1": "Nagynyárád", "IKIRLY1": "Királyegyháza", "ITAMSI1": "Tamási", "IZALAE45": "Zalaegerszeg", "IFARKA7": "Farkasgyepű", "INYRAC1": "Nyíracsád", "ISZAMO11": "Szamosújlak", "IGVAVE1": "Gávavencsellő", "IEDELN2": "Edelény", "INYRI1": "Nyíri", "IBTTS1": "Büttös", "IZD2": "Ózd" };
         
-        const HUNGARIAN_CITIES_OM = [ 
+        const HUNGARIAN_CITIES_OM =[ 
             { name: 'Debrecen', lat: 47.53, lon: 21.62 }, { name: 'Miskolc', lat: 48.10, lon: 20.78 }, { name: 'Szombathely', lat: 47.23, lon: 16.62 }, { name: 'Győr', lat: 47.68, lon: 17.63 }, { name: 'Pécs', lat: 46.07, lon: 18.23 }, { name: 'Szeged', lat: 46.25, lon: 20.15 }, { name: 'Eger', lat: 47.90, lon: 20.37 }, { name: 'Veszprém', lat: 47.09, lon: 17.91 }, { name: 'Zalaegerszeg', lat: 46.84, lon: 16.84 }, { name: 'Békéscsaba', lat: 46.68, lon: 21.09 }, { name: 'Kaposvár', lat: 46.36, lon: 17.79 }, { name: 'Tatabánya', lat: 47.57, lon: 18.40 }, { name: 'Salgótarján', lat: 48.10, lon: 19.80 }, { name: 'Szekszárd', lat: 46.35, lon: 18.70 }, { name: 'Sopron', lat: 47.68, lon: 16.58 }, { name: 'Hódmezővásárhely', lat: 46.43, lon: 20.32 }, { name: 'Nagykanizsa', lat: 46.45, lon: 16.99 }, { name: 'Dunaújváros', lat: 46.96, lon: 18.93 }, { name: 'Érd', lat: 47.38, lon: 18.91 }, { name: 'Szolnok', lat: 47.18, lon: 20.20 }, { name: 'Kecskemét', lat: 46.88, lon: 19.64 }, { name: 'Baja', lat: 46.18, lon: 18.95 }, { name: 'Cegléd', lat: 47.17, lon: 19.80 }, { name: 'Vác', lat: 47.78, lon: 19.13 }, { name: 'Gödöllő', lat: 47.60, lon: 19.35 }, { name: 'Ózd', lat: 48.22, lon: 20.29 }, { name: 'Pápa', lat: 47.33, lon: 17.47 }, { name: 'Gyula', lat: 46.65, lon: 21.28 }, { name: 'Hajdúböszörmény', lat: 47.67, lon: 21.51 }, { name: 'Nyíregyháza', lat: 47.95, lon: 21.71 }, { name: 'Balatonfüred', lat: 46.96, lon: 17.89 }, { name: 'Keszthely', lat: 46.76, lon: 17.24 }, { name: 'Siófok', lat: 46.90, lon: 18.05 }, { name: 'Komárom', lat: 47.74, lon: 18.11 }, { name: 'Esztergom', lat: 47.79, lon: 18.74 }, { name: 'Tata', lat: 47.65, lon: 18.31 }, { name: 'Mohács', lat: 45.99, lon: 18.68 }, { name: 'Paks', lat: 46.62, lon: 18.86 }, { name: 'Kalocsa', lat: 46.53, lon: 18.98 }, { name: 'Kiskunfélegyháza', lat: 46.71, lon: 19.85 }, { name: 'Jászberény', lat: 47.50, lon: 19.91 }, { name: 'Hatvan', lat: 47.66, lon: 19.67 }, { name: 'Gyöngyös', lat: 47.78, lon: 19.93 }, { name: 'Kazincbarcika', lat: 48.25, lon: 20.62 }, { name: 'Sátoraljaújhely', lat: 48.40, lon: 21.65 }, { name: 'Kisvárda', lat: 48.22, lon: 22.08 }, { name: 'Mátészalka', lat: 47.95, lon: 22.32 }, { name: 'Makó', lat: 46.22, lon: 20.47 }, { name: 'Szentes', lat: 46.65, lon: 20.26 }, { name: 'Orosháza', lat: 46.57, lon: 20.66 }, { name: 'Karcag', lat: 47.31, lon: 20.93 }, { name: 'Hajdúszoboszló', lat: 47.45, lon: 21.39 }, { name: 'Törökszentmiklós', lat: 47.17, lon: 20.41 }, { name: 'Gyál', lat: 47.38, lon: 19.22 }, { name: 'Dunakeszi', lat: 47.64, lon: 19.14 }, { name: 'Budaörs', lat: 47.46, lon: 18.96 }, { name: 'Szentendre', lat: 47.66, lon: 19.07 }, { name: 'Szigetszentmiklós', lat: 47.34, lon: 19.05 }, { name: 'Mosonmagyaróvár', lat: 47.87, lon: 17.27 }, { name: 'Bicske', lat: 47.49, lon: 18.63 }, { name: 'Monor', lat: 47.35, lon: 19.45 }, { name: 'Mezőkövesd', lat: 47.81, lon: 20.57 }, { name: 'Tiszaújváros', lat: 47.92, lon: 21.05 }, { name: 'Sárospatak', lat: 48.32, lon: 21.57 },
             /* V148 Additions */
-            { name: 'Zakopane', lat: 49.29, lon: 19.94 }, { name: 'Poprad', lat: 49.05, lon: 20.30 }, { name: 'Donovaly', lat: 48.88, lon: 19.22 }, { name: 'Semmering', lat: 47.63, lon: 15.83 }, { name: 'Murau', lat: 47.11, lon: 14.17 }, { name: 'Cortina d\'Ampezzo', lat: 46.54, lon: 12.13 }, { name: 'Chamonix', lat: 45.92, lon: 6.86 }, { name: 'Zermatt', lat: 46.02, lon: 7.74 }, { name: 'St. Moritz', lat: 46.49, lon: 9.83 }, { name: 'Aspen', lat: 39.19, lon: -106.81 }, { name: 'Whistler', lat: 50.11, lon: -122.95 }, { name: 'Banff', lat: 51.17, lon: -115.57 }, { name: 'Queenstown', lat: -45.03, lon: 168.66 }, { name: 'Bariloche', lat: -41.13, lon: -71.30 }, { name: 'Niseko', lat: 42.80, lon: 140.68 }, { name: 'Nagano', lat: 36.64, lon: 138.18 }, { name: 'Sochi', lat: 43.60, lon: 39.73 }, { name: 'Almaty', lat: 43.22, lon: 76.85 }, { name: 'Gudauri', lat: 42.47, lon: 44.48 }, { name: 'Bansko', lat: 41.83, lon: 23.48 }
+            { name: 'Zakopane', lat: 49.29, lon: 19.94 }, { name: 'Poprad', lat: 49.05, lon: 20.30 }, { name: 'Donovaly', lat: 48.88, lon: 19.22 }, { name: 'Semmering', lat: 47.63, lon: 15.83 }, { name: 'Murau', lat: 47.11, lon: 14.17 }, { name: 'Cortina d\'Ampezzo', lat: 46.54, lon: 12.13 }, { name: 'Chamonix', lat: 45.92, lon: 6.86 }, { name: 'Zermatt', lat: 46.02, lon: 7.74 }, { name: 'St. Moritz', lat: 46.49, lon: 9.83 }, { name: 'Aspen', lat: 39.19, lon: -106.81 }, { name: 'Whistler', lat: 50.11, lon: -122.95 }, { name: 'Banff', lat: 51.17, lon: -115.57 }, { name: 'Queenstown', lat: -45.03, lon: 168.66 }, { name: 'Bariloche', lat: -41.13, lon: -71.30 }, { name: 'Niseko', lat: 42.80, lon: 140.68 }, { name: 'Nagano', lat: 36.64, lon: 138.18 }, { name: 'Sochi', lat: 43.60, lon: 39.73 }, { name: 'Almaty', lat: 43.22, lon: 76.85 }, { name: 'Gudauri', lat: 42.47, lon: 44.48 }, { name: 'Bansko', lat: 41.83, lon: 23.48 },
+            /* NEW 15 EXTRA/EXTREME STATIONS */
+            { name: 'Ojmjakon (RU)', lat: 63.46, lon: 142.79 }, { name: 'Death Valley (US)', lat: 36.53, lon: -116.93 }, { name: 'McMurdo (AQ)', lat: -77.85, lon: 166.67 }, { name: 'Nuuk (GL)', lat: 64.18, lon: -51.72 }, { name: 'Ushuaia (AR)', lat: -54.80, lon: -68.30 }, { name: 'Dubai (AE)', lat: 25.20, lon: 55.27 }, { name: 'Reykjavik (IS)', lat: 64.14, lon: -21.90 }, { name: 'Las Vegas (US)', lat: 36.17, lon: -115.14 }, { name: 'Honolulu (US)', lat: 21.30, lon: -157.85 }, { name: 'Mt. Everest (NP)', lat: 27.98, lon: 86.92 }, { name: 'Cape Town (ZA)', lat: -33.92, lon: 18.42 }, { name: 'Sydney (AU)', lat: -33.86, lon: 151.20 }, { name: 'Tokyo (JP)', lat: 35.67, lon: 139.65 }, { name: 'Longyearbyen (SJ)', lat: 78.22, lon: 15.65 }, { name: 'La Paz (BO)', lat: -16.50, lon: -68.12 }
         ];
 
         const BACKUP_FEEDS = {
@@ -1368,9 +1460,9 @@
         };
 
         const firebaseConfig = { apiKey: "AIzaSyDgBgiNSxjgWP_jmaoHpf0Qejo8_OO4sPg", authDomain: "robi-oldala.firebaseapp.com", databaseURL: "https://robi-oldala-default-rtdb.europe-west1.firebasedatabase.app", projectId: "robi-oldala", storageBucket: "robi-oldala.appspot.com", messagingSenderId: "300815778397", appId: "1:300815778397:web:ec609be55cc8afd193c3b4" };
-        const CORS_PROXIES = ["https://api.allorigins.win/raw?url=", "https://cors.eu.org/", "https://thingproxy.freeboard.io/fetch/"];
+        const CORS_PROXIES =["https://api.allorigins.win/raw?url=", "https://cors.eu.org/", "https://thingproxy.freeboard.io/fetch/"];
         
-        const THEMATIC_BLOCKS = [
+        const THEMATIC_BLOCKS =[
             { start: 0,    name: 'Éjszakai műszak', type: 'summary_yesterday', refreshMinutes: 30, styleClass: 'badge-night' },
             { start: 6,    name: 'Napindító',       type: 'morning_catchup', timeWindowHours: 0, refreshMinutes: 15, styleClass: 'badge-dawn' },
             { start: 7,    name: 'Reggeli gyors',   type: 'fresh', timeWindowHours: 2, refreshMinutes: 10, styleClass: 'badge-morning' },
@@ -1383,7 +1475,7 @@
             { start: 23.98,name: 'Elköszönés',      type: 'goodbye', styleClass: 'badge-night' }
         ];
 
-        const CALENDAR_DATA = { honapok: ["január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december"] };
+        const CALENDAR_DATA = { honapok:["január", "február", "március", "április", "május", "június", "július", "augusztus", "szeptember", "október", "november", "december"] };
 
         // --- STATE & DOM ---
         const app = initializeApp(firebaseConfig);
@@ -1394,7 +1486,6 @@
             clockHm: document.getElementById('clock-hm'),
             clockS: document.getElementById('clock-s'),
             date: document.getElementById('date-display'),
-            // Nameday removed
             
             trackA: document.getElementById('track-a'),
             trackB: document.getElementById('track-b'),
@@ -1453,7 +1544,7 @@
 
         let state = {
             activeTrack: 'a',
-            items: [],
+            items:[],
             currentIndex: 0,
             block: null,
             rssFeeds: {},
@@ -1465,8 +1556,8 @@
             currentItem: null,
             scheduleHighlightIndex: 0,
             scheduleInterval: null,
-            nextItems: [],
-            weatherPlaylist: [],
+            nextItems:[],
+            weatherPlaylist:[],
             weatherPlaylistIndex: 0,
             isPaused: false,
             cardStartTime: 0,
@@ -1475,7 +1566,7 @@
             seenBreakingLinks: new Set(),
             lastBreakingCheckTime: Date.now(),
             lastNightInfoTime: 0,
-            retryQueue: [], 
+            retryQueue:[], 
             retryInterval: null,
             retryCount: 0, 
             economyVisible: false,
@@ -1488,20 +1579,19 @@
             lastRefreshTimestamp: Date.now(),
             breakingActive: false,
             breakingLink: null,
-            breakingQueue: [],
+            breakingQueue:[],
             currentNyData: null,
-            lastTipTime: Date.now(), // For the Tip Card
+            lastTipTime: Date.now(),
             testModeActive: false, 
             forcedBlock: null,
-            isHourChangeTestActive: false, // NEW for clock test
-            currentNyTemp: null, // Store temperature globally
-            currentNyFeelsLike: null, // Feels like temp
-            pwsLastUpdate: 0 // Timestamp of last value change
+            isHourChangeTestActive: false,
+            currentNyTemp: null, 
+            currentNyFeelsLike: null, 
+            pwsLastUpdate: 0 
         };
 
         const stripHtml = (html) => { let doc = new DOMParser().parseFromString(html, 'text/html'); return doc.body.textContent || ""; };
         
-        // --- HELPER: GET FIRST SENTENCE ---
         function getFirstSentence(str) {
             if (!str) return "";
             const match = str.match(/^.*?[.!?](?:\s|$)/);
@@ -1583,7 +1673,6 @@
             });
         }
 
-        // --- DEV STATS UPDATE ---
         function updateDevStats() {
             document.getElementById('ras-provider').textContent = useBackupApi ? "Open ER (Backup)" : "CurrencyAPI.net";
             document.getElementById('ras-provider').className = useBackupApi ? "dib-val backup" : "dib-val";
@@ -1593,35 +1682,22 @@
             document.getElementById('ras-c2').textContent = apiCallCounts.key2;
         }
 
-        // --- CURRENCY API LOGIC (NEW) ---
         async function fetchExchangeRates() {
-            // 1. Try CurrencyAPI.net if not in backup mode
             if (!useBackupApi) {
                 const currentKey = CURRENCY_API_KEYS[curApiKeyIndex];
                 try {
-                    // Note: Free plan on currencyapi.net usually forces Base: USD. 
-                    // So we fetch USD based rates and calculate cross rates.
                     const res = await fetch(`https://currencyapi.net/api/v1/rates?key=${currentKey}&base=USD&output=JSON`);
-                    
                     if (!res.ok) throw new Error("API Limit or Error");
-                    
                     const data = await res.json();
                     
                     if (data.rates) {
-                        // Success! Update stats
                         if(curApiKeyIndex === 0) apiCallCounts.key1++;
                         else apiCallCounts.key2++;
                         
-                        const r = data.rates; // 1 USD = X Currency
-                        // We need: 1 Currency = X HUF
-                        // 1 USD = r.HUF HUF
-                        // 1 EUR = (r.HUF / r.EUR) HUF
-                        // 1 CHF = (r.HUF / r.CHF) HUF
-
+                        const r = data.rates; 
                         const hufRate = r.HUF;
                         const eurRate = r.EUR;
                         const chfRate = r.CHF;
-                        // Add more if needed (GBP, etc)
 
                         updateRatesUI({
                             EUR: hufRate / eurRate,
@@ -1642,29 +1718,26 @@
                         });
                         
                         updateDevStats();
-                        return; // Success, exit function
+                        return; 
                     }
                 } catch (e) {
                     console.warn(`Key ${curApiKeyIndex + 1} failed, switching...`);
-                    // Switch Logic
                     if (curApiKeyIndex < CURRENCY_API_KEYS.length - 1) {
                         curApiKeyIndex++;
-                        fetchExchangeRates(); // Retry immediately with next key
+                        fetchExchangeRates(); 
                     } else {
-                        useBackupApi = true; // All keys failed, switch to backup
-                        fetchExchangeRates(); // Retry immediately with backup
+                        useBackupApi = true; 
+                        fetchExchangeRates(); 
                     }
                     updateDevStats();
                     return;
                 }
             }
 
-            // 2. Backup API (Open ER)
             try {
                 const res = await fetch('https://open.er-api.com/v6/latest/HUF');
                 const data = await res.json();
                 if (data && data.rates) {
-                     // Invert rates (1 / rate) because this API gives 1 HUF = X Currency
                      const processed = {};
                      Object.keys(data.rates).forEach(key => {
                          processed[key] = 1 / data.rates[key];
@@ -1676,8 +1749,7 @@
         }
 
         function updateRatesUI(rates) {
-            // Update Card (Decimals for Panel)
-            const currencies = ['EUR', 'USD', 'CHF', 'GBP', 'AUD', 'CAD', 'PLN', 'CZK', 'RON', 'JPY', 'CNY', 'TRY', 'SEK', 'NOK', 'DKK'];
+            const currencies =['EUR', 'USD', 'CHF', 'GBP', 'AUD', 'CAD', 'PLN', 'CZK', 'RON', 'JPY', 'CNY', 'TRY', 'SEK', 'NOK', 'DKK'];
             currencies.forEach(curr => {
                 if (rates[curr]) {
                     const elId = `rate-${curr.toLowerCase()}`;
@@ -1690,7 +1762,6 @@
                 }
             });
 
-            // Update Footer (Decimals for Footer as well - V214)
             if(rates.EUR) document.getElementById('fr-eur').textContent = rates.EUR.toFixed(2) + ' Ft';
             if(rates.USD) document.getElementById('fr-usd').textContent = rates.USD.toFixed(2) + ' Ft';
             if(rates.CHF) document.getElementById('fr-chf').textContent = rates.CHF.toFixed(2) + ' Ft';
@@ -1712,23 +1783,18 @@
         }
 
         function calculateFeelsLike(temp, hum, windKmh) {
-            // 1. Wind Chill (Cold & Windy) - NOAA
             if (temp <= 10 && windKmh > 4.8) {
                 return 13.12 + 0.6215 * temp - 11.37 * Math.pow(windKmh, 0.16) + 0.3965 * temp * Math.pow(windKmh, 0.16);
             }
-            
-            // 2. Australian Apparent Temperature (Universal Feel)
-            // e = Water Vapor Pressure (hPa)
             const e = (hum / 100) * 6.105 * Math.exp((17.27 * temp) / (237.7 + temp));
             const windMs = windKmh / 3.6;
             let AT = temp + (0.33 * e) - (0.70 * windMs) - 4.00;
-            
             return AT;
         }
 
         function getWindDirStr(deg) {
             if (deg === undefined || deg === null) return "";
-            const sectors = ["ÉSZAKI", "ÉSZAKKELETI", "KELETI", "DÉLKELETI", "DÉLI", "DÉLNYUGATI", "NYUGATI", "ÉSZAKNYUGATI"];
+            const sectors =["ÉSZAKI", "ÉSZAKKELETI", "KELETI", "DÉLKELETI", "DÉLI", "DÉLNYUGATI", "NYUGATI", "ÉSZAKNYUGATI"];
             deg += 22.5; if (deg < 0) deg += 360; deg = deg % 360;
             return sectors[Math.floor(deg / 45)];
         }
@@ -1768,14 +1834,11 @@
             return ICONS.CLOUDY;
         }
 
-        // --- NEW PWS MANAGER ---
         function managePwsVisibility(shouldShow) {
-            // No longer managing an absolute div. Function kept for compatibility structure
-            // but now logic happens inside renderCard
+            // Managed inside renderCard
         }
 
         async function fetchNyiregyhazaSpecific() {
-            // Priority list: INYREG42, INYREG26
             const PWS_IDS = ["INYREG42", "INYREG26"]; 
             let finalData = null;
             
@@ -1787,7 +1850,6 @@
                         const data = await res.json();
                         if(data.observations && data.observations.length > 0) {
                             const obs = data.observations[0];
-                            // EXTRACT MORE DATA FOR FEELS LIKE CALCULATION
                             finalData = {
                                 metric: { 
                                     temp: obs.metric.temp,
@@ -1803,23 +1865,19 @@
 
             if (finalData && finalData.metric && typeof finalData.metric.temp === 'number') {
                 const newTemp = finalData.metric.temp.toFixed(1);
-                // Calculate Heat Index using new Australian formula
                 const newFl = calculateFeelsLike(finalData.metric.temp, finalData.humidity, finalData.metric.windSpeed).toFixed(1);
 
-                // Smart Animation Check
                 if (newTemp !== state.currentNyTemp || newFl !== state.currentNyFeelsLike) {
-                    state.pwsLastUpdate = Date.now(); // Mark time of change
+                    state.pwsLastUpdate = Date.now(); 
                     state.currentNyTemp = newTemp;
                     state.currentNyFeelsLike = newFl;
                 }
             }
         }
 
-        // --- FIXED WEATHER FETCH LOGIC (PROTOPAGE OPTIMIZED) ---
         async function fetchWeatherData() {
             const fetchPWS = async (id) => {
                 try {
-                    // INCREASED TIMEOUT (6000ms)
                     const url = `https://api.weather.com/v2/pws/observations/current?stationId=${id}&format=json&units=m&apiKey=${WUNDERGROUND_API_KEY}&numericPrecision=decimal`;
                     const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
                     if(!res.ok) return null;
@@ -1842,7 +1900,6 @@
 
             const fetchSingleOM = async (city) => {
                 try {
-                    // INCREASED TIMEOUT (8000ms)
                     const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,weather_code,apparent_temperature`;
                     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
                     if(!res.ok) return null;
@@ -1873,7 +1930,6 @@
                 }
             });
             
-            // DELAYED FALLBACK (7000ms) - Increased to account for slow Protopage loading
             setTimeout(() => {
                 if(state.weatherPlaylist.length === 0) {
                      state.weatherPlaylist.push({ name: 'Budapest', temp: 15.0, hum: 50, wind: 10, wmo: 1, type:'OM', lat: 47.49, lon: 19.04 });
@@ -1925,7 +1981,7 @@
             if (!state.block || state.block.name === 'Elköszönés') return;
             state.scheduleActive = true;
             const currentIndex = THEMATIC_BLOCKS.findIndex(b => b.name === state.block.name);
-            const labels = ["MOST", "KÖVETKEZIK", "KÉSŐBB"]; 
+            const labels =["MOST", "KÖVETKEZIK", "KÉSŐBB"]; 
             el.weatherLocTime.style.display = 'none';
             const backHeader = document.getElementById('schedule-header');
             backHeader.style.display = 'flex'; 
@@ -1969,7 +2025,7 @@
 
         function generateTimeline() {
             if(!state.block || state.block.type !== 'summary_yesterday') { el.timelineContainer.classList.remove('visible'); return; }
-            const hours = [...new Set(state.items.map(item => item.date.getHours()))].sort((a,b)=>a-b);
+            const hours =[...new Set(state.items.map(item => item.date.getHours()))].sort((a,b)=>a-b);
             let html = '';
             hours.forEach(h => { html += `<button class="timeline-btn" data-hour="${h}">${String(h).padStart(2,'0')}</button>`; });
             el.timelineContainer.innerHTML = html;
@@ -2047,18 +2103,13 @@
             state.breakingActive = true;
             state.breakingLink = item.link; 
             
-            // Set Content
             el.bpText.innerText = item.title;
             el.bpSource.innerText = item.source;
             el.bpTime.innerText = item.date.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
 
-            // Slide Up Animation (No 3D Flip)
-            // Using transform: translateY from 100% to 0 for smoother performance
             el.breakingPanel.classList.add('active');
             
-            // Wait for slide to finish (500ms), then check text length
             setTimeout(() => {
-                // Force a layout recalculation to ensure accurate width
                 const containerWidth = el.bpTextMask.offsetWidth;
                 const textWidth = el.bpText.offsetWidth;
                 let totalDuration = 0;
@@ -2066,29 +2117,26 @@
                 if (textWidth > containerWidth) {
                     const dist = -(textWidth + 30) + "px"; 
                     el.bpText.style.setProperty('--scroll-dist', dist);
-                    const animDuration = Math.max((textWidth + containerWidth) / 100, 5); // Faster speed
+                    const animDuration = Math.max((textWidth + containerWidth) / 100, 5); 
                     el.bpText.style.animation = `scrollTextLeft ${animDuration}s linear 2s forwards`;
                     totalDuration = (2 + animDuration + 2) * 1000;
                 } else {
-                    totalDuration = 15000; // Fixed show time if fits
+                    totalDuration = 15000; 
                 }
 
-                // Safety default if calculation failed
                 if (!totalDuration || totalDuration < 3000) totalDuration = 15000;
 
                 setTimeout(() => {
-                    // Close animation (Slide Down)
                     el.breakingPanel.classList.remove('active');
                     
-                    // Wait for transition to finish before resetting state
                     setTimeout(() => {
                         el.bpText.style.animation = 'none';
                         state.breakingActive = false;
                         processBreakingQueue();
-                    }, 600); // 500ms transition + buffer
+                    }, 600); 
                 }, totalDuration);
 
-            }, 600); // Wait for open transition + buffer
+            }, 600); 
         }
         
         // --- DEV MENU FUNCTIONS ---
@@ -2102,12 +2150,11 @@
         window.triggerWeatherLoading = function() { el.devMenu.style.display = 'none'; el.weatherLoading.classList.add('active'); setTimeout(() => el.weatherLoading.classList.remove('active'), 5000); };
         window.triggerTipTest = function() { el.devMenu.style.display = 'none'; renderTipCard(); };
         
-        // --- FIXED DEV MODES (25 SECONDS) ---
         window.triggerNightMode = function() { 
             el.devMenu.style.display = 'none'; 
             state.testModeActive = true;
-            state.forcedBlock = THEMATIC_BLOCKS[0]; // Éjszakai műszak
-            updateTimeAndState(); // Apply immediately
+            state.forcedBlock = THEMATIC_BLOCKS[0]; 
+            updateTimeAndState(); 
             refreshNews(); 
             setTimeout(() => { 
                 state.testModeActive = false; 
@@ -2121,7 +2168,7 @@
         window.triggerDayMode = function() { 
             el.devMenu.style.display = 'none'; 
             state.testModeActive = true;
-            state.forcedBlock = THEMATIC_BLOCKS[4]; // Délidőben (Day example)
+            state.forcedBlock = THEMATIC_BLOCKS[4]; 
             updateTimeAndState(); 
             refreshNews(); 
             setTimeout(() => { 
@@ -2148,7 +2195,7 @@
         window.triggerCredits = function() { el.devMenu.style.display = 'none'; showCredits(); };
         window.closeDevMenu = function() { el.devMenu.style.display = 'none'; }
         
-        document.querySelector('.brand-wrapper').addEventListener('click', (e) => { e.stopPropagation(); const code = prompt("Fejlesztői kód:"); if(code === "0000") el.devMenu.style.display = 'flex'; });
+        document.getElementById('brand-click-area').addEventListener('click', (e) => { e.stopPropagation(); const code = prompt("Fejlesztői kód:"); if(code === "0000") el.devMenu.style.display = 'flex'; });
 
         function handleVisibilityChange() {
             if (document.visibilityState === 'visible') {
@@ -2158,7 +2205,7 @@
                 d.setSeconds(0);
                 d.setMilliseconds(0);
                 const lastCheckpoint = d.getTime();
-                if (state.lastRefreshTimestamp < lastCheckpoint) { state.items = []; refreshNews(false); }
+                if (state.lastRefreshTimestamp < lastCheckpoint) { state.items =[]; refreshNews(false); }
             }
         }
         
@@ -2177,15 +2224,13 @@
             const now = new Date();
             el.clockHm.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
             el.clockS.textContent = `:${String(now.getSeconds()).padStart(2, '0')}`;
-            const days = ['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat'];
-            el.date.textContent = `${now.getFullYear()}. ${CALENDAR_DATA.honapok[now.getMonth()]} ${now.getDate()}., ${days[now.getDay()]}`;
-            // Nameday logic removed
+            const days =['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat'];
+            el.date.textContent = `${now.getFullYear()}. ${CALENDAR_DATA.honapok[now.getMonth()]} ${now.getDate()}. | ${days[now.getDay()]}`.toUpperCase();
             updateSkyGradient();
             updateAnalogClock();
             
             const h = now.getHours() + now.getMinutes()/60;
             
-            // --- MODIFIED BLOCK SELECTION LOGIC ---
             let currentBlock;
             if(state.testModeActive && state.forcedBlock) {
                 currentBlock = state.forcedBlock;
@@ -2195,12 +2240,10 @@
 
             const min = now.getMinutes(); const sec = now.getSeconds(); const hour = now.getHours();
 
-            // PWS HIDING LOGIC for BIG CLOCK (via Manager)
             if (el.bigClockLayer.classList.contains('active')) {
                  managePwsVisibility(false);
             } 
 
-            // Always update big clock time text if active (for test or real)
             if(el.bigClockLayer.classList.contains('active')) {
                  el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
             }
@@ -2213,7 +2256,7 @@
             } else {
                 if(!state.isHourChangeTestActive && el.bigClockLayer.classList.contains('active')) { 
                     el.bigClockLayer.classList.remove('active'); el.goodbyeCard.classList.remove('active'); 
-                    if(state.block.type !== 'summary_yesterday') { state.currentIndex = 0; if(state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems = []; } showNextItem(false); } 
+                    if(state.block.type !== 'summary_yesterday') { state.currentIndex = 0; if(state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems =[]; } showNextItem(false); } 
                 }
             }
 
@@ -2229,7 +2272,6 @@
             if((min === 12 || min === 32 || min === 52) && sec === 30) { fetchExchangeRates(); }
             if((min === 13 || min === 33 || min === 53) && sec === 0) { showEconomy(); }
             
-            // --- UPDATED REFRESH RATE LOGIC (10 Minutes) ---
             if (min % 10 === 0 && sec === 0) { fetchExchangeRates(); }
 
             const currentIndex = THEMATIC_BLOCKS.findIndex(b => b.name === state.block.name);
@@ -2249,23 +2291,20 @@
             if (sec === 0) cleanUpOldItems();
 
             const nightLabel = document.getElementById('night-summary-label');
-            // Strict logic: ONLY show if block type is exactly 'summary_yesterday'
             if (state.block && state.block.type === 'summary_yesterday') {
                 el.timelineContainer.style.display = 'flex';
                 nightLabel.classList.add('active');
-                // HIDE RATES
                 document.getElementById('cb-left-rates').style.display = 'none';
             } else { 
                 el.timelineContainer.style.display = 'none'; 
                 nightLabel.classList.remove('active'); 
-                // SHOW RATES
                 document.getElementById('cb-left-rates').style.display = 'flex';
             }
         }
 
         function filterItemsByBlock(items) {
             const now = new Date();
-            let filtered = [];
+            let filtered =[];
             if(state.block.type === 'summary_yesterday') {
                 const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1); yesterday.setHours(0,0,0,0);
                 const end = new Date(yesterday); end.setHours(23,59,59,999);
@@ -2284,7 +2323,7 @@
             const res = await fetchWithProxyFallback(url);
             let txt; if(url.includes('ma.hu')) txt = new TextDecoder('iso-8859-2').decode(await res.arrayBuffer()); else txt = await res.text();
             const xml = new DOMParser().parseFromString(txt, "text/xml");
-            const parsedItems = [];
+            const parsedItems =[];
             xml.querySelectorAll("item").forEach(item => {
                 const title = item.querySelector("title")?.textContent || "";
                 const descHtml = item.querySelector("description")?.textContent || "";
@@ -2297,15 +2336,15 @@
 
         async function processRetries() {
             state.retryCount = (state.retryCount || 0) + 1;
-            if(state.retryQueue.length === 0 || state.retryCount > 15) { clearInterval(state.retryInterval); state.retryQueue = []; return; }
-            const currentQueue = [...state.retryQueue]; state.retryQueue = []; const fetched = [];
+            if(state.retryQueue.length === 0 || state.retryCount > 15) { clearInterval(state.retryInterval); state.retryQueue =[]; return; }
+            const currentQueue =[...state.retryQueue]; state.retryQueue = []; const fetched =[];
             for(const task of currentQueue) { try { const items = await attemptFetchFeed(task.key, task.url); fetched.push(...items); } catch(e) { state.retryQueue.push(task); } }
             if(fetched.length > 0) mergeNewItems(fetched);
         }
 
         function mergeNewItems(newItems) {
             const currentLink = state.currentItem ? state.currentItem.link : null;
-            const combined = [...state.items, ...newItems];
+            const combined =[...state.items, ...newItems];
             const uniqueMap = new Map(); combined.forEach(item => uniqueMap.set(item.link, item));
             let uniqueItems = Array.from(uniqueMap.values()); uniqueItems = filterItemsByBlock(uniqueItems);
             if(state.block.type !== 'summary_yesterday') { uniqueItems.sort((a,b) => b.date - a.date); }
@@ -2317,9 +2356,9 @@
         async function refreshNews(silent = false) {
             state.lastRefreshTimestamp = Date.now(); state.retryCount = 0; 
             if(!silent) el.loading.classList.add('active');
-            state.retryQueue = []; if(state.retryInterval) clearInterval(state.retryInterval);
+            state.retryQueue =[]; if(state.retryInterval) clearInterval(state.retryInterval);
             let feeds = BACKUP_FEEDS; if(Object.keys(state.rssFeeds).length > 0) feeds = { ...feeds, ...state.rssFeeds };
-            let fetchedItems = [];
+            let fetchedItems =[];
             const fetchPromises = Object.entries(feeds).map(async ([key, url]) => { try { const items = await attemptFetchFeed(key, url); fetchedItems.push(...items); } catch(e) { state.retryQueue.push({ key, url }); } });
             await Promise.allSettled(fetchPromises);
             const now = new Date();
@@ -2328,7 +2367,7 @@
             else if (state.block.type === 'morning_catchup') { cutoffTime = new Date(now); cutoffTime.setHours(0,0,0,0); }
             fetchedItems = fetchedItems.filter(item => item.date >= cutoffTime); fetchedItems.sort((a,b) => b.date - a.date);
             const filtered = filterItemsByBlock(fetchedItems); 
-            const uniqueItems = []; const seenLinks = new Set();
+            const uniqueItems =[]; const seenLinks = new Set();
             for(const item of filtered) { if(!seenLinks.has(item.link)) { uniqueItems.push(item); seenLinks.add(item.link); } }
             if(silent) { state.nextItems = uniqueItems; document.getElementById('live-indicator').classList.remove('updating'); } 
             else { state.items = uniqueItems; el.loading.classList.remove('active'); state.currentIndex = 0; showNextItem(false); }
@@ -2340,24 +2379,21 @@
         function showNextItem(advance = true) {
             clearTimeout(state.flipTimer); state.isTransitioning = true;
             
-            // --- TIP CARD LOGIC ---
-            // Check if 10 minutes have passed since last tip
             const now = Date.now();
-            if (now - state.lastTipTime > 600000 && state.items.length > 0) { // 10 mins = 600000 ms
+            if (now - state.lastTipTime > 600000 && state.items.length > 0) { 
                 renderTipCard();
                 state.lastTipTime = now;
                 return;
             }
 
             if(state.block.type === 'summary_yesterday') { if (now - state.lastNightInfoTime > 300000) { renderNightInfoCard(); return; } }
-            if(state.pendingListReset && state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems = []; state.currentIndex = -1; advance = true; state.pendingListReset = false; }
+            if(state.pendingListReset && state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems =[]; state.currentIndex = -1; advance = true; state.pendingListReset = false; }
             if(state.items.length === 0) { el[state.activeTrack === 'a' ? 'trackA' : 'trackB'].innerHTML = `<div class="news-title">Nincs hír...</div>`; return; }
             if(advance) state.currentIndex++;
             let item = state.items[state.currentIndex % state.items.length];
             if(state.items.length > 1 && state.currentItem && (item.link === state.currentItem.link || item.title === state.currentItem.title)) { state.currentIndex++; item = state.items[state.currentIndex % state.items.length]; }
             state.currentItem = item;
             renderCard(item, false);
-            // Duration is now fixed or slight variation
             let duration = 15000;
             state.currentDuration = duration;
             state.cardStartTime = Date.now();
@@ -2366,7 +2402,6 @@
         }
 
         function renderTipCard() {
-            // HIDE PWS immediately
             managePwsVisibility(false);
 
             const nextTrack = el[state.activeTrack === 'a' ? 'trackB' : 'trackA']; const currentTrack = el[state.activeTrack === 'a' ? 'trackA' : 'trackB'];
@@ -2400,7 +2435,6 @@
         }
 
         function renderNightInfoCard() {
-            // Usually allow PWS on night info
             managePwsVisibility(true);
             
             state.lastNightInfoTime = Date.now(); 
@@ -2415,7 +2449,6 @@
         }
 
         function renderCard(item, isBreaking) {
-            // RESTORE PWS (Managed will handle delay)
             managePwsVisibility(true);
 
             const nextTrack = el[state.activeTrack === 'a' ? 'trackB' : 'trackA'];
@@ -2423,7 +2456,7 @@
             const fav = getFavicon(item.link);
             const displaySource = getSourceName(item.link);
             const timeStr = item.date.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
-            nextTrack.className = 'news-card'; // Reset classes
+            nextTrack.className = 'news-card'; 
             
             const isTraffic = (displaySource === 'KÖZÚT' || displaySource === 'BKK');
             if (isTraffic) {
@@ -2434,7 +2467,6 @@
 
             let iconHtml = isTraffic ? TRAFFIC_ICON : `<img src="${fav}" class="provider-icon">`;
             
-            // --- INLINE PWS CAPSULE GENERATION (V220) ---
             let weatherHTML = '';
             if (state.currentNyTemp) {
                 const shouldAnimate = (Date.now() - state.pwsLastUpdate) < 15000;
@@ -2461,7 +2493,6 @@
                 weatherHTML += `</div>`; 
             }
 
-            // Combine into footer meta (Weather pushed to right by margin-left:auto in CSS)
             let footerMetaHTML = `
                 <div class="provider-identity">${iconHtml} ${displaySource}</div>
                 <span style="margin-left:8px;">${timeStr}</span>
@@ -2469,30 +2500,34 @@
             `;
             
             let visualHtml = ''; let hasVisual = false;
-            let overlayStyle = 'style="background: rgba(2, 6, 23, 0.98);"'; // Default dark
+            let overlayStyle = 'style="background: rgba(2, 6, 23, 0.98);"';
 
             if (item.img) {
                 hasVisual = true; 
                 visualHtml = `<div class="news-visual-column"><img src="${item.img}" class="news-visual-image" alt="Hír kép"></div>`;
-                // Add linear gradient over image for readability
                 overlayStyle = `style="background-image: linear-gradient(to bottom, rgba(2,6,23,0.92), rgba(2,6,23,0.96)), url('${item.img}'); background-size: cover; background-position: center;"`;
             } else {
-                // NO VISUAL - Text will expand due to CSS max-width: 100% on wrapper
                 hasVisual = false; 
-                visualHtml = ''; // No fallback graphic
+                visualHtml = ''; 
             }
 
             if (hasVisual) { nextTrack.classList.add('has-visual'); }
             
-            // Extract single sentence for short view
             const shortDesc = getFirstSentence(item.desc);
 
             const html = `
                 <div class="news-content-wrapper">
-                    <!-- WATERMARK ADDED HERE -->
                     <div class="card-watermark">
-                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-                        <span>TKP NEWS</span>
+                        <div class="tkp-animated-logo watermark-mode" style="transform: scale(0.6); margin-bottom: 0;">
+                            <div class="new-logo-container">
+                                <div class="logo-letters">
+                                    <div class="logo-block lb-t">T</div>
+                                    <div class="logo-block lb-k">K</div>
+                                    <div class="logo-block lb-p">P</div>
+                                </div>
+                                <div class="logo-news-bar" style="border:none; box-shadow:none;">NEWS</div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="news-title">${item.title}</div>
@@ -2524,7 +2559,17 @@
         el.newsViewport.addEventListener('mouseenter', () => { if(!state.isPaused) { clearTimeout(state.flipTimer); el.progressBar.style.animationPlayState = 'paused'; state.isPaused = true; const elapsed = Date.now() - state.cardStartTime; state.remainingTime = Math.max(0, state.currentDuration - elapsed); } });
         el.newsViewport.addEventListener('mouseleave', () => { if(state.isPaused) { el.progressBar.style.animationPlayState = 'running'; state.isPaused = false; state.cardStartTime = Date.now(); state.currentDuration = state.remainingTime; state.flipTimer = setTimeout(() => { showNextItem(true); }, state.remainingTime); } });
 
-        function initIntroSequence() { el.leftPanel.classList.add('loaded'); el.rightPanel.classList.add('loaded'); setTimeout(() => { el.mainContainer.classList.add('open'); }, 1500); }
+        function initIntroSequence() { 
+            el.leftPanel.classList.add('loaded'); 
+            el.rightPanel.classList.add('loaded'); 
+            setTimeout(() => { el.mainContainer.classList.add('open'); }, 1500); 
+            
+            // Jumps for 5 seconds, then elegantly settles to watermark mode
+            setTimeout(() => {
+                const mainLogo = document.getElementById('brand-click-area');
+                if(mainLogo) mainLogo.classList.add('watermark-mode');
+            }, 5000);
+        }
         
         document.addEventListener("DOMContentLoaded", () => {
             el.crYear.textContent = new Date().getFullYear(); 
@@ -2533,7 +2578,6 @@
             onValue(feedsRef, (snap) => { state.rssFeeds = snap.val() || {}; refreshNews(); });
             fetchWeatherData(); setInterval(fetchWeatherData, 150000); setInterval(displayWeather, 6000);
             
-            // Fixed PWS:
             fetchNyiregyhazaSpecific(); setInterval(fetchNyiregyhazaSpecific, 30000);
             
             setInterval(checkBreakingNews, 45000); setTimeout(checkBreakingNews, 5000);
@@ -2542,9 +2586,7 @@
             document.getElementById('next-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); showNextItem(true); });
             document.getElementById('prev-btn').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); state.currentIndex -= 2; showNextItem(true); });
 
-            // --- SINGLE CLICK LISTENER ---
             el.newsContainer.addEventListener('click', (e) => {
-                // 1. Breaking News Priority Check
                 if(e.target.closest('#breaking-panel')) {
                     e.preventDefault(); e.stopPropagation();
                     if(state.breakingLink) {
@@ -2553,14 +2595,10 @@
                     return;
                 }
 
-                // 2. Prevent controls from triggering news link
                 if(e.target.closest('.controls-bar') || e.target.closest('.breaking-pod')) return; 
-
-                // 3. Prevent tip card clicks
                 if(e.target.closest('.tip-card')) return;
                 
-                // 4. Main News Link
-                e.stopPropagation(); // Stop bubbling
+                e.stopPropagation(); 
                 
                 if(state.currentItem && state.currentItem.link) {
                     window.open(state.currentItem.link, '_blank'); 
