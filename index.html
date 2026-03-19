@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V228 (Studio BG, Perfect Flip & HD)</title>
+    <title>Aurora News Ticker - V229 (Static Newsroom, Max Performance & HD)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -132,16 +132,12 @@
 
         .tkp-logo-sm { transform: scale(0.65); margin: -8px 0; pointer-events: none; }
         .tkp-logo-lg { transform: scale(1.4); pointer-events: none; }
-        .tkp-logo-bg { transform: scale(8); opacity: 0.08; margin: 0; pointer-events: none; }
-
-        /* STABLE BACKGROUND */
+        
+        /* STABLE BACKGROUND - (Max teljesítmény, NINCS animáció) */
         .ambient-background {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2), var(--bg-grad-3));
-            background-size: 300% 300%;
-            animation: skyFlow 60s ease infinite;
+            background: linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-3));
         }
-        @keyframes skyFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         /* --- CONTAINER --- */
         .ticker-container { 
@@ -162,7 +158,7 @@
             .id-content, .weather-view { padding: 10px !important; }
         }
 
-        /* PREMIUM PANEL DESIGN - Tűéles 2D alapállapot */
+        /* PREMIUM PANEL DESIGN */
         .glass-panel {
             background: var(--panel-gradient);
             border: 1px solid var(--panel-border); 
@@ -203,7 +199,7 @@
         }
         .ticker-container.open .news-panel { flex: 1; opacity: 1; }
 
-        /* --- TÖKÉLETESEN ÉLES 2D FLIPPER (CSS 3D nélkül nyugalmi állapotban) --- */
+        /* --- TÖKÉLETESEN ÉLES 2D FLIPPER --- */
         .panel-flipper {
             width: 100%; height: 100%;
             position: relative;
@@ -226,9 +222,9 @@
         }
         
         .panel-face.back { 
-            display: none; /* JS cseréli forgás közben flex-re */
-            flex-direction: column; 
-            /* NINCS FORGATÁS ITT, EZÉRT NEM LESZ FEJJEL LEFELÉ A MŰSORAJÁNLÓ! */
+            display: none; 
+            align-items: center; justify-content: center;
+            transform: rotateX(180deg);
             z-index: 1;
         }
 
@@ -515,61 +511,59 @@
         .tip-main-line { font-family: var(--font-head); font-weight: 900; font-size: 2.0rem; color: var(--accent-info); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); line-height: 1; white-space: nowrap; }
         .tip-sub-line { font-family: var(--font-body); font-weight: 600; font-size: 1.05rem; color: #ffffff; white-space: normal; line-height: 1.4; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
 
-        /* --- MODERN "NEWSROOM" STUDIO HÁTTÉR --- */
+        /* --- COMPLETELY STATIC & OPTIMIZED "NEWSROOM" STUDIO HÁTTÉR --- */
         .default-news-bg { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             z-index: 0; overflow: hidden; opacity: 1; transition: opacity 1s ease;
-            background: linear-gradient(135deg, #040b16 0%, #0a1930 50%, #02060d 100%);
+            background: linear-gradient(135deg, #060d1a 0%, #0a1930 50%, #02060d 100%);
         }
         
-        /* Studio Lights (Glowing Orbs) */
-        .studio-light {
-            position: absolute; border-radius: 50%; filter: blur(80px);
-            opacity: 0.45; animation: lightFloat 15s infinite alternate ease-in-out;
-            pointer-events: none;
+        /* Static Studio Lights (No animation, Native radial-gradient) */
+        .static-light {
+            position: absolute; border-radius: 50%; pointer-events: none;
         }
-        .light-1 { width: 400px; height: 400px; background: #0ea5e9; top: -100px; left: -100px; }
-        .light-2 { width: 500px; height: 500px; background: #4338ca; bottom: -200px; right: -100px; animation-delay: -5s; }
-        .light-3 { width: 300px; height: 300px; background: #0284c7; top: 20%; left: 50%; animation-delay: -10s; opacity: 0.3; }
-        
-        @keyframes lightFloat {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(60px, 40px) scale(1.1); }
-        }
+        .sl-1 { width: 800px; height: 800px; background: radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%); top: -300px; left: -200px; }
+        .sl-2 { width: 1000px; height: 1000px; background: radial-gradient(circle, rgba(67,56,202,0.08) 0%, transparent 70%); bottom: -400px; right: -200px; }
 
-        /* Abstract Tech Lines */
-        .tech-lines {
+        /* Elegant Static Grid */
+        .static-grid {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 100px, rgba(255,255,255,0.02) 100px, rgba(255,255,255,0.02) 101px),
-                repeating-linear-gradient(-45deg, transparent, transparent 100px, rgba(255,255,255,0.02) 100px, rgba(255,255,255,0.02) 101px);
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 35px 35px;
             pointer-events: none;
         }
 
-        /* Dotted World Map */
-        .world-map-dots {
+        /* Static Dotted World Map */
+        .static-map {
             position: absolute; top: 50%; left: 50%; width: 100%; height: 100%;
             transform: translate(-50%, -50%);
-            background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1.5px, transparent 1.5px);
-            background-size: 18px 18px;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1.5px, transparent 1.5px);
+            background-size: 16px 16px;
             mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 10%, transparent 65%);
             -webkit-mask-image: radial-gradient(ellipse at center, rgba(0,0,0,1) 10%, transparent 65%);
             pointer-events: none;
         }
 
-        /* Moving Ticker Text in Background */
-        .bg-ticker-track {
-            position: absolute; bottom: 10%; left: 0; display: flex;
-            opacity: 0.03; font-family: var(--font-head); font-weight: 900; font-size: 7rem;
-            color: #fff; white-space: nowrap; letter-spacing: 8px;
-            animation: bgTickerMove 40s linear infinite;
-            pointer-events: none;
+        /* Beautiful Organized Static Typography */
+        .static-typo-container {
+            position: absolute; bottom: 30px; left: 40px;
+            display: flex; flex-direction: column;
+            pointer-events: none; opacity: 0.08;
         }
-        @keyframes bgTickerMove {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); } 
+        .st-main {
+            font-family: var(--font-head); font-weight: 900; font-size: 5rem;
+            color: #fff; line-height: 0.9; letter-spacing: 2px;
         }
-        .dnb-watermark { position: absolute; top: 50%; left: 75%; transform: translate(-50%, -50%); pointer-events: none; }
+        .st-sub {
+            font-family: var(--font-body); font-weight: 700; font-size: 1.2rem;
+            color: #fff; letter-spacing: 12px; margin-top: 8px; margin-left: 5px;
+        }
+
+        /* Static Watermark Logo */
+        .dnb-watermark { position: absolute; top: 50%; right: 15%; transform: translateY(-50%); pointer-events: none; }
+        .dnb-watermark .tkp-logo-bg { transform: scale(5); opacity: 0.05; margin:0;}
 
         .news-card.night-info { background: radial-gradient(circle at top left, #312e81, #1e1b4b); border-left: 4px solid #a855f7; alignItems: center; justify-content: center; text-align: center; padding: 0 20px 28px 20px; flex-direction: column; }
         
@@ -874,15 +868,16 @@
         <div class="glass-panel news-panel" id="news-container">
             
             <div class="default-news-bg">
-                <div class="studio-light light-1"></div>
-                <div class="studio-light light-2"></div>
-                <div class="studio-light light-3"></div>
-                <div class="tech-lines"></div>
-                <div class="world-map-dots"></div>
-                <div class="bg-ticker-track">
-                    <span>TKP NEWS LIVE BROADCAST • MEGBÍZHATÓ HÍREK 24/7 • LEGFRISSEBB INFORMÁCIÓK • </span>
-                    <span>TKP NEWS LIVE BROADCAST • MEGBÍZHATÓ HÍREK 24/7 • LEGFRISSEBB INFORMÁCIÓK • </span>
+                <div class="static-light sl-1"></div>
+                <div class="static-light sl-2"></div>
+                <div class="static-grid"></div>
+                <div class="static-map"></div>
+                
+                <div class="static-typo-container">
+                    <div class="st-main">TKP NEWS</div>
+                    <div class="st-sub">LIVE BROADCAST</div>
                 </div>
+
                 <div class="dnb-watermark">
                     <div class="tkp-animated-logo tkp-logo-bg">
                         <div class="new-logo-container">
@@ -1524,7 +1519,9 @@
             else if (altitudeDeg < 6) stops = SKY_PHASES.SUNRISE.stops;
             else if (altitudeDeg < 25) stops = SKY_PHASES.MORNING.stops;
             else stops = SKY_PHASES.NOON.stops;
-            el.sky.style.background = `linear-gradient(135deg, ${stops[0]}, ${stops[1]}, ${stops[2]})`;
+            
+            // Fő külső háttér (státikus linear-gradient, nincs render terhelés)
+            el.sky.style.background = `linear-gradient(135deg, ${stops[0]}, ${stops[2]})`;
         }
 
         function calculateFeelsLike(temp, hum, windKmh) {
