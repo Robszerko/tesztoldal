@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V226 (Ultra HD, Fast Load & Perfect Fit)</title>
+    <title>Aurora News Ticker - V227 (Newsroom BG, 10 Animations, Flags & HD)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -81,7 +81,7 @@
             transition: transform 1.5s ease, opacity 1.5s ease;
         }
         .new-logo-container { display: flex; flex-direction: column; align-items: center; }
-        .logo-letters { display: flex; gap: 2px; z-index: 2; }
+        .logo-letters { display: flex; gap: 2px; z-index: 2; position: relative; }
         .logo-block {
             width: 23px; height: 23px; 
             display: flex; align-items: center; justify-content: center;
@@ -91,6 +91,7 @@
             border: 1px solid rgba(255,255,255,0.25);
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            /* Transform eltávolítva alapállapotból a tűélességért */
         }
         .lb-t { background: linear-gradient(135deg, #d00000 0%, #900000 100%); }
         .lb-k { background: linear-gradient(135deg, #702082 0%, #4a1555 100%); }
@@ -106,18 +107,50 @@
             margin-top: 2px;
         }
 
-        /* --- HÁTRA SZALTÓS LOGÓ ANIMÁCIÓ --- */
-        @keyframes letterBackflipFall {
-            0%   { transform: translateY(0) rotateX(0deg); opacity: 1; }
-            30%  { transform: translateY(40px) rotateX(-180deg); opacity: 0; }
-            35%  { transform: translateY(-40px) rotateX(-180deg); opacity: 0; }
-            70%  { transform: translateY(5px) rotateX(-360deg); opacity: 1; }
-            85%  { transform: translateY(-2px) rotateX(-360deg); opacity: 1; }
-            100% { transform: translateY(0) rotateX(-360deg); opacity: 1; }
-        }
-        .logo-random-anim .lb-t { animation: letterBackflipFall 2.5s ease-in-out forwards; }
-        .logo-random-anim .lb-k { animation: letterBackflipFall 2.5s ease-in-out 0.4s forwards; }
-        .logo-random-anim .lb-p { animation: letterBackflipFall 2.5s ease-in-out 0.8s forwards; }
+        /* --- 10 JÁTÉKOS LOGÓ ANIMÁCIÓ --- */
+        
+        /* 1. Hátra szaltó eséssel */
+        @keyframes anim1_fall { 0% { transform: translateY(0) rotateX(0); opacity: 1; } 30% { transform: translateY(30px) rotateX(-180deg); opacity: 0; } 70% { transform: translateY(-10px) rotateX(-360deg); opacity: 1; } 100% { transform: translateY(0) rotateX(-360deg); opacity: 1; } }
+        .anim-1 .lb-t { animation: anim1_fall 1.5s ease-in-out forwards; } .anim-1 .lb-k { animation: anim1_fall 1.5s ease-in-out 0.2s forwards; } .anim-1 .lb-p { animation: anim1_fall 1.5s ease-in-out 0.4s forwards; }
+
+        /* 2. Ugrás és pörgés */
+        @keyframes anim2_jump { 0%, 100% { transform: translateY(0) rotateY(0); } 50% { transform: translateY(-20px) rotateY(180deg); } }
+        .anim-2 .lb-t { animation: anim2_jump 1s ease-in-out; } .anim-2 .lb-k { animation: anim2_jump 1s ease-in-out 0.15s; } .anim-2 .lb-p { animation: anim2_jump 1s ease-in-out 0.3s; }
+
+        /* 3. Nyúlás és Zsugorodás (Squash) */
+        @keyframes anim3_squash { 0%, 100% { transform: scale(1, 1) translateY(0); } 30% { transform: scale(1.4, 0.6) translateY(5px); } 60% { transform: scale(0.8, 1.3) translateY(-10px); } }
+        .anim-3 .logo-block { animation: anim3_squash 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); } .anim-3 .lb-k { animation-delay: 0.1s; } .anim-3 .lb-p { animation-delay: 0.2s; }
+
+        /* 4. Dominó dőlés */
+        @keyframes anim4_domino { 0%, 100% { transform: rotate(0) translateX(0); } 30% { transform: rotate(25deg) translateX(5px); } 70% { transform: rotate(-5deg) translateX(-2px); } }
+        .anim-4 .lb-t { animation: anim4_domino 1s ease-in-out; } .anim-4 .lb-k { animation: anim4_domino 1s ease-in-out 0.1s; } .anim-4 .lb-p { animation: anim4_domino 1s ease-in-out 0.2s; }
+
+        /* 5. Hullámzás (Wave Swing) */
+        @keyframes anim5_wave { 0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-15px) rotate(-15deg); } 75% { transform: translateY(15px) rotate(15deg); } }
+        .anim-5 .logo-block { animation: anim5_wave 1.2s ease-in-out; } .anim-5 .lb-k { animation-delay: 0.2s; } .anim-5 .lb-p { animation-delay: 0.4s; }
+
+        /* 6. Érme Pörgetés (Flip Y) */
+        @keyframes anim6_flipY { 0% { transform: perspective(400px) rotateY(0); } 100% { transform: perspective(400px) rotateY(360deg); } }
+        .anim-6 .logo-block { animation: anim6_flipY 1s ease-in-out; } .anim-6 .lb-k { animation-delay: 0.15s; } .anim-6 .lb-p { animation-delay: 0.3s; }
+
+        /* 7. Spirál Zoom */
+        @keyframes anim7_spiral { 0%, 100% { transform: scale(1) rotate(0); z-index:1; } 50% { transform: scale(1.5) rotate(360deg); z-index:10; } }
+        .anim-7 .logo-block { animation: anim7_spiral 1.5s ease-in-out; } .anim-7 .lb-k { animation-delay: 0.2s; } .anim-7 .lb-p { animation-delay: 0.4s; }
+
+        /* 8. Keverés (Shuffle Swap) */
+        @keyframes anim8_swapT { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(54px) scale(1.1); z-index: 10; } }
+        @keyframes anim8_swapP { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-54px) scale(0.9); opacity: 0.5; } }
+        @keyframes anim8_duckK { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(15px) scale(0.8); } }
+        .anim-8 .lb-t { animation: anim8_swapT 1.2s ease-in-out; } .anim-8 .lb-k { animation: anim8_duckK 1.2s ease-in-out; } .anim-8 .lb-p { animation: anim8_swapP 1.2s ease-in-out; }
+
+        /* 9. Remegés és Leesés */
+        @keyframes anim9_shiver { 0%, 100% { transform: translate(0, 0); opacity:1; } 10%, 30% { transform: translate(-2px, 0); } 20%, 40% { transform: translate(2px, 0); } 50% { transform: translate(0, 40px); opacity:0; } 60% { transform: translate(0, -30px); opacity:0; } 80% { transform: translate(0, 5px); opacity:1; } }
+        .anim-9 .logo-block { animation: anim9_shiver 1.5s ease-in-out; } .anim-9 .lb-k { animation-delay: 0.1s; } .anim-9 .lb-p { animation-delay: 0.2s; }
+
+        /* 10. Matrix 3D Tumble */
+        @keyframes anim10_matrix { 0%, 100% { transform: rotate3d(1, 1, 1, 0deg); } 50% { transform: rotate3d(1, 1, 1, 180deg) scale(0.8); } }
+        .anim-10 .logo-block { animation: anim10_matrix 1.2s ease-in-out; } .anim-10 .lb-k { animation-delay: 0.2s; } .anim-10 .lb-p { animation-delay: 0.4s; }
+
 
         .tkp-logo-sm { transform: scale(0.65); margin: -8px 0; pointer-events: none; }
         .tkp-logo-lg { transform: scale(1.4); pointer-events: none; }
@@ -164,6 +197,11 @@
             height: 100%; 
         }
         
+        /* Csak pörgéskor lesz 3D tere, különben tűéles 2D! */
+        .glass-panel.flipping-active {
+            perspective: 1000px;
+        }
+
         .glass-panel.loaded { opacity: 1; transform: translateY(0); }
 
         /* --- SHAPES --- */
@@ -191,8 +229,13 @@
         .panel-flipper {
             width: 100%; height: 100%;
             position: relative;
-            /* A transform és transition a JS-ben lesz hozzáadva a pördülés másodpercében! */
         }
+        
+        .glass-panel.flipping-active .panel-flipper {
+            transform-style: preserve-3d;
+        }
+
+        .panel-flipper.flipped { transform: rotateX(900deg); }
         
         .panel-face {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -200,12 +243,20 @@
             background: var(--panel-gradient);
             z-index: 2;
         }
+
+        .glass-panel.flipping-active .panel-face {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
         
         .panel-face.back { 
-            display: none; /* Alapból elrejtjük, JS cseréli forgás közben */
+            display: none; 
             align-items: center; justify-content: center;
+            transform: rotateX(180deg);
             z-index: 1;
         }
+
+        .glass-panel.flipping-active .panel-face.back { display: flex; }
 
         /* --- LEFT PANEL CONTENT --- */
         .id-content { 
@@ -488,9 +539,41 @@
         .tip-main-line { font-family: var(--font-head); font-weight: 900; font-size: 2.0rem; color: var(--accent-info); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); line-height: 1; white-space: nowrap; }
         .tip-sub-line { font-family: var(--font-body); font-weight: 600; font-size: 1.05rem; color: #ffffff; white-space: normal; line-height: 1.4; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
 
+        /* --- MODERN "NEWSROOM" JELLEGŰ HÁTTÉR --- */
         .default-news-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; opacity: 1; transition: opacity 1s ease; }
-        .dnb-gradient { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top right, #1e3a8a, #0f172a 70%, #020617); }
-        .dnb-world-map { position: absolute; top: 5%; right: -5%; width: 70%; height: 80%; background-image: radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px); background-size: 20px 20px; mask-image: radial-gradient(circle, black 30%, transparent 80%); transform: rotate(-10deg); }
+        .dnb-gradient { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(125deg, #091221 0%, #030712 40%, #0b1a38 100%);
+        }
+        .dnb-grid {
+            position: absolute; top: 0; left: 0; width: 200%; height: 200%;
+            background-image: 
+                linear-gradient(rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: gridMove 20s linear infinite;
+            transform-origin: top center;
+        }
+        @keyframes gridMove {
+            from { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); }
+            to { transform: perspective(500px) rotateX(60deg) translateY(40px) translateZ(-200px); }
+        }
+        .dnb-glow {
+            position: absolute; width: 600px; height: 600px; 
+            background: radial-gradient(circle, rgba(56,189,248,0.06) 0%, transparent 70%);
+            border-radius: 50%; top: -200px; right: -100px;
+            animation: pulseGlow 10s infinite alternate;
+        }
+        @keyframes pulseGlow { 0% { transform: scale(1); opacity: 0.5;} 100% { transform: scale(1.2); opacity: 1;} }
+
+        .dnb-world-map { 
+            position: absolute; top: 5%; right: -5%; width: 70%; height: 80%; 
+            background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px); 
+            background-size: 20px 20px; 
+            mask-image: radial-gradient(circle, black 30%, transparent 80%); 
+            transform: rotate(-10deg); 
+        }
         .dnb-watermark { position: absolute; top: 50%; left: 70%; transform: translate(-50%, -50%); pointer-events: none; }
         .dnb-text-strip { position: absolute; bottom: 40px; left: 0; width: 100%; display: flex; justify-content: space-around; transform: rotate(-3deg); opacity: 0.05; font-family: var(--font-head); font-weight: 900; font-size: 4.5rem; color: #fff; white-space: nowrap; letter-spacing: 5px; }
 
@@ -524,7 +607,7 @@
         .hand.minute { width: 3px; height: 48px; margin-left: -1.5px; opacity: 0.9; }
         .hand.second { width: 1px; height: 52px; margin-left: -0.5px; background: var(--accent-danger); box-shadow: none; }
         .center-dot { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 5px rgba(255,255,255,0.8); }
-        .hour-mark { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; justify-content: center; padding-top: 4px; font-family: var(--font-serif); font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.8); pointer-events: none; }
+        .hour-mark { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; justify-content: center; padding-top: 4px; font-family: var(--font-serif); font-size: 0.9rem; font-weight: 700; color: rgba(255,255,255,0.8); pointer-events: none; }
         
         /* --- CONTROLS BAR - Fix sötét HD háttér --- */
         .controls-bar { 
@@ -587,7 +670,9 @@
         
         /* --- WEATHER & SCHEDULE FLIPPER --- */
         .weather-header-container { height: 28px; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--panel-border); display: flex; align-items: center; justify-content: center; padding: 0 15px; z-index: 10; width: 100%; position: absolute; top:0; left:0; }
-        .weather-location-header { display: flex; justify-content: center; align-items: center; width: 100%; font-weight: 700; color: var(--accent-color); transition: opacity 0.5s; font-size: 0.8rem; text-transform: uppercase; }
+        .weather-location-header { display: flex; justify-content: flex-start; align-items: center; width: 100%; font-weight: 700; color: var(--accent-color); transition: opacity 0.5s; font-size: 0.8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 5px; }
+        .wlh-flag-img { width: 19px; height: auto; border-radius: 2px; margin-right: 6px; cursor: help; display: none; }
+        
         .weather-view { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 35px 20px 10px 20px; background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.1) 100%); }
         .weather-main { flex-grow: 1; display: flex; align-items: center; justify-content: space-between; padding: 0 5px; }
         .weather-main-left { display: flex; align-items: center; justify-content: center; width: 40%; }
@@ -796,6 +881,8 @@
             
             <div class="default-news-bg">
                 <div class="dnb-gradient"></div>
+                <div class="dnb-grid"></div>
+                <div class="dnb-glow"></div>
                 <div class="dnb-world-map"></div>
                 <div class="dnb-watermark">
                     <div class="tkp-animated-logo tkp-logo-bg">
@@ -915,6 +1002,7 @@
                 <div class="panel-face">
                      <div class="weather-header-container">
                         <div class="weather-location-header">
+                            <img id="weather-loc-flag-img" class="wlh-flag-img" src="" title="">
                             <span class="wlh-loc" id="weather-loc-name">IDŐJÁRÁS KÖZPONT</span>
                         </div>
                     </div>
@@ -1018,11 +1106,31 @@
             NOON:       { stops:["#0284c7", "#38bdf8", "#e0f2fe"] }
         };
 
+        const COUNTRY_NAMES = {
+            'hu': 'Magyarország', 'ru': 'Oroszország', 'us': 'Amerikai Egyesült Államok', 'aq': 'Antarktika',
+            'gl': 'Grönland', 'ar': 'Argentína', 'ae': 'Egyesült Arab Emírségek', 'is': 'Izland', 'np': 'Nepál',
+            'za': 'Dél-Afrika', 'au': 'Ausztrália', 'jp': 'Japán', 'sj': 'Svalbard és Jan Mayen', 'bo': 'Bolívia',
+            'pe': 'Peru', 'ua': 'Ukrajna', 'cl': 'Chile', 'mn': 'Mongólia', 'et': 'Etiópia', 'in': 'India',
+            'ca': 'Kanada', 'pl': 'Lengyelország', 'sk': 'Szlovákia', 'at': 'Ausztria', 'it': 'Olaszország',
+            'fr': 'Franciaország', 'ch': 'Svájc', 'nz': 'Új-Zéland', 'kz': 'Kazahsztán', 'ge': 'Grúzia',
+            'bg': 'Bulgária', 'gb': 'Egyesült Királyság', 'de': 'Németország', 'es': 'Spanyolország',
+            'cz': 'Csehország', 'ro': 'Románia'
+        };
+
+        function parseLocationName(rawName) {
+            const match = rawName.match(/(.+?)\s*\(([A-Z]{2})\)$/);
+            if (match) {
+                const cc = match[2].toLowerCase();
+                return { name: match[1], cc: cc, cn: COUNTRY_NAMES[cc] || cc.toUpperCase() };
+            }
+            return { name: rawName, cc: 'hu', cn: 'Magyarország' };
+        }
+
         const PWS_MAP = { "ISRVR13": "Sárvár", "IOSZK4": "Oszkó", "ISZNTD6": "Szántód", "IBALAT149": "Balatonszemes", "IBUZSK1": "Csisztapuszta", "ISZEKS12": "Szekszárd", "IJNOSH2": "Jánoshalma", "IPCS52": "Pécs", "IPPRD1": "Páprád", "IKISKU42": "Kiskunhalas", "INEMES10": "Nemesnádudvar", "ISZEGE67": "Szeged", "IBKSCS12": "Békéscsaba", "IFZESG2": "Füzesgyarmat", "IMIKEP2": "Mikepércs", "ITGLS2": "Téglás", "IGACSL1": "Gacsály", "IFLESD1": "Fülesd", "IKISSZ3": "Kisszekeres", "ILEVEL2": "Levelek", "IKEMEC2": "Kemecse", "INAGYC6": "Nagycserkesz", "ITISZA15": "Tiszavasvári", "INEMES19": "Nemesbikk", "IEGERS22": "Egerszólát", "IBKKSZ5": "Bükkszenterzsébet", "IPSZT1": "Pásztó", "IPALOT13": "Palotás", "IGDLL37": "Gödöllő", "IZSMBK6": "Zsámbék", "ICSORN6": "Csorna", "IGAGYV1": "Gagyvendégi", "IMARTO122": "Martonyi", "IKAZIN14": "Kazincbarcika", "IPUTNO1": "Putnok", "IZABAR1": "Zabar", "ISALGT1": "Salgótarján", "IKARAN11": "Karancslapujtő", "IBEKLC3": "Bekölce", "IMTRAB1": "Mátraballa", "IVC267": "Vác", "IPILIS37": "Pilisvörösvár", "IFELCS4": "Felcsút", "IBUDAK6": "Budakeszi", "IBIATO9": "Biatorbágy", "ICSKVR4": "Csákvár", "IOROSZ2": "Oroszlány", "IBALINKA2": "Bakony", "ISR67": "Súr", "IPANNO3": "Pannonhalma", "IKAJRP2": "Kajárpéc", "IPPA11": "Pápa", "ICELLD14": "Celldömölk", "IHEVES2": "Heves", "IGYNGY22": "Gyöngyös", "ISZCSN9": "Szécsény", "ITAHIT11": "Tahitótfalu", "IESZTE5": "Esztergom", "ITATA16": "Tata", "IKARTAL4": "Kartal", "IMARTO67": "Martonvásár", "ISZOLNOK10": "Szolnok", "ISZOLN13": "Szolnok", "INAGYK59": "Nagykőrös", "IKECSK31": "Kecskemét", "IKALOCSA2": "Kalocsa", "IBONYH1": "Bonyhád", "ISZENT114": "Szentlőrinc", "ILJUBL47": "Ljubljana", "IBAKTA4": "Baktalórántháza", "IJFEHR1": "Újfehértó", "IPAPOS6": "Papos", "ISONKD1": "Sonkád", "INAPKO1": "Napkor", "IHARSN4": "Harsány", "IBKKSZ2": "Bükkszentkereszt", "INYREG37": "Nyíregyháza", "IPUSZT3": "Pusztadobos", "ITISZA93": "Tiszaújváros", "IEGER76": "Eger", "IHAJDD7": "Hajdúdorog", "IGYULA12": "Gyula", "IMAGYA4": "Magyarcsanád", "IHDMEZ21": "Hódmezővásárhely", "ISZEGE23": "Szeged-Rókus", "ICSENG9": "Csengele", "INAGYN1": "Nagynyárád", "IKIRLY1": "Királyegyháza", "ITAMSI1": "Tamási", "IZALAE45": "Zalaegerszeg", "IFARKA7": "Farkasgyepű", "INYRAC1": "Nyíracsád", "ISZAMO11": "Szamosújlak", "IGVAVE1": "Gávavencsellő", "IEDELN2": "Edelény", "INYRI1": "Nyíri", "IBTTS1": "Büttös", "IZD2": "Ózd" };
         
         const HUNGARIAN_CITIES_OM =[ 
             { name: 'Debrecen', lat: 47.53, lon: 21.62 }, { name: 'Miskolc', lat: 48.10, lon: 20.78 }, { name: 'Szombathely', lat: 47.23, lon: 16.62 }, { name: 'Győr', lat: 47.68, lon: 17.63 }, { name: 'Pécs', lat: 46.07, lon: 18.23 }, { name: 'Szeged', lat: 46.25, lon: 20.15 }, { name: 'Eger', lat: 47.90, lon: 20.37 }, { name: 'Veszprém', lat: 47.09, lon: 17.91 }, { name: 'Zalaegerszeg', lat: 46.84, lon: 16.84 }, { name: 'Békéscsaba', lat: 46.68, lon: 21.09 }, { name: 'Kaposvár', lat: 46.36, lon: 17.79 }, { name: 'Tatabánya', lat: 47.57, lon: 18.40 }, { name: 'Salgótarján', lat: 48.10, lon: 19.80 }, { name: 'Szekszárd', lat: 46.35, lon: 18.70 }, { name: 'Sopron', lat: 47.68, lon: 16.58 }, { name: 'Hódmezővásárhely', lat: 46.43, lon: 20.32 }, { name: 'Nagykanizsa', lat: 46.45, lon: 16.99 }, { name: 'Dunaújváros', lat: 46.96, lon: 18.93 }, { name: 'Érd', lat: 47.38, lon: 18.91 }, { name: 'Szolnok', lat: 47.18, lon: 20.20 }, { name: 'Kecskemét', lat: 46.88, lon: 19.64 }, { name: 'Baja', lat: 46.18, lon: 18.95 }, { name: 'Cegléd', lat: 47.17, lon: 19.80 }, { name: 'Vác', lat: 47.78, lon: 19.13 }, { name: 'Gödöllő', lat: 47.60, lon: 19.35 }, { name: 'Ózd', lat: 48.22, lon: 20.29 }, { name: 'Pápa', lat: 47.33, lon: 17.47 }, { name: 'Gyula', lat: 46.65, lon: 21.28 }, { name: 'Hajdúböszörmény', lat: 47.67, lon: 21.51 }, { name: 'Nyíregyháza', lat: 47.95, lon: 21.71 }, { name: 'Balatonfüred', lat: 46.96, lon: 17.89 }, { name: 'Keszthely', lat: 46.76, lon: 17.24 }, { name: 'Siófok', lat: 46.90, lon: 18.05 }, { name: 'Komárom', lat: 47.74, lon: 18.11 }, { name: 'Esztergom', lat: 47.79, lon: 18.74 }, { name: 'Tata', lat: 47.65, lon: 18.31 }, { name: 'Mohács', lat: 45.99, lon: 18.68 }, { name: 'Paks', lat: 46.62, lon: 18.86 }, { name: 'Kalocsa', lat: 46.53, lon: 18.98 }, { name: 'Kiskunfélegyháza', lat: 46.71, lon: 19.85 }, { name: 'Jászberény', lat: 47.50, lon: 19.91 }, { name: 'Hatvan', lat: 47.66, lon: 19.67 }, { name: 'Gyöngyös', lat: 47.78, lon: 19.93 }, { name: 'Kazincbarcika', lat: 48.25, lon: 20.62 }, { name: 'Sátoraljaújhely', lat: 48.40, lon: 21.65 }, { name: 'Kisvárda', lat: 48.22, lon: 22.08 }, { name: 'Mátészalka', lat: 47.95, lon: 22.32 }, { name: 'Makó', lat: 46.22, lon: 20.47 }, { name: 'Szentes', lat: 46.65, lon: 20.26 }, { name: 'Orosháza', lat: 46.57, lon: 20.66 }, { name: 'Karcag', lat: 47.31, lon: 20.93 }, { name: 'Hajdúszoboszló', lat: 47.45, lon: 21.39 }, { name: 'Törökszentmiklós', lat: 47.17, lon: 20.41 }, { name: 'Gyál', lat: 47.38, lon: 19.22 }, { name: 'Dunakeszi', lat: 47.64, lon: 19.14 }, { name: 'Budaörs', lat: 47.46, lon: 18.96 }, { name: 'Szentendre', lat: 47.66, lon: 19.07 }, { name: 'Szigetszentmiklós', lat: 47.34, lon: 19.05 }, { name: 'Mosonmagyaróvár', lat: 47.87, lon: 17.27 }, { name: 'Bicske', lat: 47.49, lon: 18.63 }, { name: 'Monor', lat: 47.35, lon: 19.45 }, { name: 'Mezőkövesd', lat: 47.81, lon: 20.57 }, { name: 'Tiszaújváros', lat: 47.92, lon: 21.05 }, { name: 'Sárospatak', lat: 48.32, lon: 21.57 },
-            { name: 'Zakopane', lat: 49.29, lon: 19.94 }, { name: 'Poprad', lat: 49.05, lon: 20.30 }, { name: 'Donovaly', lat: 48.88, lon: 19.22 }, { name: 'Semmering', lat: 47.63, lon: 15.83 }, { name: 'Murau', lat: 47.11, lon: 14.17 }, { name: 'Cortina d\'Ampezzo', lat: 46.54, lon: 12.13 }, { name: 'Chamonix', lat: 45.92, lon: 6.86 }, { name: 'Zermatt', lat: 46.02, lon: 7.74 }, { name: 'St. Moritz', lat: 46.49, lon: 9.83 }, { name: 'Aspen', lat: 39.19, lon: -106.81 }, { name: 'Whistler', lat: 50.11, lon: -122.95 }, { name: 'Banff', lat: 51.17, lon: -115.57 }, { name: 'Queenstown', lat: -45.03, lon: 168.66 }, { name: 'Bariloche', lat: -41.13, lon: -71.30 }, { name: 'Niseko', lat: 42.80, lon: 140.68 }, { name: 'Nagano', lat: 36.64, lon: 138.18 }, { name: 'Sochi', lat: 43.60, lon: 39.73 }, { name: 'Almaty', lat: 43.22, lon: 76.85 }, { name: 'Gudauri', lat: 42.47, lon: 44.48 }, { name: 'Bansko', lat: 41.83, lon: 23.48 },
+            { name: 'Zakopane (PL)', lat: 49.29, lon: 19.94 }, { name: 'Poprad (SK)', lat: 49.05, lon: 20.30 }, { name: 'Donovaly (SK)', lat: 48.88, lon: 19.22 }, { name: 'Semmering (AT)', lat: 47.63, lon: 15.83 }, { name: 'Murau (AT)', lat: 47.11, lon: 14.17 }, { name: 'Cortina d\'Ampezzo (IT)', lat: 46.54, lon: 12.13 }, { name: 'Chamonix (FR)', lat: 45.92, lon: 6.86 }, { name: 'Zermatt (CH)', lat: 46.02, lon: 7.74 }, { name: 'St. Moritz (CH)', lat: 46.49, lon: 9.83 }, { name: 'Aspen (US)', lat: 39.19, lon: -106.81 }, { name: 'Whistler (CA)', lat: 50.11, lon: -122.95 }, { name: 'Banff (CA)', lat: 51.17, lon: -115.57 }, { name: 'Queenstown (NZ)', lat: -45.03, lon: 168.66 }, { name: 'Bariloche (AR)', lat: -41.13, lon: -71.30 }, { name: 'Niseko (JP)', lat: 42.80, lon: 140.68 }, { name: 'Nagano (JP)', lat: 36.64, lon: 138.18 }, { name: 'Sochi (RU)', lat: 43.60, lon: 39.73 }, { name: 'Almaty (KZ)', lat: 43.22, lon: 76.85 }, { name: 'Gudauri (GE)', lat: 42.47, lon: 44.48 }, { name: 'Bansko (BG)', lat: 41.83, lon: 23.48 },
             { name: 'Kékestető', lat: 47.87, lon: 20.01 }, { name: 'Hortobágy', lat: 47.58, lon: 21.15 }, { name: 'Hévíz', lat: 46.79, lon: 17.19 }, { name: 'Tihany', lat: 46.91, lon: 17.88 }, { name: 'Visegrád', lat: 47.78, lon: 18.97 }, { name: 'Szilvásvárad', lat: 48.10, lon: 20.39 }, { name: 'Dobogókő', lat: 47.72, lon: 18.89 }, { name: 'Lillafüred', lat: 48.10, lon: 20.62 }, { name: 'Aggtelek', lat: 48.47, lon: 20.45 }, { name: 'Bugac', lat: 46.68, lon: 19.68 },
             { name: 'Ojmjakon (RU)', lat: 63.46, lon: 142.79 }, { name: 'Death Valley (US)', lat: 36.53, lon: -116.93 }, { name: 'McMurdo (AQ)', lat: -77.85, lon: 166.67 }, { name: 'Nuuk (GL)', lat: 64.18, lon: -51.72 }, { name: 'Ushuaia (AR)', lat: -54.80, lon: -68.30 }, { name: 'Dubai (AE)', lat: 25.20, lon: 55.27 }, { name: 'Reykjavik (IS)', lat: 64.14, lon: -21.90 }, { name: 'Las Vegas (US)', lat: 36.17, lon: -115.14 }, { name: 'Honolulu (US)', lat: 21.30, lon: -157.85 }, { name: 'Mt. Everest (NP)', lat: 27.98, lon: 86.92 }, { name: 'Cape Town (ZA)', lat: -33.92, lon: 18.42 }, { name: 'Sydney (AU)', lat: -33.86, lon: 151.20 }, { name: 'Tokyo (JP)', lat: 35.67, lon: 139.65 }, { name: 'Longyearbyen (SJ)', lat: 78.22, lon: 15.65 }, { name: 'La Paz (BO)', lat: -16.50, lon: -68.12 },
             { name: 'Machu Picchu (PE)', lat: -13.16, lon: -72.54 }, { name: 'Csernobil (UA)', lat: 51.27, lon: 30.22 }, { name: 'Húsvét-sziget (CL)', lat: -27.11, lon: -109.35 }, { name: 'Grand Canyon (US)', lat: 36.10, lon: -112.11 }, { name: 'Góbi sivatag (MN)', lat: 42.59, lon: 103.43 },
@@ -1089,6 +1197,7 @@
             loading: document.getElementById('loading-overlay'),
             counter: document.getElementById('counter-display'),
             weatherLocName: document.getElementById('weather-loc-name'),
+            weatherHeader: document.querySelector('.weather-location-header'),
             weatherLocTime: document.getElementById('weather-loc-time'),
             weatherTemp: document.getElementById('weather-temp'),
             weatherFeels: document.getElementById('weather-feels'),
@@ -1107,7 +1216,7 @@
             newsViewport: document.getElementById('news-viewport'),
             badge: document.getElementById('left-program-badge'), 
             sky: document.getElementById('sky-bg'),
-            weatherHeader: document.querySelector('.weather-location-header'),
+            
             idFlipper: document.getElementById('id-flipper'),
             weatherFlipper: document.getElementById('weather-flipper'),
             goodbyeCard: document.getElementById('goodbye-card'),
@@ -1228,7 +1337,7 @@
             } catch(e) { return "HÍR"; }
         }
 
-        // HALF-FLIP LOGIKA - A tökéletes, éles 2D megjelenésért
+        // HALF-FLIP LOGIKA - A tökéletes, éles 2D megjelenésért (NINCS BLUR!)
         function flipPanel(panelType, showBack) {
             const panel = panelType === 'identity' ? el.leftPanel : el.rightPanel;
             const flipper = panelType === 'identity' ? el.idFlipper : el.weatherFlipper;
@@ -1562,7 +1671,15 @@
             state.weatherPlaylistIndex++;
             if(!item) return;
 
-            el.weatherLocName.textContent = item.name;
+            // Zászló és Név beállítása
+            const locInfo = parseLocationName(item.name);
+            el.weatherLocName.textContent = locInfo.name;
+            
+            const flagImg = document.getElementById('weather-loc-flag-img');
+            flagImg.src = `https://flagcdn.com/w20/${locInfo.cc}.png`;
+            flagImg.title = locInfo.cn;
+            flagImg.style.display = 'inline-block';
+
             const timeStr = item.updatedAt ? item.updatedAt.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'}) : '--:--';
             document.getElementById('weather-loc-time').textContent = `FRISSÍTVE: ${timeStr}`;
             const temp = typeof item.temp === 'number' ? item.temp : 0;
@@ -1944,9 +2061,15 @@
             const delay = Math.random() * 60000 + 30000; 
             setTimeout(() => {
                 const logo = document.getElementById('brand-click-area');
-                if (logo && !logo.classList.contains('logo-random-anim')) { 
-                    logo.classList.add('logo-random-anim'); 
-                    setTimeout(() => { logo.classList.remove('logo-random-anim'); }, 4000); 
+                if (logo && !logo.className.includes('anim-')) { 
+                    // Véletlenszerűen választunk a 10 animáció közül
+                    const animId = Math.floor(Math.random() * 10) + 1;
+                    const animClass = `anim-${animId}`;
+                    
+                    logo.classList.add(animClass); 
+                    
+                    // 4 mp után kitisztítjuk az osztályt
+                    setTimeout(() => { logo.classList.remove(animClass); }, 4000); 
                 }
                 scheduleRandomLogoAnimation();
             }, delay);
