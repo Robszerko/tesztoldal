@@ -91,7 +91,6 @@
             border: 1px solid rgba(255,255,255,0.25);
             box-shadow: 0 4px 10px rgba(0,0,0,0.4);
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            /* Transform eltávolítva alapállapotból a tűélességért */
         }
         .lb-t { background: linear-gradient(135deg, #d00000 0%, #900000 100%); }
         .lb-k { background: linear-gradient(135deg, #702082 0%, #4a1555 100%); }
@@ -142,7 +141,7 @@
             position: relative; 
             justify-content: center; 
             align-items: stretch;
-            transition: gap 1.0s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: gap 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .ticker-container.open { gap: 8px; }
 
@@ -165,11 +164,6 @@
             height: 100%; 
         }
         
-        /* 3D Teret CSAK a pördüléskor használunk a homályosodás elkerülésére */
-        .glass-panel.flipping-active {
-            perspective: 1000px;
-        }
-
         .glass-panel.loaded { opacity: 1; transform: translateY(0); }
 
         /* --- SHAPES --- */
@@ -193,19 +187,12 @@
         }
         .ticker-container.open .news-panel { flex: 1; opacity: 1; }
 
-        /* --- FLIPPER --- */
+        /* --- TÖKÉLETESEN ÉLES 2D FLIPPER (CSS 3D nélkül nyugalmi állapotban) --- */
         .panel-flipper {
             width: 100%; height: 100%;
-            transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             position: relative;
+            /* A transform és transition a JS-ben lesz hozzáadva a pördülés másodpercében! */
         }
-        
-        /* Preserve-3D csak aktív forgás közben */
-        .glass-panel.flipping-active .panel-flipper {
-            transform-style: preserve-3d;
-        }
-
-        .panel-flipper.flipped { transform: rotateX(900deg); }
         
         .panel-face {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -213,21 +200,11 @@
             background: var(--panel-gradient);
             z-index: 2;
         }
-
-        .glass-panel.flipping-active .panel-face {
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-        }
         
         .panel-face.back { 
-            display: none; /* Alapból elrejtjük */
+            display: none; /* Alapból elrejtjük, JS cseréli forgás közben */
             align-items: center; justify-content: center;
-            transform: rotateX(180deg);
             z-index: 1;
-        }
-
-        .glass-panel.flipping-active .panel-face.back {
-            display: flex; /* Csak pörgéskor jelenítjük meg a hátsó oldalt */
         }
 
         /* --- LEFT PANEL CONTENT --- */
@@ -278,7 +255,7 @@
         .left-prog-badge.badge-traffic { color: #fcd34d; background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.5); }
         .left-prog-badge.badge-tip { color: #6ee7b7; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.5); box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
 
-        /* --- TÖKÉLETESEN KERETEZETT HD ÓRA (Nincs Blur szűrő) --- */
+        /* --- TÖKÉLETESEN KERETEZETT HD ÓRA --- */
         .clock-container { 
             width: 100%; 
             margin: auto 0; 
@@ -292,17 +269,16 @@
             background: linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(2, 6, 23, 0.98) 100%);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-bottom: 1px solid rgba(0, 0, 0, 0.8);
-            border-radius: 10px;
-            padding: 8px 10px; 
-            width: 92%; /* Határozott szélesség */
-            max-width: 200px;
+            border-radius: 12px;
+            padding: 10px; 
+            width: 180px; 
             box-shadow: 0 8px 25px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center;
             margin: 0 auto;
-            overflow: hidden; /* Szigorú keretezés, semmi sem lóg ki */
+            overflow: hidden; 
             box-sizing: border-box;
         }
 
@@ -315,10 +291,10 @@
             font-weight: 700; 
             margin-bottom: 4px; 
             text-align: center; 
-            white-space: nowrap; 
             width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis; /* Ha túl hosszú lenne a dátum, kipontozza a kilógás helyett */
+            display: flex;
+            flex-direction: column; 
+            line-height: 1.2;
         }
 
         .clock-main-row { 
@@ -437,10 +413,10 @@
             position: relative; max-width: 99%; text-shadow: 0 1px 2px rgba(0,0,0,1); z-index: 5; 
         }
 
-        /* FULL OVERLAY TOOLTIP - Nincs Blur, tömör sötét háttér a tűélességért */
+        /* FULL OVERLAY TOOLTIP - Színátmenetes háttér, Blur mentes a HD minőségért */
         .news-full-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(2, 6, 23, 0.98); padding: 20px;
+            background: linear-gradient(135deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.98)); padding: 20px;
             display: flex; flex-direction: column; gap: 10px; opacity: 0; visibility: hidden;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             z-index: 100; overflow-y: auto;
@@ -528,7 +504,7 @@
             opacity: 0; visibility: hidden; transition: opacity 1.5s cubic-bezier(0.19, 1, 0.22, 1), transform 1.5s ease;
             transform: scale(0.95); z-index: 1000; border: 1px solid rgba(255,255,255,0.05); box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
         }
-        .goodbye-card.active { opacity: 1; visibility: visible; transform: scale(1); }
+        .goodbye-card.active { opacity: 1; visibility: visible; transform: none; }
         
         .gb-moon { font-size: 3.2rem; margin-bottom: 8px; filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.4)); animation: float 6s ease-in-out infinite; }
         .gb-title { font-family: var(--font-serif); font-size: 1.4rem; font-weight: 700; color: #fff; margin-bottom: 8px; text-align: center; letter-spacing: 1px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); background: linear-gradient(to bottom, #fff 40%, #94a3b8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -542,7 +518,7 @@
         .bc-center-brand { flex: 0 1 auto; display: flex; flex-direction: column; align-items: center; }
 
         /* ANALOG CLOCK */
-        .analog-clock { flex: 0 0 auto; width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.8); background: rgba(0,0,0,0.4); position: relative; box-shadow: 0 0 25px rgba(56, 189, 248, 0.2); transform: translateY(-10px); }
+        .analog-clock { flex: 0 0 auto; width: 120px; height: 120px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.8); background: rgba(0,0,0,0.8); position: relative; box-shadow: 0 0 25px rgba(56, 189, 248, 0.2); margin-top: -10px; }
         .hand { position: absolute; bottom: 50%; left: 50%; transform-origin: bottom center; background: #fff; border-radius: 4px; box-shadow: 0 0 5px rgba(255,255,255,0.5); }
         .hand.hour { width: 4px; height: 35px; margin-left: -2px; }
         .hand.minute { width: 3px; height: 48px; margin-left: -1.5px; opacity: 0.9; }
@@ -550,7 +526,7 @@
         .center-dot { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: #fff; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 5px rgba(255,255,255,0.8); }
         .hour-mark { position: absolute; width: 100%; height: 100%; top: 0; left: 0; display: flex; justify-content: center; padding-top: 4px; font-family: var(--font-serif); font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.8); pointer-events: none; }
         
-        /* --- CONTROLS BAR - Nincs Blur, fix sötét! --- */
+        /* --- CONTROLS BAR - Fix sötét HD háttér --- */
         .controls-bar { 
             position: absolute; bottom: 0; left: 0; width: 100%; height: 28px; 
             border-top: 1px solid var(--panel-border); background: rgba(2, 6, 23, 0.98);
@@ -1252,22 +1228,54 @@
             } catch(e) { return "HÍR"; }
         }
 
+        // HALF-FLIP LOGIKA - A tökéletes, éles 2D megjelenésért
         function flipPanel(panelType, showBack) {
             const panel = panelType === 'identity' ? el.leftPanel : el.rightPanel;
             const flipper = panelType === 'identity' ? el.idFlipper : el.weatherFlipper;
-            
-            /* Csak forgás közben aktiváljuk a 3D teret a fókuszáláshoz */
-            panel.classList.add('flipping-active');
-            
-            requestAnimationFrame(() => {
-                if(showBack) flipper.classList.add('flipped');
-                else flipper.classList.remove('flipped');
-            });
+            const frontFace = flipper.querySelector('.panel-face:not(.back)');
+            const backFace = flipper.querySelector('.panel-face.back');
 
-            /* Amint kész a pörgés, kivesszük a 3D rétegből, így visszakapjuk a pixel-perfect 2D vektort */
+            if (flipper.isFlipping) return;
+            flipper.isFlipping = true;
+
+            // Csak forgás közben aktiváljuk a 3D-t
+            panel.classList.add('flipping-active');
+
+            const outDeg = showBack ? 90 : -90;
+            const inDeg = showBack ? -90 : 90;
+
+            // 1. Félidős kilépő forgás
+            flipper.style.transition = 'transform 0.6s cubic-bezier(0.55, 0.085, 0.68, 0.53)';
+            flipper.style.transform = `rotateX(${outDeg}deg)`;
+
             setTimeout(() => {
-                panel.classList.remove('flipping-active');
-            }, 1600);
+                // Félidőben, amikor teljesen lapos, láthatatlanul cseréljük a tartalmat
+                if (showBack) {
+                    frontFace.style.display = 'none';
+                    backFace.style.display = 'flex';
+                } else {
+                    backFace.style.display = 'none';
+                    frontFace.style.display = 'flex';
+                }
+
+                // A túloldalra forgatjuk gyorsan
+                flipper.style.transition = 'none';
+                flipper.style.transform = `rotateX(${inDeg}deg)`;
+                
+                void flipper.offsetHeight; // Kényszerített DOM frissítés
+
+                // 2. Félidős belépő forgás (vissza 0-ra)
+                flipper.style.transition = 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                flipper.style.transform = 'rotateX(0deg)';
+
+                setTimeout(() => {
+                    // Forgás vége, teljesen kitisztítjuk a 3D paramétereket a maximális HD élményért
+                    flipper.style.transition = 'none';
+                    panel.classList.remove('flipping-active');
+                    flipper.isFlipping = false;
+                }, 600);
+
+            }, 600);
         }
 
         function showCredits() {
@@ -1576,7 +1584,7 @@
             state.scheduleActive = true;
             const currentIndex = THEMATIC_BLOCKS.findIndex(b => b.name === state.block.name);
             const labels =["MOST", "KÖVETKEZIK", "KÉSŐBB"]; 
-            el.weatherLocTime.style.display = 'none';
+            
             const backHeader = document.getElementById('schedule-header'); backHeader.style.display = 'flex'; 
             el.scheduleView.style.display = 'flex'; el.promoView.style.display = 'none';
             let html = '';
@@ -1587,11 +1595,25 @@
                 html += `<div class="schedule-item" id="sch-item-${i}"><div class="sch-time">${timeStr}</div><div style="flex-grow:1;"><div class="sch-label">${labels[i]}</div><div class="sch-name">${block.name}</div></div></div>`;
             }
             el.scheduleList.innerHTML = html;
+            
             flipPanel('weather', true);
             state.scheduleHighlightIndex = 0; updateScheduleHighlight();
             state.scheduleInterval = setInterval(updateScheduleHighlight, 5000); 
-            setTimeout(() => { clearInterval(state.scheduleInterval); backHeader.style.display = 'none'; el.scheduleView.style.display = "none"; el.promoView.style.display = "flex"; }, 15000);
-            setTimeout(() => { flipPanel('weather', false); state.scheduleActive = false; el.scheduleView.style.display = "flex"; el.promoView.style.display = "none"; displayWeather(); }, 25000);
+            
+            setTimeout(() => { 
+                clearInterval(state.scheduleInterval); 
+                backHeader.style.display = 'none'; 
+                el.scheduleView.style.display = "none"; 
+                el.promoView.style.display = "flex"; 
+            }, 15000);
+            
+            setTimeout(() => { 
+                flipPanel('weather', false); 
+                state.scheduleActive = false; 
+                el.scheduleView.style.display = "flex"; 
+                el.promoView.style.display = "none"; 
+                displayWeather(); 
+            }, 25000);
         }
 
         function updateScheduleHighlight() { document.querySelectorAll('.schedule-item').forEach(item => item.classList.remove('active-highlight')); const currentItem = document.getElementById(`sch-item-${state.scheduleHighlightIndex}`); if(currentItem) currentItem.classList.add('active-highlight'); state.scheduleHighlightIndex = (state.scheduleHighlightIndex + 1) % 3; }
@@ -1676,7 +1698,12 @@
             el.clockHm.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'});
             el.clockS.textContent = `:${String(now.getSeconds()).padStart(2, '0')}`;
             const days =['vasárnap', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat'];
-            el.date.textContent = `${now.getFullYear()}. ${CALENDAR_DATA.honapok[now.getMonth()]} ${now.getDate()}. | ${days[now.getDay()]}`.toUpperCase();
+            
+            // Garantált kétsoros dátum a kilógás megakadályozására
+            const nap = days[now.getDay()];
+            const honap = CALENDAR_DATA.honapok[now.getMonth()];
+            el.date.innerHTML = `<span>${now.getFullYear()}. ${honap} ${now.getDate()}.</span><span style="opacity:0.8;">${nap}</span>`.toUpperCase();
+            
             updateSkyGradient(); updateAnalogClock();
             
             const h = now.getHours() + now.getMinutes()/60;
@@ -1919,7 +1946,6 @@
                 const logo = document.getElementById('brand-click-area');
                 if (logo && !logo.classList.contains('logo-random-anim')) { 
                     logo.classList.add('logo-random-anim'); 
-                    // 4 mp múlva szedjük le a class-t, megvárva, amíg mindhárom betű befejezi a zuhanást és visszaugrik
                     setTimeout(() => { logo.classList.remove('logo-random-anim'); }, 4000); 
                 }
                 scheduleRandomLogoAnimation();
@@ -1929,11 +1955,7 @@
         function initIntroSequence() { 
             el.leftPanel.classList.add('loaded'); 
             el.rightPanel.classList.add('loaded'); 
-            
-            // Gyorstott megnyitás (1500ms -> 300ms)
-            setTimeout(() => { el.mainContainer.classList.add('open'); }, 300); 
-            
-            // Animáció is hamarabb indul
+            setTimeout(() => { el.mainContainer.classList.add('open'); }, 300); // Gyorstott betöltés
             setTimeout(() => { scheduleRandomLogoAnimation(); }, 2000); 
         }
         
