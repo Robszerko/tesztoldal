@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V229 (Static Newsroom, Max Performance & HD)</title>
+    <title>Aurora News Ticker - V230 (Static Newsroom, Perfect Flip, Fixed Back-Faces)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -132,7 +132,7 @@
 
         .tkp-logo-sm { transform: scale(0.65); margin: -8px 0; pointer-events: none; }
         .tkp-logo-lg { transform: scale(1.4); pointer-events: none; }
-        
+
         /* STABLE BACKGROUND - (Max teljesítmény, NINCS animáció) */
         .ambient-background {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
@@ -158,7 +158,7 @@
             .id-content, .weather-view { padding: 10px !important; }
         }
 
-        /* PREMIUM PANEL DESIGN */
+        /* PREMIUM PANEL DESIGN - Tűéles 2D alapállapot */
         .glass-panel {
             background: var(--panel-gradient);
             border: 1px solid var(--panel-border); 
@@ -199,7 +199,7 @@
         }
         .ticker-container.open .news-panel { flex: 1; opacity: 1; }
 
-        /* --- TÖKÉLETESEN ÉLES 2D FLIPPER --- */
+        /* --- TÖKÉLETESEN ÉLES 2D FLIPPER (NINCS MÁR FORGATVA A HÁTLAP!) --- */
         .panel-flipper {
             width: 100%; height: 100%;
             position: relative;
@@ -208,7 +208,7 @@
         .glass-panel.flipping-active .panel-flipper {
             transform-style: preserve-3d;
         }
-
+        
         .panel-face {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column; 
@@ -222,10 +222,11 @@
         }
         
         .panel-face.back { 
-            display: none; 
+            display: none; /* A JS cseréli forgás közben flex-re */
+            flex-direction: column; 
             align-items: center; justify-content: center;
-            transform: rotateX(180deg);
             z-index: 1;
+            /* FIGYELEM: NINCS transform: rotateX(180deg); -> Így a hátlapok is talpukon állnak! */
         }
 
         .glass-panel.flipping-active .panel-face.back { display: flex; }
@@ -518,13 +519,6 @@
             background: linear-gradient(135deg, #060d1a 0%, #0a1930 50%, #02060d 100%);
         }
         
-        /* Static Studio Lights (No animation, Native radial-gradient) */
-        .static-light {
-            position: absolute; border-radius: 50%; pointer-events: none;
-        }
-        .sl-1 { width: 800px; height: 800px; background: radial-gradient(circle, rgba(14,165,233,0.1) 0%, transparent 70%); top: -300px; left: -200px; }
-        .sl-2 { width: 1000px; height: 1000px; background: radial-gradient(circle, rgba(67,56,202,0.08) 0%, transparent 70%); bottom: -400px; right: -200px; }
-
         /* Elegant Static Grid */
         .static-grid {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -546,24 +540,18 @@
             pointer-events: none;
         }
 
-        /* Beautiful Organized Static Typography */
-        .static-typo-container {
-            position: absolute; bottom: 30px; left: 40px;
-            display: flex; flex-direction: column;
-            pointer-events: none; opacity: 0.08;
-        }
-        .st-main {
-            font-family: var(--font-head); font-weight: 900; font-size: 5rem;
-            color: #fff; line-height: 0.9; letter-spacing: 2px;
-        }
-        .st-sub {
-            font-family: var(--font-body); font-weight: 700; font-size: 1.2rem;
-            color: #fff; letter-spacing: 12px; margin-top: 8px; margin-left: 5px;
+        /* Beautiful Organized Static Typography (Centered text) */
+        .centered-bg-text {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-family: var(--font-head); font-weight: 900; font-size: 4.0rem;
+            color: #fff; letter-spacing: 12px; opacity: 0.05;
+            white-space: nowrap; pointer-events: none; z-index: 1;
+            text-align: center;
         }
 
-        /* Static Watermark Logo */
-        .dnb-watermark { position: absolute; top: 50%; right: 15%; transform: translateY(-50%); pointer-events: none; }
-        .dnb-watermark .tkp-logo-bg { transform: scale(5); opacity: 0.05; margin:0;}
+        /* Static Watermark Logo (Picike logó) */
+        .dnb-watermark { position: absolute; top: 35px; right: 40px; pointer-events: none; opacity: 0.15; }
+        .dnb-watermark .tkp-logo-bg { transform: scale(1.5); margin: 0; opacity: 1; }
 
         .news-card.night-info { background: radial-gradient(circle at top left, #312e81, #1e1b4b); border-left: 4px solid #a855f7; alignItems: center; justify-content: center; text-align: center; padding: 0 20px 28px 20px; flex-direction: column; }
         
@@ -804,7 +792,7 @@
                     </div>
                 </div>
                 <div class="panel-face back">
-                    <div class="back-face-container">
+                    <div class="back-face-container" style="width:100%; height:100%;">
                         <div class="credits-content" id="credits-content">
                             <div class="cr-container">
                                 <div class="cr-logo-icon">✦</div>
@@ -868,15 +856,10 @@
         <div class="glass-panel news-panel" id="news-container">
             
             <div class="default-news-bg">
-                <div class="static-light sl-1"></div>
-                <div class="static-light sl-2"></div>
                 <div class="static-grid"></div>
                 <div class="static-map"></div>
                 
-                <div class="static-typo-container">
-                    <div class="st-main">TKP NEWS</div>
-                    <div class="st-sub">LIVE BROADCAST</div>
-                </div>
+                <div class="centered-bg-text">TKP NEWS BROADCAST</div>
 
                 <div class="dnb-watermark">
                     <div class="tkp-animated-logo tkp-logo-bg">
