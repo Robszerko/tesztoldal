@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V241 (Refined Weather Center, Studio Background)</title>
+    <title>Aurora News Ticker - V244 (Clean Gradients & Razor Sharp UI)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,7 +47,7 @@
             --bar-height: 200px; 
         }
 
-        /* TÖKÉLETES ÉLSIMÍTÁS ÉS HARDVERES GYORSÍTÁS - Garantált tűéles pixelek! */
+        /* TÖKÉLETES ÉLSIMÍTÁS - Minden hardveres blur torzítás kiküszöbölve */
         * { 
             margin: 0; padding: 0; box-sizing: border-box; outline: none; 
             -webkit-font-smoothing: antialiased !important;
@@ -183,20 +183,20 @@
             border: 1px solid var(--panel-border); 
             position: relative;
             opacity: 0; 
-            transform: translateY(10px) translateZ(0);
+            /* Kezdeti csúszás beúszáshoz */
+            transform: translateY(10px);
             transition: opacity 0.4s ease, transform 0.4s ease, background 1s ease;
             height: 100%; 
             border-radius: var(--cap-radius);
             box-shadow: 0 10px 40px -5px rgba(0,0,0,0.5);
-            will-change: transform, opacity;
         }
 
-        .glass-panel.loaded { opacity: 1; transform: translateY(0) translateZ(0); }
+        /* Amikor betöltött, eltűnik a transform, így a pixel rendering hibátlan marad! */
+        .glass-panel.loaded { opacity: 1; transform: none; }
 
         /* --- SHAPES --- */
         .identity-panel { width: 240px; flex-shrink: 0; z-index: 10; overflow: hidden; top: 13px; }
         
-        /* MEGNÖVELT SZÉLESSÉG AZ IDŐJÁRÁSNAK */
         .weather-panel { width: 280px; flex-shrink: 0; z-index: 10; overflow: hidden; top: 13px; }
         
         .news-panel { 
@@ -293,6 +293,7 @@
             opacity: 0; visibility: hidden; transform: translateX(20px); 
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
+        /* Tökéletes élsimítás: amint megáll a kártya, eltűnik a transform */
         .news-card.visible { opacity: 1; visibility: visible; transform: none; }
         
         .news-content-wrapper { 
@@ -315,7 +316,7 @@
             .news-card.has-visual .news-content-wrapper { max-width: 100% !important; border-right: none; }
         }
         
-        .news-visual-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; transform: translateZ(0); }
+        .news-visual-image { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
 
         .news-card.traffic-alert .news-content-wrapper { border-left-color: var(--accent-traffic); background: rgba(69, 26, 3, 0.6); }
 
@@ -358,7 +359,7 @@
         .news-card.traffic-alert .news-meta { color: var(--accent-warm); }
         
         /* INLINE PWS CAPSULE */
-        .pws-smart-badge { display: inline-flex; align-items: stretch; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; margin-left: auto; height: 24px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); transform: translateZ(0); }
+        .pws-smart-badge { display: inline-flex; align-items: stretch; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; margin-left: auto; height: 24px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .pws-sb-header { display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); padding: 0 8px; border-right: 1px solid rgba(255,255,255,0.2); font-size: 0.65rem; color: #e2e8f0; font-weight: 700; text-transform: uppercase; }
         .pws-sb-live { display: flex; align-items: center; gap: 4px; background: var(--accent-danger); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 0 6px; }
         .pws-sb-data { display: flex; align-items: center; gap: 8px; padding: 0 10px; font-size: 0.8rem; color: #fff; font-family: var(--font-mono); font-weight: 700; }
@@ -366,7 +367,7 @@
         .pws-feels-label { font-size: 0.6rem; color: #cbd5e1; text-transform: uppercase; }
         @media (max-width: 600px) { .pws-feels-label, .pws-sb-header { display: none; } }
         
-        .provider-identity { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 15px; color: #fff; font-family: var(--font-mono); border: 1px solid rgba(255,255,255,0.1); transform: translateZ(0); }
+        .provider-identity { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 15px; color: #fff; font-family: var(--font-mono); border: 1px solid rgba(255,255,255,0.1); }
         .provider-icon { width: 14px; height: 14px; border-radius: 2px; }
         .traffic-icon-svg { width: 16px; height: 16px; fill: var(--accent-traffic); filter: drop-shadow(0 1px 2px #000); }
 
@@ -379,7 +380,7 @@
         .tip-main-line { font-family: var(--font-mono); font-weight: 700; font-size: 2.0rem; color: var(--accent-info); margin-bottom: 6px; line-height: 1; text-shadow: 0 2px 4px #000; }
         .tip-sub-line { font-family: var(--font-body); font-weight: 400; font-size: 1.05rem; color: #e2e8f0; line-height: 1.4; text-shadow: 0 1px 2px #000; }
 
-        /* GYÖNYÖRŰ ÚJ STUDIO HÁTTÉR VÍZJEL (Dinamikusan skálázódó fixálás) */
+        /* GYÖNYÖRŰ ÚJ STUDIO HÁTTÉR VÍZJEL */
         .default-news-bg { 
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
             z-index: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; 
@@ -388,7 +389,7 @@
         .centered-bg-content { 
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             opacity: 0.1; filter: grayscale(100%) contrast(150%); pointer-events: none; 
-            width: 100%; padding: 0 20px; box-sizing: border-box; transform: translateZ(0);
+            width: 100%; padding: 0 20px; box-sizing: border-box;
         }
         .bg-logo-letters { display: flex; gap: clamp(4px, 1vw, 6px); }
         .bg-logo-block { 
@@ -424,14 +425,14 @@
         
         /* GOODBYE CARD */
         .goodbye-card { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.9); opacity: 0; visibility: hidden; transition: opacity 0.5s ease; z-index: 1000; border: 1px solid var(--panel-border); border-radius: var(--cap-radius); }
-        .goodbye-card.active { opacity: 1; visibility: visible; transform: translateZ(0); }
+        .goodbye-card.active { opacity: 1; visibility: visible; }
         .gb-moon { font-size: 3.0rem; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.4)); color: #fde047; }
         .gb-title { font-family: var(--font-mono); font-size: 1.2rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-align: center; }
         .gb-brand-lockup { transform: scale(1.2); }
 
         /* BIG CLOCK */
         .big-clock-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 60; display: flex; flex-direction: row; align-items: center; justify-content: space-evenly; padding: 0 40px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; border: 1px solid var(--panel-border); border-radius: var(--cap-radius); }
-        .big-clock-layer.active { opacity: 1; pointer-events: all; transform: translateZ(0); }
+        .big-clock-layer.active { opacity: 1; pointer-events: all; }
         .bc-digital-wrapper { display: flex; flex-direction: column; align-items: center; }
         .bc-time { font-family: var(--font-mono); font-size: 4.0rem; font-weight: 700; color: var(--accent-color); font-variant-numeric: tabular-nums; text-shadow: 0 0 20px rgba(0, 229, 255, 0.3); }
         .bc-center-brand { display: flex; flex-direction: column; align-items: center; }
@@ -453,7 +454,7 @@
             transition: opacity 0.3s ease; pointer-events: auto;
             border-radius: 0 0 var(--cap-radius) var(--cap-radius);
         }
-        .ticker-container.open .controls-bar { opacity: 1; transform: translateZ(0); }
+        .ticker-container.open .controls-bar { opacity: 1; }
 
         .controls-normal-content { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 28px; padding: 0 10px; position: absolute; top: 0; left: 0; gap: 15px; }
 
@@ -481,8 +482,8 @@
         .next-prog-alert.active { display: flex; }
 
         /* --- BREAKING PANEL --- */
-        .breaking-panel { position: absolute; left: 0; width: 100%; height: 28px; bottom: 0; background: linear-gradient(90deg, #d32f2f, #9a0007); border-top: 1px solid #ff5252; display: flex; align-items: center; padding: 0 15px; z-index: 600; overflow: hidden; transform: translateY(100%) translateZ(0); opacity: 0; visibility: hidden; transition: transform 0.3s ease, opacity 0.2s; border-radius: 0 0 var(--cap-radius) var(--cap-radius); }
-        .breaking-panel.active { transform: translateY(0) translateZ(0); opacity: 1; visibility: visible; }
+        .breaking-panel { position: absolute; left: 0; width: 100%; height: 28px; bottom: 0; background: linear-gradient(90deg, #d32f2f, #9a0007); border-top: 1px solid #ff5252; display: flex; align-items: center; padding: 0 15px; z-index: 600; overflow: hidden; transform: translateY(100%); opacity: 0; visibility: hidden; transition: transform 0.3s ease, opacity 0.2s; border-radius: 0 0 var(--cap-radius) var(--cap-radius); }
+        .breaking-panel.active { transform: none; opacity: 1; visibility: visible; }
         .clean-badge { font-family: var(--font-mono); font-weight: 900; font-size: 0.7rem; color: #d32f2f; background: #fff; padding: 2px 6px; border-radius: 4px; margin-right: 10px; text-transform: uppercase; flex-shrink: 0; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .bp-meta-info { font-family: var(--font-mono); font-size: 0.75rem; color: #ffcdd2; font-weight: 700; margin-right: 15px; white-space: nowrap; flex-shrink: 0; text-shadow: 0 1px 2px #000; }
         .bp-text-mask { flex-grow: 1; overflow: hidden; position: relative; height: 100%; display: flex; align-items: center; }
@@ -496,78 +497,98 @@
         @keyframes progressFill { from { width: 0%; } to { width: 100%; } }
         
         /* --- ADVANCED WEATHER CENTER FLIPPER --- */
+        .weather-panel .panel-face { background: transparent; transition: background 0.5s ease; position: relative; overflow: hidden; border-radius: inherit; }
         
+        /* ÚJ: Dinamikus Vektoros Színátmenetek Kategóriák Szerint (Tűéles és villámgyors!) */
         .wx-theme-clear { background: linear-gradient(135deg, rgba(2, 132, 199, 0.85), rgba(56, 189, 248, 0.85)) !important; }
         .wx-theme-clearnight { background: linear-gradient(135deg, rgba(30, 27, 75, 0.9), rgba(49, 46, 129, 0.9)) !important; }
         .wx-theme-clouds { background: linear-gradient(135deg, rgba(51, 65, 85, 0.85), rgba(100, 116, 139, 0.85)) !important; }
+        .wx-theme-cloudsnight { background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9)) !important; }
         .wx-theme-rain { background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(59, 130, 246, 0.85)) !important; border-top: 1px solid #38bdf8; }
         .wx-theme-snow { background: linear-gradient(135deg, rgba(59, 130, 246, 0.85), rgba(147, 197, 253, 0.85)) !important; }
         .wx-theme-storm { background: linear-gradient(135deg, rgba(46, 16, 101, 0.9), rgba(76, 29, 149, 0.9)) !important; border-top: 1px solid #a855f7;}
         .wx-theme-fog { background: linear-gradient(135deg, rgba(71, 85, 105, 0.85), rgba(148, 163, 184, 0.85)) !important; }
+
+        .weather-header-container { height: 28px; background: rgba(0,0,0,0.4); border-bottom: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: space-between; padding: 0 15px; z-index: 10; width: 100%; position: absolute; top:0; left:0; }
         
-        .weather-panel .panel-face { background: transparent; transition: background 0.5s ease; }
+        .wlh-loc-container { display: flex; align-items: center; flex: 1; min-width: 0; }
+        .weather-location-header { font-family: var(--font-mono); font-weight: 700; color: #fff; font-size: 0.8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        .wlh-flag-img { width: 16px; height: auto; border-radius: 2px; margin-right: 6px; display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.5); flex-shrink: 0; }
         
-        .weather-header-container { height: 28px; background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; padding: 0 15px; z-index: 10; width: 100%; position: absolute; top:0; left:0; }
-        .weather-location-header { display: flex; align-items: center; width: 100%; font-family: var(--font-mono); font-weight: 700; color: #fff; font-size: 0.8rem; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
-        .wlh-flag-img { width: 16px; height: auto; border-radius: 2px; margin-right: 6px; display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-        
+        /* ÚJ: HELYI IDŐ KIJELZŐ - Védve a kilógástól */
+        .weather-local-time { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 800; color: var(--accent-color); flex-shrink: 0; margin-left: 10px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); display: flex; align-items: center; }
+
         /* ÚJ TISZTA ÉS KILÓGÁSMENTES IDŐJÁRÁS KÁRTYA ELRENDEZÉS */
         .weather-view { 
             width: 100%; height: 100%; display: flex; flex-direction: column; 
-            padding: 35px 15px 12px 15px; 
-            background: linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.6)); 
-            box-sizing: border-box; transform: translateZ(0); 
+            padding: 38px 15px 12px 15px; 
+            box-sizing: border-box; 
+            position: relative; z-index: 2;
+            background: transparent; /* A fő panel adja a színt */
+        }
+
+        /* Glassmorphism panel lecserélve egy szép sötét dobozra, mert nincs fotó a háttérben */
+        .wx-main-content-card {
+            border-radius: var(--cap-radius);
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(0,0,0,0.25); /* Finom kontraszt az alap panelhez képest */
+            padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex-grow: 1;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
         }
         
         .wx-current-box {
-            display: flex; align-items: center; justify-content: center; gap: 15px;
-            margin-top: 5px; margin-bottom: 12px; flex-grow: 1;
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%;
         }
         
-        .wx-icon-col {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 6px; width: 100px;
-        }
-        
-        .wx-icon-large svg {
-            width: 44px; height: 44px; stroke: #fff; stroke-width: 1.5;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-        }
-        
-        .wx-condition-text {
-            font-family: var(--font-body); font-size: 0.65rem; color: #fff; font-weight: 700;
-            text-transform: uppercase; text-align: center; line-height: 1.1; 
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8); letter-spacing: 0.5px;
-            width: 100%; word-wrap: break-word;
-        }
-        
-        .wx-temp-group { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .wx-temp-group { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
         
         .wx-temp-main { 
-            font-family: var(--font-head); font-size: 2.5rem; font-weight: 600;
+            font-family: var(--font-head); font-size: 2.8rem; font-weight: 700;
             color: #fff; line-height: 1; letter-spacing: -1px; 
-            font-variant-numeric: tabular-nums; text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+            font-variant-numeric: tabular-nums; text-shadow: 0 2px 8px rgba(0,0,0,0.7);
         }
         
         .wx-feels-like {
             font-family: var(--font-mono); font-size: 0.55rem; color: #cbd5e1; font-weight: 700;
-            text-transform: uppercase; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 4px; padding: 3px 6px; margin-top: 4px; letter-spacing: 0.5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.4); white-space: nowrap;
+            text-transform: uppercase; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 4px; padding: 3px 6px; margin-top: 6px; letter-spacing: 0.5px;
+            white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .wx-icon-col {
+            display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
+            gap: 4px; width: 100px; flex-shrink: 0;
+        }
+        
+        .wx-icon-large svg {
+            width: 44px; height: 44px; stroke: #fff; stroke-width: 1.5;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+        }
+        
+        .wx-condition-text {
+            font-family: var(--font-body); font-size: 0.65rem; color: #fff; font-weight: 700;
+            text-transform: uppercase; text-align: right; line-height: 1.2; 
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9); letter-spacing: 0.5px;
+            width: 100%;
         }
         
         /* MODERN VEKTOROS INFORMÁCIÓS SÁV */
         .wx-data-bar {
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15);
-            border-radius: var(--cap-radius); padding: 8px 12px; margin-bottom: 10px;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); width: 100%;
+            border-top: 1px dashed rgba(255,255,255,0.3);
+            padding-top: 12px; margin-top: auto;
+            width: 100%;
         }
         
-        .wx-data-item { display: flex; align-items: center; gap: 6px; }
+        .wx-data-item { display: flex; align-items: center; gap: 5px; }
         
         .wxd-icon { 
-            width: 16px; height: 16px; stroke: var(--accent-color); 
+            width: 15px; height: 15px; stroke: var(--accent-color); 
             stroke-width: 2; fill: none; filter: drop-shadow(0 1px 2px #000); 
         }
         
@@ -578,12 +599,12 @@
 
         .weather-footer-time { 
             display: flex; align-items: center; justify-content: center; gap: 5px;
-            font-family: var(--font-mono); font-size: 0.55rem; font-weight: 600; color: rgba(255,255,255,0.7); 
-            margin-top: auto; padding-top: 6px; width: 100%; 
-            border-top: 1px solid rgba(255,255,255,0.15); text-transform: uppercase; letter-spacing: 0.5px;
+            font-family: var(--font-mono); font-size: 0.55rem; font-weight: 600; color: rgba(255,255,255,0.9); 
+            margin-top: 8px; width: 100%; text-transform: uppercase; letter-spacing: 0.5px;
+            text-shadow: 0 1px 3px #000;
         }
         
-        .wft-icon { width: 10px; height: 10px; stroke: currentColor; opacity: 0.8; stroke-width: 2; }
+        .wft-icon { width: 10px; height: 10px; stroke: currentColor; opacity: 0.9; stroke-width: 2; }
 
         #weather-loading-state { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; }
         #weather-loading-state.active { display: flex; }
@@ -601,8 +622,8 @@
         .sch-label { font-size: 0.6rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 2px; transition: color 0.3s;}
         .sch-name { font-size: 0.8rem; color: #cbd5e1; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: color 0.3s; }
 
-        /* EREDETI PROMO KÁRTYA DESIGN */
-        .promo-content { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 10px; text-align: center; background: linear-gradient(135deg, #1e1b4b, #312e81); border-radius: var(--cap-radius); transform: translateZ(0); }
+        /* PROMO */
+        .promo-content { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 10px; text-align: center; background: linear-gradient(135deg, #1e1b4b, #312e81); border-radius: var(--cap-radius); }
         .promo-main-block { display: flex; flex-direction: column; align-items: center; gap: 2px; color: #e2e8f0; font-size: 0.8rem; font-weight: 600; }
         .promo-logo-inline { display: inline-flex; align-items: center; justify-content: center; margin: 0; height: 35px; }
         .promo-24-wrapper { display: flex; align-items: center; justify-content: center; margin: 8px 0; gap: 8px; position: relative; }
@@ -772,7 +793,6 @@
         <!-- PANEL 2: NEWS CONTENT -->
         <div class="glass-panel news-panel" id="news-container">
             
-            <!-- GYÖNYÖRŰ ÚJ STÚDIÓ HÁTTÉR VÍZJEL (TKP LOGÓVAL) -->
             <div class="default-news-bg">
                 <div class="centered-bg-content">
                     <div class="bg-logo-container">
@@ -789,7 +809,6 @@
 
             <div class="loading-overlay" id="loading-overlay"></div>
             
-            <!-- A NAGY ÓRÁS ELVÁLASZTÓ - MINDEN ÓRA 59:50-KOR MEGJELENIK -->
             <div class="big-clock-layer" id="big-clock-layer">
                 <div class="bc-digital-wrapper">
                     <div class="bc-time" id="bc-time-display">00:00:00</div>
@@ -887,17 +906,19 @@
         </div>
 
         <!-- PANEL 3: WEATHER / SCHEDULE / PROMO -->
-        <div class="glass-panel weather-panel wx-theme-clouds" id="panel-right">
+        <div class="glass-panel weather-panel" id="panel-right">
             <div class="panel-flipper" id="weather-flipper">
                 <div class="panel-face" id="weather-face-front">
+
                      <div class="weather-header-container">
-                        <div class="weather-location-header">
+                        <div class="wlh-loc-container">
                             <img id="weather-loc-flag-img" class="wlh-flag-img" src="" title="">
-                            <span class="wlh-loc" id="weather-loc-name">STATION DATA</span>
+                            <span class="weather-location-header" id="weather-loc-name">STATION DATA</span>
                         </div>
+                        <div class="weather-local-time" id="weather-local-time">--:--</div>
                     </div>
                     
-                    <!-- ÚJ MINIMALISTA IDŐJÁRÁS VIEW -->
+                    <!-- ÚJ MINIMALISTA ÉS LETISZTULT IDŐJÁRÁS VIEW -->
                     <div class="weather-view">
                          <div id="weather-loading-state" class="active">
                             <div class="radar-spinner"></div>
@@ -906,29 +927,31 @@
 
                         <div id="weather-data-container" style="opacity: 0; transition: opacity 0.3s; height: 100%; display: flex; flex-direction: column;">
                             
-                            <div class="wx-current-box">
-                                <div class="wx-icon-col">
-                                    <div class="wx-icon-large" id="weather-icon-slot"></div>
-                                    <div class="wx-condition-text" id="weather-cond-text">--</div>
+                            <div class="wx-main-content-card">
+                                <div class="wx-current-box">
+                                    <div class="wx-temp-group">
+                                        <div class="wx-temp-main" id="weather-temp">--°</div>
+                                        <div class="wx-feels-like" id="weather-feels">HŐÉRZET: --°</div>
+                                    </div>
+                                    <div class="wx-icon-col">
+                                        <div class="wx-icon-large" id="weather-icon-slot"></div>
+                                        <div class="wx-condition-text" id="weather-cond-text">--</div>
+                                    </div>
                                 </div>
-                                <div class="wx-temp-group">
-                                    <div class="wx-temp-main" id="weather-temp">--°</div>
-                                    <div class="wx-feels-like" id="weather-feels">HŐÉRZET: --°</div>
-                                </div>
-                            </div>
-                            
-                            <div class="wx-data-bar">
-                                <div class="wx-data-item" title="Szélsebesség">
-                                    <svg class="wxd-icon" viewBox="0 0 24 24"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
-                                    <span id="wd-wind" class="wxd-val">--</span>
-                                </div>
-                                <div class="wx-data-item" title="Páratartalom">
-                                    <svg class="wxd-icon" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
-                                    <span id="wd-hum" class="wxd-val">--</span>
-                                </div>
-                                <div class="wx-data-item" title="Csapadék">
-                                    <svg class="wxd-icon" viewBox="0 0 24 24"><path d="M16 13v8M8 13v8M12 15v8M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>
-                                    <span id="wd-precip" class="wxd-val">--</span>
+                                
+                                <div class="wx-data-bar">
+                                    <div class="wx-data-item" title="Szélsebesség">
+                                        <svg class="wxd-icon" viewBox="0 0 24 24"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                                        <span id="wd-wind" class="wxd-val">--</span>
+                                    </div>
+                                    <div class="wx-data-item" title="Páratartalom">
+                                        <svg class="wxd-icon" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                                        <span id="wd-hum" class="wxd-val">--</span>
+                                    </div>
+                                    <div class="wx-data-item" title="Csapadék">
+                                        <svg class="wxd-icon" viewBox="0 0 24 24"><path d="M16 13v8M8 13v8M12 15v8M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>
+                                        <span id="wd-precip" class="wxd-val">--</span>
+                                    </div>
                                 </div>
                             </div>
 
@@ -939,8 +962,8 @@
                     </div>
                 </div>
                 <div class="panel-face back">
-                    <div class="weather-header-container" id="schedule-header" style="display:none;">
-                        <div class="weather-location-header">MŰSORAJÁNLÓ</div>
+                    <div class="weather-header-container" id="schedule-header" style="display:none; justify-content: center;">
+                        <div class="weather-location-header" style="text-align: center; justify-content: center;">MŰSORAJÁNLÓ</div>
                     </div>
                     <div class="schedule-view" id="schedule-view" style="display:none;">
                          <div class="schedule-list" id="schedule-list-content"></div>
@@ -1114,6 +1137,7 @@
             counter: document.getElementById('counter-display'),
             weatherLocName: document.getElementById('weather-loc-name'),
             weatherHeader: document.querySelector('.weather-location-header'),
+            weatherLocalTime: document.getElementById('weather-local-time'), 
             weatherLocTimeContainer: document.getElementById('weather-loc-time-container'),
             weatherTemp: document.getElementById('weather-temp'),
             weatherFeels: document.getElementById('weather-feels'),
@@ -1164,6 +1188,21 @@
             handMinute: document.getElementById('clock-hand-minute'),
             handSecond: document.getElementById('clock-hand-second')
         };
+
+        // --- IDŐJÁRÁS PLAYLIST VÁLTOZÓK ---
+        let remainingOMCities =[];
+        let remainingPWSStations =[];
+
+        // Profi tömb keverő algoritmus (Fisher-Yates)
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
 
         let state = {
             activeTrack: 'a',
@@ -1448,47 +1487,28 @@
             return AT;
         }
 
-        /* Rövidített szélirányok */
-        function getWindDirStr(deg) {
-            if (deg === undefined || deg === null) return "";
-            const sectors =["É", "ÉK", "K", "DK", "D", "DNY", "NY", "ÉNY"];
-            deg += 22.5; if (deg < 0) deg += 360; deg = deg % 360;
-            return sectors[Math.floor(deg / 45)];
-        }
-
         function getIconFromIBMCode(code) {
             const c = parseInt(code);
             if ([31, 33].includes(c)) return ICONS.CLEAR_NIGHT; 
             if ([32, 34].includes(c)) return ICONS.CLEAR; 
-            if ([26, 27, 28].includes(c)) return ICONS.CLOUDY; 
-            if ([29].includes(c)) return ICONS.CLOUDY_NIGHT; 
-            if ([30].includes(c)) return ICONS.CLOUDY; 
+            if ([26, 27, 28, 29, 30].includes(c)) return ICONS.CLOUDY; 
             if ([20, 21, 22, 19].includes(c)) return ICONS.FOG;
-            if ([11, 12, 39, 40, 45, 9, 10].includes(c)) return ICONS.RAIN;
+            if ([9, 10, 11, 12, 39, 40, 45].includes(c)) return ICONS.RAIN;
             if ([13, 14, 15, 16, 41, 42, 43, 46].includes(c)) return ICONS.SNOW;
             if ([3, 4, 17, 35, 37, 38, 47].includes(c)) return ICONS.THUNDER;
             return ICONS.CLOUDY; 
         }
 
         function getIconFromWMO(code, isNight) {
-            if(isNight) {
-                if(code === 0) return ICONS.CLEAR_NIGHT;
-                if(code >= 1 && code <= 3) return ICONS.CLOUDY_NIGHT; 
-                if(code === 45 || code === 48) return ICONS.FOG;
-                if(code >= 51 && code <= 67) return ICONS.RAIN;
-                if(code >= 80 && code <= 82) return ICONS.RAIN;
-                if(code >= 71 && code <= 77) return ICONS.SNOW;
-                if(code >= 95) return ICONS.THUNDER;
-                return ICONS.CLOUDY_NIGHT;
-            }
-            if(code === 0) return ICONS.CLEAR;
-            if(code >= 1 && code <= 3) return ICONS.CLOUDY;
+            if(code === 0) return isNight ? ICONS.CLEAR_NIGHT : ICONS.CLEAR;
+            if(code >= 1 && code <= 3) return isNight ? ICONS.CLOUDY_NIGHT : ICONS.CLOUDY;
             if(code === 45 || code === 48) return ICONS.FOG;
             if(code >= 51 && code <= 67) return ICONS.RAIN;
             if(code >= 80 && code <= 82) return ICONS.RAIN;
             if(code >= 71 && code <= 77) return ICONS.SNOW;
+            if(code >= 85 && code <= 86) return ICONS.SNOW;
             if(code >= 95) return ICONS.THUNDER;
-            return ICONS.CLOUDY;
+            return isNight ? ICONS.CLOUDY_NIGHT : ICONS.CLOUDY;
         }
         
         function getWeatherText(wmoCode, ibmCode, isNight) {
@@ -1512,7 +1532,7 @@
                 if ([26, 27, 28].includes(c)) return "Erősen felhős";
                 if ([29, 30].includes(c)) return "Részben felhős";
                 if ([20, 21, 22, 19].includes(c)) return "Ködös";
-                if ([11, 12, 39, 40, 45, 9, 10].includes(c)) return "Eső";
+                if ([9, 10, 11, 12, 39, 40, 45].includes(c)) return "Eső";
                 if ([13, 14, 15, 16, 41, 42, 43, 46].includes(c)) return "Havazás";
                 if ([3, 4, 17, 35, 37, 38, 47].includes(c)) return "Zivatar";
                 return "Felhős";
@@ -1520,34 +1540,41 @@
             return "Adat hiányzik";
         }
 
+        // --- ÚJ KŐKEMÉNY VEKTOROS HÁTTÉRKÉP LOGIKA (Egységes CSS Gradient osztályok) ---
         function getWeatherThemeClass(wmoCode, ibmCode, isNight) {
-            let isRain = false, isSnow = false, isStorm = false, isFog = false, isClear = false, isCloudy = true;
+            let isRain = false, isSnow = false, isStorm = false, isFog = false, isClear = false, isCloudy = false;
             
             if (wmoCode !== undefined && wmoCode !== null) {
                 if(wmoCode === 0) isClear = true;
-                else if(wmoCode >= 1 && wmoCode <= 3) isCloudy = true;
+                else if(wmoCode === 1 || wmoCode === 2 || wmoCode === 3) isCloudy = true;
                 else if(wmoCode === 45 || wmoCode === 48) isFog = true;
                 else if(wmoCode >= 51 && wmoCode <= 67) isRain = true;
                 else if(wmoCode >= 80 && wmoCode <= 82) isRain = true;
                 else if(wmoCode >= 71 && wmoCode <= 77) isSnow = true;
+                else if(wmoCode >= 85 && wmoCode <= 86) isSnow = true;
                 else if(wmoCode >= 95) isStorm = true;
             } else if (ibmCode !== undefined && ibmCode !== null) {
                 const c = parseInt(ibmCode);
-                if ([31, 32, 33, 34].includes(c)) isClear = true; 
-                else if ([20, 21, 22, 19].includes(c)) isFog = true;
-                else if ([11, 12, 39, 40, 45, 9, 10].includes(c)) isRain = true;
-                else if ([13, 14, 15, 16, 41, 42, 43, 46].includes(c)) isSnow = true;
-                else if ([3, 4, 17, 35, 37, 38, 47].includes(c)) isStorm = true;
-                else isCloudy = true;
+                if (c === 31 || c === 32 || c === 33 || c === 34) isClear = true; 
+                else if (c === 20 || c === 21 || c === 22 || c === 19) isFog = true;
+                else if (c === 9 || c === 10 || c === 11 || c === 12 || c === 39 || c === 40 || c === 45) isRain = true;
+                else if (c === 13 || c === 14 || c === 15 || c === 16 || c === 41 || c === 42 || c === 43 || c === 46) isSnow = true;
+                else if (c === 3 || c === 4 || c === 17 || c === 35 || c === 37 || c === 38 || c === 47) isStorm = true;
+                else if (c === 26 || c === 27 || c === 28 || c === 29 || c === 30) isCloudy = true;
+                else isCloudy = true; 
+            } else {
+                isCloudy = true;
             }
 
-            if(isStorm) return 'wx-theme-storm';
-            if(isSnow) return 'wx-theme-snow';
-            if(isRain) return 'wx-theme-rain';
-            if(isFog) return 'wx-theme-fog';
-            if(isClear && isNight) return 'wx-theme-clearnight';
-            if(isClear) return 'wx-theme-clear';
-            return 'wx-theme-clouds';
+            // Hierarchia
+            if (isStorm) return 'wx-theme-storm';
+            if (isSnow) return 'wx-theme-snow';
+            if (isRain) return 'wx-theme-rain';
+            if (isFog) return 'wx-theme-fog';
+            if (isClear) return isNight ? 'wx-theme-clearnight' : 'wx-theme-clear';
+            
+            // Ha felhős vagy bármi egyéb
+            return isNight ? 'wx-theme-cloudsnight' : 'wx-theme-clouds';
         }
 
         function managePwsVisibility(shouldShow) {}
@@ -1593,13 +1620,13 @@
                     if(data.observations && data.observations.length > 0) {
                         const obs = data.observations[0];
                         if(obs.metric.temp !== null) {
-                             let iconCode = 26;
+                             let iconCode = 26; // Default cloudy fallback
                              try {
                                  const wxUrl = `https://api.weather.com/v3/wx/observations/current?geocode=${obs.lat},${obs.lon}&format=json&units=m&language=hu-HU&apiKey=${WUNDERGROUND_API_KEY}`;
                                  const wxRes = await fetch(wxUrl, { signal: AbortSignal.timeout(2000) });
                                  if(wxRes.ok) { const wxData = await wxRes.json(); if(wxData.iconCode !== undefined) iconCode = wxData.iconCode; }
                              } catch(e) {}
-                             return { name: PWS_MAP[id] || id, lat: obs.lat, lon: obs.lon, temp: obs.metric.temp, hum: obs.humidity, wind: obs.metric.windSpeed, winddir: obs.metric.winddir, press: obs.metric.pressure, precip: obs.metric.precipRate, ibmIcon: iconCode, updatedAt: new Date(), type: 'PWS' };
+                             return { name: PWS_MAP[id] || id, lat: obs.lat, lon: obs.lon, temp: obs.metric.temp, hum: obs.humidity, wind: obs.metric.windSpeed, winddir: obs.metric.winddir, press: obs.metric.pressure, precip: obs.metric.precipRate, ibmIcon: iconCode, updatedAt: new Date(), type: 'PWS', timezone: 'Europe/Budapest' };
                         }
                     }
                 } catch(e) { return null; }
@@ -1608,22 +1635,34 @@
 
             const fetchSingleOM = async (city) => {
                 try {
-                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,weather_code,apparent_temperature,precipitation`;
+                    // is_day lekérése biztosítja a pontos lokális napszakot az API-tól is
+                    const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,weather_code,apparent_temperature,precipitation,is_day&timezone=auto`;
                     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
                     if(!res.ok) return null;
                     const data = await res.json();
-                    return { name: city.name, lat: city.lat, lon: city.lon, temp: data.current.temperature_2m, hum: data.current.relative_humidity_2m, wind: data.current.wind_speed_10m, winddir: data.current.wind_direction_10m, press: data.current.surface_pressure, precip: data.current.precipitation, wmo: data.current.weather_code, feelsLike: data.current.apparent_temperature, updatedAt: new Date(), type: 'OM' };
+                    return { name: city.name, lat: city.lat, lon: city.lon, temp: data.current.temperature_2m, hum: data.current.relative_humidity_2m, wind: data.current.wind_speed_10m, winddir: data.current.wind_direction_10m, press: data.current.surface_pressure, precip: data.current.precipitation, wmo: data.current.weather_code, feelsLike: data.current.apparent_temperature, isDay: data.current.is_day, timezone: data.timezone, updatedAt: new Date(), type: 'OM' };
                 } catch(e) { return null; }
             };
 
             const fetchPromises =[];
-            const huKeys = HUNGARIAN_CITIES_OM.sort(() => 0.5 - Math.random()).slice(0, 6);
+            
+            if (remainingOMCities.length < 14) {
+                remainingOMCities = shuffleArray([...HUNGARIAN_CITIES_OM]);
+            }
+            if (remainingPWSStations.length < 10) {
+                remainingPWSStations = shuffleArray(Object.keys(PWS_MAP));
+            }
+
+            const huKeys = remainingOMCities.splice(0, 14);
+            const stationKeys = remainingPWSStations.splice(0, 10);
+
             huKeys.forEach(city => fetchPromises.push(fetchSingleOM(city)));
-            const stationKeys = Object.keys(PWS_MAP).sort(() => 0.5 - Math.random()).slice(0, 5);
             stationKeys.forEach(id => fetchPromises.push(fetchPWS(id)));
 
             const results = await Promise.allSettled(fetchPromises);
-            const fetched = results.filter(r => r.status === 'fulfilled' && r.value !== null).map(r => r.value);
+            
+            let fetched = results.filter(r => r.status === 'fulfilled' && r.value !== null).map(r => r.value);
+            fetched = shuffleArray(fetched);
             
             if (fetched.length > 0) { state.weatherPlaylist = fetched; state.weatherPlaylistIndex = 0; } 
             else if (state.weatherPlaylist.length === 0) { state.weatherPlaylist.push({ name: 'Budapest', temp: 15.0, hum: 50, wind: 10, wmo: 1, type:'OM', lat: 47.49, lon: 19.04 }); state.weatherPlaylistIndex = 0; }
@@ -1650,6 +1689,18 @@
 
             const timeStr = item.updatedAt ? item.updatedAt.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit'}) : '--:--';
             
+            // --- HELYI IDŐ SZÁMÍTÁSA ---
+            let localTimeStr = "--:--";
+            try {
+                localTimeStr = new Intl.DateTimeFormat('hu-HU', {
+                    timeZone: item.timezone || 'Europe/Budapest',
+                    hour: '2-digit', minute: '2-digit'
+                }).format(new Date());
+            } catch (e) {
+                localTimeStr = new Intl.DateTimeFormat('hu-HU', { hour: '2-digit', minute: '2-digit' }).format(new Date());
+            }
+            el.weatherLocalTime.innerHTML = `<span style="opacity:0.6; font-size:0.6rem; font-family:var(--font-body); margin-right:4px;">HELYI IDŐ</span>${localTimeStr}`;
+
             const temp = typeof item.temp === 'number' ? item.temp : 0;
             const hum = item.hum || 0; const wind = typeof item.wind === 'number' ? item.wind : 0;
             const precip = typeof item.precip === 'number' ? item.precip : 0;
@@ -1658,14 +1709,29 @@
             let feelsLikeVal = item.feelsLike; if (feelsLikeVal === undefined) { feelsLikeVal = calculateFeelsLike(temp, hum, wind); }
             el.weatherFeels.textContent = `HŐÉRZET: ${feelsLikeVal.toFixed(1)}°`;
             
-            /* KEREKÍTETT, RÖVID ÉRTÉKEK A KILÓGÁS MEGELŐZÉSÉRE */
             el.wdHum.textContent = Math.round(hum) + "%";
             el.wdWind.textContent = `${Math.round(wind)} km/h`;
             el.wdPrecip.textContent = precip > 0 ? precip.toFixed(1) + " mm" : "0 mm";
             
-            const now = new Date(); 
-            const sunTimes = SunCalc.getTimes(now, item.lat || NYIREGYHAZA_COORDS.lat, item.lon || NYIREGYHAZA_COORDS.lon); 
-            const isNight = now < sunTimes.sunrise || now > sunTimes.sunset; 
+            // --- TÖKÉLETES NAPSZAK MEGÁLLAPÍTÁS ---
+            let isNight = false;
+            if (item.type === 'OM' && item.isDay !== undefined) {
+                isNight = item.isDay === 0;
+            } else if (item.type === 'PWS' && item.ibmIcon !== undefined) {
+                const c = parseInt(item.ibmIcon);
+                // Explicit éjszakai kódok
+                if ([27, 29, 31, 33, 45, 46, 47].includes(c)) isNight = true;
+                else if ([26, 28, 30, 32, 34, 39, 41].includes(c)) isNight = false;
+                else {
+                    const now = new Date(); 
+                    const sunTimes = SunCalc.getTimes(now, item.lat || NYIREGYHAZA_COORDS.lat, item.lon || NYIREGYHAZA_COORDS.lon); 
+                    isNight = now < sunTimes.sunrise || now > sunTimes.sunset; 
+                }
+            } else {
+                const now = new Date(); 
+                const sunTimes = SunCalc.getTimes(now, item.lat || NYIREGYHAZA_COORDS.lat, item.lon || NYIREGYHAZA_COORDS.lon); 
+                isNight = now < sunTimes.sunrise || now > sunTimes.sunset; 
+            }
             
             if (item.type === 'PWS' && item.ibmIcon !== undefined) { 
                 el.weatherIcon.innerHTML = getIconFromIBMCode(item.ibmIcon); 
@@ -1673,13 +1739,12 @@
                 el.weatherIcon.innerHTML = getIconFromWMO(item.wmo || 0, isNight); 
             }
             
-            // SZÖVEGES IDŐJÁRÁS ÁLLAPOT FRISSÍTÉSE
             const conditionText = getWeatherText(item.type==='OM'?item.wmo:null, item.type==='PWS'?item.ibmIcon:null, isNight);
             el.weatherCondText.textContent = conditionText;
 
+            // --- ÚJ: Egységes Vektoros Színátmenet Háttér Beállítása ---
             const themeClass = getWeatherThemeClass(item.type==='OM'?item.wmo:null, item.type==='PWS'?item.ibmIcon:null, isNight);
             el.weatherPanel.className = `glass-panel weather-panel loaded ${themeClass}`;
-            el.weatherFaceFront.style.background = 'transparent'; 
             
             el.weatherLocTimeContainer.innerHTML = `<svg class="wft-icon" viewBox="0 0 24 24" fill="none"><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="currentColor" stroke-linecap="round"/></svg> ADATOK FRISSÍTVE: ${timeStr}`;
         }
@@ -2039,7 +2104,7 @@
             document.addEventListener('visibilitychange', handleVisibilityChange);
             setInterval(updateTimeAndState, 1000); updateTimeAndState();
             onValue(feedsRef, (snap) => { state.rssFeeds = snap.val() || {}; refreshNews(); });
-            fetchWeatherData(); setInterval(fetchWeatherData, 150000); setInterval(displayWeather, 6000);
+            fetchWeatherData(); setInterval(fetchWeatherData, 120000); setInterval(displayWeather, 6000);
             fetchNyiregyhazaSpecific(); setInterval(fetchNyiregyhazaSpecific, 30000);
             setInterval(checkBreakingNews, 45000); setTimeout(checkBreakingNews, 5000);
             setInterval(showCredits, 300000); 
