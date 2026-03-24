@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V250 (Forecast Missing Data Fix)</title>
+    <title>Aurora News Ticker - V251 (Perfect Forecast Fit)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -527,10 +527,10 @@
             border-radius: var(--cap-radius);
             border: 1px solid rgba(255,255,255,0.15);
             background: rgba(0,0,0,0.25); 
-            padding: 10px 15px; 
+            padding: 8px 12px; /* Csökkentett padding, több hely marad belül */
             display: flex;
             flex-direction: column;
-            gap: 10px; 
+            gap: 8px; /* Kisebb távolság az élő adatoknál is */
             flex-grow: 1;
             box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
             position: relative;
@@ -549,9 +549,14 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .wx-current-box { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        .wx-temp-group { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
-        .wx-temp-main { font-family: var(--font-head); font-size: 2.8rem; font-weight: 700; color: #fff; line-height: 1; letter-spacing: -1px; font-variant-numeric: tabular-nums; text-shadow: 0 2px 8px rgba(0,0,0,0.7); }
+        .wx-current-box { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 5px; }
+        .wx-temp-group { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-width: 0; }
+        
+        .wx-temp-main { 
+            font-family: var(--font-head); font-size: 2.5rem; font-weight: 700; color: #fff; 
+            line-height: 1; letter-spacing: -1px; font-variant-numeric: tabular-nums; 
+            text-shadow: 0 2px 8px rgba(0,0,0,0.7); white-space: nowrap; 
+        }
         .wx-feels-like { font-family: var(--font-mono); font-size: 0.55rem; color: #cbd5e1; font-weight: 700; text-transform: uppercase; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 3px 6px; margin-top: 6px; letter-spacing: 0.5px; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
         .wx-icon-col { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; width: 100px; flex-shrink: 0; }
@@ -563,26 +568,26 @@
         .wxd-icon { width: 15px; height: 15px; stroke: var(--accent-color); stroke-width: 2; fill: none; filter: drop-shadow(0 1px 2px #000); }
         .wxd-val { font-family: var(--font-mono); font-size: 0.75rem; font-weight: 800; color: #fff; text-shadow: 0 1px 2px #000; font-variant-numeric: tabular-nums; }
 
-        /* ÚJ TÁVOLABBI KILÁTÁSOK - TÖKÉLETESEN KÖZÉPRE ZÁRVA ÉS KILÓGÁSMENTESEN */
-        .wx-forecast-view { justify-content: center; gap: 4px; height: 100%; margin-top: -2px; }
+        /* JAVÍTOTT TÁVOLABBI KILÁTÁSOK - TÖKÉLETESEN KILÓGÁSMENTES */
+        .wx-forecast-view { justify-content: center; gap: 4px; height: 100%; }
         .wx-forecast-item { 
             display: flex; align-items: center; justify-content: space-between; 
             background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 4px; padding: 5px 10px; 
+            border-radius: 4px; padding: 4px 8px; /* Csökkentett belső margó */
         }
-        .wx-fc-col-left { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; width: 70px; }
-        .wx-fc-col-right { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-grow: 1; }
+        .wx-fc-col-left { display: flex; flex-direction: column; gap: 1px; flex-shrink: 0; width: 70px; justify-content: center; }
+        .wx-fc-col-right { display: flex; align-items: center; justify-content: flex-end; gap: 6px; flex-grow: 1; }
         
-        .wx-fc-day { font-family: var(--font-head); font-size: 0.70rem; font-weight: 700; color: #fff; text-shadow: 0 1px 2px #000; }
-        .wx-fc-temps { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; color: #fff; display: flex; align-items: center; text-shadow: 0 1px 2px #000; }
+        .wx-fc-day { font-family: var(--font-head); font-size: 0.70rem; font-weight: 700; color: #fff; text-shadow: 0 1px 2px #000; line-height: 1.1; }
+        .wx-fc-temps { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; color: #fff; display: flex; align-items: center; text-shadow: 0 1px 2px #000; line-height: 1; }
         .wx-fc-max { color: #ffb300; }
         .wx-fc-min { color: #00e5ff; }
         
-        .wx-fc-icon { width: 20px; height: 20px; stroke: #fff; stroke-width: 1.5; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)); flex-shrink: 0;}
+        .wx-fc-icon { width: 18px; height: 18px; stroke: #fff; stroke-width: 1.5; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.8)); flex-shrink: 0;}
         .wx-fc-text { 
             font-family: var(--font-body); font-size: 0.55rem; font-weight: 700; color: #e2e8f0; 
             text-transform: uppercase; text-shadow: 0 1px 2px #000; text-align: right; 
-            line-height: 1.15; width: 100%; display: flex; justify-content: flex-end;
+            line-height: 1.1; width: 100%; display: flex; justify-content: flex-end;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word;
         }
 
@@ -1199,7 +1204,7 @@
             while (currentIndex !== 0) {
                 randomIndex = Math.floor(Math.random() * currentIndex);
                 currentIndex--;
-                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+                [array[currentIndex], array[randomIndex]] =[array[randomIndex], array[currentIndex]];
             }
             return array;
         }
@@ -1897,6 +1902,7 @@
                     const condText = getWeatherText(fc.wmoCode, fc.iconCode, false);
                     
                     // JAVÍTÁS: Ellenőrzés, hogy létezik-e az érték (nem null és nem undefined)
+                    // Hozzáadtuk a szigorú 0 ellenőrzést is!
                     const maxDisplay = (fc.max !== null && fc.max !== undefined && !isNaN(fc.max)) ? Math.round(fc.max) + '°' : '--';
                     const minDisplay = (fc.min !== null && fc.min !== undefined && !isNaN(fc.min)) ? Math.round(fc.min) + '°' : '--';
 
