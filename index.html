@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aurora News Ticker - V251 (Perfect Forecast Fit)</title>
+    <title>Aurora News Ticker - V254 (Perfect Alignment & Continuous Swap Anims)</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,7 +47,7 @@
             --bar-height: 200px; 
         }
 
-        /* TÖKÉLETES ÉLSIMÍTÁS - Minden hardveres blur torzítás kiküszöbölve */
+        /* TÖKÉLETES ÉLSIMÍTÁS ÉS ÉLESSÉG - Minden hardveres blur torzítás kiküszöbölve */
         * { 
             margin: 0; padding: 0; box-sizing: border-box; outline: none; 
             -webkit-font-smoothing: antialiased !important;
@@ -106,7 +106,7 @@
             margin-top: 2px;
         }
 
-        /* --- 20 RANDOM LOGO ANIMATIONS --- */
+        /* --- 22 RANDOM LOGO ANIMATIONS (Including Swaps) --- */
         @keyframes anim1_fall { 0% { transform: translateY(0) rotateX(0); opacity: 1; } 30% { transform: translateY(30px) rotateX(-180deg); opacity: 0; } 70% { transform: translateY(-10px) rotateX(-360deg); opacity: 1; } 100% { transform: translateY(0) rotateX(-360deg); opacity: 1; } }
         .anim-1 .lb-t { animation: anim1_fall 1.5s ease-in-out forwards; } .anim-1 .lb-k { animation: anim1_fall 1.5s ease-in-out 0.2s forwards; } .anim-1 .lb-p { animation: anim1_fall 1.5s ease-in-out 0.4s forwards; }
         @keyframes anim2_jump { 0%, 100% { transform: translateY(0) rotateY(0); } 50% { transform: translateY(-20px) rotateY(180deg); } }
@@ -150,6 +150,21 @@
         @keyframes anim20_flipOutIn { 0% { transform: rotateY(0); opacity:1; } 50% { transform: rotateY(90deg); opacity:0; } 100% { transform: rotateY(0); opacity:1; } }
         .anim-20 .logo-block { animation: anim20_flipOutIn 1s ease-in-out; } .anim-20 .lb-k { animation-delay: 0.1s; } .anim-20 .lb-p { animation-delay: 0.2s; }
 
+        /* NEW SWAP ANIMATIONS (21 & 22) */
+        @keyframes anim21_swap3T { 0%, 100% { transform: translateX(0) translateY(0) rotate(0); z-index: 1; } 50% { transform: translateX(54px) translateY(-15px) rotate(20deg); z-index: 10; } }
+        @keyframes anim21_swap3K { 0%, 100% { transform: translateX(0) translateY(0) rotate(0); z-index: 1; } 50% { transform: translateX(-27px) translateY(15px) rotate(-20deg); z-index: 5; } }
+        @keyframes anim21_swap3P { 0%, 100% { transform: translateX(0) translateY(0) rotate(0); z-index: 1; } 50% { transform: translateX(-27px) translateY(-10px) rotate(10deg); z-index: 5; } }
+        .anim-21 .lb-t { animation: anim21_swap3T 1.5s ease-in-out; }
+        .anim-21 .lb-k { animation: anim21_swap3K 1.5s ease-in-out; }
+        .anim-21 .lb-p { animation: anim21_swap3P 1.5s ease-in-out; }
+
+        @keyframes anim22_shuffleT { 0%, 100% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(27px, 20px) rotate(90deg); } }
+        @keyframes anim22_shuffleK { 0%, 100% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(27px, -20px) rotate(180deg); } }
+        @keyframes anim22_shuffleP { 0%, 100% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(-54px, 0) rotate(-90deg); } }
+        .anim-22 .lb-t { animation: anim22_shuffleT 1.5s ease-in-out; }
+        .anim-22 .lb-k { animation: anim22_shuffleK 1.5s ease-in-out; }
+        .anim-22 .lb-p { animation: anim22_shuffleP 1.5s ease-in-out; }
+
         .tkp-logo-sm { transform: scale(0.65); margin: -8px 0; pointer-events: none; }
         .tkp-logo-lg { transform: scale(1.4); pointer-events: none; }
 
@@ -188,14 +203,15 @@
             height: 100%; 
             border-radius: var(--cap-radius);
             box-shadow: 0 10px 40px -5px rgba(0,0,0,0.5);
+            transform: translateZ(0); /* Élesség megőrzése */
         }
 
-        .glass-panel.loaded { opacity: 1; transform: none; }
+        .glass-panel.loaded { opacity: 1; transform: translateZ(0); }
 
         /* --- SHAPES --- */
-        .identity-panel { width: 240px; flex-shrink: 0; z-index: 10; overflow: hidden; top: 13px; }
+        .identity-panel { width: 240px; flex-shrink: 0; z-index: 10; overflow: hidden; }
         
-        .weather-panel { width: 280px; flex-shrink: 0; z-index: 10; overflow: hidden; top: 13px; }
+        .weather-panel { width: 280px; flex-shrink: 0; z-index: 10; overflow: hidden; }
         
         .news-panel { 
             flex: 0; opacity: 0;
@@ -292,7 +308,7 @@
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
         /* Tökéletes élsimítás: amint megáll a kártya, eltűnik a transform */
-        .news-card.visible { opacity: 1; visibility: visible; transform: none; }
+        .news-card.visible { opacity: 1; visibility: visible; transform: translateZ(0); }
         
         .news-content-wrapper { 
             flex: 1 1 auto; display: flex; flex-direction: column; justify-content: space-between; 
@@ -323,12 +339,14 @@
             font-weight: 700; line-height: 1.3; color: #fff; width: 100%; z-index: 5; padding-bottom: 4px;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            transform: translateZ(0); backface-visibility: hidden;
         }
 
         .news-desc { 
             flex: 1 1 auto; font-size: 0.85rem; color: #e2e8f0; font-weight: 400; line-height: 1.45; 
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; z-index: 5; 
             text-shadow: 0 1px 2px rgba(0,0,0,0.8); padding-right: 5px;
+            transform: translateZ(0); backface-visibility: hidden;
         }
 
         /* FLAT OVERLAY TOOLTIP */
@@ -353,19 +371,42 @@
             width: 100%; z-index: 10; height: 26px;
         }
         
-        .news-meta { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #cbd5e1; white-space: nowrap; text-shadow: 0 1px 2px #000; }
+        .news-meta { display: flex; align-items: center; gap: 10px; font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #cbd5e1; white-space: nowrap; text-shadow: 0 1px 2px #000; width: 100%; overflow: hidden; transform: translateZ(0); backface-visibility: hidden; }
         .news-card.traffic-alert .news-meta { color: var(--accent-warm); }
         
-        /* INLINE PWS CAPSULE */
-        .pws-smart-badge { display: inline-flex; align-items: stretch; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; margin-left: auto; height: 24px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        .pws-sb-header { display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); padding: 0 8px; border-right: 1px solid rgba(255,255,255,0.2); font-size: 0.65rem; color: #e2e8f0; font-weight: 700; text-transform: uppercase; }
-        .pws-sb-live { display: flex; align-items: center; gap: 4px; background: var(--accent-danger); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 0 6px; }
-        .pws-sb-data { display: flex; align-items: center; gap: 8px; padding: 0 10px; font-size: 0.8rem; color: #fff; font-family: var(--font-mono); font-weight: 700; }
-        .pws-feels-wrapper { display: flex; align-items: center; gap: 4px; border-left: 1px dashed rgba(255,255,255,0.3); padding-left: 8px; }
-        .pws-feels-label { font-size: 0.6rem; color: #cbd5e1; text-transform: uppercase; }
-        @media (max-width: 600px) { .pws-feels-label, .pws-sb-header { display: none; } }
+        /* INLINE PWS CAPSULE (TÖKÉLETESEN KIFÉRŐ SZÉLADATTAL) */
+        .pws-smart-badge { display: inline-flex; align-items: stretch; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; margin-left: auto; height: 24px; box-shadow: 0 2px 5px rgba(0,0,0,0.5); max-width: 100%; flex-shrink: 0; transform: translateZ(0); backface-visibility: hidden; }
+        .pws-sb-header { display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); padding: 0 8px; border-right: 1px solid rgba(255,255,255,0.2); font-size: 0.65rem; color: #e2e8f0; font-weight: 700; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+        .pws-sb-live { display: flex; align-items: center; gap: 4px; background: var(--accent-danger); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 0 6px; flex-shrink: 0; }
+        .pws-sb-data { display: flex; align-items: center; gap: 8px; padding: 0 10px; font-size: 0.8rem; color: #fff; font-family: var(--font-mono); font-weight: 700; white-space: nowrap; flex-shrink: 1; min-width: 0; }
+        .pws-main-temp { flex-shrink: 0; }
+        .pws-feels-wrapper { display: flex; align-items: center; gap: 4px; border-left: 1px dashed rgba(255,255,255,0.3); padding-left: 8px; flex-shrink: 0; }
+        .pws-feels-label { font-size: 0.6rem; color: #cbd5e1; text-transform: uppercase; flex-shrink: 0; }
         
-        .provider-identity { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 15px; color: #fff; font-family: var(--font-mono); border: 1px solid rgba(255,255,255,0.1); }
+        .pws-wind-wrapper { display: flex; align-items: center; gap: 4px; border-left: 1px dashed rgba(255,255,255,0.3); padding-left: 8px; flex-shrink: 1; min-width: 0; overflow: hidden; }
+        .pws-wind-icon { width: 14px; height: 14px; stroke: var(--accent-color); stroke-width: 2.5; fill: none; flex-shrink: 0; filter: drop-shadow(0 0 3px rgba(0, 229, 255, 0.6)); }
+        .pws-wind-text { font-size: 0.65rem; font-family: var(--font-body); font-weight: 700; text-transform: uppercase; flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: #e2e8f0; white-space: nowrap; }
+        .pws-wind-speed-val { font-family: var(--font-mono); color: #fff; font-weight: 900; font-size: 0.85rem; letter-spacing: -0.5px; margin-left: 2px; text-shadow: 0 1px 2px #000; }
+        .pws-wind-dir-short { display: none; }
+
+        @media (max-width: 1250px) {
+            .pws-wind-dir-full { display: none; }
+            .pws-wind-dir-short { display: inline; }
+        }
+        @media (max-width: 1050px) {
+            .pws-sb-header { display: none; }
+        }
+        @media (max-width: 700px) { 
+            .pws-feels-label { display: none; } 
+        }
+        @media (max-width: 550px) {
+            .pws-wind-wrapper { display: none; }
+        }
+        @media (max-width: 450px) {
+            .pws-feels-wrapper { display: none; }
+        }
+        
+        .provider-identity { display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.5); padding: 2px 8px; border-radius: 15px; color: #fff; font-family: var(--font-mono); border: 1px solid rgba(255,255,255,0.1); flex-shrink: 0; }
         .provider-icon { width: 14px; height: 14px; border-radius: 2px; }
         .traffic-icon-svg { width: 16px; height: 16px; fill: var(--accent-traffic); filter: drop-shadow(0 1px 2px #000); }
 
@@ -684,7 +725,7 @@
         <h3 style="margin-top:10px;">Módok & Események</h3>
         <button class="dev-btn" onclick="window.triggerNightMode()">Teszt: Éjszakai Mód (25mp)</button>
         <button class="dev-btn" onclick="window.triggerDayMode()">Teszt: Nappali Mód (25mp)</button>
-        <button class="dev-btn" style="border-color: #a855f7; color: #a855f7;" onclick="window.triggerHourChangeTest()">Teszt: Óraváltás (10mp)</button>
+        <button class="dev-btn" style="border-color: #a855f7; color: #a855f7;" onclick="window.triggerHourChangeTest()">Teszt: Óraváltás (30mp)</button>
         <button class="dev-btn" style="border-color: #c026d3; color: #c026d3;" onclick="window.triggerGoodbyeTest()">Teszt: Elköszönés (15mp)</button>
         <button class="dev-btn" onclick="window.triggerCredits()">Teszt: Stáblista</button>
         
@@ -811,7 +852,7 @@
                 </div>
                 
                 <div class="bc-center-brand">
-                    <div class="tkp-animated-logo tkp-logo-lg">
+                    <div class="tkp-animated-logo tkp-logo-lg" id="bc-tkp-logo">
                         <div class="new-logo-container">
                             <div class="logo-letters">
                                 <div class="logo-block lb-t">T</div>
@@ -1264,8 +1305,16 @@
             testModeActive: false, 
             forcedBlock: null,
             isHourChangeTestActive: false,
+            bigClockTriggerSec: Math.floor(Math.random() * 45), 
+            animationBundles: [[1, 2, 3, 14, 15, 17, 18], // Pattogós / Dinamikus[4, 5, 7, 8, 9, 13, 21, 22],   // Hullámzó / Csúszó + Új Swap[6, 10, 12, 20],           // 3D Forgások[11, 16, 19, 14, 3],       // Pulzáló / Jello / Rázkódó[1, 5, 10, 15, 20, 8, 21, 22]  // Vegyes
+            ],
+            currentAnimationBundle:[],
+            logoAnimTimeout: null,
+            logoAnimIndex: 0,
             currentNyTemp: null, 
             currentNyFeelsLike: null, 
+            currentNyWindSpeed: null,
+            currentNyWindDir: null,
             pwsLastUpdate: 0 
         };
 
@@ -1310,6 +1359,52 @@
                 if(map[host]) return map[host];
                 return host.split('.')[0].toUpperCase();
             } catch(e) { return "HÍR"; }
+        }
+
+        function getWindDirectionHu(degree, short = false) {
+            if (degree === null || degree === undefined) return "";
+            const val = Math.floor((degree / 45) + 0.5);
+            const dirsFull =["Északi", "Északkeleti", "Keleti", "Délkeleti", "Déli", "Délnyugati", "Nyugati", "Északnyugati"];
+            const dirsShort =["É", "ÉK", "K", "DK", "D", "DNy", "Ny", "ÉNy"];
+            return short ? dirsShort[(val % 8)] : dirsFull[(val % 8)];
+        }
+
+        function selectHourlyAnimationBundle() {
+            const randIdx = Math.floor(Math.random() * state.animationBundles.length);
+            state.currentAnimationBundle = state.animationBundles[randIdx];
+            state.logoAnimIndex = 0;
+        }
+
+        function startBigClockLogoAnimation() {
+            if (state.logoAnimTimeout) clearTimeout(state.logoAnimTimeout);
+            if (!state.currentAnimationBundle || state.currentAnimationBundle.length === 0) {
+                selectHourlyAnimationBundle();
+            }
+            playNextLogoAnimation();
+        }
+
+        function playNextLogoAnimation() {
+            const logo = document.getElementById('bc-tkp-logo');
+            if (!logo || !el.bigClockLayer.classList.contains('active')) return;
+
+            // Resetelni az összes animáció osztályt (1-től 22-ig)
+            for (let i = 1; i <= 22; i++) logo.classList.remove('anim-' + i);
+            
+            // Következő animáció a csokorból
+            const animNum = state.currentAnimationBundle[state.logoAnimIndex];
+            state.logoAnimIndex = (state.logoAnimIndex + 1) % state.currentAnimationBundle.length;
+            
+            // CSS reflow kikényszerítése az élesség és újraindítás miatt
+            void logo.offsetWidth;
+            
+            // Animáció ráadása
+            logo.classList.add('anim-' + animNum);
+            
+            // Közvetlenül egymás után jönnek az animációk, szünet nélkül! (Csak megvárjuk míg lefut az aktuális, ~1.5s)
+            state.logoAnimTimeout = setTimeout(() => {
+                logo.classList.remove('anim-' + animNum);
+                playNextLogoAnimation(); 
+            }, 1500); 
         }
 
         function flipPanel(panelType, showBack) {
@@ -1628,7 +1723,11 @@
                         const data = await res.json();
                         if(data.observations && data.observations.length > 0) {
                             const obs = data.observations[0];
-                            finalData = { metric: { temp: obs.metric.temp, windSpeed: obs.metric.windSpeed }, humidity: obs.humidity };
+                            finalData = { 
+                                metric: { temp: obs.metric.temp, windSpeed: obs.metric.windSpeed }, 
+                                humidity: obs.humidity,
+                                winddir: obs.winddir 
+                            };
                             break; 
                         }
                     }
@@ -1638,11 +1737,15 @@
             if (finalData && finalData.metric && typeof finalData.metric.temp === 'number') {
                 const newTemp = finalData.metric.temp.toFixed(1);
                 const newFl = calculateFeelsLike(finalData.metric.temp, finalData.humidity, finalData.metric.windSpeed).toFixed(1);
+                const newWs = finalData.metric.windSpeed;
+                const newWd = finalData.winddir;
 
-                if (newTemp !== state.currentNyTemp || newFl !== state.currentNyFeelsLike) {
+                if (newTemp !== state.currentNyTemp || newFl !== state.currentNyFeelsLike || newWs !== state.currentNyWindSpeed || newWd !== state.currentNyWindDir) {
                     state.pwsLastUpdate = Date.now(); 
                     state.currentNyTemp = newTemp;
                     state.currentNyFeelsLike = newFl;
+                    state.currentNyWindSpeed = newWs;
+                    state.currentNyWindDir = newWd;
                 }
             }
         }
@@ -1781,7 +1884,7 @@
                             
                             return { 
                                 name: PWS_MAP[id] || id, lat: obs.lat, lon: obs.lon, 
-                                temp: obs.metric.temp, hum: obs.humidity, wind: obs.metric.windSpeed, winddir: obs.metric.winddir, 
+                                temp: obs.metric.temp, hum: obs.humidity, wind: obs.metric.windSpeed, winddir: obs.winddir, 
                                 press: obs.metric.pressure, precip: obs.metric.precipRate, ibmIcon: iconCode, forecast: forecast, 
                                 updatedAt: new Date(), type: 'PWS', timezone: 'Europe/Budapest' 
                             };
@@ -1792,14 +1895,23 @@
         };
 
         async function fetchWeatherData() {
-            const fetchPromises =[];
-            
+            // GYORSÍTOTT ELSŐ BETÖLTÉS!
+            if (state.weatherPlaylist.length === 0) {
+                fetchCityWeather({ name: 'Budapest', lat: 47.49, lon: 19.04 }).then(fastCity => {
+                    if (fastCity && state.weatherPlaylist.length === 0) {
+                        state.weatherPlaylist.push(fastCity);
+                        displayWeather();
+                    }
+                });
+            }
+
             if (remainingOMCities.length < 14) { remainingOMCities = shuffleArray([...HUNGARIAN_CITIES_OM]); }
             if (remainingPWSStations.length < 10) { remainingPWSStations = shuffleArray(Object.keys(PWS_MAP)); }
 
             const huKeys = remainingOMCities.splice(0, 14);
             const stationKeys = remainingPWSStations.splice(0, 10);
-
+            
+            const fetchPromises =[];
             huKeys.forEach(city => fetchPromises.push(fetchCityWeather(city)));
             stationKeys.forEach(id => fetchPromises.push(fetchPWS(id)));
 
@@ -1912,8 +2024,6 @@
                     
                     const condText = getWeatherText(fc.wmoCode, fc.iconCode, false);
                     
-                    // JAVÍTÁS: Ellenőrzés, hogy létezik-e az érték (nem null és nem undefined)
-                    // Hozzáadtuk a szigorú 0 ellenőrzést is!
                     const maxDisplay = (fc.max !== null && fc.max !== undefined && !isNaN(fc.max)) ? Math.round(fc.max) + '°' : '--';
                     const minDisplay = (fc.min !== null && fc.min !== undefined && !isNaN(fc.min)) ? Math.round(fc.min) + '°' : '--';
 
@@ -2054,7 +2164,21 @@
         
         window.triggerNightMode = function() { el.devMenu.style.display = 'none'; state.testModeActive = true; state.forcedBlock = THEMATIC_BLOCKS[0]; updateTimeAndState(); refreshNews(); setTimeout(() => { state.testModeActive = false; state.forcedBlock = null; updateTimeAndState(); refreshNews(); alert("Éjszakai teszt vége."); }, 25000); };
         window.triggerDayMode = function() { el.devMenu.style.display = 'none'; state.testModeActive = true; state.forcedBlock = THEMATIC_BLOCKS[4]; updateTimeAndState(); refreshNews(); setTimeout(() => { state.testModeActive = false; state.forcedBlock = null; updateTimeAndState(); refreshNews(); alert("Nappali teszt vége."); }, 25000); };
-        window.triggerHourChangeTest = function() { el.devMenu.style.display = 'none'; state.isHourChangeTestActive = true; el.bigClockLayer.classList.add('active'); const now = new Date(); el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); setTimeout(() => { state.isHourChangeTestActive = false; el.bigClockLayer.classList.remove('active'); }, 10000); };
+        
+        window.triggerHourChangeTest = function() { 
+            el.devMenu.style.display = 'none'; 
+            state.isHourChangeTestActive = true; 
+            el.bigClockLayer.classList.add('active'); 
+            startBigClockLogoAnimation(); 
+            const now = new Date(); 
+            el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); 
+            setTimeout(() => { 
+                state.isHourChangeTestActive = false; 
+                el.bigClockLayer.classList.remove('active'); 
+                clearTimeout(state.logoAnimTimeout); 
+            }, 30000); 
+        };
+        
         window.triggerGoodbyeTest = function() { el.devMenu.style.display = 'none'; el.goodbyeCard.classList.add('active'); setTimeout(() => { el.goodbyeCard.classList.remove('active'); }, 15000); };
         window.triggerCredits = function() { el.devMenu.style.display = 'none'; showCredits(); };
         window.closeDevMenu = function() { el.devMenu.style.display = 'none'; }
@@ -2081,16 +2205,38 @@
             let currentBlock; if(state.testModeActive && state.forcedBlock) { currentBlock = state.forcedBlock; } else { currentBlock = THEMATIC_BLOCKS.findLast(b => h >= b.start) || THEMATIC_BLOCKS[THEMATIC_BLOCKS.length-1]; }
             const min = now.getMinutes(); const sec = now.getSeconds(); const hour = now.getHours();
 
+            // Új csokor beállítása óra 1 perckor
+            if (min === 1 && sec === 0) selectHourlyAnimationBundle();
+
             if (el.bigClockLayer.classList.contains('active')) { managePwsVisibility(false); el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); } 
 
             if (hour === 23 && min === 59) {
-                if (sec >= 0 && sec < 50) { el.goodbyeCard.classList.add('active'); el.bigClockLayer.classList.remove('active'); } 
-                else if (sec >= 50) { el.goodbyeCard.classList.remove('active'); el.bigClockLayer.classList.add('active'); el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); if(sec === 50) showCredits(); }
-            } else if (min === 59 && sec >= 50) { 
-                el.bigClockLayer.classList.add('active'); el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); if(sec === 50) showCredits(); 
+                if (sec >= 0 && sec < state.bigClockTriggerSec) { 
+                    el.goodbyeCard.classList.add('active'); 
+                    el.bigClockLayer.classList.remove('active'); 
+                    clearTimeout(state.logoAnimTimeout);
+                } else if (sec >= state.bigClockTriggerSec) { 
+                    el.goodbyeCard.classList.remove('active'); 
+                    if (!el.bigClockLayer.classList.contains('active')) {
+                        el.bigClockLayer.classList.add('active');
+                        startBigClockLogoAnimation();
+                    }
+                    el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); 
+                    if(sec === 50) showCredits(); 
+                }
+            } else if (min === 59 && sec >= state.bigClockTriggerSec) { 
+                if (!el.bigClockLayer.classList.contains('active')) {
+                    el.bigClockLayer.classList.add('active');
+                    startBigClockLogoAnimation();
+                }
+                el.bcTime.textContent = now.toLocaleTimeString('hu-HU', {hour:'2-digit', minute:'2-digit', second:'2-digit'}); 
+                if(sec === 50) showCredits(); 
             } else {
                 if(!state.isHourChangeTestActive && el.bigClockLayer.classList.contains('active')) { 
-                    el.bigClockLayer.classList.remove('active'); el.goodbyeCard.classList.remove('active'); 
+                    el.bigClockLayer.classList.remove('active'); 
+                    el.goodbyeCard.classList.remove('active'); 
+                    clearTimeout(state.logoAnimTimeout);
+                    state.bigClockTriggerSec = Math.floor(Math.random() * 45); // Új időpont generálása a kövi órára!
                     if(state.block.type !== 'summary_yesterday') { state.currentIndex = 0; if(state.nextItems.length > 0) { state.items = state.nextItems; state.nextItems =[]; } showNextItem(false); } 
                 }
             }
@@ -2256,13 +2402,25 @@
 
             let iconHtml = isTraffic ? TRAFFIC_ICON : `<img src="${fav}" class="provider-icon">`;
             let weatherHTML = '';
+            
+            // TÖKÉLETES PWS SÁV KIFÉRŐEN - TIZEDESJEGY PONTOSSÁGÚ SZÉLADATTAL!
             if (state.currentNyTemp) {
                 weatherHTML = `<div class="pws-smart-badge"><div class="pws-sb-header">Nyíregyháza</div><div class="pws-sb-live">ÉLŐ</div><div class="pws-sb-data"><span class="pws-main-temp">${state.currentNyTemp}°C</span>`;
-                if (state.currentNyFeelsLike) { weatherHTML += `<div class="pws-feels-wrapper"><span class="pws-feels-label">HŐÉRZET</span><span class="pws-main-temp" style="color:var(--accent-warm);">${state.currentNyFeelsLike}°C</span></div>`; }
+                if (state.currentNyFeelsLike) { 
+                    weatherHTML += `<div class="pws-feels-wrapper"><span class="pws-feels-label">HŐÉRZET</span><span class="pws-main-temp" style="color:var(--accent-warm);">${state.currentNyFeelsLike}°C</span></div>`; 
+                }
+                if (state.currentNyWindSpeed !== null && state.currentNyWindDir !== null) {
+                    const windDirFull = getWindDirectionHu(state.currentNyWindDir, false);
+                    const windDirShort = getWindDirectionHu(state.currentNyWindDir, true);
+                    weatherHTML += `<div class="pws-wind-wrapper">
+                        <svg class="pws-wind-icon" viewBox="0 0 24 24"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                        <span class="pws-wind-text"><span class="pws-wind-dir-full">${windDirFull}</span><span class="pws-wind-dir-short">${windDirShort}</span> <span class="pws-wind-speed-val">${state.currentNyWindSpeed.toFixed(1)}</span> km/h</span>
+                    </div>`;
+                }
                 weatherHTML += `</div></div>`; 
             }
 
-            let footerMetaHTML = `<div class="provider-identity">${iconHtml} ${displaySource}</div><span style="margin-left:8px;">${timeStr}</span>${weatherHTML}`;
+            let footerMetaHTML = `<div class="provider-identity">${iconHtml} ${displaySource}</div><span style="margin-left:8px; flex-shrink: 0;">${timeStr}</span>${weatherHTML}`;
             let visualHtml = ''; let hasVisual = false;
 
             if (item.img) {
@@ -2303,6 +2461,8 @@
         
         document.addEventListener("DOMContentLoaded", () => {
             el.crYear.textContent = new Date().getFullYear(); 
+            selectHourlyAnimationBundle(); // Kezdeti csokor betöltése
+            
             document.addEventListener('visibilitychange', handleVisibilityChange);
             setInterval(updateTimeAndState, 1000); updateTimeAndState();
             onValue(feedsRef, (snap) => { state.rssFeeds = snap.val() || {}; refreshNews(); });
