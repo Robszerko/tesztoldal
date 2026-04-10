@@ -2,7 +2,7 @@
 <html lang="hu">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aurora News Ticker - V260 (Perfect Breaking Scroll Edition)</title>
+<title>Aurora News Ticker - V261 (High Performance Edition)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js" type="module"></script>
@@ -84,15 +84,6 @@ body{background-color:#000;font-family:var(--font-body);color:var(--text-main);o
 
 .identity-panel{width:240px;flex-shrink:0;z-index:10;overflow:hidden;}
 .weather-panel{width:280px;flex-shrink:0;z-index:10;overflow:hidden;}
-
-/* ÜVEG ABLAK CSILLOGÁS EFFEKT A WEATHER PANELEN */
-.weather-panel::after {
-    content:''; position:absolute; top:0; left:-100%; width:60%; height:100%;
-    background:linear-gradient(to right, transparent, rgba(255,255,255,0.12), transparent);
-    transform:skewX(-25deg); animation:glassReflection 10s infinite; pointer-events:none; z-index:5;
-}
-@keyframes glassReflection { 0%, 70% { left: -100%; } 100% { left: 200%; } }
-
 .news-panel{flex:0;opacity:0;display:flex;flex-direction:column;position:relative;cursor:pointer;overflow:hidden!important;transition:flex 0.6s ease,opacity 0.4s ease 0.2s;perspective:1500px;}
 .ticker-container.open .news-panel{flex:1;opacity:1;}
 
@@ -175,13 +166,12 @@ body{background-color:#000;font-family:var(--font-body);color:var(--text-main);o
 .tip-main-line{font-family:var(--font-mono);font-weight:700;font-size:2.0rem;color:var(--accent-info);margin-bottom:6px;line-height:1;text-shadow:0 2px 4px #000;}
 .tip-sub-line{font-family:var(--font-body);font-weight:400;font-size:1.05rem;color:#e2e8f0;line-height:1.4;text-shadow:0 1px 2px #000;}
 
-@keyframes subtleBgFloat{0%{transform:scale(1) translateY(0px);opacity:0.05;}50%{transform:scale(1.03) translateY(-10px);opacity:0.15;}100%{transform:scale(1) translateY(0px);opacity:0.05;}}
 .default-news-bg{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden;display:flex;align-items:center;justify-content:center;background:transparent;}
 body[data-time="night"] .default-news-bg{background:linear-gradient(135deg,rgba(2,6,23,0.85),rgba(15,23,42,0.95));}
 body[data-time="morning"] .default-news-bg{background:linear-gradient(135deg,rgba(2,6,23,0.7),rgba(14,165,233,0.4));}
 body[data-time="day"] .default-news-bg{background:linear-gradient(135deg,rgba(2,6,23,0.6),rgba(2,132,199,0.6));}
 body[data-time="sunset"] .default-news-bg{background:linear-gradient(135deg,rgba(2,6,23,0.8),rgba(219,39,119,0.4));}
-.centered-bg-content{display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0.1;filter:grayscale(100%) contrast(150%);pointer-events:none;width:100%;padding:0 20px;box-sizing:border-box;animation:subtleBgFloat 15s ease-in-out infinite;}
+.centered-bg-content{display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0.1;pointer-events:none;width:100%;padding:0 20px;box-sizing:border-box;}
 .bg-logo-letters{display:flex;gap:clamp(4px,1vw,6px);}
 .bg-logo-block{width:clamp(40px,5vw,60px);height:clamp(40px,5vw,60px);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Inter',sans-serif;font-weight:900;font-size:clamp(2rem,3vw,2.8rem);border-radius:6px;border:2px solid rgba(255,255,255,0.5);}
 .bg-lb-t{background:linear-gradient(135deg,#d00000 0%,#900000 100%);}.bg-lb-k{background:linear-gradient(135deg,#702082 0%,#4a1555 100%);}.bg-lb-p{background:linear-gradient(135deg,#009ee3 0%,#006c9b 100%);}
@@ -314,8 +304,8 @@ body[data-time="sunset"] .default-news-bg{background:linear-gradient(135deg,rgba
 .wx-current-view,.wx-forecast-view{display:flex;flex-direction:column;width:100%;flex:1;min-height:0;animation:fadeSwap 0.4s ease forwards;}
 @keyframes fadeSwap{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
 
-/* Üveg Widget Dizájn */
-.wx-current-box{background:linear-gradient(135deg,rgba(255,255,255,0.15),rgba(255,255,255,0.02));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.2);border-top-color:rgba(255,255,255,0.4);border-left-color:rgba(255,255,255,0.3);box-shadow:0 8px 32px 0 rgba(0,0,0,0.4),inset 0 0 10px rgba(255,255,255,0.05);border-radius:12px;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;width:100%;flex-shrink:0;}
+/* Üveg Widget Dizájn optimalizált verzió (blur lejjebb véve a teljesítményért) */
+.wx-current-box{background:linear-gradient(135deg,rgba(255,255,255,0.15),rgba(255,255,255,0.02));backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.2);border-top-color:rgba(255,255,255,0.4);border-left-color:rgba(255,255,255,0.3);box-shadow:0 8px 32px 0 rgba(0,0,0,0.4),inset 0 0 10px rgba(255,255,255,0.05);border-radius:12px;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;width:100%;flex-shrink:0;}
 .wx-temp-group{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-width:0;flex:1;}
 .wx-temp-main{font-family:var(--font-head);font-size:2.0rem;font-weight:700;color:#fff;line-height:1;letter-spacing:-1px;font-variant-numeric:tabular-nums;text-shadow:0 2px 5px rgba(0,0,0,0.8);white-space:nowrap;}
 .wx-feels-like{font-family:var(--font-mono);font-size:0.55rem;color:#cbd5e1;font-weight:700;text-transform:uppercase;margin-top:4px;letter-spacing:0.5px;white-space:nowrap;}
@@ -690,17 +680,14 @@ body[data-time="sunset"] .default-news-bg{background:linear-gradient(135deg,rgba
                     setTimeout(reverseMeta,100);
                 }
             }
-            const elSource=document.getElementById('bp-source');
-            const elSep=document.getElementById('bp-sep');
-            const elTime=document.getElementById('bp-time');
-            let sourceStr=item.source;
-            let timeStr=timeString;
             let step=0; 
             function reverseMeta(){
+                const elSource=document.getElementById('bp-source');
+                const elSep=document.getElementById('bp-sep');
+                const elTime=document.getElementById('bp-time');
                 if(step===0){
-                    if(sourceStr.length>0){
-                        sourceStr=sourceStr.substring(0,sourceStr.length-1);
-                        if(elSource) elSource.innerText=sourceStr;
+                    if(elSource&&elSource.innerText.length>0){
+                        elSource.innerText=elSource.innerText.substring(0,elSource.innerText.length-1);
                         setTimeout(reverseMeta,20);
                     }else{
                         if(elSep) elSep.style.display='none'; 
@@ -708,9 +695,8 @@ body[data-time="sunset"] .default-news-bg{background:linear-gradient(135deg,rgba
                         setTimeout(reverseMeta,20);
                     }
                 }else if(step===1){
-                    if(timeStr.length>0){
-                        timeStr=timeStr.substring(0,timeStr.length-1);
-                        if(elTime) elTime.innerText=timeStr;
+                    if(elTime&&elTime.innerText.length>0){
+                        elTime.innerText=elTime.innerText.substring(0,elTime.innerText.length-1);
                         setTimeout(reverseMeta,20);
                     }else{
                         el.bpText.innerHTML=''; 
@@ -861,15 +847,12 @@ body[data-time="sunset"] .default-news-bg{background:linear-gradient(135deg,rgba
             }else{
                 el.nextProgAlert.classList.remove('active');
             }
-            if(hour>=6&&sec===50&&(min===14||min===29||min===44||min===59)){
-                document.getElementById('live-indicator').classList.add('updating');
-                refreshNews(true);
-            }else{
-                document.getElementById('live-indicator').classList.remove('updating');
+            
+            // --- KÉRT OPTIMALIZÁCIÓ: Pontos frissítés :05, :15, :30, :45 perckor ---
+            if (sec === 0 && (min === 5 || min === 15 || min === 30 || min === 45)) {
+                refreshNews(false); // Teljes frissítés, hírfolyam újraindítása előlről
             }
-            if(sec===0&&(min===0||min===15||min===30||min===45)){
-                state.pendingListReset=true;
-            }
+            
             if(sec===0)cleanUpOldItems();
             const nightLabel=document.getElementById('night-summary-label');
             if(state.block&&state.block.type==='summary_yesterday'){
@@ -977,9 +960,8 @@ body[data-time="sunset"] .default-news-bg{background:linear-gradient(135deg,rgba
             updateTimelineActive();
         }
         
-        el.newsViewport.addEventListener('mousemove',(e)=>{if(!state.isPaused)return;const card=el[state.activeTrack==='a'?'trackB':'trackA'];if(!card||!card.classList.contains('visible')||card.classList.contains('tip-card')||card.classList.contains('night-info')||card.classList.contains('midnight-segment'))return;const rect=card.getBoundingClientRect();const x=e.clientX-rect.left;const y=e.clientY-rect.top;const centerX=rect.width/2;const centerY=rect.height/2;const rotateX=((y-centerY)/centerY)*-2.5;const rotateY=((x-centerX)/centerX)*2.5;card.style.transform=`translateZ(0) perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.01, 1.01, 1.01)`;});
-        el.newsViewport.addEventListener('mouseenter',()=>{if(!state.isPaused){clearTimeout(state.flipTimer);el.progressBar.style.animationPlayState='paused';state.isPaused=true;const elapsed=Date.now()-state.cardStartTime;state.remainingTime=Math.max(0,state.currentDuration-elapsed);const card=el[state.activeTrack==='a'?'trackB':'trackA'];if(card)card.style.transition='transform 0.1s ease-out';}});
-        el.newsViewport.addEventListener('mouseleave',()=>{const card=el[state.activeTrack==='a'?'trackB':'trackA'];if(card&&!card.classList.contains('tip-card')&&!card.classList.contains('night-info')&&!card.classList.contains('midnight-segment')){card.style.transition='transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';card.style.transform='translateZ(0) perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';}if(state.isPaused){el.progressBar.style.animationPlayState='running';state.isPaused=false;state.cardStartTime=Date.now();state.currentDuration=state.remainingTime;state.flipTimer=setTimeout(()=>{showNextItem(true);},state.remainingTime);}});
+        el.newsViewport.addEventListener('mouseenter',()=>{if(!state.isPaused){clearTimeout(state.flipTimer);el.progressBar.style.animationPlayState='paused';state.isPaused=true;const elapsed=Date.now()-state.cardStartTime;state.remainingTime=Math.max(0,state.currentDuration-elapsed);}});
+        el.newsViewport.addEventListener('mouseleave',()=>{if(state.isPaused){el.progressBar.style.animationPlayState='running';state.isPaused=false;state.cardStartTime=Date.now();state.currentDuration=state.remainingTime;state.flipTimer=setTimeout(()=>{showNextItem(true);},state.remainingTime);}});
         
         function initIntroSequence(){generateClockMarks();el.leftPanel.classList.add('loaded');el.rightPanel.classList.add('loaded');setTimeout(()=>{el.mainContainer.classList.add('open');},200);}
         document.addEventListener("DOMContentLoaded",()=>{el.crYear.textContent=new Date().getFullYear();selectHourlyAnimationBundle();document.addEventListener('visibilitychange',handleVisibilityChange);setInterval(updateTimeAndState,1000);updateTimeAndState();onValue(feedsRef,(snap)=>{state.rssFeeds=snap.val()||{};refreshNews();});fetchWeatherData();setInterval(fetchWeatherData,120000);fetchNyiregyhazaSpecific();setInterval(fetchNyiregyhazaSpecific,30000);setInterval(checkBreakingNews,45000);setTimeout(checkBreakingNews,5000);setInterval(showCredits,300000);document.getElementById('manual-refresh-trigger').addEventListener('click',()=>refreshNews());document.getElementById('next-btn').addEventListener('click',(e)=>{e.preventDefault();e.stopPropagation();showNextItem(true);});document.getElementById('prev-btn').addEventListener('click',(e)=>{e.preventDefault();e.stopPropagation();state.currentIndex-=2;showNextItem(true);});el.newsContainer.addEventListener('click',(e)=>{if(e.target.closest('#breaking-panel')){e.preventDefault();e.stopPropagation();if(state.breakingLink){window.open(state.breakingLink,'_blank');}return;}if(e.target.closest('.controls-bar')||e.target.closest('.breaking-pod'))return;if(e.target.closest('.tip-card'))return;e.stopPropagation();if(state.currentItem&&state.currentItem.link&&!e.target.closest('.midnight-segment')){window.open(state.currentItem.link,'_blank');}});el.msCardsViewport.addEventListener('click',(e)=>{const msCard=e.target.closest('.ms-small-card');if(msCard){e.preventDefault();e.stopPropagation();window.open(msCard.dataset.link,'_blank');}});setTimeout(fetchExchangeRates,5000);initIntroSequence();});
