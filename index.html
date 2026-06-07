@@ -11,11 +11,11 @@
 <script src="https://unpkg.com/suncalc@1.8.0/suncalc.js"></script>
 <style>
 :root {
-    --sky-1: #090d16;
-    --sky-2: #111827;
-    --panel-bg: rgba(17, 24, 39, 0.92);
-    --panel-blur: blur(12px);
-    --panel-border: rgba(245, 158, 11, 0.25);
+    --sky-1: #05070c;
+    --sky-2: #0f172a;
+    --panel-bg: rgba(13, 18, 30, 0.95);
+    --panel-blur: blur(10px);
+    --panel-border: rgba(245, 158, 11, 0.4);
     --panel-border-light: rgba(255, 255, 255, 0.08);
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
@@ -31,22 +31,22 @@
     --cap-radius: 6px;
     --inner-radius: 4px;
     --bar-height: 220px;
-    --shadow-soft: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    --shadow-soft: 0 12px 32px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-font-smoothing: antialiased !important; -moz-osx-font-smoothing: grayscale !important; text-rendering: optimizeLegibility !important; }
 svg { shape-rendering: geometricPrecision; }
 img { image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
-body { background-color: #05070c; font-family: var(--font-body); color: var(--text-main); overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; transform: translate3d(0, 0, 0); }
+body { background-color: #030408; font-family: var(--font-body); color: var(--text-main); overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; transform: translate3d(0, 0, 0); }
 .ambient-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(135deg, var(--sky-1), var(--sky-2)); transition: background 3s ease; }
 
 .kepben-logo-container { position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; z-index: 50; transition: transform 0.2s ease; margin-bottom: 6px; transform: translate3d(0,0,0); backface-visibility: hidden; }
 .kepben-logo-container:hover { transform: scale(1.01) translate3d(0,0,0); }
 .kb-slogan-top { font-family: var(--font-head); font-weight: 800; font-size: 0.55rem; letter-spacing: 4px; color: var(--text-muted); text-transform: uppercase; margin-bottom: -4px; z-index: 2; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
-.kepben-logo-mark { display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1.5px solid var(--panel-border); padding: 5px 16px; border-radius: var(--inner-radius); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); transform: translate3d(0,0,0); backface-visibility: hidden; }
-.kb-icon { width: 20px; height: 20px; stroke: var(--accent-color); stroke-width: 2.2; fill: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
-.kb-text { font-family: var(--font-head); font-weight: 900; font-size: 1.15rem; letter-spacing: 0.5px; color: #ffffff; display: flex; align-items: baseline; text-shadow: 0 2px 4px rgba(0,0,0,0.4); }
-.kb-exclaim { color: var(--accent-color); font-size: 1.3rem; font-weight: 950; text-shadow: 0 0 8px rgba(245, 158, 11, 0.5); }
+.kepben-logo-mark { display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1.5px solid var(--panel-border); padding: 6px 20px; border-radius: var(--inner-radius); box-shadow: 0 4px 12px rgba(0,0,0,0.5); backdrop-filter: blur(8px); transform: translate3d(0,0,0); backface-visibility: hidden; }
+.kb-icon { width: 22px; height: 22px; stroke: var(--accent-color); stroke-width: 2.2; fill: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+.kb-text { font-family: var(--font-head); font-weight: 900; font-size: 1.22rem; letter-spacing: 0.5px; color: #ffffff; display: flex; align-items: baseline; text-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+.kb-exclaim { color: var(--accent-color); font-size: 1.35rem; font-weight: 950; text-shadow: 0 0 8px rgba(245, 158, 11, 0.5); }
 
 .inline-kb-logo-text { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 3px 8px; border-radius: var(--inner-radius); border: 1px solid var(--panel-border); margin: -2px 0; transform: translate3d(0,0,0); backface-visibility: hidden; }
 .kb-icon-micro { width: 12px; height: 12px; stroke: var(--accent-color); stroke-width: 2.5; fill: none; }
@@ -78,27 +78,14 @@ body { background-color: #05070c; font-family: var(--font-body); color: var(--te
 .panel-face { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; z-index: 2; backface-visibility: hidden; border-radius: inherit; }
 .panel-face.back { display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1; background: transparent; }
 
-.id-content { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 12px 16px 4px 16px; text-align: center; }
-.id-header-block { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; padding-bottom: 0px; border-bottom: none; margin-bottom: 0; flex-shrink: 0; }
+.id-content { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 12px 16px 4px 16px; text-align: center; }
+.id-header-block { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; padding-bottom: 0px; border-bottom: none; margin-bottom: 0; flex-shrink: 0; }
 
-.left-prog-badge { font-family: var(--font-head); font-weight: 800; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; padding: 4px 12px; border-radius: var(--inner-radius); background: rgba(0,0,0,0.4); border: 1.5px solid var(--accent-color); color: var(--accent-color); transition: all 0.3s ease; opacity: 0; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+.left-prog-badge { font-family: var(--font-head); font-weight: 800; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; padding: 4px 12px; border-radius: var(--inner-radius); background: rgba(0,0,0,0.4); border: 1.5px solid var(--accent-color); color: var(--accent-color); transition: all 0.3s ease; opacity: 0; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
 .left-prog-badge.visible { opacity: 1; }
 
 #night-summary-label { display: none; font-size: 0.55rem; font-weight: 800; color: var(--accent-next); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 6px; text-align: center; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
 #night-summary-label.active { display: block; }
-
-.live-greeting { font-family: var(--font-head); font-size: 0.75rem; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-top: 10px; text-shadow: 0 1px 2px rgba(0,0,0,0.5); opacity: 0.9; transition: color 0.5s ease; }
-
-.badge-night { color: #d8b4fe; border-color: rgba(216,180,254,0.5); }
-.badge-dawn { color: #fca5a5; border-color: rgba(252,165,165,0.5); }
-.badge-morning { color: #fde047; border-color: rgba(253,224,71,0.5); }
-.badge-day { color: #7dd3fc; border-color: rgba(125,211,252,0.5); }
-.badge-noon { color: #fef08a; border-color: rgba(254,240,138,0.5); }
-.badge-afternoon { color: #5eead4; border-color: rgba(94,234,212,0.5); }
-.badge-sunset { color: #e879f9; border-color: rgba(232,121,249,0.5); }
-.badge-evening { color: #c084fc; border-color: rgba(192,132,252,0.5); }
-.badge-traffic { color: #000; background: var(--accent-traffic); border-color: var(--accent-traffic); }
-.badge-tip { color: #000; background: var(--accent-info); border-color: var(--accent-info); }
 
 .clock-capsule-container { width: 100%; padding: 0 16px 16px 16px; flex-shrink: 0; z-index: 20; position: relative; }
 .clock-capsule { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--inner-radius); padding: 8px 18px; width: 100%; height: 48px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); position: relative; overflow: hidden; }
@@ -122,7 +109,7 @@ body { background-color: #05070c; font-family: var(--font-body); color: var(--te
 .eco-carousel { width: 100%; flex-grow: 1; position: relative; }
 .eco-slide { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; flex-direction: column; gap: 4px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
 .eco-slide.active { opacity: 1; pointer-events: all; }
-.eco-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); padding: 5px 10px; border-radius: var(--inner-radius); }
+.eco-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.05); padding: 5px 10px; border-radius: var(--inner-radius); }
 .eco-curr { display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-weight: 700; color: var(--accent-color); font-size: 0.8rem; }
 .eco-val { font-family: var(--font-mono); font-weight: 700; color: var(--text-main); font-size: 0.75rem; }
 .eco-flag { width: 18px; border-radius: 1.5px; box-shadow: 0 1px 3px rgba(0,0,0,0.4);}
@@ -395,7 +382,6 @@ body { background-color: #05070c; font-family: var(--font-body); color: var(--te
                             </div>
                             <div id="left-program-badge" class="left-prog-badge visible">BETÖLTÉS...</div>
                             <div id="night-summary-label">AZ ELŐZŐ NAP HÍREI - ÖSSZEFOGLALÓ</div>
-                            <div id="live-time-greeting" class="live-greeting">KÉPBEN!</div>
                         </div>
                     </div>
                 </div>
@@ -631,8 +617,8 @@ body { background-color: #05070c; font-family: var(--font-body); color: var(--te
             THUNDER:`<svg viewBox="0 0 100 100"><path d="M25 55 A18 18 0 0 1 35 25 A22 22 0 0 1 70 30 A18 18 0 0 1 70 60 Z" fill="#64748b"/><polygon points="55 55 35 75 45 75 40 95 65 70 55 70" fill="#fbbf24"/></svg>`
         };
         const TRAFFIC_ICON = `<svg class="traffic-icon-svg" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>`;
-        const SKY_PHASES = { DEEP_NIGHT: { stops:["#090d16", "#111827"] }, ASTRO_DAWN: { stops:["#111827", "#1e1b4b"] }, NAUTICAL_DAWN: { stops:["#1e1b4b", "#312e81"] }, CIVIL_DAWN: { stops:["#312e81", "#4a044e"] }, SUNRISE: { stops:["#be185d", "#ea580c"] }, MORNING: { stops:["#111827", "#1e293b"] }, NOON: { stops:["#0f172a", "#1e293b"] }, AFTERNOON: { stops:["#1e293b", "#0f172a"] }, SUNSET: { stops:["#db2777", "#ea580c"] }, EVENING: { stops:["#312e81", "#1e1b4b"] } }; 
-        const COUNTRY_NAMES = {'hu':'Magyarország','ru':'Oroszország','us':'Egyesült Államok','aq':'Antarktika','gl':'Grönland','ar':'Argentína','ae':'Egyesült Arab Emírségek','is':'Izland','np':'Nepál','za':'Dél-Afrika','au':'Ausztrália','jp':'Japán','sj':'Svalbard','bo':'Bolívia','pe':'Peru','ua':'Ukrajna','cl':'Chile','mn':'Mongólia','et':'Etiópia','in':'India','ca':'Kanada','pl':'Lengyelország','sk':'Szlovákia','at':'Ausztria','it':'Olaszország','fr':'Franciaország','ch':'Svájc','nz':'Új-Zéland','kz':'Kazánsztán','ge':'Grúzia','bg':'Bulgária','gb':'Egyesült Királyság','de':'Németország','es':'Spanyolország','cz':'Csehország','ro':'Románia','no':'Norvégia','fi':'Finnország','se':'Svédország','nl':'Hollandia','dk':'Dánia','ie':'Írország','pt':'Portugália','be':'Belgium','br':'Brazília','eg':'Egyiptom','ke':'Kenya','th':'Thaiföld','sg':'Szingapúr','kr':'Dél-Korea','fo':'Feröer-szigetek','mc':'Monaco','gr':'Görögország','mx':'Mexikó','hr':'Horvátország','si':'Szlovénia','rs':'Szerbia'};
+        const SKY_PHASES = { DEEP_NIGHT: { stops:["#05070c", "#0f172a"] }, ASTRO_DAWN: { stops:["#0f172a", "#1e1b4b"] }, NAUTICAL_DAWN: { stops:["#1e1b4b", "#312e81"] }, CIVIL_DAWN: { stops:["#312e81", "#4a044e"] }, SUNRISE: { stops:["#be185d", "#ea580c"] }, MORNING: { stops:["#0f172a", "#1e293b"] }, NOON: { stops:["#0f172a", "#111827"] }, AFTERNOON: { stops:["#1e293b", "#0f172a"] }, SUNSET: { stops:["#db2777", "#ea580c"] }, EVENING: { stops:["#312e81", "#1e1b4b"] } }; 
+        const COUNTRY_NAMES = {'hu':'Magyarország','ru':'Oroszország','us':'Egyesült Államok','aq':'Antarktika','gl':'Grönland','ar':'Argentína','ae':'Egyesült Arab Emírségek','is':'Izland','np':'Nepál','za':'Dél-Afrika','au':'Ausztrália','jp':'Japán','sj':'Svalbard','bo':'Bolívia','pe':'Peru','ua':'Ukrajna','cl':'Chile','mn':'Mongólia','et':'Etiópia','in':'India','ca':'Kanada','pl':'Lengyelország','sk':'Szlovákia','at':'Ausztria','it':'Olaszország','fr':'Franciaország','ch':'Svájc','nz':'Új-Zéland','kz':'Kazánsztán','ge':'Grúzia','bg':'Bulgária','gb':'Egyesült Királyság','de':'Németország','es':'Spanyolország','cz':'Csehország','ro':'Románia','no':'Norvégia','fi':'Finnország','se':'Svédország','nl':'Hollandia','dk':'Dánia','ie':'Írország','pt':'Portugália','be':'Belgium','br':'Brazília','eg':'Egyiptom','ke':'Kenya','th':'Thaiföld','sg':'Szingapúr','kr':'Dél-Korea','fo':'Feröer-szigetek','mc':'Monaco','gr':'Görögország','mx':'Mexikó','hr':'Horvátország','si':'Szlovénia','rs':'Szerbia','tr':'Törökország','cn':'Kína','ke':'Kenya','eg':'Egyiptom'};
         
         function getCountryCode(name, tz) {
             const map = {'Zakopane':'pl', 'Varsó':'pl', 'Poprád':'sk', 'Donovaly':'sk', 'Pozsony':'sk', 'Semmering':'at', 'Murau':'at', 'Bécs':'at', 'Cortina d\'Ampezzo':'it', 'Róma':'it', 'Chamonix':'fr', 'Párizs':'fr', 'Zermatt':'ch', 'St. Moritz':'ch', 'Aspen':'us', 'Death Valley':'us', 'Las Vegas':'us', 'Honolulu':'us', 'Grand Canyon':'us', 'Mt. Washington':'us', 'New York':'us', 'Los Angeles':'us', 'Miami':'us', 'Utqiagvik':'us', 'Whistler':'ca', 'Banff':'ca', 'Alert':'ca', 'Eureka':'ca', 'Toronto':'ca', 'Queenstown':'nz', 'Bariloche':'ar', 'Ushuaia':'ar', 'Niseko':'jp', 'Nagano':'jp', 'Tokió':'jp', 'Szocsi':'ru', 'Ojmjakon':'ru', 'Verhojanszk':'ru', 'Tiksi':'ru', 'Almati':'kz', 'Gudauri':'ge', 'Banszko':'bg', 'McMurdo':'aq', 'Vostok':'aq', 'Amundsen-Scott':'aq', 'Dome Argus':'aq', 'Nuuk':'gl', 'Ittoqqortoormiit':'gl', 'Dubai':'ae', 'Reykjavík':'is', 'Mt. Everest':'np', 'Fokváros':'za', 'Sydney':'au', 'Coober Pedy':'au', 'Longyearbyen':'sj', 'La Paz':'bo', 'Machu Picchu':'pe', 'Csernobil':'ua', 'Húsvét-sziget':'cl', 'Arica':'cl', 'Atacama':'cl', 'Góbi sivatag':'mn', 'Dallol':'et', 'Cherrapunji':'in', 'Mawsynram':'in', 'London':'gb', 'Berlin':'de', 'Madrid':'es', 'Prága':'cz', 'Bukarest':'ro', 'Kolozsvár':'ro', 'Zágráb':'hr', 'Ljubljana':'si', 'Belgrád':'rs', 'Oslo':'no', 'Helsinki':'fi', 'Stockholm':'se', 'Amszterdam':'nl', 'Koppenhága':'dk', 'Dublin':'ie', 'Lisszabon':'pt', 'Brüsszel':'be', 'Rio de Janeiro':'br', 'Kairó':'eg', 'Nairobi':'ke', 'Bangkok':'th', 'Szingapúr':'sg', 'Szöul':'kr', 'Peking':'cn', 'Tórshavn':'fo', 'Monaco':'mc', 'Athén':'gr', 'Isztambul':'tr'};
@@ -642,8 +628,8 @@ body { background-color: #05070c; font-family: var(--font-body); color: var(--te
         }
 
         function parseLocationName(rawName){let cleanName=rawName;let cc='hu';let cn='Magyarország';const match=rawName.match(/(.+?)\s*\(([A-Z]{2})\)$/);if(match){cleanName=match[1].trim();cc=match[2].toLowerCase();cn=COUNTRY_NAMES[cc]||cc.toUpperCase();}return {name:cleanName,cc:cc,cn:cn};}
-        const PWS_MAP={"ISRVR13":"Sárvár","IOSZK4":"Oszkó","ISZNTD6":"Szántód","IBALAT149":"Balatonszemes","IBUZSK1":"Csisztapuszta","ISZEKS12":"Szekszárd","IJNOSH2":"Jánoshalma","IPCS52":"Pécs","IPPRD1":"Páprád","IKISKU42":"Kiskunhalas","INEMES10":"Nemesnádudvar","ISZEGE67":"Szeged","IBKSCS12":"Békéscsaba","IFZESG2":"Füzesgyarmat","IMIKEP2":"Mikepércs","ITGLS2":"Téglás","IGACSL1":"Gacsály","IFLESD1":"Fülesd","IKISSZ3":"Kisszekeres","ILEVEL2":"Levelek","IKEMEC2":"Kemecse","INAGYC6":"Nagycserkesz","ITISZA15":"Tiszavasvári","INEMES19":"Nemesbikk","IEGERS22":"Egerszólát","IBKKSZ5":"Bükkszenterzsébet","IPSZT1":"Pásztó","IPALOT13":"Palotás","IGDLL37":"Gödöllő","IZSMBK6":"Zsámbék","ICSORN6":"Csorna","IGAGYV1":"Gagyvendégi","IMARTO122":"Martonyi","IKAZIN14":"Kazincbarcika","IPUTNO1":"Putnok","IZABAR1":"Zabar","ISALGT1":"Salgótarján","IKARAN11":"Karancslapujtő","IBEKLC3":"Bekölce","IMTRAB1":"Mátraballa","IVC267":"Vác","IPILIS37":"Pilisvörösvár","IFELCS4":"Felcsút","IBUDAK6":"Budakeszi","IBIATO9":"Biatorbágy","ICSKVR4":"Csákvár","IOROSZ2":"Oroszlány","IBALINKA2":"Bakony","ISR67":"Súr","IPANNO3":"Pannonhalma","IKAJRP2":"Kajárpéc","IPPA11":"Pápa","ICELLD14":"Celldömölk","IHEVES2":"Heves","IGYNGY22":"Gyöngyös","ISZCSN9":"Szécsény","ITAHIT11":"Tahitótfalu","IESZTE5":"Esztergom","ITATA16":"Tata","IKARTAL4":"Kartal","IMARTO67":"Martonvásár","ISZOLNOK10":"Szolnok","ISZOLN13":"Szolnok","INAGYK59":"Nagykőrös","IKECSK31":"Kecskemét","IKALOCSA2":"Kalocsa","IBONYH1":"Bonyhád","ISZENT114":"Szentlőrinc","ILJUBL47":"Ljubljana","IBAKTA4":"Baktalórántháza","IJFEHR1":"Újfehértó","IPAPOS6":"Papos","ISONKD1":"Sonkád","INAPKO1":"Napkor","IHARSN4":"Harsány","IBKKSZ2":"Bükkszentkereszt","INYREG37":"Nyíregyháza","IPUSZT3":"Pusztadobos","ITISZA93":"Tiszaújváros","IEGER76":"Eger","IHAJDD7":"Hajdúdorog","IGYULA12":"Gyula","IMAGYA4":"Magyarcsanád","IHDMEZ21":"Hódmezővásárhely","ISZEGE23":"Szeged-Rókus","ICSENG9":"Csengele","INAGYN1":"Nagynyárád","IKIRLY1":"Királyegyháza","ITAMSI1":"Tamási","IZALAE45":"Zalaegerszeg","IFARKA7":"Farkasgyepű","INYRAC1":"Nyíracsád","ISZAMO11":"Szamosújlak","IGVAVE1":"Gávavencsellő","IEDELN2":"Edelény","INYRI1":"Nyíri","IBTTS1":"Büttös","IZD2":"Ózd"};
-        const HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:48.1,lon:20.78},{name:'Szombathely',lat:47.23,lon:16.62},{name:'Győr',lat:47.68,lon:17.63},{name:'Pécs',lat:46.07,lon:18.23},{name:'Szeged',lat:46.25,lon:20.15},{name:'Eger',lat:47.9,lon:20.37},{name:'Veszprém',lat:47.09,lon:17.91},{name:'Zalaegerszeg',lat:46.84,lon:16.84},{name:'Békéscsaba',lat:46.68,lon:21.09},{name:'Kaposvár',lat:46.36,lon:17.79},{name:'Tatabánya',lat:47.57,lon:18.4},{name:'Salgótarján',lat:48.1,lon:19.8},{name:'Szekszárd',lat:46.35,lon:18.7},{name:'Sopron',lat:47.68,lon:16.58},{name:'Hódmezővásárhely',lat:46.43,lon:20.32},{name:'Nagykanizsa',lat:46.45,lon:16.99},{name:'Dunaújváros',lat:46.96,lon:18.93},{name:'Érd',lat:47.38,lon:18.91},{name:'Szolnok',lat:47.18,lon:20.2},{name:'Kecskemét',lat:46.88,lon:19.64},{name:'Baja',lat:46.18,lon:18.95},{name:'Cegléd',lat:47.17,lon:19.8},{name:'Vác',lat:47.78,lon:19.13},{name:'Gödöllő',lat:47.6,lon:19.35},{name:'Ózd',lat:48.22,lon:20.29},{name:'Pápa',lat:47.33,lon:17.47},{name:'Gyula',lat:46.65,lon:21.28},{name:'Hajdúböszörmény',lat:47.67,lon:21.51},{name:'Nyíregyháza',lat:47.95,lon:21.71},{name:'Balatonfüred',lat:46.96,lon:17.89},{name:'Keszthely',lat:46.76,lon:17.24},{name:'Siófok',lat:46.9,lon:18.05},{name:'Komárom',lat:47.74,lon:18.11},{name:'Esztergom',lat:47.79,lon:18.74},{name:'Tata',lat:47.65,lon:18.31},{name:'Mohács',lat:45.99,lon:18.68},{name:'Paks',lat:46.62,lon:18.86},{name:'Kalocsa',lat:46.53,lon:18.98},{name:'Kiskunfélegyháza',lat:46.71,lon:19.85},{name:'Jászberény',lat:47.5,lon:19.91},{name:'Hatvan',lat:47.66,lon:19.67},{name:'Gyöngyös',lat:47.78,lon:19.93},{name:'Kazincbarcika',lat:48.25,lon:20.62},{name:'Sátoraljaújhely',lat:48.4,lon:21.65},{name:'Kisvárda',lat:48.22,lon:22.08},{name:'Mátészalka',lat:47.95,lon:22.32},{name:'Makó',lat:46.22,lon:20.47},{name:'Szentes',lat:46.65,lon:20.26},{name:'Orosháza',lat:46.57,lon:20.66},{name:'Karcag',lat:47.31,lon:20.93},{name:'Hajdúszoboszló',lat:47.45,lon:21.39},{name:'Törökszentmiklós',lat:47.17,lon:20.41},{name:'Gyál',lat:47.38,lon:19.22},{name:'Dunakeszi',lat:47.64,lon:19.14},{name:'Budaörs',lat:47.46,lon:18.96},{name:'Szentendre',lat:47.66,lon:19.07},{name:'Szigetszentmiklós',lat:47.34,lon:19.05},{name:'Mosonmagyaróvár',lat:47.87,lon:17.27},{name:'Bicske',lat:47.49,lon:18.63},{name:'Monor',lat:47.35,lon:19.45},{name:'Mezőkövesd',lat:47.81,lon:20.57},{name:'Tiszaújváros',lat:47.92,lon:21.05},{name:'Sárospatak',lat:48.32,lon:21.57},{name:'Kapuvár',lat:47.59,lon:17.02},{name:'Dombóvár',lat:46.37,lon:18.13},{name:'Dabas',lat:47.18,lon:19.32},{name:'Aszód',lat:47.65,lon:19.48},{name:'Kiskunhalas',lat:46.43,lon:19.48},{name:'Kiskunmajsa',lat:46.49,lon:19.73},{name:'Berettyóújfalu',lat:47.22,lon:21.54},{name:'Balmazújváros',lat:47.61,lon:21.34},{name:'Tiszafüred',lat:47.62,lon:20.76},{name:'Sárbogárd',lat:46.88,lon:18.62},{name:'Zakopane',lat:49.29,lon:19.94,tz:'Europe/Warsaw'},{name:'Poprád',lat:49.05,lon:20.3,tz:'Europe/Bratislava'},{name:'Donovaly',lat:48.88,lon:19.22,tz:'Europe/Bratislava'},{name:'Semmering',lat:47.63,lon:15.83,tz:'Europe/Vienna'},{name:'Murau',lat:47.11,lon:14.17,tz:'Europe/Vienna'},{name:'Cortina d\'Ampezzo',lat:46.54,lon:12.13,tz:'Europe/Rome'},{name:'Chamonix',lat:45.92,lon:6.86,tz:'Europe/Paris'},{name:'Zermatt',lat:46.02,lon:7.74,tz:'Europe/Zurich'},{name:'St. Moritz',lat:46.49,lon:9.83,tz:'Europe/Zurich'},{name:'Aspen',lat:39.19,lon:-106.81,tz:'America/Denver'},{name:'Whistler',lat:50.11,lon:-122.95,tz:'America/Vancouver'},{name:'Banff',lat:51.17,lon:-115.57,tz:'America/Edmonton'},{name:'Queenstown',lat:-45.03,lon:168.66,tz:'Pacific/Auckland'},{name:'Bariloche',lat:-41.13,lon:-71.3,tz:'America/Argentina/Buenos_Aires'},{name:'Niseko',lat:42.8,lon:140.68,tz:'Asia/Tokyo'},{name:'Nagano',lat:36.64,lon:138.18,tz:'Asia/Tokyo'},{name:'Szocsi',lat:43.6,lon:39.73,tz:'Europe/Moscow'},{name:'Ojmjakon',lat:63.46,lon:142.79,tz:'Asia/Srednekolymsk'},{name:'Death Valley',lat:36.53,lon:-116.93,tz:'America/Los_Angeles'},{name:'McMurdo',lat:-77.85,lon:166.67,tz:'Antarctica/McMurdo'},{name:'Nuuk',lat:64.18,lon:-51.72,tz:'America/Nuuk'},{name:'Ushuaia',lat:-54.8,lon:-68.3,tz:'America/Argentina/Ushuaia'},{name:'Dubai',lat:25.2,lon:55.27,tz:'Asia/Dubai'},{name:'Reykjavík',lat:64.14,lon:-21.9,tz:'Atlantic/Reykjavik'},{name:'Las Vegas',lat:36.17,lon:-115.14,tz:'America/Los_Angeles'},{name:'Honolulu',lat:21.3,lon:-157.85,tz:'Pacific/Honolulu'},{name:'Mt. Everest',lat:27.98,lon:86.92,tz:'Asia/Kathmandu'},{name:'Fokváros',lat:-33.92,lon:18.42,tz:'Africa/Johannesburg'},{name:'Sydney',lat:-33.86,lon:151.2,tz:'Australia/Sydney'},{name:'Tokió',lat:35.67,lon:139.65,tz:'Asia/Tokyo'},{name:'Longyearbyen',lat:78.22,lon:15.65,tz:'Arctic/Longyearbyen'},{name:'La Paz',lat:-16.5,lon:-68.12,tz:'America/La_Paz'},{name:'Machu Picchu',lat:-13.16,lon:-72.54,tz:'America/Lima'},{name:'Csernobil',lat:51.27,lon:30.22,tz:'Europe/Kyiv'},{name:'Húsvét-sziget',lat:-27.11,lon:-109.35,tz:'Pacific/Easter'},{name:'Grand Canyon',lat:36.1,lon:-112.11,tz:'America/Phoenix'},{name:'Góbi sivatag',lat:42.59,lon:103.43,tz:'Asia/Ulaanbaatar'},{name:'Túrkeve',lat:47.1,lon:20.75},{name:'Lenti',lat:46.62,lon:16.54},{name:'Répáshuta',lat:48.04,lon:20.53},{name:'Tés',lat:47.26,lon:18.03},{name:'Kőris-hegy',lat:47.29,lon:17.75},{name:'Fülöpháza',lat:46.88,lon:19.43},{name:'Dallol',lat:14.24,lon:40.3,tz:'Africa/Addis_Ababa'},{name:'Vostok',lat:-78.46,lon:106.84,tz:'Antarctica/Vostok'},{name:'Cherrapunji',lat:25.27,lon:91.73,tz:'Asia/Kolkata'},{name:'Atacama',lat:-22.91,lon:-68.2,tz:'America/Santiago'},{name:'Mt. Washington',lat:44.27,lon:-71.3,tz:'America/New_York'},{name:'Alert',lat:82.5,lon:-62.33,tz:'America/Iqaluit'},{name:'Kőszeg',lat:47.38,lon:16.54},{name:'Szentgotthárd',lat:47.27,lon:16.27},{name:'Tapolca',lat:46.88,lon:17.44},{name:'Szigetvár',lat:45.98,lon:17.8},{name:'Pásztó',lat:47.92,lon:19.69},{name:'Gönc',lat:48.47,lon:21.28},{name:'Tokaj',lat:48.12,lon:21.41},{name:'Mezőtúr',lat:47.0,lon:20.62},{name:'Csongrád',lat:46.71,lon:20.14},{name:'Balassagyarmat',lat:48.08,lon:19.29},{name:'New York',lat:40.71,lon:-74.0,tz:'America/New_York'},{name:'London',lat:51.5,lon:-0.12,tz:'Europe/London'},{name:'Párizs',lat:48.85,lon:2.35,tz:'Europe/Paris'},{name:'Róma',lat:41.9,lon:12.49,tz:'Europe/Rome'},{name:'Berlin',lat:52.52,lon:13.4,tz:'Europe/Berlin'},{name:'Madrid',lat:40.41,lon:-3.7,tz:'Europe/Madrid'},{name:'Bécs',lat:48.2,lon:16.37,tz:'Europe/Vienna'},{name:'Prága',lat:50.07,lon:14.43,tz:'Europe/Prague'},{name:'Varsó',lat:52.22,lon:21.01,tz:'Europe/Warsaw'},{name:'Bukarest',lat:44.42,lon:26.1,tz:'Europe/Bucharest'},{name:'Pozsony',lat:48.14,lon:17.1,tz:'Europe/Bratislava'},{name:'Zágráb',lat:45.81,lon:15.97,tz:'Europe/Zagreb'},{name:'Ljubljana',lat:46.05,lon:14.5,tz:'Europe/Ljubljana'},{name:'Belgrád',lat:44.81,lon:20.45,tz:'Europe/Belgrade'},{name:'Kolozsvár',lat:46.77,lon:23.59,tz:'Europe/Bucharest'},{name:'Székesfehérvár',lat:47.19,lon:18.41},{name:'Oslo',lat:59.91,lon:10.75,tz:'Europe/Oslo'},{name:'Helsinki',lat:60.16,lon:24.93,tz:'Europe/Helsinki'},{name:'Stockholm',lat:59.32,lon:18.06,tz:'Europe/Stockholm'},{name:'Amszterdam',lat:52.36,lon:4.9,tz:'Europe/Amsterdam'},{name:'Koppenhága',lat:55.67,lon:12.56,tz:'Europe/Copenhagen'},{name:'Dublin',lat:53.34,lon:-6.26,tz:'Europe/Dublin'},{name:'Lisszabon',lat:38.72,lon:-9.14,tz:'Europe/Lisbon'},{name:'Brüsszel',lat:50.85,lon:4.35,tz:'Europe/Brussels'},{name:'Verhojanszk',lat:67.54,lon:133.38,tz:'Asia/Vladivostok'},{name:'Dome Argus',lat:-80.36,lon:77.35,tz:'Antarctica/Davis'},{name:'Tiksi',lat:71.63,lon:128.86,tz:'Asia/Yakutsk'},{name:'Arica',lat:-18.47,lon:-70.31,tz:'America/Santiago'},{name:'Mawsynram',lat:25.29,lon:91.58,tz:'Asia/Kolkata'},{name:'Ittoqqortoormiit',lat:70.48,lon:-21.96,tz:'America/Scoresbysund'},{name:'Utqiagvik',lat:71.29,lon:-156.78,tz:'America/Anchorage'},{name:'Amundsen-Scott',lat:-90.0,lon:0.0,tz:'Antarctica/South_Pole'},{name:'Eureka',lat:79.98,lon:-85.94,tz:'America/Resolute'},{name:'Coober Pedy',lat:-29.01,lon:134.75,tz:'Australia/Adelaide'},{name:'Zirc',lat:47.26,lon:17.87},{name:'Szarvas',lat:46.86,lon:20.55},{name:'Kiskőrös',lat:46.62,lon:19.28},{name:'Mezőberény',lat:46.82,lon:21.03},{name:'Bonyhád',lat:46.3,lon:18.53},{name:'Mór',lat:47.37,lon:18.2},{name:'Balatonboglár',lat:46.76,lon:17.65},{name:'Fonyód',lat:46.74,lon:17.55},{name:'Szerencs',lat:48.16,lon:21.2},{name:'Bátonyterenye',lat:48.0,lon:19.83},{name:'Letenye',lat:46.43,lon:16.72},{name:'Siklós',lat:45.85,lon:18.3},{name:'Barcs',lat:45.96,lon:17.46},{name:'Kisbér',lat:47.5,lon:18.02},{name:'Miami',lat:25.76,lon:-80.19,tz:'America/New_York'},{name:'Los Angeles',lat:34.05,lon:-118.24,tz:'America/Los_Angeles'},{name:'Toronto',lat:43.65,lon:-79.38,tz:'America/Toronto'},{name:'Rio de Janeiro',lat:-22.9,lon:-43.2,tz:'America/Sao_Paulo'},{name:'Kairó',lat:30.04,lon:31.23,tz:'Africa/Cairo'},{name:'Nairobi',lat:-1.29,lon:36.82,tz:'Africa/Nairobi'},{name:'Bangkok',lat:13.75,lon:100.5,tz:'Asia/Bangkok'},{name:'Szingapúr',lat:1.35,lon:103.81,tz:'Asia/Singapore'},{name:'Szöul',lat:37.56,lon:126.97,tz:'Asia/Seoul'},{name:'Peking',lat:39.9,lon:116.4,tz:'Asia/Shanghai'},{name:'Tórshavn',lat:62.01,lon:-6.77,tz:'Atlantic/Faroe'},{name:'Monaco',lat:43.73,lon:7.42,tz:'Europe/Monaco'},{name:'Athén',lat:37.98,lon:23.72,tz:'Europe/Athens'},{name:'Isztambul',lat:41.0,lon:28.97,tz:'Europe/Istanbul'}];
+        const PWS_MAP={"ISRVR13":"Sárvár","IOSZK4":"Oszkó","ISZNTD6":"Szántód","IBALAT149":"Balatonszemes","IBUZSK1":"Csisztapuszta","ISZEKS12":"Szekszárd","IJNOSH2":"Jánoshalma","IPCS52":"Pécs","IPPRD1":"Páprád","IKISKU42":"Kiskunhalas","INEMES10":"Nemesnádudvar","ISZEGE67":"Szeged","IBKSCS12":"Békéscsaba","IFZESG2":"Füzesgyarmat","IMIKEP2":"Mikepércs","ITGLS2":"Téglás","IGACSL1":"Gacsály","IFLESD1":"Fülesd","IKISSZ3":"Kisszekeres","ILEVEL2":"Levelek","IKEMEC2":"Kemecse","INAGYC6":"Nagycserkesz","ITISZA15":"Tiszavasvári","INEMES19":"Nemesbikk","IEGERS22":"Egerszólát","IBKKSZ5":"Bükkszenterzsébet","IPSZT1":"Pásztó","IPALOT13":"Palotás","IGDLL37":"Gödöllő","IZSMBK6":"Zsámbék","ICSORN6":"Csorna","IGAGYV1":"Gagyvendégi","IMARTO122":"Martonyi","IKAZIN14":"Kazincbarcika","IPUTNO1":"Putnok","IZABAR1":"Zabar","ISALGT1":"Salgótarján","IKARAN11":"Karancslapujtő","IBEKLC3":"Bekölce","IMTRAB1":"Mátraballa","IVC267":"Vác","IPILIS37":"Pilisvörösvár","IFELCS4":"Felcsút","IBUDAK6":"Budakeszi","IBIATO9":"Biatorbágy","ICSKVR4":"Csákvár","IOROSZ2":"Oroszlány","IBALINKA2":"Bakony","ISR67":"Súr","IPANNO3":"Pannonhalma","IKAJRP2":"Kajárpéc","IPPA11":"Pápa","ICELLD14":"Celldömölk","IHEVES2":"Heves","IGYNGY22":"Gyöngyös","ISZCSN9":"Szécsény","ITAHIT11":"Tahitótfalu","IESZTE5":"Esztergom","ITATA16":"Tata","IKARTAL4":"Kartal","IMARTO67":"Martonvásár","ISZOLNOK10":"Szolnok","ISZOLN13":"Szolnok","INAGYK59":"Nagykőrös","IKECSK31":"Kecskemét","IKALOCSA2":"Kalocsa","IBONYH1":"Bonyhád","ISZENT114":"Szentlőrinc","ILJUBL47":"Ljubljana","IBAKTA4":"Baktalórántháza","IJFEHR1":"Újfehértó","IPAPOS6":"Papos","ISONKD1":"Sonkád","INAPKO1":"Napkor","IHARSN4":"Harsány","IBKKSZ2":"Bükkszentkereszt","INYREG37":"Nyíregyháza","IPUSZT3":"Pusztadobos","ITISZA93":"Tiszaújváros","IEGERS2":"Eger","IHAJDD7":"Hajdúdorog","IGYULA12":"Gyula","IMAGYA4":"Magyarcsanád","IHDMEZ21":"Hódmezővásárhely","ISZEGE23":"Szeged-Rókus","ICSENG9":"Csengele","INAGYN1":"Nagynyárád","IKIRLY1":"Királyegyháza","ITAMSI1":"Tamási","IZALAE45":"Zalaegerszeg","IFARKA7":"Farkasgyepű","INYRAC1":"Nyíracsád","ISZAMO11":"Szamosújlak","IGVAVE1":"Gávavencsellő","IEDELN2":"Edelény","INYRI1":"Nyíri","IBTTS1":"Büttös","IZD2":"Ózd"};
+        const HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:48.1,lon:20.78},{name:'Szombathely',lat:47.23,lon:16.62},{name:'Győr',lat:47.68,lon:17.63},{name:'Pécs',lat:46.07,lon:18.23},{name:'Szeged',lat:46.25,lon:20.15},{name:'Eger',lat:47.9,lon:20.37},{name:'Veszprém',lat:47.09,lon:17.91},{name:'Zalaegerszeg',lat:46.84,lon:16.84},{name:'Békéscsaba',lat:46.68,lon:21.09},{name:'Kaposvár',lat:46.36,lon:17.79},{name:'Tatabánya',lat:47.57,lon:18.4},{name:'Salgótarján',lat:48.1,lon:19.8},{name:'Szekszárd',lat:46.35,lon:18.7},{name:'Sopron',lat:47.68,lon:16.58},{name:'Hódmezővásárhely',lat:46.43,lon:20.32},{name:'Nagykanizsa',lat:46.45,lon:16.99},{name:'Dunaújváros',lat:46.96,lon:18.93},{name:'Érd',lat:47.38,lon:18.91},{name:'Szolnok',lat:47.18,lon:20.2},{name:'Kecskemét',lat:46.88,lon:19.64},{name:'Baja',lat:46.18,lon:18.95},{name:'Cegléd',lat:47.17,lon:19.8},{name:'Vác',lat:47.78,lon:19.13},{name:'Gödöllő',lat:47.6,lon:19.35},{name:'Ózd',lat:48.22,lon:20.29},{name:'Pápa',lat:47.33,lon:17.47},{name:'Gyula',lat:46.65,lon:21.28},{name:'Hajdúböszörmény',lat:47.67,lon:21.51},{name:'Nyíregyháza',lat:47.95,lon:21.71},{name:'Balatonfüred',lat:46.96,lon:17.89},{name:'Keszthely',lat:46.76,lon:17.24},{name:'Siófok',lat:46.9,lon:18.05},{name:'Komárom',lat:47.74,lon:18.11},{name:'Esztergom',lat:47.79,lon:18.74},{name:'Tata',lat:47.65,lon:18.31},{name:'Mohács',lat:45.99,lon:18.68},{name:'Paks',lat:46.62,lon:18.86},{name:'Kalocsa',lat:46.53,lon:18.98},{name:'Kiskunfélegyháza',lat:46.71,lon:19.85},{name:'Jászberény',lat:47.5,lon:19.91},{name:'Hatvan',lat:47.66,lon:19.67},{name:'Gyöngyös',lat:47.78,lon:19.93},{name:'Kazincbarcika',lat:48.25,lon:20.62},{name:'Sátoraljaújhely',lat:48.4,lon:21.65},{name:'Kisvárda',lat:48.22,lon:22.08},{name:'Mátészalka',lat:47.95,lon:22.32},{name:'Makó',lat:46.22,lon:20.47},{name:'Szentes',lat:46.65,lon:20.26},{name:'Orosháza',lat:46.57,lon:20.66},{name:'Karcag',lat:47.31,lon:20.93},{name:'Hajdúszoboszló',lat:47.45,lon:21.39},{name:'Törökszentmiklós',lat:47.17,lon:20.41},{name:'Gyál',lat:47.38,lon:19.22},{name:'Dunakeszi',lat:47.64,lon:19.14},{name:'Budaörs',lat:47.46,lon:18.96},{name:'Szentendre',lat:47.66,lon:19.07},{name:'Szigetszentmiklós',lat:47.34,lon:19.05},{name:'Mosonmagyaróvár',lat:47.87,lon:17.27},{name:'Bicske',lat:47.49,lon:18.63},{name:'Monor',lat:47.35,lon:19.45},{name:'Mezőkövesd',lat:47.81,lon:20.57},{name:'Tiszaújváros',lat:47.92,lon:21.05},{name:'Sárospatak',lat:48.32,lon:21.57},{name:'Kapuvár',lat:47.59,lon:17.02},{name:'Dombóvár',lat:46.37,lon:18.13},{name:'Dabas',lat:47.18,lon:19.32},{name:'Aszód',lat:47.65,lon:19.48},{name:'Kiskunhalas',lat:46.43,lon:19.48},{name:'Kiskunmajsa',lat:46.49,lon:19.73},{name:'Berettyóújfalu',lat:47.22,lon:21.54},{name:'Balmazújváros',lat:47.61,lon:21.34},{name:'Tiszafüred',lat:47.62,lon:20.76},{name:'Sárbogárd',lat:46.88,lon:18.62},{name:'Zakopane',lat:49.29,lon:19.94,tz:'Europe/Warsaw'},{name:'Poprád',lat:49.05,lon:20.3,tz:'Europe/Bratislava'},{name:'Donovaly',lat:48.88,lon:19.22,tz:'Europe/Bratislava'},{name:'Semmering',lat:47.63,lon:15.83,tz:'Europe/Vienna'},{name:'Murau',lat:47.11,lon:14.17,tz:'Europe/Vienna'},{name:'Cortina d\'Ampezzo',lat:46.54,lon:12.13,tz:'Europe/Rome'},{name:'Chamonix',lat:45.92,lon:6.86,tz:'Europe/Paris'},{name:'Zermatt',lat:46.02,lon:7.74,tz:'Europe/Zurich'},{name:'St. Moritz',lat:46.49,lon:9.83,tz:'Europe/Zurich'},{name:'Aspen',lat:39.19,lon:-106.81,tz:'America/Denver'},{name:'Whistler',lat:50.11,lon:-122.95,tz:'America/Vancouver'},{name:'Banff',lat:51.17,lon:-115.57,tz:'America/Edmonton'},{name:'Queenstown',lat:-45.03,lon:168.66,tz:'Pacific/Auckland'},{name:'Bariloche',lat:-41.13,lon:-71.3,tz:'America/Argentina/Buenos_Aires'},{name:'Niseko',lat:42.8,lon:140.68,tz:'Asia/Tokyo'},{name:'Nagano',lat:36.64,lon:138.18,tz:'Asia/Tokyo'},{name:'Szocsi',lat:43.6,lon:39.73,tz:'Europe/Moscow'},{name:'Almati',lat:43.22,lon:76.85,tz:'Asia/Almaty'},{name:'Gudauri',lat:42.47,lon:44.48,tz:'Asia/Tbilisi'},{name:'Banszko',lat:41.83,lon:23.48,tz:'Europe/Sofia'},{name:'Kékestető',lat:47.87,lon:20.01},{name:'Hortobágy',lat:47.58,lon:21.15},{name:'Hévíz',lat:46.79,lon:17.19},{name:'Tihany',lat:46.91,lon:17.88},{name:'Visegrád',lat:47.78,lon:18.97},{name:'Szilvásvárad',lat:48.1,lon:20.39},{name:'Dobogókő',lat:47.72,lon:18.89},{name:'Lillafüred',lat:48.1,lon:20.62},{name:'Aggtelek',lat:48.47,lon:20.45},{name:'Bugac',lat:46.68,lon:19.68},{name:'Ojmjakon',lat:63.46,lon:142.79,tz:'Asia/Srednekolymsk'},{name:'Death Valley',lat:36.53,lon:-116.93,tz:'America/Los_Angeles'},{name:'McMurdo',lat:-77.85,lon:166.67,tz:'Antarctica/McMurdo'},{name:'Nuuk',lat:64.18,lon:-51.72,tz:'America/Nuuk'},{name:'Ushuaia',lat:-54.8,lon:-68.3,tz:'America/Argentina/Ushuaia'},{name:'Dubai',lat:25.2,lon:55.27,tz:'Asia/Dubai'},{name:'Reykjavík',lat:64.14,lon:-21.9,tz:'Atlantic/Reykjavik'},{name:'Las Vegas',lat:36.17,lon:-115.14,tz:'America/Los_Angeles'},{name:'Honolulu',lat:21.3,lon:-157.85,tz:'Pacific/Honolulu'},{name:'Mt. Everest',lat:27.98,lon:86.92,tz:'Asia/Kathmandu'},{name:'Fokváros',lat:-33.92,lon:18.42,tz:'Africa/Johannesburg'},{name:'Sydney',lat:-33.86,lon:151.2,tz:'Australia/Sydney'},{name:'Tokió',lat:35.67,lon:139.65,tz:'Asia/Tokyo'},{name:'Longyearbyen',lat:78.22,lon:15.65,tz:'Arctic/Longyearbyen'},{name:'La Paz',lat:-16.5,lon:-68.12,tz:'America/La_Paz'},{name:'Machu Picchu',lat:-13.16,lon:-72.54,tz:'America/Lima'},{name:'Csernobil',lat:51.27,lon:30.22,tz:'Europe/Kyiv'},{name:'Húsvét-sziget',lat:-27.11,lon:-109.35,tz:'Pacific/Easter'},{name:'Grand Canyon',lat:36.1,lon:-112.11,tz:'America/Phoenix'},{name:'Góbi sivatag',lat:42.59,lon:103.43,tz:'Asia/Ulaanbaatar'},{name:'Túrkeve',lat:47.1,lon:20.75},{name:'Lenti',lat:46.62,lon:16.54},{name:'Répáshuta',lat:48.04,lon:20.53},{name:'Tés',lat:47.26,lon:18.03},{name:'Kőris-hegy',lat:47.29,lon:17.75},{name:'Fülöpháza',lat:46.88,lon:19.43},{name:'Dallol',lat:14.24,lon:40.3,tz:'Africa/Addis_Ababa'},{name:'Vostok',lat:-78.46,lon:106.84,tz:'Antarctica/Vostok'},{name:'Cherrapunji',lat:25.27,lon:91.73,tz:'Asia/Kolkata'},{name:'Atacama',lat:-22.91,lon:-68.2,tz:'America/Santiago'},{name:'Mt. Washington',lat:44.27,lon:-71.3,tz:'America/New_York'},{name:'Alert',lat:82.5,lon:-62.33,tz:'America/Iqaluit'},{name:'Kőszeg',lat:47.38,lon:16.54},{name:'Szentgotthárd',lat:47.27,lon:16.27},{name:'Tapolca',lat:46.88,lon:17.44},{name:'Szigetvár',lat:45.98,lon:17.8},{name:'Pásztó',lat:47.92,lon:19.69},{name:'Gönc',lat:48.47,lon:21.28},{name:'Tokaj',lat:48.12,lon:21.41},{name:'Mezőtúr',lat:47.0,lon:20.62},{name:'Csongrád',lat:46.71,lon:20.14},{name:'Balassagyarmat',lat:48.08,lon:19.29},{name:'New York',lat:40.71,lon:-74.0,tz:'America/New_York'},{name:'London',lat:51.5,lon:-0.12,tz:'Europe/London'},{name:'Párizs',lat:48.85,lon:2.35,tz:'Europe/Paris'},{name:'Róma',lat:41.9,lon:12.49,tz:'Europe/Rome'},{name:'Berlin',lat:52.52,lon:13.4,tz:'Europe/Berlin'},{name:'Madrid',lat:40.41,lon:-3.7,tz:'Europe/Madrid'},{name:'Bécs',lat:48.2,lon:16.37,tz:'Europe/Vienna'},{name:'Prága',lat:50.07,lon:14.43,tz:'Europe/Prague'},{name:'Varsó',lat:52.22,lon:21.01,tz:'Europe/Warsaw'},{name:'Bukarest',lat:44.42,lon:26.1,tz:'Europe/Bucharest'},{name:'Pozsony',lat:48.14,lon:17.1,tz:'Europe/Bratislava'},{name:'Zágráb',lat:45.81,lon:15.97,tz:'Europe/Zagreb'},{name:'Ljubljana',lat:46.05,lon:14.5,tz:'Europe/Ljubljana'},{name:'Belgrád',lat:44.81,lon:20.45,tz:'Europe/Belgrade'},{name:'Kolozsvár',lat:46.77,lon:23.59,tz:'Europe/Bucharest'},{name:'Székesfehérvár',lat:47.19,lon:18.41},{name:'Oslo',lat:59.91,lon:10.75,tz:'Europe/Oslo'},{name:'Helsinki',lat:60.16,lon:24.93,tz:'Europe/Helsinki'},{name:'Stockholm',lat:59.32,lon:18.06,tz:'Europe/Stockholm'},{name:'Amszterdam',lat:52.36,lon:4.9,tz:'Europe/Amsterdam'},{name:'Koppenhága',lat:55.67,lon:12.56,tz:'Europe/Copenhagen'},{name:'Dublin',lat:53.34,lon:-6.26,tz:'Europe/Dublin'},{name:'Lisszabon',lat:38.72,lon:-9.14,tz:'Europe/Lisbon'},{name:'Brüsszel',lat:50.85,lon:4.35,tz:'Europe/Brussels'},{name:'Verhojanszk',lat:67.54,lon:133.38,tz:'Asia/Vladivostok'},{name:'Dome Argus',lat:-80.36,lon:77.35,tz:'Antarctica/Davis'},{name:'Tiksi',lat:71.63,lon:128.86,tz:'Asia/Yakutsk'},{name:'Arica',lat:-18.47,lon:-70.31,tz:'America/Santiago'},{name:'Mawsynram',lat:25.29,lon:91.58,tz:'Asia/Kolkata'},{name:'Ittoqqortoormiit',lat:70.48,lon:-21.96,tz:'America/Scoresbysund'},{name:'Utqiagvik',lat:71.29,lon:-156.78,tz:'America/Anchorage'},{name:'Amundsen-Scott',lat:-90.0,lon:0.0,tz:'Antarctica/South_Pole'},{name:'Eureka',lat:79.98,lon:-85.94,tz:'America/Resolute'},{name:'Coober Pedy',lat:-29.01,lon:134.75,tz:'Australia/Adelaide'},{name:'Zirc',lat:47.26,lon:17.87},{name:'Szarvas',lat:46.86,lon:20.55},{name:'Kiskőrös',lat:46.62,lon:19.28},{name:'Mezőberény',lat:46.82,lon:21.03},{name:'Bonyhád',lat:46.3,lon:18.53},{name:'Mór',lat:47.37,lon:18.2},{name:'Balatonboglár',lat:46.76,lon:17.65},{name:'Fonyód',lat:46.74,lon:17.55},{name:'Szerencs',lat:48.16,lon:21.2},{name:'Bátonyterenye',lat:48.0,lon:19.83},{name:'Letenye',lat:46.43,lon:16.72},{name:'Siklós',lat:45.85,lon:18.3},{name:'Barcs',lat:45.96,lon:17.46},{name:'Kisbér',lat:47.5,lon:18.02},{name:'Miami',lat:25.76,lon:-80.19,tz:'America/New_York'},{name:'Los Angeles',lat:34.05,lon:-118.24,tz:'America/Los_Angeles'},{name:'Toronto',lat:43.65,lon:-79.38,tz:'America/Toronto'},{name:'Rio de Janeiro',lat:-22.9,lon:-43.2,tz:'America/Sao_Paulo'},{name:'Kairó',lat:30.04,lon:31.23,tz:'Africa/Cairo'},{name:'Nairobi',lat:-1.29,lon:36.82,tz:'Africa/Nairobi'},{name:'Bangkok',lat:13.75,lon:100.5,tz:'Asia/Bangkok'},{name:'Szingapúr',lat:1.35,lon:103.81,tz:'Asia/Singapore'},{name:'Szöul',lat:37.56,lon:126.97,tz:'Asia/Seoul'},{name:'Peking',lat:39.9,lon:116.4,tz:'Asia/Shanghai'},{name:'Tórshavn',lat:62.01,lon:-6.77,tz:'Atlantic/Faroe'},{name:'Monaco',lat:43.73,lon:7.42,tz:'Europe/Monaco'},{name:'Athén',lat:37.98,lon:23.72,tz:'Europe/Athens'},{name:'Isztambul',lat:41.0,lon:28.97,tz:'Europe/Istanbul'}];
         const BACKUP_FEEDS={"Telex":"https://telex.hu/rss","Index":"https://index.hu/24ora/rss/","24hu":"https://24.hu/feed/","Origo":"https://www.origo.hu/contentpartner/rss/hir-cent/origo.xml","HVG":"https://hvg.hu/rss","444":"https://444.hu/feed","Infostart":"https://infostart.hu/rss","Portfolio":"https://www.portfolio.hu/rss/all.xml","Pénzcentrum":"https://www.penzcentrum.hu/rss/all.xml","Népszava":"https://nepszava.hu/rss","Magyar Nemzet":"https://magyarnemzet.hu/feed","Mandiner":"https://mandiner.hu/feed","Blikk":"https://www.blikk.hu/rss","Hirado.hu":"https://hirado.hu/feed/","ATV":"https://www.atv.hu/feed","RTL":"https://rtl.hu/rss","Economx":"https://economx.hu/rss","Napi.hu":"https://www.napi.hu/rss","Magyar Hírlap":"https://www.magyarhirlap.hu/rss","Pesti Srácok":"https://pestisracok.hu/feed/","Nemzeti Sport":"https://www.nemzetisport.hu/feed","M4 Sport":"https://m4sport.hu/feed","Hír TV":"https://hirtv.hu/rss","Privátbankár":"https://www.privatbankar.hu/rss/all.xml","Police.hu":"http://www.police.hu/hu/rss/balesetek-torlodasok","BKK Info":"https://bkk.hu/apps/bkk-info/rss.php","Pécsi Újság":"https://feeds.feedburner.com/pecsiujsag","Dehir":"https://dehir.hu/rss.php","Roadster":"https://roadster.hu/feed/","NatGeo":"https://ng.24.hu/feed/","Player.hu":"https://player.hu/feed","Qubit":"https://qubit.hu/feed","PC World":"https://www.pcwplus.hu/site/rss/rss.xml","GameStar":"https://www.gsplus.hu/site/rss/rss.xml"};
         const firebaseConfig={apiKey:"AIzaSyDgBgiNSxjgWP_jmaoHpf0Qejo8_OO4sPg",authDomain:"robi-oldala.firebaseapp.com",databaseURL:"https://robi-oldala-default-rtdb.europe-west1.firebasedatabase.app",projectId:"robi-oldala",storageBucket:"robi-oldala.appspot.com",messagingSenderId:"300815778397",appId:"1:300815778397:web:ec609be55cc8afd193c3b4"};
         
@@ -683,8 +669,8 @@ body { background-color: #05070c; font-family: var(--font-body); color: var(--te
         function getWindDirectionHu(degree,short=false){if(degree===null||degree===undefined)return "";const val=Math.floor((degree/45)+0.5);const dirsFull=["Északi","Északkeleti","Keleti","Délkeleti","Déli","Délnyugati","Nyugati","Északnyugati"];const dirsShort=["É","ÉK","K","DK","D","DNy","Ny","ÉNy"];return short?dirsShort[(val%8)]:dirsFull[(val%8)];}
         function selectHourlyAnimationBundle(){state.currentAnimationBundle=[1];state.logoAnimIndex=0;}
         function startBigClockLogoAnimation(){if(state.logoAnimTimeout)clearTimeout(state.logoAnimTimeout);if(!state.currentAnimationBundle||state.currentAnimationBundle.length===0){selectHourlyAnimationBundle();}playNextLogoAnimation();}
-        function playNextLogoAnimation(){const logo=document.getElementById('bc-tkp-logo');if(!logo||!el.bigClockLayer.classList.contains('active'))return;for(let i=1;i<=22;i++)logo.classList.remove('anim-'+i);const animNum=state.currentAnimationBundle[state.logoAnimIndex];state.logoAnimIndex=(state.logoAnimIndex+1)%state.currentAnimationBundle.length;void logo.offsetWidth;logo.classList.add('anim-'+animNum);state.logoAnimTimeout=setTimeout(()=>{logo.classList.remove('anim-'+animNum);playNextLogoAnimation();},2000);}
-        function flipPanelCustom(panelType,targetFace){const flipper=panelType==='identity'?el.idFlipper:el.weatherFlipper;const front=panelType==='identity'?flipper.querySelector('.panel-face:not(.back)'):el.weatherFaceFront;const back=flipper.querySelector('.panel-face.back');const midnight=panelType==='weather'?el.midnightOverlay:null;if(flipper.isFlipping)return;flipper.isFlipping=true;flipper.style.transition='transform 0.2s ease-in';flipper.style.transform=`scaleY(0)`;setTimeout(()=>{front.style.display=targetFace==='front'?'flex':'none';back.style.display=targetFace==='back'?'flex':'none';if(midnight){if(targetFace==='midnight'){midnight.style.display='flex';midnight.classList.add('active');}else{midnight.style.display='none';midnight.classList.remove('active');}}void flipper.offsetHeight;flipper.style.transition='transform 0.2s ease-out';flipper.style.transform='scaleY(1)';setTimeout(()=>{flipper.style.transition='none';flipper.isFlipping=false;},200);},200);}
+        function playNextLogoAnimation(){const logo=document.getElementById('bc-tkp-logo');if(!logo||!el.bigClockLayer.classList.contains('active'))return;state.logoAnimTimeout=setTimeout(()=>{playNextLogoAnimation();},2000);}
+        function flipPanelCustom(panelType,targetFace){const flipper=panelType==='identity'?el.idFlipper:el.weatherFlipper;const front=panelType==='identity'?flipper.querySelector('.panel-face:not(.back)'):el.weatherFaceFront;const back=flipper.querySelector('.panel-face.back');const midnight=panelType==='weather'?el.midnightOverlay:null;if(flipper.isFlipping)return;flipper.isFlipping=true;flipper.style.transition='transform 0.2s ease-in';flipper.style.transform=`scaleY(0)`;if(panelType==='identity'){const clockContainer=document.querySelector('.clock-capsule-container');if(clockContainer){clockContainer.style.transition='opacity 0.2s ease';if(targetFace==='back'){clockContainer.style.opacity='0';clockContainer.style.pointerEvents='none';}else{clockContainer.style.opacity='1';clockContainer.style.pointerEvents='all';}}}setTimeout(()=>{front.style.display=targetFace==='front'?'flex':'none';back.style.display=targetFace==='back'?'flex':'none';if(midnight){if(targetFace==='midnight'){midnight.style.display='flex';midnight.classList.add('active');}else{midnight.style.display='none';midnight.classList.remove('active');}}void flipper.offsetHeight;flipper.style.transition='transform 0.2s ease-out';flipper.style.transform='scaleY(1)';setTimeout(()=>{flipper.style.transition='none';flipper.isFlipping=false;},200);},200);}
         function showCredits(){if(state.economyVisible||state.midnightActive)return;el.creditsContent.classList.add('active');el.economyContent.classList.remove('active');flipPanelCustom('identity','back');setTimeout(()=>{flipPanelCustom('identity','front');},10000);}
         function showEconomy(){if(state.midnightActive)return;state.economyVisible=true;el.creditsContent.classList.remove('active');el.economyContent.classList.add('active');state.economySlideIndex=0;updateEconomySlide();if(state.economyCarouselInterval)clearInterval(state.economyCarouselInterval);state.economyCarouselInterval=setInterval(()=>{state.economySlideIndex=(state.economySlideIndex+1)%5;updateEconomySlide();},8000);flipPanelCustom('identity','back');setTimeout(()=>{flipPanelCustom('identity','front');state.economyVisible=false;clearInterval(state.economyCarouselInterval);},40000);}
         function updateEconomySlide(){document.querySelectorAll('.eco-slide').forEach((slide,idx)=>{if(idx===state.economySlideIndex)slide.classList.add('active');else slide.classList.remove('active');});}
@@ -719,7 +705,7 @@ body { background-color: #05070c; font-family: var(--font-body); color: var(--te
         
         function getIconFromIBMCode(code){const c=parseInt(code);if([31,33].includes(c))return ICONS.CLEAR_NIGHT;if([32,34].includes(c))return ICONS.CLEAR;if([29].includes(c))return ICONS.PARTLY_CLOUDY_NIGHT;if([30].includes(c))return ICONS.PARTLY_CLOUDY;if([27,28].includes(c))return ICONS.MOSTLY_CLOUDY;if([26].includes(c))return ICONS.OVERCAST;if([20,21,22,19].includes(c))return ICONS.FOG;if([9,10,11,12,39,40,45].includes(c))return ICONS.RAIN;if([13,14,15,16,41,42,43,46].includes(c))return ICONS.SNOW;if([3,4,17,35,37,38,47].includes(c))return ICONS.THUNDER;return ICONS.MOSTLY_CLOUDY;}
         function getIconFromWMO(code,isNight){if(code===0)return isNight?ICONS.CLEAR_NIGHT:ICONS.CLEAR;if(code===1)return isNight?ICONS.PARTLY_CLOUDY_NIGHT:ICONS.PARTLY_CLOUDY;if(code===2)return ICONS.MOSTLY_CLOUDY;if(code===3)return ICONS.OVERCAST;if(code===45||code===48)return ICONS.FOG;if(code>=51&&code<=67)return ICONS.RAIN;if(code>=80&&code<=82)return ICONS.RAIN;if(code>=71&&code<=77)return ICONS.SNOW;if(code>=85&&code<=86)return ICONS.SNOW;if(code>=95)return ICONS.THUNDER;return isNight?ICONS.PARTLY_CLOUDY_NIGHT:ICONS.PARTLY_CLOUDY;}
-        function getWeatherText(wmoCode,ibmCode,isNight){if(wmoCode!==undefined&&wmoCode!==null){if(wmoCode===0)return isNight?"Derült":"Napos";if(wmoCode===1)return "Kissé felhős";if(wmoCode===2)return "Közepesen felhős";if(wmoCode===3)return "Erősen felhős";if(wmoCode===45||wmoCode===48)return "Ködös, párás";if(wmoCode>=51&&wmoCode<=57)return "Szitálás";if(wmoCode>=61&&wmoCode<=67)return "Eső";if(wmoCode>=71&&wmoCode<=77)return "Havazás";if(wmoCode>=80&&wmoCode<=82)return "Záporeső";if(wmoCode>=85&&wmoCode<=86)return "Hózápor";if(wmoCode>=95)return "Zivatar";return "Felhős";}if(ibmCode!==undefined&&ibmCode!==null){const c=parseInt(ibmCode);if([31,33].includes(c))return "Derült";if([32,34].includes(c))return "Napos";if([29,30].includes(c))return "Kissé felhős";if([27,28].includes(c))return "Közepesen felhős";if([26].includes(c))return "Erősen felhős";if([20,21,22,19].includes(c))return "Ködös";if([9,10,11,12,39,40,45].includes(c))return "Eső";if([13,14,15,16,41,42,43,46].includes(c))return "Havazás";if([3,4,17,35,37,38,47].includes(c))return "Zivatar";return "Felhős";}return "Adat hiányzik";}
+        function getWeatherText(wmoCode,ibmCode,isNight){if(wmoCode!==undefined&&wmoCode!==null){if(wmoCode===0)return isNight?"Derült":"Napos";if(wmoCode===1)return "Kissé felhős";if(wmoCode===2)return "Közepesen felhős";if(wmoCode===3)return "Erősen felhős";if(wmoCode===45||wmoCode===48)return "Ködös, párás";if(wmoCode>=51&&wmoCode<=57)return "Szitálás";if(wmoCode>=61&&wmoCode<=67)return "Eső";if(wmoCode>=71&&wmoCode<=77)return "Havazás";if(wmoCode>=80&&wmoCode<=82)return "Záporeső";if(wmoCode>=85&&wmoCode<=86)return "Hózápor";if(wmoCode>=95)return "Zivatar";return "Felhős";}if(ibmCode!==undefined&&ibmCode!==null){const c=parseInt(ibmCode);if([31,33].includes(c))return "Derült";if([32,34].includes(c))return "Napos";if([29,30].includes(c))return "Kissé felhős";if([27,28].includes(c))return "Közepesen felhős";if([26].includes(c))return "Erősen felhős";if([20,21,22,19].includes(c))return "Ködös";if([9,10,11,12,39,40,45].includes(c))return "Eső";if([13,14,15,16,41,42,43,46].includes(c))">Eső";if([13,14,15,16,41,42,43,46].includes(c))return "Havazás";if([3,4,17,35,37,38,47].includes(c))return "Zivatar";return "Felhős";}return "Adat hiányzik";}
         function getWeatherThemeClass(wmoCode,ibmCode,isNight){let isRain=false,isSnow=false,isStorm=false,isFog=false,isClear=false,isCloudy=false;if(wmoCode!==undefined&&wmoCode!==null){if(wmoCode===0)isClear=true;else if(wmoCode===1||wmoCode===2||wmoCode===3)isCloudy=true;else if(wmoCode===45||wmoCode===48)isFog=true;else if(wmoCode>=51&&wmoCode<=67)isRain=true;else if(wmoCode>=80&&wmoCode<=82)isRain=true;else if(wmoCode>=71&&wmoCode<=77)isSnow=true;else if(wmoCode>=85&&wmoCode<=86)isSnow=true;else if(wmoCode>=95)isStorm=true;}else if(ibmCode!==undefined&&ibmCode!==null){const c=parseInt(ibmCode);if(c===31||c===32||c===33||c===34)isClear=true;else if(c===20||c===21||c===22||c===19)isFog=true;else if(c===9||c===10||c===11||c===12||c===39||c===40||c===45)isRain=true;else if(c===13||c===14||c===15||c===16||c===41||c===42||c===43||c===46)isSnow=true;else if(c===3||c===4||c===17||c===35||c===37||c===38||c===47)isStorm=true;else if(c===26||c===27||c===28||c===29||c===30)isCloudy=true;else isCloudy=true;}else{isCloudy=true;}if(isStorm)return 'wx-theme-storm';if(isSnow)return 'wx-theme-snow';if(isRain)return 'wx-theme-rain';if(isFog)return 'wx-theme-fog';if(isClear)return isNight?'wx-theme-clearnight':'wx-theme-clear';return isNight?'wx-theme-cloudsnight':'wx-theme-clouds';}
         function formatDayName(dayStr){if(!dayStr)return "";const map={"monday":"Hétfő","tuesday":"Kedd","wednesday":"Szerda","thursday":"Csütörtök","friday":"Péntek","saturday":"Szombat","sunday":"Vasárnap","hétfő":"Hétfő","kedd":"Kedd","szerda":"Szerda","csütörtök":"Csütörtök","péntek":"Péntek","szombat":"Szombat","vasárnap":"Vasárnap"};const lower=dayStr.toLowerCase();return map[lower]||(dayStr.charAt(0).toUpperCase()+dayStr.slice(1));}
         function getHungarianDayNameByDate(d){const days=["Vasárnap","Hétfő","Kedd","Szerda","Csütörtök","Péntek","Szombat"];return days[d.getDay()];}
@@ -1088,23 +1074,6 @@ body { background-color: #05070c; font-family: var(--font-body); color: var(--te
             el.date.innerHTML=`<span>${now.getFullYear()}. ${honap} ${now.getDate()}.</span><span style="opacity:0.8; font-size: 0.55rem; margin-top: 2px;">${nap}</span>`.toUpperCase();
             
             const hour=now.getHours();
-            const greetingEl = document.getElementById('live-time-greeting');
-            if (greetingEl) {
-                if (hour >= 5 && hour < 9) {
-                    greetingEl.textContent = "JÓ REGGELT!";
-                    greetingEl.style.color = "var(--accent-warm)";
-                } else if (hour >= 9 && hour < 18) {
-                    greetingEl.textContent = "SZÉP NAPOT!";
-                    greetingEl.style.color = "#ffffff";
-                } else if (hour >= 18 && hour < 22) {
-                    greetingEl.textContent = "KELLEMES ESTÉT!";
-                    greetingEl.style.color = "var(--accent-next)";
-                } else {
-                    greetingEl.textContent = "JÓ ÉJSZAKÁT!";
-                    greetingEl.style.color = "var(--text-muted)";
-                }
-            }
-
             updateSkyGradient();
             updateAnalogClock();
             const h=now.getHours()+now.getMinutes()/60;
@@ -1252,38 +1221,29 @@ body { background-color: #05070c; font-family: var(--font-body); color: var(--te
             }
         }
         
-        function filterItemsByBlock(items, fromDatabase=false){
+        function filterItemsByBlock(items){
             const now=new Date();
             let filtered=[];
-            if (fromDatabase) {
-                filtered = [...items];
-                if (state.block && state.block.type === 'summary_yesterday') {
-                    filtered.sort((a,b)=>a.date-b.date);
-                } else {
-                    filtered.sort((a,b)=>b.date-a.date);
-                }
-                return filtered;
-            }
             if(state.block.type==='summary_yesterday'){
                 const yesterday=new Date(now);
                 yesterday.setDate(yesterday.getDate()-1);
                 yesterday.setHours(0,0,0,0);
                 const end=new Date(yesterday);
                 end.setHours(23,59,59,999);
-                filtered=items.filter(item=>item.date>=yesterday&&item.date<=end);
+                filtered=items.filter(item=>item.fromDatabase === true || (item.date>=yesterday&&item.date<=end));
                 filtered.sort((a,b)=>a.date-b.date);
             }else if(state.block.type==='morning_catchup'){
                 let start=new Date(now);
                 start.setHours(0,0,0,0);
-                filtered=items.filter(item=>item.date>=start);
+                filtered=items.filter(item=>item.fromDatabase === true || item.date>=start);
             }else if(state.block.type==='fresh'){
                 let timeLimit=new Date();
                 timeLimit.setHours(now.getHours()-(state.block.timeWindowHours||2));
-                filtered=items.filter(item=>item.date>=timeLimit);
+                filtered=items.filter(item=>item.fromDatabase === true || item.date>=timeLimit);
             }else{
                 let timeLimit=new Date();
                 timeLimit.setHours(0,0,0,0);
-                filtered=items.filter(item=>item.date>=timeLimit);
+                filtered=items.filter(item=>item.fromDatabase === true || item.date>=timeLimit);
             }
             return filtered;
         }
@@ -1348,67 +1308,74 @@ body { background-color: #05070c; font-family: var(--font-body); color: var(--te
             let fetchedItems = [];
             let loadedFromDatabase = false;
             
-            if (hour >= 0 && hour < 6) {
-                try {
-                    const response = await fetch(FIREBASE_URL + "/adas.json");
-                    const data = await response.json();
-                    if (data) {
-                        Object.keys(data).forEach(key => {
-                            if (data[key]) {
-                                fetchedItems.push({
-                                    title: data[key].title,
-                                    link: data[key].link,
-                                    desc: data[key].desc,
-                                    source: data[key].source,
-                                    date: new Date(data[key].date),
-                                    img: data[key].img
-                                });
-                            }
-                        });
-                    }
-                    if (fetchedItems.length > 0) {
-                        loadedFromDatabase = true;
-                    }
-                } catch(e) {
-                    console.log("Hiba az éjszakai adás betöltésekor: " + e.toString());
+            try {
+                const response = await fetch(FIREBASE_URL + "/adas.json");
+                const data = await response.json();
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        if (data[key]) {
+                            fetchedItems.push({
+                                title: data[key].title,
+                                link: data[key].link,
+                                desc: data[key].desc,
+                                source: data[key].source,
+                                date: new Date(data[key].date),
+                                img: data[key].img,
+                                fromDatabase: true
+                            });
+                        }
+                    });
                 }
+                if (fetchedItems.length > 0) {
+                    loadedFromDatabase = true;
+                }
+            } catch(e) {
+                console.log("Hiba a Firebase hírfolyam betöltésekor: " + e.toString());
             }
             
-            if (!loadedFromDatabase) {
-                let feeds=BACKUP_FEEDS;
-                if(Object.keys(state.rssFeeds).length>0)feeds={...feeds,...state.rssFeeds};
-                const fetchPromises=Object.entries(feeds).map(async([key,url])=>{
-                    try{
-                        const items=await attemptFetchFeed(key,url);
-                        fetchedItems.push(...items);
-                    }catch(e){
-                        state.retryQueue.push({key,url});
-                    }
-                });
-                await Promise.allSettled(fetchPromises);
+            let feeds=BACKUP_FEEDS;
+            if(Object.keys(state.rssFeeds).length>0)feeds={...feeds,...state.rssFeeds};
+            const fetchPromises=Object.entries(feeds).map(async([key,url])=>{
+                try{
+                    const items=await attemptFetchFeed(key,url);
+                    fetchedItems.push(...items);
+                }catch(e){
+                    state.retryQueue.push({key,url});
+                }
+            });
+            await Promise.allSettled(fetchPromises);
+            
+            let cutoffTime=new Date(0);
+            if(state.block.type==='fresh'){
+                const hoursBack=state.block.timeWindowHours||2;
+                cutoffTime=new Date(now.getTime()-(hoursBack*60*60*1000));
+            }else if(state.block.type==='morning_catchup'){
+                cutoffTime=new Date(now);
+                cutoffTime.setHours(0,0,0,0);
+            }
+            
+            fetchedItems = fetchedItems.filter(item => item.fromDatabase === true || item.date >= cutoffTime);
+            fetchedItems=fetchedItems.sort((a,b)=>b.date-a.date);
+            state.rawItems=fetchedItems;
+            
+            const filtered=filterItemsByBlock(fetchedItems);
+            
+            const uniqueItems = [];
+            const seenLinks = new Set();
+            const seenTitles = new Set();
+            for (const item of filtered) {
+                const hasValidLink = item.link && item.link !== "#" && item.link !== "";
+                const isDuplicateLink = hasValidLink && seenLinks.has(item.link);
+                const isDuplicateTitle = item.title && seenTitles.has(item.title);
                 
-                let cutoffTime=new Date(0);
-                if(state.block.type==='fresh'){
-                    const hoursBack=state.block.timeWindowHours||2;
-                    cutoffTime=new Date(now.getTime()-(hoursBack*60*60*1000));
-                }else if(state.block.type==='morning_catchup'){
-                    cutoffTime=new Date(now);
-                    cutoffTime.setHours(0,0,0,0);
-                }
-                fetchedItems=fetchedItems.sort((a,b)=>b.date-a.date);
-                state.rawItems=fetchedItems;
-                fetchedItems=fetchedItems.filter(item=>item.date>=cutoffTime);
-            } else {
-                fetchedItems.sort((a,b)=>b.date - a.date);
-            }
-            
-            const filtered=filterItemsByBlock(fetchedItems, loadedFromDatabase);
-            const uniqueItems=[];
-            const seenLinks=new Set();
-            for(const item of filtered){
-                if(!seenLinks.has(item.link)){
+                if (!isDuplicateLink && !isDuplicateTitle) {
                     uniqueItems.push(item);
-                    seenLinks.add(item.link);
+                    if (hasValidLink) {
+                        seenLinks.add(item.link);
+                    }
+                    if (item.title) {
+                        seenTitles.add(item.title);
+                    }
                 }
             }
             
@@ -1425,7 +1392,7 @@ body { background-color: #05070c; font-family: var(--font-body); color: var(--te
             if(state.block && state.block.type==='summary_yesterday')generateTimeline();
             else el.timelineContainer.classList.remove('visible');
             
-            if(state.retryQueue.length>0 && !loadedFromDatabase){
+            if(state.retryQueue.length>0){
                 state.retryInterval=setInterval(processRetries,20000);
             }
             
