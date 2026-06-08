@@ -132,8 +132,8 @@ body { background-color: #020305; font-family: var(--font-body); color: var(--te
 .glass-panel.loaded { opacity: 1; }
 
 .glass-panel::before, .glass-panel::after { content: ''; position: absolute; width: 16px; height: 16px; border-color: var(--accent-steel); border-style: solid; pointer-events: none; z-index: 10; transition: border-color 3s ease; }
-.glass-panel::before { top: -2.5px; left: -1.5px; border-width: 2px 0 0 2px; border-top-left-radius: var(--cap-radius); }
-.glass-panel::after { bottom: -1.5px; right: -1.5px; border-width: 0 2px 2px 0; border-bottom-right-radius: var(--cap-radius); }
+.glass-panel::before { top: -3px; left: -1.5px; border-width: 3px 0 0 1.5px; border-top-left-radius: var(--cap-radius); }
+.glass-panel::after { bottom: -1.5px; right: -1.5px; border-width: 0 1.5px 1.5px 0; border-bottom-right-radius: var(--cap-radius); }
 
 .identity-panel { flex: 0 0 270px; z-index: 10; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
 .identity-panel .panel-flipper { height: 156px !important; flex-shrink: 0; }
@@ -723,26 +723,24 @@ body:has(.goodmorning-card.active) .clock-capsule-container {
                     <div class="schedule-view" id="schedule-view" style="display:none;"><div class="schedule-list" id="schedule-list-content"></div></div>
                     
                     <div class="promo-content" id="promo-view">
-                        <div class="promo-content" id="promo-view">
-                            <div class="promo-main-block">
-                                <span>Legyél</span>
-                                <div class="kepben-logo-container tkp-logo-sm" style="margin: 4px 0;">
-                                    <div class="kepben-logo-mark">
-                                        <svg class="kb-icon" viewBox="0 0 24 24"><path d="M3 8V5a2 2 0 0 1 2-2h3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3"/><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 4" opacity="0.5"/></svg>
-                                        <div class="kb-text">KÉPBEN<span class="kb-exclaim">!</span></div>
-                                    </div>
-                                </div>
-                                <span>a nap</span>
-                            </div>
-                            <div class="promo-24-wrapper">
-                                <div class="promo-24-block">24</div>
-                                <div class="promo-daynight-badge">
-                                    <svg class="promo-dn-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-                                    <svg class="promo-dn-icon" viewBox="0 0 24 24" style="margin-top:4px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                        <div class="promo-main-block">
+                            <span>Legyél</span>
+                            <div class="kepben-logo-container tkp-logo-sm" style="margin: 4px 0;">
+                                <div class="kepben-logo-mark">
+                                    <svg class="kb-icon" viewBox="0 0 24 24"><path d="M3 8V5a2 2 0 0 1 2-2h3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3"/><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8" stroke-dasharray="2 4" opacity="0.5"/></svg>
+                                    <div class="kb-text">KÉPBEN<span class="kb-exclaim">!</span></div>
                                 </div>
                             </div>
-                            <div class="promo-sub">órájában</div>
+                            <span>a nap</span>
                         </div>
+                        <div class="promo-24-wrapper">
+                            <div class="promo-24-block">24</div>
+                            <div class="promo-daynight-badge">
+                                <svg class="promo-dn-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                                <svg class="promo-dn-icon" viewBox="0 0 24 24" style="margin-top:4px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                            </div>
+                        </div>
+                        <div class="promo-sub">órájában</div>
                     </div>
                 </div>
             </div>
@@ -1440,7 +1438,7 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
             });
         }
         
-        function cleanUpOldItems(){if(!state.block)return;const now=new Date();let cutoffTime;if(state.block.type==='fresh'){cutoffTime=new Date();const hoursBack=state.block.timeWindowHours||2;cutoffTime.setHours(now.getHours()-hoursBack);state.items=state.items.filter(item=>item.date>=cutoffTime);}else if(state.block.type==='morning_catchup'){cutoffTime=new Date(now);cutoffTime.setHours(0,0,0,0);state.items=state.items.filter(item=>item.date>=cutoffTime);}}
+        function cleanUpOldItems(){if(!state.block)return;const now=new Date();let cutoffTime;if(state.block.type==='fresh'){cutoffTime=new Date();const hoursBack=state.block.timeWindowHours||2;cutoffTime.setHours(now.getHours()-hoursBack);state.items=state.items.filter(item=>item.date>=cutoffTime);}else if(state.block.type==='morning_catchup'){cutoffTime=new Date(now);cutoffTime.setHours(0,0,0,0);state.items=state.items.filter(item=>item.date>=cutoffTime);}else{let timeLimit=new Date();timeLimit.setHours(0,0,0,0);state.items=state.items.filter(item=>item.fromDatabase === true || item.date>=timeLimit);}}
         
         async function checkBreakingNews(){
             const now=Date.now();
@@ -2040,60 +2038,60 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         
         let iconHtml=isTraffic?TRAFFIC_ICON:`<img src="${fav}" class="provider-icon">`;
         let footerMetaHTML=`<div class="provider-identity">${iconHtml} ${displaySource}</div><span style="margin-left:8px; flex-shrink: 0; opacity:0.8;">${timeStr}</span>`;
-        
-        let visualHtml='';
-        let hasVisual=false;
-        if(item.img){
-            hasVisual=true;
-            const imgUrl = to4K(item.img);
-            visualHtml=`<div class="news-visual-column"><img src="${imgUrl}" class="news-visual-image" alt="Hír kép"></div>`;
-        }
-        if(hasVisual){
-            nextTrack.classList.add('has-visual');
-        }
-        
-        const shortDesc=getShortDesc(item.desc, 220);
-        const html=`<div class="news-content-wrapper"><div class="news-title">${item.title}</div><div class="news-desc">${shortDesc}</div><div class="news-footer-row"><div class="news-meta" style="width:100%;">${footerMetaHTML}</div></div></div>${visualHtml}<div class="news-full-overlay"><div class="nfo-title">${item.title}</div><div class="nfo-text">${item.desc}</div></div>`;
-        
-        nextTrack.innerHTML=html;
-        currentTrack.classList.remove('visible');
-        nextTrack.classList.add('visible');
-        state.activeTrack=state.activeTrack==='a'?'b':'a';
-        el.counter.textContent=`${(state.currentIndex%state.items.length)+1}/${state.items.length}`;
-        updateTimelineActive();
+
+let visualHtml='';
+    let hasVisual=false;
+    if(item.img){
+        hasVisual=true;
+        const imgUrl = to4K(item.img);
+        visualHtml=`<div class="news-visual-column"><img src="${imgUrl}" class="news-visual-image" alt="Hír kép"></div>`;
+    }
+    if(hasVisual){
+        nextTrack.classList.add('has-visual');
     }
     
-    el.newsViewport.addEventListener('mouseenter',()=>{if(!state.isPaused){clearTimeout(state.flipTimer);el.progressBar.style.animationPlayState='paused';state.isPaused=true;const elapsed=Date.now()-state.cardStartTime;state.remainingTime=Math.max(0,state.currentDuration-elapsed);}});
-    el.newsViewport.addEventListener('mouseleave',()=>{if(state.isPaused){el.progressBar.style.animationPlayState='running';state.isPaused=false;state.cardStartTime=Date.now();state.currentDuration=state.remainingTime;state.flipTimer=setTimeout(()=>{showNextItem(true);},state.remainingTime);}});
+    const shortDesc=getShortDesc(item.desc, 220);
+    const html=`<div class="news-content-wrapper"><div class="news-title">${item.title}</div><div class="news-desc">${shortDesc}</div><div class="news-footer-row"><div class="news-meta" style="width:100%;">${footerMetaHTML}</div></div></div>${visualHtml}<div class="news-full-overlay"><div class="nfo-title">${item.title}</div><div class="nfo-text">${item.desc}</div></div>`;
     
-    function initIntroSequence(){generateClockMarks();el.leftPanel.classList.add('loaded');el.rightPanel.classList.add('loaded');setTimeout(()=>{el.mainContainer.classList.add('open');animateRateItemsSequential();},200);}
-    
-    initIntroSequence();
-    el.crYear.textContent=new Date().getFullYear();
-    selectHourlyAnimationBundle();
-    generateHourlyTriggers();
-    document.addEventListener('visibilitychange',handleVisibilityChange);
-    setInterval(updateTimeAndState,1000);
-    
+    nextTrack.innerHTML=html;
+    currentTrack.classList.remove('visible');
+    nextTrack.classList.add('visible');
+    state.activeTrack=state.activeTrack==='a'?'b':'a';
+    el.counter.textContent=`${(state.currentIndex%state.items.length)+1}/${state.items.length}`;
+    updateTimelineActive();
+}
+
+el.newsViewport.addEventListener('mouseenter',()=>{if(!state.isPaused){clearTimeout(state.flipTimer);el.progressBar.style.animationPlayState='paused';state.isPaused=true;const elapsed=Date.now()-state.cardStartTime;state.remainingTime=Math.max(0,state.currentDuration-elapsed);}});
+el.newsViewport.addEventListener('mouseleave',()=>{if(state.isPaused){el.progressBar.style.animationPlayState='running';state.isPaused=false;state.cardStartTime=Date.now();state.currentDuration=state.remainingTime;state.flipTimer=setTimeout(()=>{showNextItem(true);},state.remainingTime);}});
+
+function initIntroSequence(){generateClockMarks();el.leftPanel.classList.add('loaded');el.rightPanel.classList.add('loaded');setTimeout(()=>{el.mainContainer.classList.add('open');animateRateItemsSequential();},200);}
+
+initIntroSequence();
+el.crYear.textContent=new Date().getFullYear();
+selectHourlyAnimationBundle();
+generateHourlyTriggers();
+document.addEventListener('visibilitychange',handleVisibilityChange);
+setInterval(updateTimeAndState,1000);
+
+refreshNews();
+updateTimeAndState();
+
+feedsRef.on('value', (snap) => {
+    state.rssFeeds = snap.val() || {};
     refreshNews();
-    updateTimeAndState();
-    
-    feedsRef.on('value', (snap) => {
-        state.rssFeeds = snap.val() || {};
-        refreshNews();
-    });
-    
-    fetchWeatherData();
-    setInterval(fetchWeatherData,120000);
-    setInterval(checkBreakingNews,45000);
-    setTimeout(checkBreakingNews,5000);
-    setInterval(showCredits,300000);
-    document.getElementById('manual-refresh-trigger').addEventListener('click',()=>refreshNews());
-    document.getElementById('next-btn').addEventListener('click',(e)=>{e.preventDefault();e.stopPropagation();showNextItem(true);});
-    document.getElementById('prev-btn').addEventListener('click',(e)=>{e.preventDefault();e.stopPropagation();state.currentIndex-=2;showNextItem(true);});
-    el.newsContainer.addEventListener('click',(e)=>{if(e.target.closest('#breaking-panel')){e.preventDefault();e.stopPropagation();if(state.breakingLink){window.open(state.breakingLink,'_blank');}return;}if(e.target.closest('.controls-bar')||e.target.closest('.breaking-pod'))return;if(e.target.closest('.tip-card'))return;e.stopPropagation();if(state.currentItem&&state.currentItem.link&&!e.target.closest('.midnight-segment')){window.open(state.currentItem.link,'_blank');}});
-    el.msCardsViewport.addEventListener('click',(e)=>{const msCard=e.target.closest('.ms-small-card');if(msCard){e.preventDefault();e.stopPropagation();window.open(msCard.dataset.link,'_blank');}});
-    setTimeout(fetchExchangeRates,5000);
+});
+
+fetchWeatherData();
+setInterval(fetchWeatherData,120000);
+setInterval(checkBreakingNews,45000);
+setTimeout(checkBreakingNews,5000);
+setInterval(showCredits,300000);
+document.getElementById('manual-refresh-trigger').addEventListener('click',()=>refreshNews());
+document.getElementById('next-btn').addEventListener('click',(e)=>{e.preventDefault();e.stopPropagation();showNextItem(true);});
+document.getElementById('prev-btn').addEventListener('click',(e)=>{e.preventDefault();e.stopPropagation();state.currentIndex-=2;showNextItem(true);});
+el.newsContainer.addEventListener('click',(e)=>{if(e.target.closest('#breaking-panel')){e.preventDefault();e.stopPropagation();if(state.breakingLink){window.open(state.breakingLink,'_blank');}return;}if(e.target.closest('.controls-bar')||e.target.closest('.breaking-pod'))return;if(e.target.closest('.tip-card'))return;e.stopPropagation();if(state.currentItem&&state.currentItem.link&&!e.target.closest('.midnight-segment')){window.open(state.currentItem.link,'_blank');}});
+el.msCardsViewport.addEventListener('click',(e)=>{const msCard=e.target.closest('.ms-small-card');if(msCard){e.preventDefault();e.stopPropagation();window.open(msCard.dataset.link,'_blank');}});
+setTimeout(fetchExchangeRates,5000);
 </script>
 </body>
 </html>
