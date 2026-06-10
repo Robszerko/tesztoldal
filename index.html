@@ -186,6 +186,7 @@ body:has(.goodmorning-card.active) .clock-capsule-container {
 .eco-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 4px; width: 100%; justify-content: center; }
 .eco-title { font-family: var(--font-head); font-weight: 800; color: var(--text-main); font-size: 0.85rem; letter-spacing: 0.5px; }
 .eco-carousel { width: 100%; flex-grow: 1; position: relative; }
+.eco-carousel { width: 100%; flex-grow: 1; position: relative; }
 .eco-slide { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; flex-direction: column; gap: 4px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
 .eco-slide.active { opacity: 1; pointer-events: all; }
 .eco-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.05); padding: 5px 10px; border-radius: var(--inner-radius); }
@@ -1319,7 +1320,7 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         
         function getIconFromIBMCode(code){const c=parseInt(code);if([31,33].includes(c))return ICONS.CLEAR_NIGHT;if([32,34].includes(c))return ICONS.CLEAR;if([29].includes(c))return ICONS.PARTLY_CLOUDY_NIGHT;if([30].includes(c))return ICONS.PARTLY_CLOUDY;if([27,28].includes(c))return ICONS.MOSTLY_CLOUDY;if([26].includes(c))return ICONS.OVERCAST;if([20,21,22,19].includes(c))return ICONS.FOG;if([9,10,11,12,39,40,45].includes(c))return ICONS.RAIN;if([13,14,15,16,41,42,43,46].includes(c))return ICONS.SNOW;if([3,4,17,35,37,38,47].includes(c))return ICONS.THUNDER;return ICONS.MOSTLY_CLOUDY;}
         function getIconFromWMO(code,isNight){if(code===0)return isNight?ICONS.CLEAR_NIGHT:ICONS.CLEAR;if(code===1)return isNight?ICONS.PARTLY_CLOUDY_NIGHT:ICONS.PARTLY_CLOUDY;if(code===2)return ICONS.MOSTLY_CLOUDY;if(code===3)return ICONS.OVERCAST;if(code===45||code===48)return ICONS.FOG;if(code>=51&&code<=67)return ICONS.RAIN;if(code>=80&&code<=82)return ICONS.RAIN;if(code>=71&&code<=77)return ICONS.SNOW;if(code>=85&&code<=86)return ICONS.SNOW;if(code>=95)return ICONS.THUNDER;return isNight?ICONS.PARTLY_CLOUDY_NIGHT:ICONS.PARTLY_CLOUDY;}
-        function getWeatherText(wmoCode,ibmCode,isNight){if(wmoCode!==undefined&&wmoCode!==null){if(wmoCode===0)return isNight?"Derült":"Napos";if(wmoCode===1)return "Kissé felhős";if(wmoCode===2)return "Közepesen felhős";if(wmoCode===3)return "Erősen felhős";if(wmoCode===45||wmoCode===48)return "Ködös, párás";if(wmoCode>=51&&wmoCode<=57)return "Szitálás";if(wmoCode>=61&&wmoCode<=67)return "Eső";if(wmoCode>=71&&wmoCode<=77)return "Havazás";if(wmoCode>=80&&wmoCode<=82)return "Záporeső";if(wmoCode>=85&&wmoCode<=86)return "Hózápor";if(wmoCode>=95)return "Zivatar";return "Felhős";}if(ibmCode!==undefined&&ibmCode!==null){const c=parseInt(ibmCode);if([31,33].includes(c))return "Derült";if([32,34].includes(c))return "Napos";if([29,30].includes(c))return "Kissé felhős";if([27,28].includes(c))return "Közepesen felhős";if([26].includes(c))return "Erősen felhős";if([20,21,22,19].includes(c))return "Ködös";if([9,10,11,12,39,40,45].includes(c))return "Eső";if([13,14,15,16,41,42,43,46].includes(c))return "Havazás";if([3,4,17,35,37,38,47].includes(c))">Zivatar";return "Felhős";}return "Adat hiányzik";}
+        function getWeatherText(wmoCode,ibmCode,isNight){if(wmoCode!==undefined&&wmoCode!==null){if(wmoCode===0)return isNight?"Derült":"Napos";if(wmoCode===1)return "Kissé felhős";if(wmoCode===2)return "Közepesen felhős";if(wmoCode===3)return "Erősen felhős";if(wmoCode===45||wmoCode===48)return "Ködös, párás";if(wmoCode>=51&&wmoCode<=57)return "Szitálás";if(wmoCode>=61&&wmoCode<=67)return "Eső";if(wmoCode>=71&&wmoCode<=77)return "Havazás";if(wmoCode>=80&&wmoCode<=82)return "Záporeső";if(wmoCode>=85&&wmoCode<=86)return "Hózápor";if(wmoCode>=95)return "Zivatar";return "Felhős";}if(ibmCode!==undefined&&ibmCode!==null){const c=parseInt(ibmCode);if([31,33].includes(c))return "Derült";if([32,34].includes(c))return "Napos";if([29,30].includes(c))return "Kissé felhős";if([27,28].includes(c))return "Közepesen felhős";if([26].includes(c))return "Erősen felhős";if([20,21,22,19].includes(c))return "Ködös";if([9,10,11,12,39,40,45].includes(c))return "Eső";if([13,14,15,16,41,42,43,46].includes(c))return "Havazás";if([3,4,17,35,37,38,47].includes(c))return "Zivatar";return "Felhős";}return "Adat hiányzik";}
         function getWeatherThemeClass(wmoCode,ibmCode,isNight){let isRain=false,isSnow=false,isStorm=false,isFog=false,isClear=false,isCloudy=false;if(wmoCode!==undefined&&wmoCode!==null){if(wmoCode===0)isClear=true;else if(wmoCode===1||wmoCode===2||wmoCode===3)isCloudy=true;else if(wmoCode===45||wmoCode===48)isFog=true;else if(wmoCode>=51&&wmoCode<=67)isRain=true;else if(wmoCode>=80&&wmoCode<=82)isRain=true;else if(wmoCode>=71&&wmoCode<=77)isSnow=true;else if(wmoCode>=85&&wmoCode<=86)isSnow=true;else if(wmoCode>=95)isStorm=true;}else if(ibmCode!==undefined&&ibmCode!==null){const c=parseInt(ibmCode);if(c===31||c===32||c===33||c===34)isClear=true;else if(c===20||c===21||c===22||c===19)isFog=true;else if(c===9||c===10||c===11||c===12||c===39||c===40||c===45)isRain=true;else if(c===13||c===14||c===15||c===16||c===41||c===42||c===43||c===46)isSnow=true;else if(c===3||c===4||c===17||c===35||c===37||c===38||c===47)isStorm=true;else if(c===26||c===27||c===28||c===29||c===30)isCloudy=true;else isCloudy=true;}else{isCloudy=true;}if(isStorm)return 'wx-theme-storm';if(isSnow)return 'wx-theme-snow';if(isRain)return 'wx-theme-rain';if(isFog)return 'wx-theme-fog';if(isClear)return isNight?'wx-theme-clearnight':'wx-theme-clear';return isNight?'wx-theme-cloudsnight':'wx-theme-clouds';}
         function formatDayName(dayStr){if(!dayStr)return "";const map={"monday":"Hétfő","tuesday":"Kedd","wednesday":"Szerda","thursday":"Csütörtök","friday":"Péntek","saturday":"Szombat","sunday":"Vasárnap","hétfő":"Hétfő","kedd":"Kedd","szerda":"Szerda","csütörtök":"Csütörtök","péntek":"Péntek","szombat":"Szombat","vasárnap":"Vasárnap"};const lower=dayStr.toLowerCase();return map[lower]||(dayStr.charAt(0).toUpperCase()+dayStr.slice(1));}
         function getHungarianDayNameByDate(d){const days=["Vasárnap","Hétfő","Kedd","Szerda","Csütörtök","Péntek","Szombat"];return days[d.getDay()];}
@@ -1529,35 +1530,6 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         
         function cleanUpOldItems(){if(!state.block)return;const now=new Date();let cutoffTime;if(state.block.type==='fresh'){cutoffTime=new Date();const hoursBack=state.block.timeWindowHours||2;cutoffTime.setHours(now.getHours()-hoursBack);state.items=state.items.filter(item=>item.date>=cutoffTime);}else if(state.block.type==='morning_catchup'){cutoffTime=new Date(now);cutoffTime.setHours(0,0,0,0);state.items=state.items.filter(item=>item.date>=cutoffTime);}else{let timeLimit=new Date();timeLimit.setHours(0,0,0,0);state.items=state.items.filter(item=>item.fromDatabase === true || item.date>=timeLimit);}}
         
-        async function checkBreakingNews(){
-            const now=Date.now();
-            const twoMinutesAgo=now-(2*60*1000);
-            
-            try {
-                const res = await fetch(FIREBASE_URL + "/aggregated_news.json");
-                const data = await res.json();
-                if (data && Array.isArray(data)) {
-                    for (let i = 0; i < data.length; i++) {
-                        const item = data[i];
-                        const date = new Date(item.date);
-                        if (date.getTime() > twoMinutesAgo && !state.seenBreakingLinks.has(item.link)) {
-                            state.seenBreakingLinks.add(item.link);
-                            state.breakingQueue.push({
-                                title: item.title,
-                                desc: item.desc,
-                                source: item.source,
-                                date: date,
-                                link: item.link
-                            });
-                        }
-                    }
-                }
-            } catch(e) {
-                console.log("Hiba a rendkívüli hírek ellenőrzésekor: " + e.toString());
-            }
-            processBreakingQueue();
-        }
-
         function processBreakingQueue(){
             if(state.breakingActive)return;
             if(state.breakingQueue.length===0)return;
@@ -2230,43 +2202,75 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         nextTrack.classList.add('visible');
         state.activeTrack=state.activeTrack==='a'?'b':'a';
         el.counter.textContent=`${(state.currentIndex%state.items.length)+1}/${state.items.length}`;
-updateTimelineActive();
-}
-
-el.newsViewport.addEventListener('mouseenter',()=>{if(!state.isPaused){clearTimeout(state.flipTimer);el.progressBar.style.animationPlayState='paused';state.isPaused=true;const elapsed=Date.now()-state.cardStartTime;state.remainingTime=Math.max(0,state.currentDuration-elapsed);}});
-el.newsViewport.addEventListener('mouseleave',()=>{if(state.isPaused){el.progressBar.style.animationPlayState='running';state.isPaused=false;state.cardStartTime=Date.now();state.currentDuration=state.remainingTime;state.flipTimer=setTimeout(()=>{showNextItem(true);},state.remainingTime);}});
-
-function initIntroSequence(){generateClockMarks();el.leftPanel.classList.add('loaded');el.rightPanel.classList.add('loaded');setTimeout(()=>{el.mainContainer.classList.add('open');animateRateItemsSequential();},200);}
-
-initIntroSequence();
-el.crYear.textContent=new Date().getFullYear();
-selectHourlyAnimationBundle();
-generateHourlyTriggers();
-document.addEventListener('visibilitychange',handleVisibilityChange);
-setInterval(updateTimeAndState,1000);
-
-refreshNews();
-updateTimeAndState();
-
-feedsRef.on('value', (snap) => {
-    state.rssFeeds = snap.val() || {};
-    refreshNews();
-});
-
-rates24hRef.on('value', (snap) => {
-    const val = snap.val();
-    if (val) {
-        state.rates24hData = val;
-        updateRates24hUI();
-    } else {
-        state.rates24hData = null;
+        updateTimelineActive();
     }
-});
 
+    el.newsViewport.addEventListener('mouseenter',()=>{if(!state.isPaused){clearTimeout(state.flipTimer);el.progressBar.style.animationPlayState='paused';state.isPaused=true;const elapsed=Date.now()-state.cardStartTime;state.remainingTime=Math.max(0,state.currentDuration-elapsed);}});
+    el.newsViewport.addEventListener('mouseleave',()=>{if(state.isPaused){el.progressBar.style.animationPlayState='running';state.isPaused=false;state.cardStartTime=Date.now();state.currentDuration=state.remainingTime;state.flipTimer=setTimeout(()=>{showNextItem(true);},state.remainingTime);}});
+
+    function initIntroSequence(){generateClockMarks();el.leftPanel.classList.add('loaded');el.rightPanel.classList.add('loaded');setTimeout(()=>{el.mainContainer.classList.add('open');animateRateItemsSequential();},200);}
+
+    initIntroSequence();
+    el.crYear.textContent=new Date().getFullYear();
+    selectHourlyAnimationBundle();
+    generateHourlyTriggers();
+    document.addEventListener('visibilitychange',handleVisibilityChange);
+    setInterval(updateTimeAndState,1000);
+
+    refreshNews();
+    updateTimeAndState();
+
+    feedsRef.on('value', (snap) => {
+        state.rssFeeds = snap.val() || {};
+        refreshNews();
+    });
+
+    rates24hRef.on('value', (snap) => {
+        const val = snap.val();
+        if (val) {
+            state.rates24hData = val;
+            updateRates24hUI();
+        } else {
+            state.rates24hData = null;
+        }
+    });
+
+    let isFirstBreakingLoad = true;
+    database.ref('aggregated_news').on('value', (snap) => {
+        const data = snap.val();
+        if (data && Array.isArray(data)) {
+            if (isFirstBreakingLoad) {
+                data.forEach(item => {
+                    if (item && item.link) {
+                        state.seenBreakingLinks.add(item.link);
+                    }
+                });
+                isFirstBreakingLoad = false;
+            } else {
+                let newBreakingCount = 0;
+                const itemsCopy = [...data].reverse();
+                itemsCopy.forEach(item => {
+                    if (item && item.link && !state.seenBreakingLinks.has(item.link)) {
+                        state.seenBreakingLinks.add(item.link);
+                        state.breakingQueue.push({
+                            title: item.title,
+                            desc: item.desc,
+                            source: item.source,
+                            date: new Date(item.date
+),
+link: item.link
+});
+newBreakingCount++;
+}
+});
+if (newBreakingCount > 0) {
+processBreakingQueue();
+}
+}
+}
+});
 fetchWeatherData();
 setInterval(fetchWeatherData,120000);
-setInterval(checkBreakingNews,45000);
-setTimeout(checkBreakingNews,5000);
 setInterval(showCredits,300000);
 document.getElementById('manual-refresh-trigger').addEventListener('click',()=>refreshNews());
 document.getElementById('next-btn').addEventListener('click',(e)=>{e.preventDefault();e.stopPropagation();showNextItem(true);});
