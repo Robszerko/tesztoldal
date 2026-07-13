@@ -186,7 +186,6 @@ body:has(.goodmorning-card.active) .clock-capsule-container {
 .eco-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 4px; width: 100%; justify-content: center; }
 .eco-title { font-family: var(--font-head); font-weight: 800; color: var(--text-main); font-size: 0.85rem; letter-spacing: 0.5px; }
 .eco-carousel { width: 100%; flex-grow: 1; position: relative; }
-.eco-carousel { width: 100%; flex-grow: 1; position: relative; }
 .eco-slide { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; flex-direction: column; gap: 4px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
 .eco-slide.active { opacity: 1; pointer-events: all; }
 .eco-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.05); padding: 5px 10px; border-radius: var(--inner-radius); }
@@ -796,45 +795,7 @@ body:has(.goodmorning-card.active) .clock-capsule-container {
 
         const app = firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        const feedsRef = database.ref('feeds');
         const rates24hRef = database.ref('rates_24h');
-
-        const BACKUP_FEEDS = {
-            "Telex": "https://telex.hu/rss",
-            "Index": "https://index.hu/24ora/rss/",
-            "24hu": "https://24.hu/feed/",
-            "Origo": "https://www.origo.hu/contentpartner/rss/hir-cent/origo.xml",
-            "HVG": "https://hvg.hu/rss",
-            "444": "https://444.hu/feed",
-            "Infostart": "https://infostart.hu/rss",
-            "Portfolio": "https://www.portfolio.hu/rss/all.xml",
-            "Pénzcentrum": "https://www.penzcentrum.hu/rss/all.xml",
-            "Népszava": "https://nepszava.hu/rss",
-            "Magyar Nemzet": "https://magyarnemzet.hu/feed",
-            "Mandiner": "https://mandiner.hu/feed",
-            "Blikk": "https://www.blikk.hu/rss",
-            "Hirado.hu": "https://hirado.hu/feed/",
-            "ATV": "https://www.atv.hu/feed",
-            "RTL": "https://rtl.hu/rss",
-            "Economx": "https://economx.hu/rss",
-            "Napi.hu": "https://www.napi.hu/rss",
-            "Magyar Hírlap": "https://www.magyarhirlap.hu/rss",
-            "Pesti Srácok": "https://pestisracok.hu/feed/",
-            "Nemzeti Sport": "https://www.nemzetisport.hu/feed",
-            "M4 Sport": "https://m4sport.hu/feed",
-            "Hír TV": "https://hirtv.hu/rss",
-            "Privátbankár": "https://www.privatbankar.hu/rss/all.xml",
-            "Police.hu": "http://www.police.hu/hu/rss/balesetek-torlodasok",
-            "BKK Info": "https://bkk.hu/apps/bkk-info/rss.php",
-            "Pécsi Újság": "https://feeds.feedburner.com/pecsiujsag",
-            "Dehir": "https://dehir.hu/rss.php",
-            "Roadster": "https://roadster.hu/feed/",
-            "NatGeo": "https://ng.24.hu/feed/",
-            "Player.hu": "https://player.hu/feed",
-            "Qubit": "https://qubit.hu/feed",
-            "PC World": "https://www.pcwplus.hu/site/rss/rss.xml",
-            "GameStar": "https://www.gsplus.hu/site/rss/rss.xml"
-        };
 
         const NYIREGYHAZA_COORDS = { lat: 47.95, lon: 21.71 };
         const CURRENCY_API_KEYS = ['8258c9489622103635e16227fd9dadd7b8d1', '883da7c029a9ffaede3d17ae88d4b574a081'];
@@ -987,7 +948,10 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         }
         
         function getFavicon(url){try{const domain=new URL(url).hostname;return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;}catch(e){return '';}}
-        function getSourceName(link){try{const url=new URL(link);const host=url.hostname.replace('www.','').toLowerCase();const map={'telex.hu':'TELEX','index.hu':'INDEX','24.hu':'24.HU','origo.hu':'ORIGO','hirado.hu':'HIRADO','rtl.hu':'RTL','atv.hu':'ATV','police.hu':'KÖZÚT','bkk.hu':'BKK'};if(map[host])return map[host];return host.split('.')[0].toUpperCase();}catch(e){return "HÍR";}}
+        
+        // Tartalék névfelismerő arra az esetre, ha a Firebase-ből jövő név üres lenne
+        function getSourceName(link){try{const url=new URL(link);const host=url.hostname.replace('www.','').toLowerCase();const map={'telex.hu':'TELEX','index.hu':'INDEX','24.hu':'24.HU','origo.hu':'ORIGO','hirado.hu':'HIRADO','rtl.hu':'RTL','atv.hu':'ATV','police.hu':'KÖZÚT','bkk.hu':'BKK','roadster.hu':'ROADSTER','ng.24.hu':'NATGEO','player.hu':'PLAYER.HU','qubit.hu':'QUBIT','pcworld.hu':'PC WORLD','gamestar.hu':'GAMESTAR'};if(map[host])return map[host];return host.split('.')[0].toUpperCase();}catch(e){return "HÍR";}}
+        
         function getWindDirectionHu(degree,short=false){if(degree===null||degree===undefined)return "";const val=Math.floor((degree/45)+0.5);const dirsFull=["Északi","Északkeleti","Keleti","Délkeleti","Déli","Délnyugati","Nyugati","Északnyugati"];const dirsShort=["É","ÉK","K","DK","D","DNy","Ny","ÉNy"];return short?dirsShort[(val%8)]:dirsFull[(val%8)];}
         function selectHourlyAnimationBundle(){state.currentAnimationBundle=[1];state.logoAnimIndex=0;}
         function startBigClockLogoAnimation(){if(state.logoAnimTimeout)clearTimeout(state.logoAnimTimeout);if(!state.currentAnimationBundle||state.currentAnimationBundle.length===0){selectHourlyAnimationBundle();}playNextLogoAnimation();}
@@ -1041,6 +1005,12 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
                     flipper.isFlipping=false;
                 },150);
             },150);
+        }
+
+        function stripFirebaseKeys(str) {
+            if (typeof str !== 'string') return str;
+            const regex = /-[a-zA-Z0-9_-]{15,25}/g;
+            return str.replace(regex, '').trim();
         }
 
         function showCredits(){if(state.economyVisible||state.midnightActive || state.leftClockActive)return;el.creditsContent.classList.add('active');el.economyContent.classList.remove('active');document.getElementById('left-clock-content').classList.remove('active');flipPanelCustom('identity','back');setTimeout(()=>{flipPanelCustom('identity','front');},10000);}
@@ -1637,7 +1607,7 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         }
         
         window.triggerTestBreaking=function(){state.breakingQueue.push({title:"MOST ÉRKEZETT! Ez egy rövid teszt hír.",date:new Date(),source:"SYSTEM",link:"#"});processBreakingQueue();el.devMenu.style.display='none';}
-        window.triggerTestBreakingLong=function(){state.breakingQueue.push({title:"MOST ÉRKEZETT! Ez egy rendkívül hosszú teszt hír, amely arra szolgál, hogy ellenőrivel a typewriter görgetős, illetve a végén a biztonságos, folyamatos visszafelé történő törlését a teljes sávban.",date:new Date(),source:"SYSTEM",link:"#"});processBreakingQueue();el.devMenu.style.display='none';}
+        window.triggerTestBreakingLong=function(){state.breakingQueue.push({title:"MOST ÉRKEZETT! Ez egy rendkívül hosszú teszt hír, amely arra szolgál, hogy ellenőrizze a typewriter görgetős, illetve a végén a biztonságos, folyamatos visszafelé történő törlését a teljes sávban.",date:new Date(),source:"SYSTEM",link:"#"});processBreakingQueue();el.devMenu.style.display='none';}
         window.triggerTestTraffic=function(){el.devMenu.style.display='none';state.items.splice(state.currentIndex+1,0,{title:"Baleset az M3-as autópályán",desc:"Torlódás várható.",source:"KÖZÚT",date:new Date(),link:"#"});clearTimeout(state.flipTimer);showNextItem(true);};
         window.triggerVisualNews=function(){el.devMenu.style.display='none';state.items.splice(state.currentIndex+1,0,{title:"Képes Hír Teszt - Dinamikus Kártya",desc:"Egy lenyűgöző képpel ellátott hírblokk tesztelése modern áttűnésekkel.",source:"INDEX",date:new Date(),link:"#",img:"https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=3840&q=90"});clearTimeout(state.flipTimer);showNextItem(true);};
         window.triggerTextNews=function(){el.devMenu.style.display='none';state.items.splice(state.currentIndex+1,0,{title:"Szöveges Hír Letisztult Design",desc:"A sima szöveges hír megjelenésének tesztelése 2026-os tipográfiával.",source:"TELEX",date:new Date(),link:"#",img:null});clearTimeout(state.flipTimer);showNextItem(true);};
@@ -1663,7 +1633,7 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         window.triggerNightMode=function(){el.devMenu.style.display='none';state.testModeActive=true;state.forcedBlock=THEMATIC_BLOCKS[0];updateTimeAndState();refreshNews();setTimeout(()=>{state.testModeActive=false;state.forcedBlock=null;updateTimeAndState();},25000);};
         window.triggerDayMode=function(){el.devMenu.style.display='none';state.testModeActive=true;state.forcedBlock=THEMATIC_BLOCKS[3];updateTimeAndState();refreshNews();setTimeout(()=>{state.testModeActive=false;state.forcedBlock=null;updateTimeAndState();},25000);};
         window.triggerHourChangeTest=function(){el.devMenu.style.display='none';state.isHourChangeTestActive=true;el.bigClockLayer.classList.add('active');syncBigClockBackground();startBigClockLogoAnimation();const now=new Date();updateBigClockDigital(now);setTimeout(()=>{state.isHourChangeTestActive=false;el.bigClockLayer.classList.remove('active');clearTimeout(state.logoAnimTimeout);},30000);};
-        window.triggerMidnightTest=function(){el.devMenu.style.display='none';state.lastNightInfoTime=0;clearTimeout(state.flipTimer);const testItems=[{title:"Éjszakai villámteszt: Sikeres a próbariadó",desc:"A katasztrófavédelem sikeresen lezárta az éjszakai próbariadót.",link:"https://telex.hu",date:new Date(),source:"Telex"},{title:"Rendkívüli forgalomkorozás az M5-ösön",desc:"Hajnali baleset miatt teljes útzárat rendeltek el.",link:"https://index.hu",date:new Date(),source:"Index"}];runMidnightSequence(testItems);};
+        window.triggerMidnightTest=function(){el.devMenu.style.display='none';state.lastNightInfoTime=0;clearTimeout(state.flipTimer);const testItems=[{title:"Éjszakai villámteszt: Sikeres a próbariadó",desc:"A katasztrófavédelem sikeresen lezárta az éjszakai próbariadót.",link:"https://telex.hu",date:new Date(),source:"Telex"},{title:"Rendkívüli forgalomkorlátozás az M5-ösön",desc:"Hajnali baleset miatt teljes útzárat rendeltek el.",link:"https://index.hu",date:new Date(),source:"Index"}];runMidnightSequence(testItems);};
         window.triggerGoodbyeTest=function(){el.devMenu.style.display='none';el.goodbyeCard.classList.add('active');setTimeout(()=>{el.goodbyeCard.classList.remove('active');},15000);};
         window.triggerGoodMorningTest=function(){el.devMenu.style.display='none';el.goodmorningCard.classList.add('active');setTimeout(()=>{el.goodmorningCard.classList.remove('active');},15000);};
         window.triggerCredits=function(){el.devMenu.style.display='none';showCredits();};
@@ -1990,6 +1960,7 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         return filtered;
     }
     
+    // FRISSÍTETT HÍRLEKÉRŐ: Csak az adas.json, gyujto.json és on_this_day.json adatbázisokat használja
     async function refreshNews(silent=false){
         state.lastRefreshTimestamp=Date.now();
         if(!silent)el.loading.classList.add('active');
@@ -2016,6 +1987,7 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
             console.log("Hiba az on_this_day betöltésekor: " + e.toString());
         }
         
+        // 1. adas.json letöltése
         try {
             const response = await fetch(FIREBASE_URL + "/adas.json");
             const data = await response.json();
@@ -2025,10 +1997,10 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
                         fetchedItems.push({
                             title: data[key].title,
                             link: data[key].link,
-                            desc: data[key].desc,
+                            desc: data[key].desc || data[key].description || "",
                             source: data[key].source || "ADÁS",
                             date: new Date(data[key].date),
-                            img: data[key].img,
+                            img: data[key].img || data[key].image || null,
                             fromDatabase: true
                         });
                     }
@@ -2038,24 +2010,27 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
             console.log("Hiba az adas.json betöltésekor: " + e.toString());
         }
         
+        // 2. gyujto.json letöltése (Az új, felhőben gyűjtött RSS hírek helye)
         try {
-            const aggRes = await fetch(FIREBASE_URL + "/aggregated_news.json");
-            const aggData = await aggRes.json();
-            if (aggData && Array.isArray(aggData)) {
-                aggData.forEach(item => {
-                    fetchedItems.push({
-                        title: item.title,
-                        link: item.link,
-                        desc: item.desc,
-                        source: item.source,
-                        date: new Date(item.date),
-                        img: item.img,
-                        fromDatabase: false
-                    });
+            const response = await fetch(FIREBASE_URL + "/gyujto.json");
+            const data = await response.json();
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    if (data[key]) {
+                        fetchedItems.push({
+                            title: data[key].title,
+                            link: data[key].link,
+                            desc: data[key].desc || data[key].description || "",
+                            source: data[key].source || "GYŰJTŐ",
+                            date: new Date(data[key].date),
+                            img: data[key].img || data[key].image || null,
+                            fromDatabase: true
+                        });
+                    }
                 });
             }
         } catch(e) {
-            console.log("Hiba az aggregated_news.json betöltésekor: " + e.toString());
+            console.log("Hiba az gyujto.json betöltésekor: " + e.toString());
         }
         
         fetchedItems = fetchedItems.sort((a,b)=>b.date-a.date);
@@ -2103,7 +2078,7 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         else el.timelineContainer.classList.remove('visible');
     }
 
-    async function runMidnightSequence(testItems=null){if(state.midnightActive)return;const currentHour=new Date().getHours();if(!testItems&&currentHour>=6)return;state.midnightActive=true;state.lastNightInfoTime=Date.now();let recentItems=[];if(testItems){recentItems=testItems;}else{const now=new Date();const midnight=new Date(now);midnight.setHours(0,0,0,0);recentItems=(state.rawItems||[]).filter(item=>item.date>=midnight&&item.date<=now);const uniqueMap=new Map();recentItems.forEach(item=>uniqueMap.set(item.link,item));recentItems=Array.from(uniqueMap.values()).sort((a,b)=>a.date-b.date);}if(recentItems.length===0){state.midnightActive=false;return;}flipPanelCustom('weather','midnight');await new Promise(r=>setTimeout(r,600));for(let i=0;i<recentItems.length;i++){if(!state.midnightActive)break;const item=recentItems[i];const source=getSourceName(item.link)||item.source;const fav=getFavicon(item.link);const timeStr=item.date.toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});const cardHtml=`<div class="ms-small-card" id="ms-card-${i}" data-link="${item.link}"><div class="msc-meta"><span class="msc-source"><img src="${fav}">${source}</span><span class="msc-time">${timeStr}</span></div><div class="msc-scroll-wrapper" id="msc-wrap-${i}"><div class="msc-scroll-content" id="msc-content-${i}"><div class="msc-title">${item.title}</div><div class="msc-desc">${item.desc}</div></div></div></div>`;el.msCardsViewport.innerHTML=cardHtml;await new Promise(r=>setTimeout(r,50));const cardEl=document.getElementById(`ms-card-${i}`);const contentEl=document.getElementById(`msc-content-${i}`);const wrapperEl=document.getElementById(`msc-wrap-${i}`);cardEl.classList.add('visible');await new Promise(r=>setTimeout(r,800));const contentHeight=contentEl.offsetHeight;const wrapperHeight=wrapperEl.offsetHeight;
+    async function runMidnightSequence(testItems=null){if(state.midnightActive)return;const currentHour=new Date().getHours();if(!testItems&&currentHour>=6)return;state.midnightActive=true;state.lastNightInfoTime=Date.now();let recentItems=[];if(testItems){recentItems=testItems;}else{const now=new Date();const midnight=new Date(now);midnight.setHours(0,0,0,0);recentItems=(state.rawItems||[]).filter(item=>item.date>=midnight&&item.date<=now);const uniqueMap=new Map();recentItems.forEach(item=>uniqueMap.set(item.link,item));recentItems=Array.from(uniqueMap.values()).sort((a,b)=>a.date-b.date);}if(recentItems.length===0){state.midnightActive=false;return;}flipPanelCustom('weather','midnight');await new Promise(r=>setTimeout(r,600));for(let i=0;i<recentItems.length;i++){if(!state.midnightActive)break;const item=recentItems[i];const source=stripFirebaseKeys(item.source || getSourceName(item.link)).toUpperCase().trim();const fav=getFavicon(item.link);const timeStr=item.date.toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});const cardHtml=`<div class="ms-small-card" id="ms-card-${i}" data-link="${item.link}"><div class="msc-meta"><span class="msc-source"><img src="${fav}">${source}</span><span class="msc-time">${timeStr}</span></div><div class="msc-scroll-wrapper" id="msc-wrap-${i}"><div class="msc-scroll-content" id="msc-content-${i}"><div class="msc-title">${item.title}</div><div class="msc-desc">${item.desc}</div></div></div></div>`;el.msCardsViewport.innerHTML=cardHtml;await new Promise(r=>setTimeout(r,50));const cardEl=document.getElementById(`ms-card-${i}`);const contentEl=document.getElementById(`msc-content-${i}`);const wrapperEl=document.getElementById(`msc-wrap-${i}`);cardEl.classList.add('visible');await new Promise(r=>setTimeout(r,800));const contentHeight=contentEl.offsetHeight;const wrapperHeight=wrapperEl.offsetHeight;
         let displayTime = 8000;
         if(contentHeight>wrapperHeight){
             const scrollDist = contentHeight + 20;
@@ -2148,127 +2123,128 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         state.flipTimer=setTimeout(()=>{state.isTransitioning=false;showNextItem(true);},duration);
     }
     
-    function renderTipCard(){const nextTrack=el[state.activeTrack==='a'?'trackB':'trackA'];const currentTrack=el[state.activeTrack==='a'?'trackA':'trackB'];el.badge.className='left-prog-badge visible badge-tip';el.badge.textContent='SYSTEM TIP';const html=`<div class="tip-container-horizontal"><div class="tip-visual"><div class="mouse-anim-box"><svg viewBox="0 0 24 24"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/><path d="M14 17H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div></div><div class="tip-text-content"><div class="tip-main-line">RENDSZER TIPP</div><div class="tip-sub-line">Vidd az egeret bármelyik hír fölé a teljes tartalom azonnade olvasásához. Kattints a kártyára az eredeti cikk megnyitásához.</div></div></div>`;nextTrack.innerHTML=html;nextTrack.className='news-card tip-card visible';currentTrack.classList.remove('visible');state.activeTrack=state.activeTrack==='a'?'b':'a';el.progressBar.classList.remove('animate-progress');void el.progressBar.offsetWidth;el.progressBar.style.animationDuration='10s';el.progressBar.classList.add('animate-progress');state.flipTimer=setTimeout(()=>{state.isTransitioning=false;showNextItem(false);},10000);}
+    function renderTipCard(){const nextTrack=el[state.activeTrack==='a'?'trackB':'trackA'];const currentTrack=el[state.activeTrack==='a'?'trackA':'trackB'];el.badge.className='left-prog-badge visible badge-tip';el.badge.textContent='SYSTEM TIP';const html=`<div class="tip-container-horizontal"><div class="tip-visual"><div class="mouse-anim-box"><svg viewBox="0 0 24 24"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/><path d="M14 17H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div></div><div class="tip-text-content"><div class="tip-main-line">RENDSZER TIPP</div><div class="tip-sub-line">Vidd az egeret bármelyik hír fölé a teljes tartalom azonnali elolvasásához. Kattints a kártyára az eredeti cikk megnyitásához.</div></div></div>`;nextTrack.innerHTML=html;nextTrack.className='news-card tip-card visible';currentTrack.classList.remove('visible');state.activeTrack=state.activeTrack==='a'?'b':'a';el.progressBar.classList.remove('animate-progress');void el.progressBar.offsetWidth;el.progressBar.style.animationDuration='10s';el.progressBar.classList.add('animate-progress');state.flipTimer=setTimeout(()=>{state.isTransitioning=false;showNextItem(false);},10000);}
+
+function renderCard(item,isBreaking){
+    const nextTrack=el[state.activeTrack==='a'?'trackB':'trackA'];
+    const currentTrack=el[state.activeTrack==='a'?'trackA':'trackB'];
+    const fav=getFavicon(item.link);
     
-    function renderCard(item,isBreaking){
-        const nextTrack=el[state.activeTrack==='a'?'trackB':'trackA'];
-        const currentTrack=el[state.activeTrack==='a'?'trackA':'trackB'];
-        const fav=getFavicon(item.link);
-        const displaySource=getSourceName(item.link);
-        const timeStr=item.date.toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});
-        nextTrack.className='news-card';
-        nextTrack.style.transform='translateZ(0) perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-        
-        const isTraffic=(displaySource==='KÖZÚT'||displaySource==='BKK');
-        
-        if (item.isOnThisDay) {
-            el.badge.className='left-prog-badge visible badge-history';
-            el.badge.textContent='HISTÓRIA';
-            nextTrack.classList.add('history-card');
-        } else if(isTraffic){
-            el.badge.className='left-prog-badge visible badge-traffic';
-            el.badge.textContent='KÖZLEKEDÉS';
-            nextTrack.classList.add('traffic-alert');
-        }else{
-            el.badge.className=`left-prog-badge visible ${state.block.styleClass}`;
-            el.badge.textContent=state.block.name;
-        }
-        
-        let iconHtml=isTraffic?TRAFFIC_ICON:`<img src="${fav}" class="provider-icon">`;
-        let metaSource = displaySource;
-        if (item.isOnThisDay) {
-            iconHtml = `<span style="font-size:1.1rem; line-height:1; filter: drop-shadow(0 0 4px rgba(251,191,36,0.5));">🏛️</span>`;
-            metaSource = "MÚLTIDÉZŐ";
-        }
-        
-        let footerMetaHTML=`<div class="provider-identity">${iconHtml} ${metaSource}</div><span style="margin-left:8px; flex-shrink: 0; opacity:0.8;">${timeStr}</span>`;
-
-        let visualHtml='';
-        let hasVisual=false;
-        if(item.img){
-            hasVisual=true;
-            const imgUrl = to4K(item.img);
-            visualHtml=`<div class="news-visual-column"><img src="${imgUrl}" class="news-visual-image" alt="Hír kép"></div>`;
-        }
-        if(hasVisual){
-            nextTrack.classList.add('has-visual');
-        }
-        
-        const shortDesc=getShortDesc(item.desc, 220);
-        const html=`<div class="news-content-wrapper"><div class="news-title">${item.title}</div><div class="news-desc">${shortDesc}</div><div class="news-footer-row"><div class="news-meta" style="width:100%;">${footerMetaHTML}</div></div></div>${visualHtml}<div class="news-full-overlay"><div class="nfo-title">${item.title}</div><div class="nfo-text">${item.desc}</div></div>`;
-        
-        nextTrack.innerHTML=html;
-        currentTrack.classList.remove('visible');
-        nextTrack.classList.add('visible');
-        state.activeTrack=state.activeTrack==='a'?'b':'a';
-        el.counter.textContent=`${(state.currentIndex%state.items.length)+1}/${state.items.length}`;
-        updateTimelineActive();
+    // A táblázatból származó nevet jelenítjük meg, csupa nagybetűvel, levágva a Firebase-es sallangokat
+    const displaySource = stripFirebaseKeys(item.source || getSourceName(item.link)).toUpperCase().trim();
+    const timeStr=item.date.toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});
+    nextTrack.className='news-card';
+    nextTrack.style.transform='translateZ(0) perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+    
+    const isTraffic=(displaySource==='KÖZÚT'||displaySource==='BKK');
+    
+    if (item.isOnThisDay) {
+        el.badge.className='left-prog-badge visible badge-history';
+        el.badge.textContent='HISTÓRIA';
+        nextTrack.classList.add('history-card');
+    } else if(isTraffic){
+        el.badge.className='left-prog-badge visible badge-traffic';
+        el.badge.textContent='KÖZLEKEDÉS';
+        nextTrack.classList.add('traffic-alert');
+    }else{
+        el.badge.className=`left-prog-badge visible ${state.block.styleClass}`;
+        el.badge.textContent=state.block.name;
     }
+    
+    let iconHtml=isTraffic?TRAFFIC_ICON:`<img src="${fav}" class="provider-icon">`;
+    let metaSource = displaySource;
+    if (item.isOnThisDay) {
+        iconHtml = `<span style="font-size:1.1rem; line-height:1; filter: drop-shadow(0 0 4px rgba(251,191,36,0.5));">🏛️</span>`;
+        metaSource = "MÚLTIDÉZŐ";
+    }
+    
+    let footerMetaHTML=`<div class="provider-identity">${iconHtml} ${metaSource}</div><span style="margin-left:8px; flex-shrink: 0; opacity:0.8;">${timeStr}</span>`;
 
-    el.newsViewport.addEventListener('mouseenter',()=>{if(!state.isPaused){clearTimeout(state.flipTimer);el.progressBar.style.animationPlayState='paused';state.isPaused=true;const elapsed=Date.now()-state.cardStartTime;state.remainingTime=Math.max(0,state.currentDuration-elapsed);}});
-    el.newsViewport.addEventListener('mouseleave',()=>{if(state.isPaused){el.progressBar.style.animationPlayState='running';state.isPaused=false;state.cardStartTime=Date.now();state.currentDuration=state.remainingTime;state.flipTimer=setTimeout(()=>{showNextItem(true);},state.remainingTime);}});
+    let visualHtml='';
+    let hasVisual=false;
+    if(item.img){
+        hasVisual=true;
+        const imgUrl = to4K(item.img);
+        visualHtml=`<div class="news-visual-column"><img src="${imgUrl}" class="news-visual-image" alt="Hír kép"></div>`;
+    }
+    if(hasVisual){
+        nextTrack.classList.add('has-visual');
+    }
+    
+    const shortDesc=getShortDesc(item.desc, 220);
+    const html=`<div class="news-content-wrapper"><div class="news-title">${item.title}</div><div class="news-desc">${shortDesc}</div><div class="news-footer-row"><div class="news-meta" style="width:100%;">${footerMetaHTML}</div></div></div>${visualHtml}<div class="news-full-overlay"><div class="nfo-title">${item.title}</div><div class="nfo-text">${item.desc}</div></div>`;
+    
+    nextTrack.innerHTML=html;
+    currentTrack.classList.remove('visible');
+    nextTrack.classList.add('visible');
+    state.activeTrack=state.activeTrack==='a'?'b':'a';
+    el.counter.textContent=`${(state.currentIndex%state.items.length)+1}/${state.items.length}`;
+    updateTimelineActive();
+}
 
-    function initIntroSequence(){generateClockMarks();el.leftPanel.classList.add('loaded');el.rightPanel.classList.add('loaded');setTimeout(()=>{el.mainContainer.classList.add('open');animateRateItemsSequential();},200);}
+el.newsViewport.addEventListener('mouseenter',()=>{if(!state.isPaused){clearTimeout(state.flipTimer);el.progressBar.style.animationPlayState='paused';state.isPaused=true;const elapsed=Date.now()-state.cardStartTime;state.remainingTime=Math.max(0,state.currentDuration-elapsed);}});
+el.newsViewport.addEventListener('mouseleave',()=>{if(state.isPaused){el.progressBar.style.animationPlayState='running';state.isPaused=false;state.cardStartTime=Date.now();state.currentDuration=state.remainingTime;state.flipTimer=setTimeout(()=>{showNextItem(true);},state.remainingTime);}});
 
-    initIntroSequence();
-    el.crYear.textContent=new Date().getFullYear();
-    selectHourlyAnimationBundle();
-    generateHourlyTriggers();
-    document.addEventListener('visibilitychange',handleVisibilityChange);
-    setInterval(updateTimeAndState,1000);
+function initIntroSequence(){generateClockMarks();el.leftPanel.classList.add('loaded');el.rightPanel.classList.add('loaded');setTimeout(()=>{el.mainContainer.classList.add('open');animateRateItemsSequential();},200);}
 
-    refreshNews();
-    updateTimeAndState();
+initIntroSequence();
+el.crYear.textContent=new Date().getFullYear();
+selectHourlyAnimationBundle();
+generateHourlyTriggers();
+document.addEventListener('visibilitychange',handleVisibilityChange);
+setInterval(updateTimeAndState,1000);
 
-    feedsRef.on('value', (snap) => {
-        state.rssFeeds = snap.val() || {};
-        refreshNews();
-    });
+refreshNews();
+updateTimeAndState();
 
-    rates24hRef.on('value', (snap) => {
-        const val = snap.val();
-        if (val) {
-            state.rates24hData = val;
-            updateRates24hUI();
+// Árfolyamfigyelő WebSocket
+rates24hRef.on('value', (snap) => {
+    const val = snap.val();
+    if (val) {
+        state.rates24hData = val;
+        updateRates24hUI();
+    } else {
+        state.rates24hData = null;
+    }
+});
+
+// ÉLŐ BREAKING NEWS FIGYELŐ (A gyujto.json változásait követi valós időben a felhőből)
+let isFirstBreakingLoad = true;
+database.ref('gyujto').on('value', (snap) => {
+    const data = snap.val();
+    if (data) {
+        const itemsArray = Object.values(data);
+        if (isFirstBreakingLoad) {
+            itemsArray.forEach(item => {
+                if (item && item.link) {
+                    state.seenBreakingLinks.add(item.link);
+                }
+            });
+            isFirstBreakingLoad = false;
         } else {
-            state.rates24hData = null;
+            let newBreakingCount = 0;
+            // Legfrissebb hírek rendezése idő szerint, hogy a legutolsó fusson le utoljára
+            const sortedItems = itemsArray.sort((a,b) => new Date(a.date) - new Date(b.date));
+            sortedItems.forEach(item => {
+                if (item && item.link && !state.seenBreakingLinks.has(item.link)) {
+                    state.seenBreakingLinks.add(item.link);
+                    state.breakingQueue.push({
+                        title: item.title,
+                        desc: item.desc || item.description || "",
+                        source: stripFirebaseKeys(item.source || getSourceName(item.link)).toUpperCase().trim(),
+                        date: new Date(item.date),
+                        link: item.link
+                    });
+                    newBreakingCount++;
+                }
+            });
+            if (newBreakingCount > 0) {
+                processBreakingQueue();
+            }
         }
-    });
+    }
+});
 
-    let isFirstBreakingLoad = true;
-    database.ref('aggregated_news').on('value', (snap) => {
-        const data = snap.val();
-        if (data && Array.isArray(data)) {
-            if (isFirstBreakingLoad) {
-                data.forEach(item => {
-                    if (item && item.link) {
-                        state.seenBreakingLinks.add(item.link);
-                    }
-                });
-                isFirstBreakingLoad = false;
-            } else {
-                let newBreakingCount = 0;
-                const itemsCopy = [...data].reverse();
-                itemsCopy.forEach(item => {
-                    if (item && item.link && !state.seenBreakingLinks.has(item.link)) {
-                        state.seenBreakingLinks.add(item.link);
-                        state.breakingQueue.push({
-                            title: item.title,
-                            desc: item.desc,
-                            source: item.source,
-                            date: new Date(item.date
-),
-link: item.link
-});
-newBreakingCount++;
-}
-});
-if (newBreakingCount > 0) {
-processBreakingQueue();
-}
-}
-}
-});
 fetchWeatherData();
 setInterval(fetchWeatherData,120000);
 setInterval(showCredits,300000);
