@@ -681,7 +681,7 @@ body:has(.goodmorning-card.active) .clock-capsule-container {
             <div class="progress-line-container" id="progress-line-wrapper"><div id="progress-bar" class="progress-line"></div></div>
             
             <div class="breaking-panel" id="breaking-panel">
-                <div class="clean-badge">MOST ÉRKEZETT!</div>
+                <div class="clean-badge"></div>
                 <div class="bp-meta-info" id="bp-meta-container"><span id="bp-time">00:00</span> <span style="opacity:0.5; margin:0 8px;" id="bp-sep">|</span> <span id="bp-source">FORRÁS</span></div>
                 <div class="bp-text-mask" id="bp-text-mask"><div class="bp-text-content" id="bp-text">Ez egy rendkívüli hír szövege...</div></div>
             </div>
@@ -1606,8 +1606,8 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
             setTimeout(typeWriter,400); 
         }
         
-        window.triggerTestBreaking=function(){state.breakingQueue.push({title:"MOST ÉRKEZETT! Ez egy rövid teszt hír.",date:new Date(),source:"SYSTEM",link:"#"});processBreakingQueue();el.devMenu.style.display='none';}
-        window.triggerTestBreakingLong=function(){state.breakingQueue.push({title:"MOST ÉRKEZETT! Ez egy rendkívül hosszú teszt hír, amely arra szolgál, hogy ellenőrizze a typewriter görgetős, illetve a végén a biztonságos, folyamatos visszafelé történő törlését a teljes sávban.",date:new Date(),source:"SYSTEM",link:"#"});processBreakingQueue();el.devMenu.style.display='none';}
+        window.triggerTestBreaking=function(){state.breakingQueue.push({title:"Ez egy rövid teszt hír.",date:new Date(),source:"SYSTEM",link:"#"});processBreakingQueue();el.devMenu.style.display='none';}
+        window.triggerTestBreakingLong=function(){state.breakingQueue.push({title:"Ez egy rendkívül hosszú teszt hír, amely arra szolgál, hogy ellenőrizze a typewriter görgetős, illetve a végén a biztonságos, folyamatos visszafelé történő törlését a teljes sávban.",date:new Date(),source:"SYSTEM",link:"#"});processBreakingQueue();el.devMenu.style.display='none';}
         window.triggerTestTraffic=function(){el.devMenu.style.display='none';state.items.splice(state.currentIndex+1,0,{title:"Baleset az M3-as autópályán",desc:"Torlódás várható.",source:"KÖZÚT",date:new Date(),link:"#"});clearTimeout(state.flipTimer);showNextItem(true);};
         window.triggerVisualNews=function(){el.devMenu.style.display='none';state.items.splice(state.currentIndex+1,0,{title:"Képes Hír Teszt - Dinamikus Kártya",desc:"Egy lenyűgöző képpel ellátott hírblokk tesztelése modern áttűnésekkel.",source:"INDEX",date:new Date(),link:"#",img:"https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=3840&q=90"});clearTimeout(state.flipTimer);showNextItem(true);};
         window.triggerTextNews=function(){el.devMenu.style.display='none';state.items.splice(state.currentIndex+1,0,{title:"Szöveges Hír Letisztult Design",desc:"A sima szöveges hír megjelenésének tesztelése 2026-os tipográfiával.",source:"TELEX",date:new Date(),link:"#",img:null});clearTimeout(state.flipTimer);showNextItem(true);};
