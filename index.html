@@ -333,8 +333,45 @@ body:has(.goodmorning-card.active) .clock-capsule-container {
 .controls-normal-content { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 20px; }
 .cb-left { display: flex; align-items: center; gap: 16px; border-right: 1px solid rgba(255,255,255,0.08); padding-right: 16px; }
 
-.footer-rate-item, #timeline-container, .next-prog-alert, .live-dot, #counter-display, .control-btn { opacity: 0; transform: translateY(4px); transition: opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.footer-rate-item.item-active, #timeline-container.item-active, .next-prog-alert.item-active, .live-dot.item-active, #counter-display.item-active, .control-btn.item-active { opacity: 1; transform: translateY(0); }
+/* STROBOSZKÓPOS PATTOGÓ ANIMÁCIÓ ÁRROLYAM FRISSÜLÉSKOR */
+@keyframes rateStrobePop {
+    0% { transform: scale(1); opacity: 1; filter: brightness(1); }
+    15% { transform: scale(1.4) translateY(-3px); opacity: 0.1; filter: brightness(3); color: #ffffff; text-shadow: 0 0 15px var(--accent-steel), 0 0 25px #ffffff; }
+    30% { transform: scale(0.8) translateY(2px); opacity: 1; filter: brightness(0.6); }
+    45% { transform: scale(1.3) translateY(-1px); opacity: 0.2; filter: brightness(2.5); color: #ffffff; text-shadow: 0 0 18px var(--accent-steel); }
+    60% { transform: scale(0.92); opacity: 1; filter: brightness(0.9); }
+    75% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1) translateY(0); opacity: 1; filter: brightness(1); text-shadow: none; }
+}
+.rate-pop-strobe {
+    display: inline-block !important;
+    animation: rateStrobePop 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* DEVIZAPIAC ZÁRVA BADGE / STÁTUSZ SZÖVEG */
+.market-closed-status {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    padding: 2px 8px;
+    border-radius: var(--inner-radius);
+    white-space: nowrap;
+    display: none;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.3px;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.15);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.market-closed-status.visible {
+    display: inline-flex;
+}
+
+.footer-rate-item, #timeline-container, .next-prog-alert, .live-dot, #counter-display, .control-btn, .market-closed-status { opacity: 0; transform: translateY(4px); transition: opacity 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.footer-rate-item.item-active, #timeline-container.item-active, .next-prog-alert.item-active, .live-dot.item-active, #counter-display.item-active, .control-btn.item-active, .market-closed-status.item-active { opacity: 1; transform: translateY(0); }
 
 .footer-rate-item { font-family: var(--font-mono); font-size: 0.8rem; color: #cbd5e1; font-weight: 600; display: flex; align-items: center; }
 .footer-rate-val { color: var(--accent-steel); margin-left: 6px; }
@@ -692,6 +729,7 @@ body:has(.goodmorning-card.active) .clock-capsule-container {
                         <span class="footer-rate-item" id="fri-eur"><img src="https://flagcdn.com/w20/eu.png" class="footer-flag">EUR <span class="footer-rate-val" id="fr-eur">--</span></span>
                         <span class="footer-rate-item" id="fri-usd"><img src="https://flagcdn.com/w20/us.png" class="footer-flag">USD <span class="footer-rate-val" id="fr-usd">--</span></span>
                         <span class="footer-rate-item" id="fri-chf"><img src="https://flagcdn.com/w20/ch.png" class="footer-flag">CHF <span class="footer-rate-val" id="fr-chf">--</span></span>
+                        <span class="market-closed-status" id="market-closed-status">🔒 PIAC ZÁRVA · NYITÁS: HÉTFŐ 00:00</span>
                     </div>
                     <div class="cb-center"><div id="timeline-container"></div></div>
                     <div class="cb-right">
@@ -830,10 +868,8 @@ body:has(.goodmorning-card.active) .clock-capsule-container {
 
         function parseLocationName(rawName){let cleanName=rawName;let cc='hu';let cn='Magyarország';const match=rawName.match(/(.+?)\s*\(([A-Z]{2})\)$/);if(match){cleanName=match[1].trim();cc=match[2].toLowerCase();cn=COUNTRY_NAMES[cc]||cc.toUpperCase();}else{cc=getCountryCode(rawName,null);cn=COUNTRY_NAMES[cc]||'Magyarország';}return {name:cleanName,cc:cc,cn:cn};}
         const PWS_MAP={"ISRVR13":"Sárvár","IOSZK4":"Oszkó","ISZNTD6":"Szántód","IBALAT149":"Balatonszemes","IBUZSK1":"Csisztapuszta","ISZEKS12":"Szekszárd","IJNOSH2":"Jánoshalma","IPCS52":"Pécs","IPPRD1":"Páprád","IKISKU42":"Kiskunhalas","INEMES10":"Nemesnádudvar","ISZEGE67":"Szeged","IBKSCS12":"Békéscsaba","IFZESG2":"Füzesgyarmat","IMIKEP2":"Mikepércs","ITGLS2":"Téglás","IGACSL1":"Gacsály","IFLESD1":"Fülesd","IKISSZ3":"Kisszekeres","ILEVEL2":"Levelek","IKEMEC2":"Kemecse","INAGYC6":"Nagycserkesz","ITISZA15":"Tiszavasvári","INEMES19":"Nemesbikk","IEGERS22":"Egerszólát","IBKKSZ5":"Bükkszenterzsébet","IPSZT1":"Pásztó","IPALOT13":"Palotás","IGDLL37":"Gödöllő","IZSMBK6":"Zsámbék","ICSORN6":"Csorna","IGAGYV1":"Gagyvendégi","IMARTO122":"Martonyi","IKAZIN14":"Kazincbarcika","IPUTNO1":"Putnok","IZABAR1":"Zabar","ISALGT1":"Salgótarján","IKARAN11":"Karanclapujtő","IBEKLC3":"Bekölce","IMTRAB1":"Mátraballa","IVC267":"Vác","IPILIS37":"Pilisvörösvár","IFELCS4":"Felcsút","IBUDAK6":"Budakeszi","IBIATO9":"Biatorbágy","ICSKVR4":"Csákvár","IOROSZ2":"Oroszlány","IBALINKA2":"Bakony","ISR67":"Súr","IPANNO3":"Pannonhalma","IKAJRP2":"Kajárpéc","IPPA11":"Pápa","ICELLD14":"Celldömölk","IHEVES2":"Heves","IGYNGY22":"Gyöngyös","ISZCSN9":"Szécsény","ITAHIT11":"Tahitótfalu","IESZTE5":"Esztergom","ITATA16":"Tata","IKARTAL4":"Kartal","IMARTO67":"Martonvásár","ISZOLNOK10":"Szolnok","ISZOLN13":"Szolnok","INAGYK59":"Nagykőrös","IKECSK31":"Kecskemét","IKALOCSA2":"Kalocsa","IBONYH1":"Bonyhád","ISZENT114":"Szentlőrinc","ILJUBL47":"Ljubljana","IBAKTA4":"Baktalórántháza","IJFEHR1":"Újfehértó","IPAPOS6":"Papos","ISONKD1":"Sonkád","INAPKO1":"Napkor","IHARSN4":"Harsány","IBKKSZ2":"Bükkszentkereszt","INYREG37":"Nyíregyháza","IPUSZT3":"Pusztadobos","ITISZA93":"Tiszaújváros","IEGERS2":"Eger","IHAJDD7":"Hajdúdorog","IGYULA12":"Gyula","IMAGYA4":"Magyarcsanád","IHDMEZ21":"Hódmezővásárhely","ISZEGE23":"Szeged-Rókus","ICSENG9":"Csengele","INAGYN1":"Nagynyárád","IKIRLY1":"Királyegyháza","ITAMSI1":"Tamási","IZALAE45":"Zalaegerszeg","IFARKA7":"Farkasgyepű","INYRAC1":"Nyíracsád","ISZAMO11":"Szamosújlak","IGVAVE1":"Gávavencsellő","IEDELN2":"Edelény","INYRI1":"Nyíri","IBTTS1":"Büttös","IZD2":"Ózd"};
-        const 
-HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:48.1,lon:20.78},{name:'Szombathely',lat:47.23,lon:16.62},{name:'Győr',lat:47.68,lon:17.63},{name:'Pécs',lat:46.07,lon:18.23},{name:'Szeged',lat:46.25,lon:20.15},{name:'Eger',lat:47.9,lon:20.37},{name:'Veszprém',lat:47.09,lon:17.91},{name:'Zalaegerszeg',lat:46.84,lon:16.84},{name:'Békéscsaba',lat:46.68,lon:21.09},{name:'Kaposvár',lat:46.36,lon:17.79},{name:'Tatabánya',lat:47.57,lon:18.4},{name:'Salgótarján',lat:48.1,lon:19.8},{name:'Szekszárd',lat:46.35,lon:18.7},{name:'Sopron',lat:47.68,lon:16.58},{name:'Hódmezővásárhely',lat:46.43,lon:20.32},{name:'Nagykanizsa',lat:46.45,lon:16.99},{name:'Dunaújváros',lat:46.96,lon:18.93},{name:'Érd',lat:47.38,lon:18.91},{name:'Szolnok',lat:47.18,lon:20.2},{name:'Kecskemét',lat:46.88,lon:19.64},{name:'Baja',lat:46.18,lon:18.95},{name:'Cegléd',lat:47.17,lon:19.8},{name:'Vác',lat:47.78,lon:19.13},{name:'Gödöllő',lat:47.6,lon:19.35},{name:'Ózd',lat:48.22,lon:20.29},{name:'Pápa',lat:47.33,lon:17.47},{name:'Gyula',lat:46.65,lon:21.28},{name:'Hajdúböszörmény',lat:47.67,lon:21.51},{name:'Nyíregyháza',lat:47.95,lon:21.71},{name:'Balatonfüred',lat:46.96,lon:17.89},{name:'Keszthely',lat:46.76,lon:17.24},{name:'Siófok',lat:46.9,lon:18.05},{name:'Komárom',lat:47.74,lon:18.11},{name:'Esztergom',lat:47.79,lon:18.74},{name:'Tata',lat:47.65,lon:18.31},{name:'Mohács',lat:45.99,lon:18.68},{name:'Paks',lat:46.62,lon:18.86},{name:'Kalocsa',lat:46.53,lon:18.98},{name:'Kiskunfélegyháza',lat:46.71,lon:19.85},{name:'Jászberény',lat:47.5,lon:19.91},{name:'Hatvan',lat:47.66,lon:19.67},{name:'Gyöngyös',lat:47.78,lon:19.93},{name:'Kazincbarcika',lat:48.25,lon:20.62},{name:'Sátoraljaújhely',lat:48.4,lon:21.65},{name:'Kisvárda',lat:48.22,lon:22.08},{name:'Mátészalka',lat:47.95,lon:22.32},{name:'Makó',lat:46.22,lon:20.47},{name:'Szentes',lat:46.65,lon:20.26},{name:'Orosháza',lat:46.57,lon:20.66},{name:'Karcag',lat:47.31,lon:20.93},{name:'Hajdúszoboszló',lat:47.45,lon:21.39},{name:'Törökszentmiklós',lat:47.17,lon:20.41},{name:'Gyál',lat:47.38,lon:19.22},{name:'Dunakeszi',lat:47.64,lon:19.14},{name:'Budaörs',lat:47.46,lon:18.96},{name:'Szentendre',lat:47.66,lon:19.07},{name:'Szigetszentmiklós',lat:47.34,lon:19.05},{name:'Mosonmagyaróvár',lat:47.87,lon:17.27},{name:'Bicske',lat:47.49,lon:18.63},{name:'Monor',lat:47.35,lon:19.45},{name:'Mezőkövesd',lat:47.81,lon:20.57},{name:'Tiszaújváros',lat:47.92,lon:21.05},{name:'Sárospatak',lat:48.32,lon:21.57},{name:'Kapuvár',lat:47.59,lon:17.02},{name:'Dombóvár',lat:46.37,lon:18.13},{name:'Dabas',lat:47.18,lon:19.32},{name:'Aszód',lat:47.65,lon:19.48},{name:'Kiskunhalas',lat:46.43,lon:19.48},{name:'Kiskunmajsa',lat:46.49,lon:19.73},{name:'Berettyóújfalu',lat:47.22,lon:21.54},{name:'Balmazújváros',lat:47.61,lon:21.34},{name:'Tiszafüred',lat:47.62,lon:20.76},{name:'Sárbogárd',lat:46.88,lon:18.62},{name:'Zakopane',lat:49.29,lon:19.94,tz:'Europe/Warsaw'},{name:'Poprád',lat:49.05,lon:20.3,tz:'Europe/Bratislava'},{name:'Donovaly',lat:48.88,lon:19.22,tz:'Europe/Bratislava'},{name:'Semmering',lat:47.63,lon:15.83,tz:'Europe/Vienna'},{name:'Murau',lat:47.11,lon:14.17,tz:'Europe/Vienna'},{name:'Cortina d\'Ampezzo',lat:46.54,lon:12.13,tz:'Europe/Rome'},{name:'Chamonix',lat:45.92,lon:6.86,tz:'Europe/Paris'},{name:'Zermatt',lat:46.02,lon:7.74,tz:'Europe/Zurich'},{name:'St. Moritz',lat:46.49,lon:9.83,tz:'Europe/Zurich'},{name:'Aspen',lat:39.19,lon:-106.81,tz:'America/Denver'},{name:'Whistler',lat:50.11,lon:-122.95,tz:'America/Vancouver'},{name:'Banff',lat:51.17,lon:-115.57,tz:'America/Edmonton'},{name:'Queenstown',lat:-45.03,lon:168.66,tz:'Pacific/Auckland'},{name:'Bariloche',lat:-41.13,lon:-71.3,tz:'America/Argentina/Buenos_Aires'},{name:'Niseko',lat:42.8,lon:140.68,tz:'Asia/Tokyo'},{name:'Nagano',lat:36.64,lon:138.18,tz:'Asia/Tokyo'},{name:'Szocsi',lat:43.6,lon:39.73,tz:'Europe/Moscow'},{name:'Almati',lat:43.22,lon:76.85,tz:'Asia/Almaty'},{name:'Gudauri',lat:42.47,lon:44.48,tz:'Asia/Tbilisi'},{name:'Banszko',lat:41.83,lon:23.48,tz:'Europe/Sofia'},{name:'Kékestető',lat:47.87,lon:20.01},{name:'Hortobágy',lat:47.58,lon:21.15},{name:'Hévíz',lat:46.79,lon:17.19},{name:'Tihany',lat:46.91,lon:17.88},{name:'Visegrád',lat:47.78,lon:18.97},{name:'Szilvásvárad',lat:48.1,lon:20.39},{name:'Dobogókő',lat:47.72,lon:18.89},{name:'Lillafüred',lat:48.1,lon:20.62},{name:'Aggtelek',lat:48.47,lon:20.45},{name:'Bugac',lat:46.68,lon:19.68},{name:'Ojmjakon',lat:63.46,lon:142.79,tz:'Asia/Srednekolymsk'},{name:'Death Valley',lat:36.53,lon:-116.93,tz:'America/Los_Angeles'},{name:'McMurdo',lat:-77.85,lon:166.67,tz:'Antarctica/McMurdo'},{name:'Nuuk',lat:64.18,lon:-51.72,tz:'America/Nuuk'},{name:'Ushuaia',lat:-54.8,lon:-68.3,tz:'America/Argentina/Ushuaia'},{name:'Dubai',lat:25.2,lon:55.27,tz:'Asia/Dubai'},{name:'Reykjavík',lat:64.14,lon:-21.9,tz:'Atlantic/Reykjavik'},{name:'Las Vegas',lat:36.17,lon:-115.14,tz:'America/Los_Angeles'},{name:'Honolulu',lat:21.3,lon:-157.85,tz:'Pacific/Honolulu'},{name:'Mt. Everest',lat:27.98,lon:86.92,tz:'Asia/Kathmandu'},{name:'Fokváros',lat:-33.92,lon:18.42,tz:'Africa/Johannesburg'},{name:'Sydney',lat:-33.86,lon:151.2,tz:'Australia/Sydney'},{name:'Tokió',lat:35.67,lon:139.65,tz:'Asia/Tokyo'},{name:'Longyearbyen',lat:78.22,lon:15.65,tz:'Arctic/Longyearbyen'},{name:'La Paz',lat:-16.5,lon:-68.12,tz:'America/La_Paz'},{name:'Machu Picchu',lat:-13.16,lon:-72.54,tz:'America/Lima'},{name:'Csernobil',lat:51.27,lon:30.22,tz:'Europe/Kyiv'},{name:'Húsvét-sziget',lat:-27.11,lon:-109.35,tz:'Pacific/Easter'},{name:'Grand Canyon',lat:36.1,lon:-112.11,tz:'America/Phoenix'},{name:'Góbi sivatag',lat:42.59,lon:103.43,tz:'Asia/Ulaanbaatar'},{name:'Túrkeve',lat:47.1,lon:20.75},{name:'Lenti',lat:46.62,lon:16.54},{name:'Répáshuta',lat:48.04,lon:20.53},{name:'Tés',lat:47.26,lon:18.03},{name:'Kőris-hegy',lat:47.29,lon:17.75},{name:'Fülöpháza',lat:46.88,lon:19.43},{name:'Dallol',lat:14.24,lon:40.3,tz:'Africa/Addis_Ababa'},{name:'Vostok',lat:-78.46,lon:106.84,tz:'Antarctica/Vostok'},{name:'Cherrapunji',lat:25.27,lon:91.73,tz:'Asia/Kolkata'},{name:'Atacama',lat:-22.91,lon:-68.2,tz:'America/Santiago'},{name:'Mt. Washington',lat:44.27,lon:-71.3,tz:'America/New_York'},{name:'Alert',lat:82.5,lon:-62.33,tz:'America/Iqaluit'},{name:'Kőszeg',lat:47.38,lon:16.54},{name:'Szentgotthárd',lat:47.27,lon:16.27},{name:'Tapolca',lat:46.88,lon:17.44},{name:'Szigetvár',lat:45.98,lon:17.8},{name:'Pásztó',lat:47.92,lon:19.69},{name:'Gönc',lat:48.47,lon:21.28},{name:'Tokaj',lat:48.12,lon:21.41},{name:'Mezőtúr',lat:47.0,lon:20.62},{name:'Csongrád',lat:46.71,lon:20.14},{name:'Balassagyarmat',lat:48.08,lon:19.29},{name:'New York',lat:40.71,lon:-74.0,tz:'America/New_York'},{name:'London',lat:51.5,lon:-0.12,tz:'Europe/London'},{name:'Párizs',lat:48.85,lon:2.35,tz:'Europe/Paris'},{name:'Róma',lat:41.9,lon:12.49,tz:'Europe/Rome'},{name:'Berlin',lat:52.52,lon:13.4,tz:'Europe/Berlin'},{name:'Madrid',lat:40.41,lon:-3.7,tz:'Europe/Madrid'},{name:'Bécs',lat:48.2,lon:16.37,tz:'Europe/Vienna'},{name:'Prága',lat:50.07,lon:14.43,tz:'Europe/Prague'},{name:'Varsó',lat:52.22,lon:21.01,tz:'Europe/Warsaw'},{name:'Bukarest',lat:44.42,lon:26.1,tz:'Europe/Bucharest'},{name:'Pozsony',lat:48.14,lon:17.1,tz:'Europe/Bratislava'},{name:'Zágráb',lat:45.81,lon:15.97,tz:'Europe/Zagreb'},{name:'Ljubljana',lat:46.05,lon:14.5,tz:'Europe/Ljubljana'},{name:'Belgrád',lat:44.81,lon:20.45,tz:'Europe/Belgrade'},{name:'Kolozsvár',lat:46.77,lon:23.59,tz:'Europe/Bucharest'},{name:'Székesfehérvár',lat:47.19,lon:18.41},{name:'Oslo',lat:59.91,lon:10.75,tz:'Europe/Oslo'},{name:'Helsinki',lat:60.16,lon:24.93,tz:'Europe/Helsinki'},{name:'Stockholm',lat:59.32,lon:18.06,tz:'Europe/Stockholm'},{name:'Amszterdam',lat:52.36,lon:4.9,tz:'Europe/Amsterdam'},{name:'Koppenhága',lat:55.67,lon:12.56,tz:'Europe/Copenhagen'},{name:'Dublin',lat:53.34,lon:-6.26,tz:'Europe/Dublin'},{name:'Lisszabon',lat:38.72,lon:-9.14,tz:'Europe/Lisbon'},{name:'Brüsszel',lat:50.85,lon:4.35,tz:'Europe/Brussels'},{name:'Verhojanszk',lat:67.54,lon:133.38,tz:'Asia/Vladivostok'},{name:'Dome Argus',lat:-80.36,lon:77.35,tz:'Antarctica/Davis'},{name:'Tiksi',lat:71.63,lon:128.86,tz:'Asia/Yakutsk'},{name:'Arica',lat:-18.47,lon:-70.31,tz:'America/Santiago'},{name:'Mawsynram',lat:25.29,lon:91.58,tz:'Asia/Kolkata'},{name:'Ittoqqortoormiit',lat:70.48,lon:-21.96,tz:'America/Scoresbysund'},{name:'Utqiagvik',lat:71.29,lon:-156.78,tz:'America/Anchorage'},{name:'Amundsen-Scott',lat:-90.0,lon:0.0,tz:'Antarctica/South_Pole'},{name:'Eureka',lat:79.98,lon:-85.94,tz:'America/Resolute'},{name:'Coober Pedy',lat:-29.01,lon:134.75,tz:'Australia/Adelaide'},{name:'Zirc',lat:47.26,lon:17.87},{name:'Szarvas',lat:46.86,lon:20.55},{name:'Kiskőrös',lat:46.62,lon:19.28},{name:'Mezőberény',lat:46.82,lon:21.03},{name:'Bonyhád',lat:46.3,lon:18.53},{name:'Mór',lat:47.37,lon:18.2},{name:'Balatonboglár',lat:46.76,lon:17.65},{name:'Fonyód',lat:46.74,lon:17.55},{name:'Szerencs',lat:48.16,lon:21.2},{name:'Bátonyterenye',lat:48.0,lon:19.83},{name:'Letenye',lat:46.43,lon:16.72},{name:'Siklós',lat:45.85,lon:18.3},{name:'Barcs',lat:45.96,lon:17.46},{name:'Kisbér',lat:47.5,lon:18.02},{name:'Miami',lat:25.76,lon:-80.19,tz:'America/New_York'},{name:'Los Angeles',lat:34.05,lon:-118.24,tz:'America/Los_Angeles'},{name:'Toronto',lat:43.65,lon:-79.38,tz:'America/Toronto'},{name:'Rio de Janeiro',lat:-22.9,lon:-43.2,tz:'America/Sao_Paulo'},{name:'Kairó',lat:30.04,lon:31.23,tz:'Africa/Cairo'},{name:'Nairobi',lat:-1.29,lon:36.82,tz:'Africa/Nairobi'},{name:'Bangkok',lat:13.75,lon:100.5,tz:'Asia/Bangkok'},{name:'Szingapúr',lat:1.35,lon:103.81,tz:'Asia/Singapore'},{name:'Szöul',lat:37.56,lon:126.97,tz:'Asia/Seoul'},{name:'Peking',lat:39.9,lon:116.4,tz:'Asia/Shanghai'},{name:'Tórshavn',lat:62.01,lon:-6.77,tz:'Atlantic/Faroe'},{name:'Monaco',lat:43.73,lon:7.42,tz:'Europe/Monaco'},{name:'Athén',lat:37.98,lon:23.72,tz:'Europe/Athens'},{name:'Isztambul',lat:41.0,lon:28.97,tz:'Europe/Istanbul'}];
+        const HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:48.1,lon:20.78},{name:'Szombathely',lat:47.23,lon:16.62},{name:'Győr',lat:47.68,lon:17.63},{name:'Pécs',lat:46.07,lon:18.23},{name:'Szeged',lat:46.25,lon:20.15},{name:'Eger',lat:47.9,lon:20.37},{name:'Veszprém',lat:47.09,lon:17.91},{name:'Zalaegerszeg',lat:46.84,lon:16.84},{name:'Békéscsaba',lat:46.68,lon:21.09},{name:'Kaposvár',lat:46.36,lon:17.79},{name:'Tatabánya',lat:47.57,lon:18.4},{name:'Salgótarján',lat:48.1,lon:19.8},{name:'Szekszárd',lat:46.35,lon:18.7},{name:'Sopron',lat:47.68,lon:16.58},{name:'Hódmezővásárhely',lat:46.43,lon:20.32},{name:'Nagykanizsa',lat:46.45,lon:16.99},{name:'Dunaújváros',lat:46.96,lon:18.93},{name:'Érd',lat:47.38,lon:18.91},{name:'Szolnok',lat:47.18,lon:20.2},{name:'Kecskemét',lat:46.88,lon:19.64},{name:'Baja',lat:46.18,lon:18.95},{name:'Cegléd',lat:47.17,lon:19.8},{name:'Vác',lat:47.78,lon:19.13},{name:'Gödöllő',lat:47.6,lon:19.35},{name:'Ózd',lat:48.22,lon:20.29},{name:'Pápa',lat:47.33,lon:17.47},{name:'Gyula',lat:46.65,lon:21.28},{name:'Hajdúböszörmény',lat:47.67,lon:21.51},{name:'Nyíregyháza',lat:47.95,lon:21.71},{name:'Balatonfüred',lat:46.96,lon:17.89},{name:'Keszthely',lat:46.76,lon:17.24},{name:'Siófok',lat:46.9,lon:18.05},{name:'Komárom',lat:47.74,lon:18.11},{name:'Esztergom',lat:47.79,lon:18.74},{name:'Tata',lat:47.65,lon:18.31},{name:'Mohács',lat:45.99,lon:18.68},{name:'Paks',lat:46.62,lon:18.86},{name:'Kalocsa',lat:46.53,lon:18.98},{name:'Kiskunfélegyháza',lat:46.71,lon:19.85},{name:'Jászberény',lat:47.5,lon:19.91},{name:'Hatvan',lat:47.66,lon:19.67},{name:'Gyöngyös',lat:47.78,lon:19.93},{name:'Kazincbarcika',lat:48.25,lon:20.62},{name:'Sátoraljaújhely',lat:48.4,lon:21.65},{name:'Kisvárda',lat:48.22,lon:22.08},{name:'Mátészalka',lat:47.95,lon:22.32},{name:'Makó',lat:46.22,lon:20.47},{name:'Szentes',lat:46.65,lon:20.26},{name:'Orosháza',lat:46.57,lon:20.66},{name:'Karcag',lat:47.31,lon:20.93},{name:'Hajdúszoboszló',lat:47.45,lon:21.39},{name:'Törökszentmiklós',lat:47.17,lon:20.41},{name:'Gyál',lat:47.38,lon:19.22},{name:'Dunakeszi',lat:47.64,lon:19.14},{name:'Budaörs',lat:47.46,lon:18.96},{name:'Szentendre',lat:47.66,lon:19.07},{name:'Szigetszentmiklós',lat:47.34,lon:19.05},{name:'Mosonmagyaróvár',lat:47.87,lon:17.27},{name:'Bicske',lat:47.49,lon:18.63},{name:'Monor',lat:47.35,lon:19.45},{name:'Mezőkövesd',lat:47.81,lon:20.57},{name:'Tiszaújváros',lat:47.92,lon:21.05},{name:'Sárospatak',lat:48.32,lon:21.57},{name:'Kapuvár',lat:47.59,lon:17.02},{name:'Dombóvár',lat:46.37,lon:18.13},{name:'Dabas',lat:47.18,lon:19.32},{name:'Aszód',lat:47.65,lon:19.48},{name:'Kiskunhalas',lat:46.43,lon:19.48},{name:'Kiskunmajsa',lat:46.49,lon:19.73},{name:'Berettyóújfalu',lat:47.22,lon:21.54},{name:'Balmazújváros',lat:47.61,lon:21.34},{name:'Tiszafüred',lat:47.62,lon:20.76},{name:'Sárbogárd',lat:46.88,lon:18.62},{name:'Zakopane',lat:49.29,lon:19.94,tz:'Europe/Warsaw'},{name:'Poprád',lat:49.05,lon:20.3,tz:'Europe/Bratislava'},{name:'Donovaly',lat:48.88,lon:19.22,tz:'Europe/Bratislava'},{name:'Semmering',lat:47.63,lon:15.83,tz:'Europe/Vienna'},{name:'Murau',lat:47.11,lon:14.17,tz:'Europe/Vienna'},{name:'Cortina d\'Ampezzo',lat:46.54,lon:12.13,tz:'Europe/Rome'},{name:'Chamonix',lat:45.92,lon:6.86,tz:'Europe/Paris'},{name:'Zermatt',lat:46.02,lon:7.74,tz:'Europe/Zurich'},{name:'St. Moritz',lat:46.49,lon:9.83,tz:'Europe/Zurich'},{name:'Aspen',lat:39.19,lon:-106.81,tz:'America/Denver'},{name:'Whistler',lat:50.11,lon:-122.95,tz:'America/Vancouver'},{name:'Banff',lat:51.17,lon:-115.57,tz:'America/Edmonton'},{name:'Queenstown',lat:-45.03,lon:168.66,tz:'Pacific/Auckland'},{name:'Bariloche',lat:-41.13,lon:-71.3,tz:'America/Argentina/Buenos_Aires'},{name:'Niseko',lat:42.8,lon:140.68,tz:'Asia/Tokyo'},{name:'Nagano',lat:36.64,lon:138.18,tz:'Asia/Tokyo'},{name:'Szocsi',lat:43.6,lon:39.73,tz:'Europe/Moscow'},{name:'Almati',lat:43.22,lon:76.85,tz:'Asia/Almaty'},{name:'Gudauri',lat:42.47,lon:44.48,tz:'Asia/Tbilisi'},{name:'Banszko',lat:41.83,lon:23.48,tz:'Europe/Sofia'},{name:'Kékestető',lat:47.87,lon:20.01},{name:'Hortobágy',lat:47.58,lon:21.15},{name:'Hévíz',lat:46.79,lon:17.19},{name:'Tihany',lat:46.91,lon:17.88},{name:'Visegrád',lat:47.78,lon:18.97},{name:'Szilvásvárad',lat:48.1,lon:20.39},{name:'Dobogókő',lat:47.72,lon:18.89},{name:'Lillafüred',lat:48.1,lon:20.62},{name:'Aggtelek',lat:48.47,lon:20.45},{name:'Bugac',lat:46.68,lon:19.68},{name:'Ojmjakon',lat:63.46,lon:142.79,tz:'Asia/Srednekolymsk'},{name:'Death Valley',lat:36.53,lon:-116.93,tz:'America/Los_Angeles'},{name:'McMurdo',lat:-77.85,lon:166.67,tz:'Antarctica/McMurdo'},{name:'Nuuk',lat:64.18,lon:-51.72,tz:'America/Nuuk'},{name:'Ushuaia',lat:-54.8,lon:-68.3,tz:'America/Argentina/Ushuaia'},{name:'Dubai',lat:25.2,lon:55.27,tz:'Asia/Dubai'},{name:'Reykjavík',lat:64.14,lon:-21.9,tz:'Atlantic/Reykjavik'},{name:'Las Vegas',lat:36.17,lon:-115.14,tz:'America/Los_Angeles'},{name:'Honolulu',lat:21.3,lon:-157.85,tz:'Pacific/Honolulu'},{name:'Mt. Everest',lat:27.98,lon:86.92,tz:'Asia/Kathmandu'},{name:'Fokváros',lat:-33.92,lon:18.42,tz:'Africa/Johannesburg'},{name:'Sydney',lat:-33.86,lon:151.2,tz:'Australia/Sydney'},{name:'Tokió',lat:35.67,lon:139.65,tz:'Asia/Tokyo'},{name:'Longyearbyen',lat:78.22,lon:15.65,tz:'Arctic/Longyearbyen'},{name:'La Paz',lat:-16.5,lon:-68.12,tz:'America/La_Paz'},{name:'Machu Picchu',lat:-13.16,lon:-72.54,tz:'America/Lima'},{name:'Csernobil',lat:51.27,lon:30.22,tz:'Europe/Kyiv'},{name:'Húsvét-sziget',lat:-27.11,lon:-109.35,tz:'Pacific/Easter'},{name:'Grand Canyon',lat:36.1,lon:-112.11,tz:'America/Phoenix'},{name:'Góbi sivatag',lat:42.59,lon:103.43,tz:'Asia/Ulaanbaatar'},{name:'Túrkeve',lat:47.1,lon:20.75},{name:'Lenti',lat:46.62,lon:16.54},{name:'Répáshuta',lat:48.04,lon:20.53},{name:'Tés',lat:47.26,lon:18.03},{name:'Kőris-hegy',lat:47.29,lon:17.75},{name:'Fülöpháza',lat:46.88,lon:19.43},{name:'Dallol',lat:14.24,lon:40.3,tz:'Africa/Addis_Ababa'},{name:'Vostok',lat:-78.46,lon:106.84,tz:'Antarctica/Vostok'},{name:'Cherrapunji',lat:25.27,lon:91.73,tz:'Asia/Kolkata'},{name:'Atacama',lat:-22.91,lon:-68.2,tz:'America/Santiago'},{name:'Mt. Washington',lat:44.27,lon:-71.3,tz:'America/New_York'},{name:'Alert',lat:82.5,lon:-62.33,tz:'America/Iqaluit'},{name:'Kőszeg',lat:47.38,lon:16.54},{name:'Szentgotthárd',lat:47.27,lon:16.27},{name:'Tapolca',lat:46.88,lon:17.44},{name:'Szigetvár',lat:45.98,lon:17.8},{name:'Pásztó',lat:47.92,lon:19.69},{name:'Gönc',lat:48.47,lon:21.28},{name:'Tokaj',lat:48.12,lon:21.41},{name:'Mezőtúr',lat:47.0,lon:20.62},{name:'Csongrád',lat:46.71,lon:20.14},{name:'Balassagyarmat',lat:48.08,lon:19.29},{name:'New York',lat:40.71,lon:-74.0,tz:'America/New_York'},{name:'London',lat:51.5,lon:-0.12,tz:'Europe/London'},{name:'Párizs',lat:48.85,lon:2.35,tz:'Europe/Paris'},{name:'Róma',lat:41.9,lon:12.49,tz:'Europe/Rome'},{name:'Berlin',lat:52.52,lon:13.4,tz:'Europe/Berlin'},{name:'Madrid',lat:40.41,lon:-3.7,tz:'Europe/Madrid'},{name:'Bécs',lat:48.2,lon:16.37,tz:'Europe/Vienna'},{name:'Prága',lat:50.07,lon:14.43,tz:'Europe/Prague'},{name:'Varsó',lat:52.22,lon:21.01,tz:'Europe/Warsaw'},{name:'Bukarest',lat:44.42,lon:26.1,tz:'Europe/Bucharest'},{name:'Pozsony',lat:48.14,lon:17.1,tz:'Europe/Bratislava'},{name:'Zágráb',lat:45.81,lon:15.97,tz:'Europe/Zagreb'},{name:'Ljubljana',lat:46.05,lon:14.5,tz:'Europe/Ljubljana'},{name:'Belgrád',lat:44.81,lon:20.45,tz:'Europe/Belgrade'},{name:'Kolozsvár',lat:46.77,lon:23.59,tz:'Europe/Bucharest'},{name:'Székesfehérvár',lat:47.19,lon:18.41},{name:'Oslo',lat:59.91,lon:10.75,tz:'Europe/Oslo'},{name:'Helsinki',lat:60.16,lon:24.93,tz:'Europe/Helsinki'},{name:'Stockholm',lat:59.32,lon:18.06,tz:'Europe/Stockholm'},{name:'Amszterdam',lat:52.36,lon:4.9,tz:'Europe/Amsterdam'},{name:'Koppenhága',lat:55.67,lon:12.56,tz:'Europe/Copenhagen'},{name:'Dublin',lat:53.34,lon:-6.26,tz:'Europe/Dublin'},{name:'Lisszabon',lat:38.72,lon:-9.14,tz:'Europe/Lisbon'},{name:'Brüsszel',lat:50.85,lon:4.35,tz:'Europe/Brussels'},{name:'Verhojanszk',lat:67.54,lon:133.38,tz:'Asia/Vladivostok'},{name:'Dome Argus',lat:-80.36,lon:77.35,tz:'Antarctica/Davis'},{name:'Tiksi',lat:71.63,lon:128.86,tz:'Asia/Yakutsk'},{name:'Arica',lat:-18.47,lon:-70.31,tz:'America/Santiago'},{name:'Mawsynram',lat:25.29,lon:91.58,tz:'Asia/Kolkata'},{name:'Ittoqqortoormiit',lat:70.48,lon:-21.96,tz:'America/Scoresbysund'},{name:'Utqiagvik',lat:71.29,lon:-156.78,tz:'America/Anchorage'},{name:'Amundsen-Scott',lat:-90.0,lon:0.0,tz:'Antarctica/South_Pole'},{name:'Eureka',lat:79.98,lon:-85.94,tz:'America/Resolute'},{name:'Coober Pedy',lat:-29.01,lon:134.75,tz:'Australia/Adelaide'},{name:'Zirc',lat:47.26,lon:17.87},{name:'Szarvas',lat:46.86,lon:20.55},{name:'Kiskőrös',lat:46.62,lon:19.28},{name:'Mezőberény',lat:46.82,lon:21.03},{name:'Bonyhád',lat:46.3,lon:18.53},{name:'Mór',lat:47.37,lon:18.2},{name:'Balatonboglár',lat:46.76,lon:17.65},{name:'Fonyód',lat:46.74,lon:17.55},{name:'Szerencs',lat:48.16,lon:21.2},{name:'Bátonyterenye',lat:48.0,lon:19.83},{name:'Letenye',lat:46.43,lon:16.72},{name:'Siklós',lat:45.85,lon:18.3},{name:'Barcs',lat:45.96,lon:17.46},{name:'Kisbér',lat:47.5,lon:18.02},{name:'Miami',lat:25.76,lon:-80.19,tz:'America/New_York'},{name:'Los Angeles',lat:34.05,lon:-118.24,tz:'America/Los_Angeles'},{name:'Toronto',lat:43.65,lon:-79.38,tz:'America/Toronto'},{name:'Rio de Janeiro',lat:-22.9,lon:-43.2,tz:'America/Sao_Paulo'},{name:'Kairó',lat:30.04,lon:31.23,tz:'Africa/Cairo'},{name:'Nairobi',lat:-1.29,lon:36.82,tz:'Africa/Nairobi'},{name:'Bangkok',lat:13.75,lon:100.5,tz:'Asia/Bangkok'},{name:'Szingapúr',lat:1.35,lon:103.81,tz:'Asia/Singapore'},{name:'Szöul',lat:37.56,lon:126.97,tz:'Asia/Seoul'},{name:'Peking',lat:39.9,lon:116.4,tz:'Asia/Shanghai'},{name:'Tórshavn',lat:62.01,lon:-6.77,tz:'Atlantic/Faroe'},{name:'Monaco',lat:43.73,lon:7.42,tz:'Europe/Monaco'},{name:'Athén',lat:37.98,lon:23.72,tz:'Europe/Athens'},{name:'Isztambul',lat:41.0,lon:28.97,tz:'Europe/Istanbul'}];
 
-        
         const THEMATIC_BLOCKS=[
             {start:0, name:'Ismétlés', type:'summary_yesterday', refreshMinutes:30, styleClass:'badge-night'},
             {start:6, name:'Napindító', type:'morning_catchup', timeWindowHours:0, refreshMinutes:15, styleClass:'badge-dawn'},
@@ -907,12 +943,13 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
             handMinute:document.getElementById('clock-hand-minute'),
             handSecond:document.getElementById('clock-hand-second'),
             midnightOverlay:document.getElementById('midnight-overlay'),
-            msCardsViewport:document.getElementById('ms-cards-viewport')
+            msCardsViewport:document.getElementById('ms-cards-viewport'),
+            marketClosedStatus:document.getElementById('market-closed-status')
         };
         
         let remainingOMCities=[],remainingPWSStations=[];
         function shuffleArray(array){let currentIndex=array.length,randomIndex;while(currentIndex!==0){randomIndex=Math.floor(Math.random()*currentIndex);currentIndex--;[array[currentIndex],array[randomIndex]]=[array[randomIndex],array[currentIndex]];}return array;}
-        let state={activeTrack:'a',items:[],rawItems:[],currentIndex:0,block:null,rssFeeds:{},weatherIndex:0,flipTimer:null,loading:false,scheduleActive:false,lastScheduleMin:-1,currentItem:null,scheduleHighlightIndex:0,scheduleInterval:null,nextItems:[],weatherPlaylist:[],weatherPlaylistIndex:0,weatherDisplayTimer:null,isPaused:false,cardStartTime:0,currentDuration:18000,remainingTime:0,seenBreakingLinks:new Set(),lastBreakingCheckTime:Date.now(),midnightActive:false,retryQueue:[],retryInterval:null,retryCount:0,economyVisible:false,economyRates:{EUR:null,USD:null,CHF:null,GBP:null,AUD:null,CAD:null,PLN:null,CZK:null,RON:null,JPY:null,CNY:null,TRY:null,SEK:null,NOK:null,DKK:null},prevEconomyRates:{},economyKeyIndex:0,economyCarouselInterval:null,economySlideIndex:0,pendingListReset:false,isTransitioning:false,lastRefreshTimestamp:Date.now(),breakingActive:false,breakingLink:null,breakingQueue:[],currentNyData:null,lastTipTime:Date.now(),testModeActive:false,forcedBlock:null,isHourChangeTestActive:false,bigClockTriggerSec:Math.floor(Math.random()*45),animationBundles:[[1]],currentAnimationBundle:[],logoAnimTimeout:null,logoAnimIndex:0,controlsBarVisible:true,isHourTransitionDelayed:false,hourlyClockTriggers:[],leftClockActive:false,leftClockTriggeredMin:-1,rates24hData:null};
+        let state={activeTrack:'a',items:[],rawItems:[],currentIndex:0,block:null,rssFeeds:{},weatherIndex:0,flipTimer:null,loading:false,scheduleActive:false,lastScheduleMin:-1,currentItem:null,scheduleHighlightIndex:0,scheduleInterval:null,nextItems:[],weatherPlaylist:[],weatherPlaylistIndex:0,weatherDisplayTimer:null,isPaused:false,cardStartTime:0,currentDuration:18000,remainingTime:0,seenBreakingLinks:new Set(),lastBreakingCheckTime:Date.now(),midnightActive:false,retryQueue:[],retryInterval:null,retryCount:0,economyVisible:false,economyRates:{EUR:null,USD:null,CHF:null,GBP:null,AUD:null,CAD:null,PLN:null,CZK:null,RON:null,JPY:null,CNY:null,TRY:null,SEK:null,NOK:null,DKK:null},prevEconomyRates:{},economyKeyIndex:0,economyCarouselInterval:null,economySlideIndex:0,pendingListReset:false,isTransitioning:false,lastRefreshTimestamp:Date.now(),breakingActive:false,breakingLink:null,breakingQueue:[],currentNyData:null,lastTipTime:Date.now(),testModeActive:false,forcedBlock:null,isHourChangeTestActive:false,bigClockTriggerSec:Math.floor(Math.random()*45),animationBundles:[[1]],currentAnimationBundle:[],logoAnimTimeout:null,logoAnimIndex:0,controlsBarVisible:true,isHourTransitionDelayed:false,hourlyClockTriggers:[],leftClockActive:false,leftClockTriggeredMin:-1,rates24hData:null,lastDisplayedRates24h:{EUR:null,USD:null,CHF:null}};
         
         const stripHtml=(html)=>{let doc=new DOMParser().parseFromString(html,'text/html');return doc.body.textContent||"";};
         function getShortDesc(str, maxLen = 220) {
@@ -948,8 +985,6 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         }
         
         function getFavicon(url){try{const domain=new URL(url).hostname;return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;}catch(e){return '';}}
-        
-        // Tartalék névfelismerő arra az esetre, ha a Firebase-ből jövő név üres lenne
         function getSourceName(link){try{const url=new URL(link);const host=url.hostname.replace('www.','').toLowerCase();const map={'telex.hu':'TELEX','index.hu':'INDEX','24.hu':'24.HU','origo.hu':'ORIGO','hirado.hu':'HIRADO','rtl.hu':'RTL','atv.hu':'ATV','police.hu':'KÖZÚT','bkk.hu':'BKK','roadster.hu':'ROADSTER','ng.24.hu':'NATGEO','player.hu':'PLAYER.HU','qubit.hu':'QUBIT','pcworld.hu':'PC WORLD','gamestar.hu':'GAMESTAR'};if(map[host])return map[host];return host.split('.')[0].toUpperCase();}catch(e){return "HÍR";}}
         
         function getWindDirectionHu(degree,short=false){if(degree===null||degree===undefined)return "";const val=Math.floor((degree/45)+0.5);const dirsFull=["Északi","Északkeleti","Keleti","Délkeleti","Déli","Délnyugati","Nyugati","Északnyugati"];const dirsShort=["É","ÉK","K","DK","D","DNy","Ny","ÉNy"];return short?dirsShort[(val%8)]:dirsFull[(val%8)];}
@@ -957,6 +992,40 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         function startBigClockLogoAnimation(){if(state.logoAnimTimeout)clearTimeout(state.logoAnimTimeout);if(!state.currentAnimationBundle||state.currentAnimationBundle.length===0){selectHourlyAnimationBundle();}playNextLogoAnimation();}
         function playNextLogoAnimation(){const logo=document.getElementById('bc-tkp-logo');if(!logo||!el.bigClockLayer.classList.contains('active'))return;state.logoAnimTimeout=setTimeout(()=>{playNextLogoAnimation();},2000);}
         
+        function isForexMarketOpenClient() {
+            if (state.rates24hData && typeof state.rates24hData.isMarketOpen === 'boolean') {
+                return state.rates24hData.isMarketOpen;
+            }
+            const now = new Date();
+            const day = now.getDay(); // 0 = Vasárnap, 1 = Hétfő ... 5 = Péntek, 6 = Szombat
+            const hour = now.getHours();
+            if (day === 6) return false;
+            if (day === 5 && hour >= 23) return false;
+            if (day === 0 && hour < 23) return false;
+            return true;
+        }
+
+        function triggerRatePopAnimation(element) {
+            if (!element) return;
+            element.classList.remove('rate-pop-strobe');
+            void element.offsetWidth; // Force Reflow
+            element.classList.add('rate-pop-strobe');
+            setTimeout(() => {
+                element.classList.remove('rate-pop-strobe');
+            }, 550);
+        }
+
+        function updateMarketStatusVisibility() {
+            const isOpen = isForexMarketOpenClient();
+            const isNextAlertActive = el.nextProgAlert && el.nextProgAlert.classList.contains('active');
+            
+            if (!isOpen && !isNextAlertActive) {
+                if (el.marketClosedStatus) el.marketClosedStatus.classList.add('visible');
+            } else {
+                if (el.marketClosedStatus) el.marketClosedStatus.classList.remove('visible');
+            }
+        }
+
         function flipPanelCustom(panelType,targetFace){
             const flipper=panelType==='identity'?el.idFlipper:el.weatherFlipper;
             const front=panelType==='identity'?flipper.querySelector('.panel-face:not(.back)'):el.weatherFaceFront;
@@ -1020,6 +1089,10 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         function getTrendHtml(curr,rates,isSmall=false){if(state.prevEconomyRates[curr]){const diff=rates[curr]-state.prevEconomyRates[curr];const size=isSmall?'0.65rem':'0.75rem';if(diff>0.01)return ` <span style="color:var(--accent-danger); font-size:${size}; line-height:1;">▲</span>`;if(diff<-0.01)return ` <span style="color:var(--accent-info); font-size:${size}; line-height:1;">▼</span>`;}return '';}
         
         async function fetchExchangeRates() {
+            if (!isForexMarketOpenClient()) {
+                updateMarketStatusVisibility();
+                return; // Piac zárva van, nincs új adat letöltés
+            }
             if (!useBackupApi) {
                 const currentKey = CURRENCY_API_KEYS[curApiKeyIndex];
                 keysTried.add(curApiKeyIndex);
@@ -1088,6 +1161,9 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         }
 
         function updateRatesUI(rates){
+            const isOpen = isForexMarketOpenClient();
+            updateMarketStatusVisibility();
+
             const currencies=['EUR','USD','CHF','GBP','AUD','CAD','PLN','CZK','RON','JPY','CNY','TRY','SEK','NOK','DKK'];
             currencies.forEach(curr=>{
                 if(rates[curr]){
@@ -1097,15 +1173,29 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
                         if (['EUR', 'USD', 'CHF'].includes(curr) && state.rates24hData && state.rates24hData[curr]) {
                             return; 
                         }
-                        element.innerHTML=`${rates[curr].toFixed(2)} Ft${getTrendHtml(curr,rates,false)}`;
-                        element.style.color='#f59e0b';
-                        setTimeout(()=>element.style.color=null,500);
+                        const newText = `${rates[curr].toFixed(2)} Ft${getTrendHtml(curr,rates,false)}`;
+                        if (element.innerHTML !== newText && isOpen) {
+                            element.innerHTML = newText;
+                            triggerRatePopAnimation(element);
+                        }
                     }
                 }
             });
-            if(rates.EUR && !(state.rates24hData && state.rates24hData.EUR)) document.getElementById('fr-eur').innerHTML=`${rates.EUR.toFixed(2)}${getTrendHtml('EUR',rates,true)}`;
-            if(rates.USD && !(state.rates24hData && state.rates24hData.USD)) document.getElementById('fr-usd').innerHTML=`${rates.USD.toFixed(2)}${getTrendHtml('USD',rates,true)}`;
-            if(rates.CHF && !(state.rates24hData && state.rates24hData.CHF)) document.getElementById('fr-chf').innerHTML=`${rates.CHF.toFixed(2)}${getTrendHtml('CHF',rates,true)}`;
+
+            if (isOpen) {
+                if(rates.EUR && !(state.rates24hData && state.rates24hData.EUR)) {
+                    const elEur = document.getElementById('fr-eur');
+                    if (elEur) { elEur.innerHTML=`${rates.EUR.toFixed(2)}${getTrendHtml('EUR',rates,true)}`; triggerRatePopAnimation(elEur); }
+                }
+                if(rates.USD && !(state.rates24hData && state.rates24hData.USD)) {
+                    const elUsd = document.getElementById('fr-usd');
+                    if (elUsd) { elUsd.innerHTML=`${rates.USD.toFixed(2)}${getTrendHtml('USD',rates,true)}`; triggerRatePopAnimation(elUsd); }
+                }
+                if(rates.CHF && !(state.rates24hData && state.rates24hData.CHF)) {
+                    const elChf = document.getElementById('fr-chf');
+                    if (elChf) { elChf.innerHTML=`${rates.CHF.toFixed(2)}${getTrendHtml('CHF',rates,true)}`; triggerRatePopAnimation(elChf); }
+                }
+            }
             state.prevEconomyRates={...rates};
             if(state.rates24hData) {
                 updateRates24hUI();
@@ -1114,6 +1204,9 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
 
         function updateRates24hUI() {
             if (!state.rates24hData) return;
+            const isOpen = isForexMarketOpenClient();
+            updateMarketStatusVisibility();
+
             const currencies = ['EUR', 'USD', 'CHF'];
             currencies.forEach(curr => {
                 const data = state.rates24hData[curr];
@@ -1125,16 +1218,32 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
                     const arrow = isPositive ? '▲' : '▼';
                     const color = isPositive ? 'var(--accent-danger)' : 'var(--accent-info)';
                     
+                    const formattedSideText = `${currentVal.toFixed(2)} Ft <span style="color:${color}; font-size:0.65rem; font-weight:800;">${arrow}${Math.abs(changePercent).toFixed(2)}%</span>`;
+                    const formattedFooterText = `${currentVal.toFixed(2)} <span style="color:${color}; font-size:0.65rem; font-weight:800; margin-left:2px;">${arrow}${Math.abs(changePercent).toFixed(2)}%</span>`;
+
                     const elId = `rate-${curr.toLowerCase()}`;
                     const element = document.getElementById(elId);
-                    if (element) {
-                        element.innerHTML = `${currentVal.toFixed(2)} Ft <span style="color:${color}; font-size:0.65rem; font-weight:800;">${arrow}${Math.abs(changePercent).toFixed(2)}%</span>`;
-                    }
                     
                     const footerElId = `fr-${curr.toLowerCase()}`;
                     const footerEl = document.getElementById(footerElId);
-                    if (footerEl) {
-                        footerEl.innerHTML = `${currentVal.toFixed(2)} <span style="color:${color}; font-size:0.65rem; font-weight:800; margin-left:2px;">${arrow}${Math.abs(changePercent).toFixed(2)}%</span>`;
+
+                    const prevVal = state.lastDisplayedRates24h[curr];
+
+                    // Zárva lévő piac esetén ne frissüljön és ne pattogjon tovább, ha már ki van írva egyszer
+                    if (!isOpen && prevVal !== null) {
+                        return;
+                    }
+
+                    if (prevVal === null || Math.abs(prevVal - currentVal) > 0.0001) {
+                        if (element) {
+                            element.innerHTML = formattedSideText;
+                            if (prevVal !== null && isOpen) triggerRatePopAnimation(element);
+                        }
+                        if (footerEl) {
+                            footerEl.innerHTML = formattedFooterText;
+                            if (prevVal !== null && isOpen) triggerRatePopAnimation(footerEl);
+                        }
+                        state.lastDisplayedRates24h[curr] = currentVal;
                     }
                 }
             });
@@ -1418,9 +1527,9 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
                         bar.classList.add('bar-hidden');
                         const items = [
                             document.getElementById('fri-eur'), document.getElementById('fri-usd'), document.getElementById('fri-chf'),
-                            document.getElementById('timeline-container'), document.getElementById('next-prog-alert'),
-                            document.getElementById('live-indicator'), document.getElementById('counter-display'),
-                            document.getElementById('prev-btn'), document.getElementById('next-btn')
+                            document.getElementById('market-closed-status'), document.getElementById('timeline-container'), 
+                            document.getElementById('next-prog-alert'), document.getElementById('live-indicator'), 
+                            document.getElementById('counter-display'), document.getElementById('prev-btn'), document.getElementById('next-btn')
                         ];
                         items.forEach(item => { if (item) item.classList.remove('item-active'); });
                     }
@@ -1433,6 +1542,7 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
                 document.getElementById('fri-eur'),
                 document.getElementById('fri-usd'),
                 document.getElementById('fri-chf'),
+                document.getElementById('market-closed-status'),
                 document.getElementById('timeline-container'),
                 document.getElementById('next-prog-alert'),
                 document.getElementById('live-indicator'),
@@ -1447,11 +1557,12 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
             setTimeout(() => { if (items[1]) items[1].classList.add('item-active'); }, 250);
             setTimeout(() => { if (items[2]) items[2].classList.add('item-active'); }, 400);
             setTimeout(() => { if (items[3]) items[3].classList.add('item-active'); }, 550);
+            setTimeout(() => { if (items[4]) items[4].classList.add('item-active'); }, 700);
             setTimeout(() => {
-                for (let i = 4; i < items.length; i++) {
+                for (let i = 5; i < items.length; i++) {
                     if (items[i]) items[i].classList.add('item-active');
                 }
-            }, 700);
+            }, 850);
         }
 
         function displaySchedule(){if(!state.block||state.block.name==='Elköszönés'||state.midnightActive)return;state.scheduleActive=true;if(state.weatherDisplayTimer)clearTimeout(state.weatherDisplayTimer);const currentIndex=THEMATIC_BLOCKS.findIndex(b=>b.name===state.block.name);const labels=["MOST","KÖVETKEZIK","KÉSŐBB"];const backHeader=document.getElementById('schedule-header');backHeader.style.display='flex';el.scheduleView.style.display='flex';el.promoView.style.display='none';let html='';for(let i=0;i<3;i++){const idx=(currentIndex+i)%THEMATIC_BLOCKS.length;const block=THEMATIC_BLOCKS[idx];const hour=Math.floor(block.start);const min=Math.round((block.start%1)*60);const timeStr=`${String(hour).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
@@ -1761,6 +1872,8 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
             updateSkyGradient();
             updateAnalogClock();
             updateEnrichmentBlock();
+            updateMarketStatusVisibility();
+
             const h=now.getHours()+now.getMinutes()/60;
             let currentBlock;
             if(state.testModeActive&&state.forcedBlock){
@@ -1960,7 +2073,6 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
         return filtered;
     }
     
-    // FRISSÍTETT HÍRLEKÉRŐ: Csak az adas.json, gyujto.json és on_this_day.json adatbázisokat használja
     async function refreshNews(silent=false){
         state.lastRefreshTimestamp=Date.now();
         if(!silent)el.loading.classList.add('active');
@@ -1987,7 +2099,6 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
             console.log("Hiba az on_this_day betöltésekor: " + e.toString());
         }
         
-        // 1. adas.json letöltése
         try {
             const response = await fetch(FIREBASE_URL + "/adas.json");
             const data = await response.json();
@@ -2010,7 +2121,6 @@ HUNGARIAN_CITIES_OM=[{name:'Debrecen',lat:47.53,lon:21.62},{name:'Miskolc',lat:4
             console.log("Hiba az adas.json betöltésekor: " + e.toString());
         }
         
-        // 2. gyujto.json letöltése (Az új, felhőben gyűjtött RSS hírek helye)
         try {
             const response = await fetch(FIREBASE_URL + "/gyujto.json");
             const data = await response.json();
@@ -2130,7 +2240,6 @@ function renderCard(item,isBreaking){
     const currentTrack=el[state.activeTrack==='a'?'trackA':'trackB'];
     const fav=getFavicon(item.link);
     
-    // A táblázatból származó nevet jelenítjük meg, csupa nagybetűvel, levágva a Firebase-es sallangokat
     const displaySource = stripFirebaseKeys(item.source || getSourceName(item.link)).toUpperCase().trim();
     const timeStr=item.date.toLocaleTimeString('hu-HU',{hour:'2-digit',minute:'2-digit'});
     nextTrack.className='news-card';
@@ -2197,7 +2306,6 @@ setInterval(updateTimeAndState,1000);
 refreshNews();
 updateTimeAndState();
 
-// Árfolyamfigyelő WebSocket
 rates24hRef.on('value', (snap) => {
     const val = snap.val();
     if (val) {
@@ -2208,7 +2316,6 @@ rates24hRef.on('value', (snap) => {
     }
 });
 
-// ÉLŐ BREAKING NEWS FIGYELŐ (A gyujto.json változásait követi valós időben a felhőből)
 let isFirstBreakingLoad = true;
 database.ref('gyujto').on('value', (snap) => {
     const data = snap.val();
@@ -2223,7 +2330,6 @@ database.ref('gyujto').on('value', (snap) => {
             isFirstBreakingLoad = false;
         } else {
             let newBreakingCount = 0;
-            // Legfrissebb hírek rendezése idő szerint, hogy a legutolsó fusson le utoljára
             const sortedItems = itemsArray.sort((a,b) => new Date(a.date) - new Date(b.date));
             sortedItems.forEach(item => {
                 if (item && item.link && !state.seenBreakingLinks.has(item.link)) {
